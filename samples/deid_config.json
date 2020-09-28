@@ -1,0 +1,62 @@
+{
+  "rules": [
+    {
+      "name": "HASH",
+      "maskingProviders": [
+        {
+          "type": "HASH"
+        }
+      ]
+    },
+    {
+      "name": "PHONE",
+      "maskingProviders": [
+        {
+          "type": "PHONE"
+        }
+      ]
+    },
+    {
+      "name": "NAME",
+      "maskingProviders": [
+        {
+          "type": "NAME"
+        }
+      ]
+    },
+    {
+      "name": "MaskBirthDay",
+      "maskingProviders": [
+        {
+          "type": "DATETIME",
+          "generalizeYear": true
+        }
+      ]
+    }
+  ],
+  "json": {
+    "schemaType": "FHIR",
+    "messageTypeKey": "resourceType",
+    "messageTypes": [
+      "Patient"
+    ],
+    "maskingRules": [
+      {
+        "jsonPath": "/fhir/Patient/name/given",
+        "rule": "HASH"
+      },
+      {
+        "jsonPath": "/fhir/Patient/name/family",
+        "rule": "NAME"
+      },
+      {
+        "jsonPath": "/fhir/Patient/telecom/value",
+        "rule": "PHONE"
+      },
+      {
+        "jsonPath": "/fhir/Patient/birthDate",
+        "rule": "MaskBirthDay"
+      }
+    ]
+  }
+}

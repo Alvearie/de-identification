@@ -1,0 +1,29 @@
+{
+  "resourceType": "Patient",
+  "id": "example",
+  "name": [
+    {
+      "use": "official",
+      "family": "Chalmers",
+      "given": [
+        "Peter",
+        "James"
+      ]
+    },
+    {
+      "use": "usual",
+      "given": [
+        "Jim"
+      ]
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "+1-3471234567",
+      "use": "work",
+      "rank": 1
+    }
+  ],
+  "birthDate": "1974-12-25"
+}
