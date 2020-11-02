@@ -8,6 +8,11 @@
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Sample packaging</name>
+        <properties>
+            <sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
+            <sonar.organization>alvearie</sonar.organization>
+            <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        </properties>
 
 	<!-- sub modules -->
 	<modules>
