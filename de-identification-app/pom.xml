@@ -13,7 +13,6 @@
 	<properties>
 		<swagger.version>2.0.3</swagger.version>
 		<springfox-version>2.7.0</springfox-version>
-		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<profiles>
