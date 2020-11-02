@@ -30,7 +30,7 @@
 	</properties>
 
 	<groupId>com.ibm.whc.deid</groupId>
-	<artifactId>de-id</artifactId>
+	<artifactId>de-identification</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1.master-SNAPSHOT</version>
 	<name>DeID</name>
