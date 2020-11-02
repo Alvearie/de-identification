@@ -23,14 +23,13 @@
 		<commons-compress.version>1.20</commons-compress.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
 		<sonar.organization>alvearie</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<groupId>com.ibm.whc.deid</groupId>
-	<artifactId>de-id</artifactId>
+	<artifactId>de-identification</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1.master-SNAPSHOT</version>
 	<name>DeID</name>
@@ -125,70 +124,9 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12.4</version>
-				<configuration>
-					<systemPropertyVariables>
-						<whc.lsf.config.properties.file>${whc.lsf.config.properties.file}</whc.lsf.config.properties.file>
-					</systemPropertyVariables>
-					<parallel>all</parallel>
-					<threadCount>12</threadCount>
-					<forkCount>2.0C</forkCount>
-					<threadCountSuites>8</threadCountSuites>
-					<threadCountClasses>8</threadCountClasses>
-					<threadCountMethods>8</threadCountMethods>
-					<parallelTestTimeoutInSeconds>40</parallelTestTimeoutInSeconds>
-					<parallelTestTimeoutForcedInSeconds>40</parallelTestTimeoutForcedInSeconds>
-					<perCoreThreadCount>true</perCoreThreadCount>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<source>LATEST</source>
-					<target>LATEST</target>
-					<doclint>none</doclint>
-				</configuration>
-			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.6</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>coverage</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>prepare-agent</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+	
 </project>
 
