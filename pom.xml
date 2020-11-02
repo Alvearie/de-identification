@@ -27,7 +27,6 @@
 		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
 		<sonar.organization>alvearie</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.scanner.force-deprecated-java-version>true</sonar.scanner.force-deprecated-java-version>
 	</properties>
 
 	<groupId>com.ibm.whc.deid</groupId>
@@ -158,11 +157,6 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.sonarsource.scanner.maven</groupId>
-					<artifactId>sonar-maven-plugin</artifactId>
-					<version>3.7.0.1746</version>
-				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
