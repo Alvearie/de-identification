@@ -5,7 +5,7 @@
 
 	<groupId>com.ibm.whc.deid</groupId>
 	<artifactId>de-id</artifactId>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<version>0.0.1.master-SNAPSHOT</version>
 	<name>DeID</name>
 
