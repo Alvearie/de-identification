@@ -13,6 +13,8 @@ public class SampleClassTest {
   @Test
   public void getHelloWorld() {
     SampleClass test = new SampleClass();
+    
+    System.out.println(SampleClass.TestA);
     assertEquals("Hello World!", test.getHelloWorld());
   }
 
