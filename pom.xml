@@ -15,11 +15,6 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
-	<!-- sub modules -->
-	<modules>
-		<module>sample-project</module>
-	</modules>
-
 	<build>
 		<plugins>
 			<plugin>
