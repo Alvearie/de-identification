@@ -13,12 +13,13 @@
 		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
 		<sonar.organization>alvearie</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 	</properties>
 
-        <!-- sub modules -->
-        <modules>
-                <module>sample-project</module>
-        </modules>
+	<!-- sub modules -->
+	<modules>
+		<module>sample-project</module>
+	</modules>
 
 	<dependencies>
 		<dependency>
@@ -39,6 +40,49 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
+				<configuration>
+					<systemPropertyVariables>
+						<whc.lsf.config.properties.file>${whc.lsf.config.properties.file}</whc.lsf.config.properties.file>
+					</systemPropertyVariables>
+					<parallel>all</parallel>
+					<threadCount>12</threadCount>
+					<forkCount>2.0C</forkCount>
+					<threadCountSuites>8</threadCountSuites>
+					<threadCountClasses>8</threadCountClasses>
+					<threadCountMethods>8</threadCountMethods>
+					<parallelTestTimeoutInSeconds>40</parallelTestTimeoutInSeconds>
+					<parallelTestTimeoutForcedInSeconds>40</parallelTestTimeoutForcedInSeconds>
+					<perCoreThreadCount>true</perCoreThreadCount>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<source>LATEST</source>
+					<target>LATEST</target>
+					<doclint>none</doclint>
+				</configuration>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>3.7.0.1746</version>
+				</plugin>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.6</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
