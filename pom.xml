@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ibm.whc.deid</groupId>
-	<artifactId>de-identification</artifactId>
+	<artifactId>de-id</artifactId>
 	<packaging>pom</packaging>
-    <version>0.0.1.master-SNAPSHOT</version>
+	<version>0.0.1.master-SNAPSHOT</version>
 	<name>Sample packaging</name>
-	
+
 	<properties>
 		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
 		<sonar.organization>alvearie</sonar.organization>
