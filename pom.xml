@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ibm.whc.deid</groupId>
@@ -9,17 +10,23 @@
 	<packaging>pom</packaging>
 	<name>DeID</name>
 
-	<properties>
-		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
-		<sonar.organization>alvearie</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
-	</properties>
-
 	<!-- sub modules -->
 	<modules>
 		<module>sample-project</module>
 	</modules>
+
+	<properties>
+		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
+		<sonar.organization>alvearie</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<aggregate.report.dir>tests/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+	</properties>
+
+
 
 	<dependencies>
 		<dependency>
@@ -31,47 +38,45 @@
 	</dependencies>
 
 	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12.4</version>
-				<configuration>
-					<systemPropertyVariables>
-						<whc.lsf.config.properties.file>${whc.lsf.config.properties.file}</whc.lsf.config.properties.file>
-					</systemPropertyVariables>
-					<parallel>all</parallel>
-					<threadCount>12</threadCount>
-					<forkCount>2.0C</forkCount>
-					<threadCountSuites>8</threadCountSuites>
-					<threadCountClasses>8</threadCountClasses>
-					<threadCountMethods>8</threadCountMethods>
-					<parallelTestTimeoutInSeconds>40</parallelTestTimeoutInSeconds>
-					<parallelTestTimeoutForcedInSeconds>40</parallelTestTimeoutForcedInSeconds>
-					<perCoreThreadCount>true</perCoreThreadCount>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<source>LATEST</source>
-					<target>LATEST</target>
-					<doclint>none</doclint>
-				</configuration>
-			</plugin>
-		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version>
+					<configuration>
+						<source>1.8</source>
+						<target>1.8</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.12.4</version>
+					<configuration>
+						<systemPropertyVariables>
+							<whc.lsf.config.properties.file>${whc.lsf.config.properties.file}</whc.lsf.config.properties.file>
+						</systemPropertyVariables>
+						<parallel>all</parallel>
+						<threadCount>12</threadCount>
+						<forkCount>2.0C</forkCount>
+						<threadCountSuites>8</threadCountSuites>
+						<threadCountClasses>8</threadCountClasses>
+						<threadCountMethods>8</threadCountMethods>
+						<parallelTestTimeoutInSeconds>40</parallelTestTimeoutInSeconds>
+						<parallelTestTimeoutForcedInSeconds>40</parallelTestTimeoutForcedInSeconds>
+						<perCoreThreadCount>true</perCoreThreadCount>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.0.0</version>
+					<configuration>
+						<source>LATEST</source>
+						<target>LATEST</target>
+						<doclint>none</doclint>
+					</configuration>
+				</plugin>
 				<plugin>
 					<groupId>org.sonarsource.scanner.maven</groupId>
 					<artifactId>sonar-maven-plugin</artifactId>
@@ -85,4 +90,29 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>coverage</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
