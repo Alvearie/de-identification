@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.ibm.whc.deid</groupId>
-	<artifactId>de-id</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>de-identification</artifactId>
 	<version>0.0.1.master-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>DeID</name>
 
 	<properties>

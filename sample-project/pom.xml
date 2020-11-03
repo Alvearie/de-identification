@@ -6,9 +6,12 @@
 
 	<name>DeID Endpoint</name>
 	<packaging>jar</packaging>
-	<groupId>com.ibm.whc.deid</groupId>
-	<artifactId>de-identification-app</artifactId>
-	<version>0.0.1.master-SNAPSHOT</version>
+		<artifactId>de-identification-app</artifactId>
+	<parent>
+		<groupId>com.ibm.whc.deid</groupId>
+		<artifactId>de-identification</artifactId>
+		<version>0.0.1.master-SNAPSHOT</version>
+	</parent>
 
 	<dependencies>
 		<dependency>
