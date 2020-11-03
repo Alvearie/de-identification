@@ -9,6 +9,9 @@ public class SampleClass {
   public static String TestA = "hello";
 
   public String getHelloWorld() {
+    if (1 == 1) {
+      System.out.println("Test");
+    }
 
     return "Hello World!";
   }
