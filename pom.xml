@@ -3,16 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.ibm.sample</groupId>
-	<artifactId>samplePackage</artifactId>
+	<groupId>com.ibm.whc.deid</groupId>
+	<artifactId>de-identification</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1.master-SNAPSHOT</version>
 	<name>Sample packaging</name>
-        <properties>
-            <sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
-            <sonar.organization>alvearie</sonar.organization>
-            <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        </properties>
+	
+	<properties>
+		<sonar.projectKey>Alvearie_de-identification</sonar.projectKey>
+		<sonar.organization>alvearie</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+	</properties>
 
 	<!-- sub modules -->
 	<modules>
