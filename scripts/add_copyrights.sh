@@ -40,16 +40,15 @@ function pushCopyrightChangesToRepo() {
   git push
 
   # Create a pull request
-  createPullRequest $repo $TEMP_BRANCH "Trigger Tooling build"
+  createPullRequest $TEMP_BRANCH "Trigger Tooling build"
 
   # Delete the temporary branch
   git push origin --delete $TEMP_BRANCH
 }
 
 function createPullRequest() {
-  repo=$1
-  branch=$2
-  message=$3
+  branch=$1
+  message=$2
 
   FUNCTIONAL_ID=c3cvpfj7@ca.ibm.com
   git config --global user.email "$FUNCTIONAL_ID"
@@ -61,7 +60,7 @@ function createPullRequest() {
   PULL_REQUEST=`curl -H "Authorization: token $GITAPIKEY " \
      --request POST\
      --data '{ "title": "Tooling create PR", "body": "Tooling create PR", "head": "'$branch'", "base": "master" }'\
-     https://api.github.com/repos/Alvearie/$repo/pulls | grep "\"url\"" |grep pulls`
+     https://api.github.com/repos/Alvearie/de-identification/pulls | grep "\"url\"" |grep pulls`
   echo "PULL_REQUEST $PULL_REQUEST"
  
   # Extract the URL by removing the last character, get the second token, and trim quotes
