@@ -1,0 +1,9 @@
+{
+	"/gen/Patient/identifier/assigner/display": "HASH",
+	"/gen/Patient/identifier/assigner/reference": "HASH",
+	"/gen/Patient/identifier/system": "NULL",
+	"/gen/Patient/identifier/type/coding/code": "HASH",
+	"/gen/Patient/identifier/period/start": "HASH",
+	"/gen/Patient/identifier/type/text": "NULL",
+	"/gen/Patient/identifier/value": "NULL"
+}

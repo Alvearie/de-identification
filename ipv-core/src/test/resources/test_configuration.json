@@ -1,0 +1,13 @@
+{
+  "rules" : {
+    "field1": {
+      "phone.countryCode.preserve": false
+    },
+    "field2": {
+      "phone.countryCode.preserve": true
+    }
+  },
+  "keys": {
+    "phone.countryCode.preserve": false
+  }
+}

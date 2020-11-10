@@ -1,0 +1,45 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "d8b63b4f-f80e-4e64-9c11-10f638186f72",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2017-03-29T16:40:00.636Z"
+  },
+  "extension": [
+    {
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/studyid",
+      "valueString": "reference"
+    },
+    {
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/siteid",
+      "valueString": "reference"
+    }
+  ],
+  "version": "1",
+  "status": "published",
+  "group": {
+    "linkId": "1.0",
+    "title": "General Questions",
+    "required": true,
+    "question": [
+      {
+        "linkId": "1.1",
+        "text": "On a scale of 1 to 10, 10 being the best, how are you feeling today?",
+        "type": "text",
+        "required": true
+      },
+      {
+        "linkId": "1.2",
+        "text": "Have you taken your medication today?",
+        "type": "text",
+        "required": true
+      },
+      {
+        "linkId": "1.3",
+        "text": "Have you exercised today?",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+}

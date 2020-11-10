@@ -1,0 +1,1943 @@
+{
+	"errorMessage": {
+		"default.masking.provider": "RANDOM"
+	},
+	"event/purposeOfEvent/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"event/purposeOfEvent/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"event/subtype/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"event/subtype/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/detail/databaseName": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/detail/fieldName": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"object/name": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/reference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"object/reference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"participant/location/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/location/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"participant/reference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/reference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"participant/userId/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/userId/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"participant/userId/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/userId/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"ptpsVersion": {
+		"default.masking.provider": "RANDOM"
+	},
+	"source/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"source/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"source/identifier/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"source/identifier/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"status": {
+		"default.masking.provider": "RANDOM"
+	},
+	"versionNumber": {
+		"default.masking.provider": "RANDOM"
+	},
+	"MQMsgID": {
+		"default.masking.provider": "RANDOM"
+	},
+	"UUID": {
+		"default.masking.provider": "RANDOM"
+	},
+    "url": {
+        "default.masking.provider": "NULL"
+    },	
+	"activity/actionResulting/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/actionResulting/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/category/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/category/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/category/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/dailyAmount/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/dailyAmount/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/dailyAmount/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/dailyAmount/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/description": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/goal/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/goal/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/location/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/location/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/performer/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/performer/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/productCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/productCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/productCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/productReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/productReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/quantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/quantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/quantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/quantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/reasonCode/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/reasonCode/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/reasonCode/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/reasonReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/reasonReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/detail/scheduledString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/event": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsPeriod/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsPeriod/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/high/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/high/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/high/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/high/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/low/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/low/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/low/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/boundsRange/low/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/count": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/duration": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/durationMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/durationUnits": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/frequency": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/frequencyMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/period": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/periodMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/periodUnits": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/scheduledTiming/repeat/when": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/statusReason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/statusReason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/detail/statusReason/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/note/authorReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/note/authorReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/note/authorString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/note/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/note/time": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/progress/authorReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/progress/authorReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"activity/progress/authorString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/progress/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/progress/time": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/reference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"activity/reference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"addresses/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"addresses/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"author/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"author/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"category/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"category/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"category/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"coachChangeTime": {
+		"default.masking.provider": "RANDOM"
+	},
+	"coachDays": {
+		"default.masking.provider": "RANDOM"
+	},
+	"coachHasChanged": {
+		"default.masking.provider": "RANDOM"
+	},
+	"context/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"context/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"description": {
+		"default.masking.provider": "RANDOM"
+	},
+	"deviceInfo": {
+		"default.masking.provider": "RANDOM"
+	},
+	"goal/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"goal/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"identifier/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"modified": {
+		"default.masking.provider": "RANDOM"
+	},
+	"objectReference": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/member/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/member/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"participant/role/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/role/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/role/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"participant/role/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"relatedPlan/plan/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"relatedPlan/plan/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"requestID": {
+		"default.masking.provider": "RANDOM"
+	},
+	"subject/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"subject/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"support/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"support/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"action/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"action/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"action/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actionReason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actionReason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actionReason/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actor/entity/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actor/entity/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"actor/role/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actor/role/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"actor/role/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"authority/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"authority/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"bindingReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"bindingReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"consentName": {
+		"default.masking.provider": "RANDOM"
+	},
+	"consentVersion": {
+		"default.masking.provider": "RANDOM"
+	},
+	"consentVersionDate": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dataToShare ": {
+		"default.masking.provider": "RANDOM"
+	},
+	"domain/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"domain/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"friendly/contentReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"friendly/contentReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"legal/contentReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"legal/contentReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"rule/contentReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"rule/contentReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"signer/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"signer/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"signer/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"signer/party/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"signer/party/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"signer/signature": {
+		"default.masking.provider": "RANDOM"
+	},
+	"subType/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"subType/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"subType/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/action/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/action/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/action/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/action/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actionReason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actionReason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actionReason/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actionReason/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actor/entity/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/actor/entity/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"term/group": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"term/identifier/period/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/period/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/type/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/identifier/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/role/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/role/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/role/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/role/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subType/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subType/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subType/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subType/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subject/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/subject/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"term/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/type/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/entityCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/entityCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/entityCodeableConcept/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/entityCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/factor": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"term/valuedItem/identifier/period/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/period/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/type/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/identifier/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/net/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/net/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/net/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/net/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/points": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/quantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/quantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/quantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/quantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/unitPrice/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/unitPrice/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/unitPrice/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"term/valuedItem/unitPrice/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueItem/entityReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueItem/entityReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"valuedItem/entityCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/entityCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/entityCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/factor": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"valuedItem/identifier/period/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/period/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/identifier/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/net/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/net/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/net/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/net/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/points": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/quantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/quantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/quantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/quantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/unitPrice/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/unitPrice/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/unitPrice/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valuedItem/unitPrice/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"authorReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"authorReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"authorString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/rank": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/use": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"expiry": {
+		"default.masking.provider": "NULL"
+	},
+	"location/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"location/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"lotNumber": {
+		"default.masking.provider": "RANDOM"
+	},
+	"manufacturer": {
+		"default.masking.provider": "RANDOM"
+	},
+	"manufacturerDate": {
+		"default.masking.provider": "RANDOM"
+	},
+	"messageID": {
+		"default.masking.provider": "RANDOM"
+	},
+	"model": {
+		"default.masking.provider": "RANDOM"
+	},
+	"nickName": {
+		"default.masking.provider": "RANDOM"
+	},
+	"owner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"owner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"patient/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"patient/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"time": {
+		"default.masking.provider": "RANDOM"
+	},
+	"udi": {
+		"default.masking.provider": "RANDOM"
+	},
+	"version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/period/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"identifier/period/start": {
+		"default.masking.provider": "HASH"
+	},
+	"languageCode/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"languageCode/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"languageCode/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"lastSystemChange": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPrinciple": {
+		"default.masking.provider": "RANDOM"
+	},
+	"operationalStatus/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"operationalStatus/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"operationalStatus/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"parameterGroup/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"parameterGroup/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"parameterGroup/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"parent/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"parent/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"productionSpecification/componentId/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"productionSpecification/componentId/period/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/period/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/type/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/use": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/componentId/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/productSpec": {
+		"default.masking.provider": "RANDOM"
+	},
+	"productionSpecification/specType": {
+		"default.masking.provider": "RANDOM"
+	},
+	"source/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"source/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"calibration/state": {
+		"default.masking.provider": "RANDOM"
+	},
+	"calibration/time": {
+		"default.masking.provider": "RANDOM"
+	},
+	"calibration/type": {
+		"default.masking.provider": "RANDOM"
+	},
+	"category": {
+		"default.masking.provider": "RANDOM"
+	},
+	"color": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/event": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsPeriod/end": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsPeriod/start": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/high/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/high/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/high/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/high/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/low/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/low/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/low/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/boundsRange/low/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/count": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/duration": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/durationMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/durationUnits": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/frequency": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/frequencyMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/period": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/periodMax": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/periodUnits": {
+		"default.masking.provider": "RANDOM"
+	},
+	"measurementPeriod/repeat/when": {
+		"default.masking.provider": "RANDOM"
+	},
+	"unit/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"unit/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"unit/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/high/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/high/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/high/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/high/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/low/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/low/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/low/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"characteristic/valueRange/low/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"member/entity/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"member/entity/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"name": {
+		"default.masking.provider": "RANDOM"
+	},
+	"address/city": {
+		"default.masking.provider": "RANDOM"
+	},
+	"address/district": {
+		"default.masking.provider": "RANDOM"
+	},
+	"address/line": {
+		"default.masking.provider": "RANDOM"
+	},
+	"address/postalCode": {
+		"default.masking.provider": "RANDOM"
+	},
+	"address/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"documentStatus": {
+		"default.masking.provider": "RANDOM"
+	},
+	"geoLocation": {
+		"default.masking.provider": "RANDOM"
+	},
+	"managingOrganization/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"managingOrganization/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"partOf/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"partOf/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"physicalType/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"physicalType/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"physicalType/coding/version": {
+		"default.masking.provider": "RANDOM"
+	},
+	"position/altitude": {
+		"default.masking.provider": "RANDOM"
+	},
+	"position/latitude": {
+		"default.masking.provider": "RANDOM"
+	},
+	"position/longitude": {
+		"default.masking.provider": "RANDOM"
+	},
+	"telecom/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"manufacturer/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"manufacturer/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"package": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/container/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/container/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/container/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/contect/amount": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/content": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/content/item/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"package/content/item/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"product/batch": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/batch/expirationDate": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/batch/lotNumber": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/form/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/form/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/form/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/ingredient/item/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"product/ingredient/item/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"Dosage PeakFlow": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Dosage PeakOffset": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Dosage Volume": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Inhale": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Inhaler Cap Open": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Total Device Doses": {
+		"default.masking.provider": "RANDOM"
+	},
+	"Total Remaining Device Doses": {
+		"default.masking.provider": "RANDOM"
+	},
+	"cartridgeUID ": {
+		"default.masking.provider": "RANDOM"
+	},
+	"device/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"device/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"dosage": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/method/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/method/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/route/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/route/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/siteCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/siteCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/siteReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosage/siteReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"dosage/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"doseID ": {
+		"default.masking.provider": "RANDOM"
+	},
+	"encounter/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"encounter/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"medicationCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"medicationCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"medicationReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"medicationReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"note": {
+		"default.masking.provider": "NULL"
+	},
+	"practitioner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"practitioner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"prescription/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"prescription/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"reasonGiven/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonGiven/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonNotGiven/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonNotGiven/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"upperThresholdDuration": {
+		"default.masking.provider": "RANDOM"
+	},
+	"upperThresholdDurationUOM": {
+		"default.masking.provider": "RANDOM"
+	},
+	"upperThresholdOffset": {
+		"default.masking.provider": "RANDOM"
+	},
+	"upperThresholdOffsetUOM": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dispenseRequest/medicationCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dispenseRequest/medicationCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dispenseRequest/medicationReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dispenseRequest/medicationReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"dispenseRequest/numberOfRepeatsAllowed": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/additionalInstructions/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/additionalInstructions/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/asNeededCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/asNeededCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/method/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/method/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/route/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/route/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/siteCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/siteCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/siteReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/siteReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"dosageInstruction/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/event": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/repeat/boundsQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/repeat/boundsQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/repeat/boundsQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dosageInstruction/timing/repeat/boundsQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"prescriber/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"prescriber/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"priorPrescription/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"priorPrescription/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"reasonCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonEnded/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonEnded/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"reasonReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"substitution/reason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"substitution/reason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"substitution/type/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"substitution/type/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"bodySite/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"bodySite/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"bodySite/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/code/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/code/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/code/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/dataAbsentReason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/dataAbsentReason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/dataAbsentReason/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/referenceRange": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRange/high": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRange/low": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/denominator/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/denominator/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/denominator/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/denominator/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/numerator/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/numerator/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/numerator/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueRatio/numerator/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/data": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/dimensions": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/factor": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/lowerlimit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/origin": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/period": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueSampledData/upperlimit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"component/valueString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dataAbsentReason/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dataAbsentReason/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"dataAbsentReason/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"interpretation/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"interpretation/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"interpretation/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"method/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"method/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"method/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"performer/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"performer/reference": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/age/high": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/age/low": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/high": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/low": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/meaning/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/meaning/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/meaning/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"referenceRange/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"related/target/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"related/target/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"related/type": {
+		"default.masking.provider": "RANDOM"
+	},
+	"specimen/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"specimen/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"valueCodeableConcept/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueCodeableConcept/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueCodeableConcept/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRange/high": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRange/low": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/denominator/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/denominator/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/denominator/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/denominator/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/numerator/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/numerator/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/numerator/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueRatio/numerator/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/data": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/dimensions": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/factor": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/lowerlimit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/origin": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/period": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueSampledData/upperlimit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"valueString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"birthDate": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/address/city": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/address/district": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/address/line": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/address/postalCode": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/address/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/name/family": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/name/given": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/name/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/relationship/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/relationship/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/telecom/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"deceasedDateTime": {
+		"default.masking.provider": "RANDOM"
+	},
+	"family": {
+		"default.masking.provider": "RANDOM"
+	},
+	"federationNumber": {
+		"default.masking.provider": "RANDOM"
+	},
+	"gender": {
+		"default.masking.provider": "GENDER"
+	},
+	"given": {
+		"default.masking.provider": "RANDOM"
+	},
+	"maritalStatus/coding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"maritalStatus/coding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"maritalStatus/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"ptpsIdentifier": {
+		"default.masking.provider": "RANDOM"
+	},
+	"text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"contact/email/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"name/family": {
+		"default.masking.provider": "RANDOM"
+	},
+	"name/given": {
+		"default.masking.provider": "RANDOM"
+	},
+	"name/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"practitionerRole/healthcareService/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"practitionerRole/healthcareService/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"practitionerRole/location/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"practitionerRole/location/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"practitionerRole/managingOrganization/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"practitionerRole/managingOrganization/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"qualification/identifier/assigner/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"qualification/identifier/assigner/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"qualification/issuer/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"qualification/issuer/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"group/linkId": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueBoolean": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueCoding/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueCoding/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueDate": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueDateTime": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueDecimal": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueInstant": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueInteger": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueQuantity/code": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueQuantity/comparator": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueQuantity/system": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueQuantity/unit": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueQuantity/value": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueReference/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueReference/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"group/question/answer/valueString": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueTime": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/answer/valueUri": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/linkId": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/question/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/subject/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/subject/reference": {
+		"default.masking.provider": "HASH"
+	},
+	"group/text": {
+		"default.masking.provider": "RANDOM"
+	},
+	"group/title": {
+		"default.masking.provider": "RANDOM"
+	},
+	"questionnaire/display": {
+		"default.masking.provider": "RANDOM"
+	},
+	"questionnaire/reference": {
+		"default.masking.provider": "HASH"
+	}
+}

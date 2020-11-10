@@ -1,0 +1,22 @@
+{
+  "basePath": "/fhir/Device",
+
+  "fields": {
+
+    "url" : {
+      "path": "/url",
+      "fhirType": null
+    },
+
+    "type" : {
+      "path": "/type",
+      "fhirType": "CodeableConcept"
+    },
+
+    "noteAuthorReference" : {
+      "path": "/note/authorReference",
+      "fhirType": "Reference"
+    }
+
+  }
+}

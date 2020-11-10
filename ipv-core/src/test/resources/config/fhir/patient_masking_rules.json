@@ -1,0 +1,9 @@
+{
+	"/fhir/Patient/identifier/assigner/display": "HASH",
+	"/fhir/Patient/identifier/assigner/reference": "HASH",
+	"/fhir/Patient/identifier/system": "NULL",
+	"/fhir/Patient/identifier/type/coding/code": "HASH",
+	"/fhir/Patient/identifier/period/start": "HASH",
+	"/fhir/Patient/identifier/type/text": "HASH",
+	"/fhir/Patient/identifier/value": "NULL"
+}
