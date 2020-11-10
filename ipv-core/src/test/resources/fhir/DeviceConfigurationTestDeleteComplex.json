@@ -1,0 +1,18 @@
+{
+  "basePath": "/fhir/Device",
+
+  "fields": {
+
+    "note" : {
+      "path": "/note",
+      "fhirType": "Delete"
+    },
+
+    "expiry" : {
+      "path": "/expiry",
+      "fhirType": "Delete"
+    }
+
+
+  }
+}

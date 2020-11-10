@@ -1,0 +1,31 @@
+{
+    "delimiter": ",",
+    "quoteChar": "\"",
+
+    "fieldsList": [
+    ],
+
+    "types" : {},
+
+    "schemaType": "FHIR",
+  	"messageTypeKey" : "resourceType", 
+   	"messageTypeValues": "Questionnaire,Device,DeviceMetric,DeviceComponent,Patient,Practitioner,Location,Organization,Observation,Medication,MedicationOrder,MedicationAdministration,Contract,QuestionnaireResponse,BodySite,Group,CarePlan,AuditEvent",
+  
+
+    "inputFormat": "JSON",
+    "outputFormat": "JSON",
+    "defNoRuleRes": true,
+
+    "siteIDKey" : "siteID",
+    "ingestIDKey" : "ingestID",
+    "studyIDKey": "studyID",
+
+    "identifyRelationships": false,
+
+    "predefinedRelationships": [],
+
+    "consistentMasking": [],
+
+    "globalConsistentMasking" : null
+
+}
