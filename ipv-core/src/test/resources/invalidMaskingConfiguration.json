@@ -1,0 +1,17 @@
+{
+  "address.city.mask": {
+    "value": true,
+    "description": "Mask city",
+    "category": "Address"
+  }
+  "address.country.mask": {
+    "value": true,
+    "description": "Mask country",
+    "category": "Address"
+  },
+  "address.mask.pseudorandom": {
+    "value": false,
+    "description": "Mask based on pseudorandom function",
+    "category": "Address"
+  }
+}

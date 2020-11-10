@@ -1,0 +1,17 @@
+{
+  "basePath": "/fhir/Device",
+
+  "fields": {
+
+    "owner" : {
+      "path": "/note/authorReference",
+      "fhirType": "Reference"
+    },
+
+    "contact" : {
+      "path": "/contact",
+      "fhirType": "ContactPoint"
+    }
+
+  }
+}

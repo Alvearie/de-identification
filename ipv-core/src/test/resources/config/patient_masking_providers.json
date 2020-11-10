@@ -1,0 +1,9 @@
+{
+	"HASH": {
+		"default.masking.provider": "HASH"
+	},
+	"NULL": {
+		"maskReturnNull": true,
+		"default.masking.provider": "NULL"
+	}
+}

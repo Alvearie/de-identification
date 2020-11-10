@@ -1,0 +1,13 @@
+{
+  "basePath": "/fhir/Device",
+
+  "fields": {
+
+    "expiry" : {
+      "path": "/expiry",
+      "fhirType": null
+    }
+
+
+  }
+}

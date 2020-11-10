@@ -1,0 +1,103 @@
+/**
+ * ***************************************************************************** IBM Confidential
+ * OCO Source Materials 5737-D31, 5737-A56 (C) Copyright IBM Corp. 2020
+ *
+ * <p>
+ * The source code for this program is not published or otherwise divested of its trade secrets,
+ * irrespective of what has been deposited with the U.S. Copyright Office.
+ * *****************************************************************************
+ */
+package com.ibm.whc.deid.providers.identifiers;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.ibm.whc.deid.identifiers.EntityType;
+import com.ibm.whc.deid.identifiers.EntityTypes;
+
+public class BuiltInIdentifierFactory {
+
+	/**
+	 * Get an Identifier based on the input type
+	 *
+	 * @param type
+	 * @return
+	 */
+	public Identifier getIdentifier(EntityTypes type, String tenantId) {
+		switch ((EntityType) type) {
+		case ADDRESS:
+			return new AddressIdentifier();
+		case ATC:
+			return new ATCIdentifier();
+		case CITY:
+			return new CityIdentifier();
+		case CONTINENT:
+			return new ContinentIdentifier();
+		case COUNTRY:
+			return new CountryIdentifier();
+		case COUNTY:
+			return new CountyIdentifier();
+		case CREDIT_CARD:
+			return new CreditCardIdentifier();
+		case CREDIT_CARD_TYPE:
+			return new CreditCardTypeIdentifier();
+		case DATETIME:
+			return new DateTimeIdentifier();
+		case EMAIL:
+			return new EmailIdentifier();
+		case GENDER:
+			return new GenderIdentifier();
+		case HOSPITAL:
+			return new HospitalIdentifier();
+		case IBAN:
+			return new IBANIdentifier();
+		case ICDV9:
+			return new ICDv9Identifier();
+		case ICDV10:
+			return new ICDv10Identifier();
+		case IMEI:
+			return new IMEIIdentifier();
+		case IP_ADDRESS:
+			return new IPAddressIdentifier();
+		case LATITUDE_LONGITUDE:
+			return new LatitudeLongitudeIdentifier();
+		case MAC_ADDRESS:
+			return new MACAddressIdentifier();
+		case MARITAL_STATUS:
+			return new MaritalStatusIdentifier();
+		case NAME:
+			return new NameIdentifier();
+		case OCCUPATION:
+			return new OccupationIdentifier();
+		case RACE:
+			return new RaceEthnicityIdentifier();
+		case RELIGION:
+			return new ReligionIdentifier();
+		case STATES_US:
+			return new StatesUSIdentifier();
+		case SWIFT:
+			return new SWIFTCodeIdentifier();
+		case VIN:
+			return new VINIdentifier();
+		case ZIPCODE:
+			return new ZIPCodeIdentifier();
+		default:
+			throw new IllegalArgumentException("Unknown type " + type);
+		}
+
+	}
+
+	public Collection<Identifier> getAvailableIdentifiers(String tenantId) {
+		Set<Identifier> identifiers = new HashSet<Identifier>();
+
+		Arrays.stream(EntityType.values()).forEach(e -> {
+			identifiers.add(getIdentifier(e, tenantId));
+		});
+
+		return identifiers;
+
+	}
+
+}

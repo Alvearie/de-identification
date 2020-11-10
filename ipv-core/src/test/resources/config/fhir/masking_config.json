@@ -1,0 +1,107 @@
+{
+	"rules": [
+		{
+			"name": "HASH",
+			"maskingProviders": [
+				{
+					"type": "HASH",
+				       "algorithmDefault": "SHA-256",
+			    		"offsetOffsetMask": false,
+					"offsetOffsetMaskDelete": false,
+					"offsetBegin": -1,
+					"offsetEnd": -1,
+					"offsetInvalidOffsetValue": 1,
+					"salt": ""
+				}
+			]
+		},
+		{
+			"name": "NULL",
+			"maskingProviders": [
+				{
+					"type": "NULL",
+					"maskReturnNull": true
+				}
+			]
+		}
+	],
+	"defaultNoRuleResolution": true,
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Questionnaire",
+			"Device",
+			"DeviceMetric",
+			"DeviceComponent",
+			"Patient",
+			"Practitioner",
+			"Location",
+			"Organization",
+			"Observation",
+			"Medication",
+			"MedicationOrder",
+			"MedicationAdministration",
+			"Contract",
+			"QuestionnaireResponse",
+			"BodySite",
+			"Group",
+			"CarePlan",
+			"AuditEvent"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Patient/identifier/assigner/display",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/assigner/reference",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/system",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/type/coding/code",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/period/start",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/type/text",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/value",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Device/identifier/system",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Device/identifier/value",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Device/identifier/type/text",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Device/system/value",
+				"rule": "NULL"
+			},
+			{
+				"jsonPath": "/fhir/Patient/address/city",
+				"rule": "HASH"
+			},
+			{
+				"jsonPath": "/fhir/Device/patient/reference",
+				"rule": "HASH"
+			}
+		]
+	}
+}

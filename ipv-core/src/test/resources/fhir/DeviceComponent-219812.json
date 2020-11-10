@@ -1,0 +1,97 @@
+{
+  "resourceType": "DeviceComponent",
+  "id": "b89a70a3-17f2-4c08-b399-0a4970733cae",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2017-01-13T19:32:00.380Z"
+  },
+  "contained": [
+    {
+      "resourceType": "Device",
+      "id": "d1",
+      "identifier": [
+        {
+          "type": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/identifier-type",
+                "code": "SNO"
+              }
+            ]
+          },
+          "value": "ID 13.1"
+        },
+        {
+          "type": {
+            "text": "Global Medical Device Nomenclature"
+          },
+          "system": "urn:iso:std:iso:11073:10101",
+          "value": "2000"
+        }
+      ],
+      "type": {
+        "coding": [
+          {
+            "system": "urn:iso:std:iso:11073:10101",
+            "code": "2000",
+            "display": "MDC_DEV_ANALY_SAT_O2_MDS"
+          }
+        ]
+      },
+      "manufacturer": "Center4MI",
+      "model": "2-0-14"
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/studyid",
+      "valueString": "SYSST1"
+    },
+    {
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/siteid",
+      "valueString": "SYSSI1"
+    },
+    {
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/patientid",
+      "valueString": "OS:INGConsented_patientid1"
+    }
+  ],
+  "type": {
+    "coding": [
+      {
+        "system": "urn:iso:std:iso:11073:10101",
+        "code": "2000",
+        "display": "MDC_DEV_ANALY_SAT_O2_MDS"
+      }
+    ]
+  },
+  "identifier": {
+    "type": {
+      "text": "Handle ID"
+    },
+    "value": "0"
+  },
+  "lastSystemChange": "2014-10-07T14:45:00Z",
+  "source": {
+    "reference": "#d1"
+  },
+  "operationalStatus": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:11073:10101",
+          "code": "0",
+          "display": "disconnected"
+        }
+      ]
+    }
+  ],
+  "languageCode": {
+    "coding": [
+      {
+        "system": "http://tools.ietf.org/html/bcp47",
+        "code": "en-US"
+      }
+    ]
+  }
+}
