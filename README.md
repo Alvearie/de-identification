@@ -11,4 +11,4 @@ The samples directory contains the following files:
 
 
 # Contributing
-Please review the [contributing guide](docs/contributing) for information on how to get started contributing to the project.
+Please review the [contributing guide](docs/contributing.md) for information on how to get started contributing to the project.
