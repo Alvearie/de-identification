@@ -63,20 +63,6 @@ function createPullRequest() {
      https://api.github.com/repos/Alvearie/de-identification/pulls | grep "\"url\"" |grep pulls`
   echo "PULL_REQUEST $PULL_REQUEST"
  
-  # Extract the URL by removing the last character, get the second token, and trim quotes
-  PULL_REQUEST_URL=`echo ${PULL_REQUEST%?} | awk '{print $2}' |tr -d '"'`
-  echo "PR URL $PULL_REQUEST_URL"
-  
-  # Approve the pull request
-  curl -H "Authorization: token $GITAPIKEY" \
-       --request POST\
-       --data '{ "body": "Tooling approve PR", "event": "APPROVE" }'      $PULL_REQUEST_URL/reviews
-
-  # Merge the PR
-  curl -H "Authorization: token $GITAPIKEY" \
-      --request PUT\
-      --data '{"commit_title": "Tooling merge PR", "commit_message": "Tooling merge PR", "merge_method": "merge"  }'\
-      $PULL_REQUEST_URL/merge
 }
 
 
