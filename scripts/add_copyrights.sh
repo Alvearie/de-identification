@@ -1,6 +1,7 @@
 #
 # Create a GIT branch from master if the GIT branch does not exist
 #
+#
 # Params:
 #   Name of the repo
 #   Name of the branch in the repo
