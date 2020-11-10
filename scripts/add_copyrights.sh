@@ -61,7 +61,7 @@ function createPullRequest() {
   PULL_REQUEST=`curl -H "Authorization: token $GITAPIKEY " \
      --request POST\
      --data '{ "title": "Tooling create PR", "body": "Tooling create PR", "head": "'$branch'", "base": "master" }'\
-     https://api.github.com/repos/de-identification/$repo/pulls | grep "\"url\"" |grep pulls`
+     https://api.github.com/repos/Alvearie/$repo/pulls | grep "\"url\"" |grep pulls`
   echo "PULL_REQUEST $PULL_REQUEST"
  
   # Extract the URL by removing the last character, get the second token, and trim quotes
@@ -92,7 +92,7 @@ for f in `cat filesWithoutCopyrights.txt`; do echo ${f}; sed -i '1s/^/\/*\n \* \
 # Create a pull request and commit it, if there are files
 git diff --exit-code
 if [ $? != "0" ]; then
-    pushCopyrightChangesToRepo internal-de-identification
+    pushCopyrightChangesToRepo de-identification
 else
     echo "No files needed their copyrights adjusted"
 fi
