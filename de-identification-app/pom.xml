@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.ibm.whc.deid</groupId>
 		<artifactId>de-identification</artifactId>
-		<version>0.0.1.master-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 
 	<properties>
@@ -214,6 +214,10 @@
 						<phase>verify</phase>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 		<pluginManagement>

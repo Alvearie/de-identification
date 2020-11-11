@@ -3,6 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
+		<revision>0.0.1-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hbase.version>1.2.1</hbase.version>
 		<scala.version>2.11.12</scala.version>
@@ -28,7 +29,7 @@
 	<groupId>com.ibm.whc.deid</groupId>
 	<artifactId>de-identification</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.1.master-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>DeID</name>
 
 	<!-- sub modules -->
@@ -151,6 +152,10 @@
 					<doclint>none</doclint>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -164,7 +169,32 @@
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>0.8.6</version>
 				</plugin>
-			</plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>1.1.0</version>
+					<configuration>
+						<updatePomFile>true</updatePomFile>
+						<flattenMode>resolveCiFriendliesOnly</flattenMode>
+					</configuration>
+					<executions>
+						<execution>
+							<id>flatten</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>flatten</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>flatten.clean</id>
+							<phase>clean</phase>
+							<goals>
+								<goal>clean</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>				
 		</pluginManagement>
 	</build>
 
