@@ -6,3 +6,4 @@ target
 bin
 pom.xml.versionsBackup
 .mvn/maven.config
+/.flattened-pom.xml
