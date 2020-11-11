@@ -5,3 +5,4 @@ target
 .factorypath
 bin
 pom.xml.versionsBackup
+.mvn/maven.config

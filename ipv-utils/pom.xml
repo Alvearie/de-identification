@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.ibm.whc.deid</groupId>
 		<artifactId>de-identification</artifactId>
-		<version>0.0.1.master-SNAPSHOT</version>
+		<version>${revision}</version>
 	</parent>
 	<artifactId>ipv-utils</artifactId>
 	<name>DeID Utils</name>
