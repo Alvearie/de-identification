@@ -3,4 +3,5 @@ target
 .settings
 .project
 .factorypath
+bin
 pom.xml.versionsBackup
