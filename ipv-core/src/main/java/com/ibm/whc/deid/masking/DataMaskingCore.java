@@ -7,11 +7,10 @@ package com.ibm.whc.deid.masking;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
-import scala.Tuple2;
+import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
 
 public class DataMaskingCore {
 
@@ -23,7 +22,7 @@ public class DataMaskingCore {
    * @param maskingOptions
    * @return
    */
-  protected List<Tuple2<String, String>> protectRecord(List<Tuple2<String, String>> input,
+  protected List<IdentifiedData> protectRecord(List<IdentifiedData> input,
       final MaskingProvider maskingProvider) {
 
     return maskingProvider.maskWithBatch(input, "REST");
@@ -39,17 +38,14 @@ public class DataMaskingCore {
    * @throws IOException
    * @throws DeidException
    */
-  public List<String> maskData(final String configuration, final List<String> inputData,
+  public List<IdentifiedData> maskData(final String configuration,
+      final List<IdentifiedData> inputData,
       ConfigSchemaTypes schemaType) throws IOException, DeidException {
 
     MaskingProvider complexMaskingProvider = maskingProviderCache.getMaskingProvider(configuration,
         null, schemaType);
 
-    return protectRecord(inputData.stream().map(record -> new Tuple2<String, String>("", record))
-        .collect(Collectors.toList()), complexMaskingProvider).stream()
-            .map(record -> {
-              return record._2();
-            }).collect(Collectors.toList());
+    return protectRecord(inputData, complexMaskingProvider);
   }
 
 }

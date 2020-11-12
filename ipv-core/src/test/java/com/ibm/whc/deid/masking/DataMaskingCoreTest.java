@@ -16,17 +16,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
 
 public class DataMaskingCoreTest {
 
   private String maskingConf = null;
   private String maskingConf_generic = null;
+
+  private static List<IdentifiedData> convertList(List<String> inputList) {
+    return inputList.stream().map(input -> {
+      return new IdentifiedData(input);
+    }).collect(Collectors.toList());
+  }
 
   @Before
   public void setup() throws IOException {
@@ -68,7 +76,8 @@ public class DataMaskingCoreTest {
       patientData = scanner.useDelimiter("\\A").next();
     }
     try {
-      dataMask.maskData(invalidConfig, Arrays.asList(patientData), ConfigSchemaType.FHIR);
+      dataMask.maskData(invalidConfig, Arrays.asList(new IdentifiedData(patientData)),
+          ConfigSchemaType.FHIR);
     } catch (DeidException e) {
       assertTrue(e.getMessage().contains("Unrecognized field \"INVALID_rules\""));
       throw e;
@@ -99,7 +108,8 @@ public class DataMaskingCoreTest {
       patientData = scanner.useDelimiter("\\A").next();
     }
     try {
-      dataMask.maskData(invalidConfig, Arrays.asList(patientData), ConfigSchemaType.FHIR);
+      dataMask.maskData(invalidConfig, Arrays.asList(new IdentifiedData(patientData)),
+          ConfigSchemaType.FHIR);
     } catch (DeidException e) {
       assertTrue(e.getMessage().contains("The JSON masking rule does not refer to a valid rule"));
       throw e;
@@ -118,8 +128,9 @@ public class DataMaskingCoreTest {
       patientData = scanner.useDelimiter("\\A").next();
     }
     inputList.add(patientData);
-    List<String> maskedDataList = dataMask.maskData(maskingConf, inputList, ConfigSchemaType.FHIR);
-    String maskedData = maskedDataList.get(0);
+    List<IdentifiedData> maskedDataList = dataMask.maskData(maskingConf,
+        DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
+    String maskedData = maskedDataList.get(0).getData();
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode maskedNode = objectMapper.readTree(maskedData);
 
@@ -144,10 +155,11 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<String> maskedDataList = dataMask.maskData(maskingConf, inputList, ConfigSchemaType.FHIR);
+    List<IdentifiedData> maskedDataList = dataMask.maskData(maskingConf,
+        DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0));
+    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());
 
     // Make sure the id field is not accidentally masked
     assertEquals("example", maskedNode.path("id").textValue());
@@ -173,11 +185,11 @@ public class DataMaskingCoreTest {
     }
     inputList.add(patientData);
 
-    List<String> maskedDataList =
-        dataMask.maskData(maskingConf_generic, inputList, ConfigSchemaType.GEN);
+    List<IdentifiedData> maskedDataList = dataMask.maskData(maskingConf_generic,
+        DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
 
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0));
+    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());
 
     assertFalse(maskedNode.path("address").get(0).path("city").textValue().isEmpty());
     assertThat(maskedNode.path("address").get(0).path("city").textValue(), not("PleasantVille"));
@@ -196,10 +208,10 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<String> maskedDataList =
-        dataMask.maskData(maskingConf_generic, inputList, ConfigSchemaType.GEN);
+    List<IdentifiedData> maskedDataList = dataMask.maskData(maskingConf_generic,
+        DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
     ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0));
+    JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());
 
     // Make sure the id field is not accidentally masked
     assertEquals("example", maskedNode.path("id").textValue());

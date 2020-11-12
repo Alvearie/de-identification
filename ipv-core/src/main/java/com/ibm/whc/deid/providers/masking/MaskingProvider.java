@@ -11,8 +11,8 @@ import java.util.Map;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
+import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
 import com.ibm.whc.deid.utils.log.LogManager;
-import scala.Tuple2;
 
 /**
  * The interface Masking provider.
@@ -68,7 +68,7 @@ public interface MaskingProvider extends Serializable {
 
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers);
 
-  public List<Tuple2<String, String>> maskWithBatch(List<Tuple2<String, String>> payloadData,
+  public List<IdentifiedData> maskWithBatch(List<IdentifiedData> payloadData,
       String jobId);
 
   void setName(String ruleName);
