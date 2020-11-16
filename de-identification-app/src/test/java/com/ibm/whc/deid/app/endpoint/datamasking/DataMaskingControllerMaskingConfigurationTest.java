@@ -77,8 +77,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 	}
 
 	/**
-	 * Masking rules no longer support "<RULE>:invalid"
-	 * Returns error in return body 
+	 * Verifying invalid masking rule returns 400
 	 * @throws Exception
 	 */
 	@Test
