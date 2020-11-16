@@ -5,16 +5,12 @@
  */
 package com.ibm.whc.deid.app.endpoint.datamasking;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +31,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ibm.whc.deid.app.endpoint.Application;
 import com.ibm.whc.deid.shared.exception.DeidException;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
-import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
@@ -78,7 +72,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 		ArrayNode dataNode = rootNode.putArray("data");
 		dataNode.add(data);
 		rootNode.put("config", config);
-		rootNode.put("schemaType", (String) "FHIR");
+		rootNode.put("schemaType", "FHIR");
 		String request = mapper.writeValueAsString(rootNode);
 
 		log.info(request);
@@ -104,7 +98,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 		ArrayNode dataNode = rootNode.putArray("data");
 		dataNode.add(data);
 		rootNode.put("config", config);
-		rootNode.put("schemaType", (String) "FHIR");
+		rootNode.put("schemaType", "FHIR");
 		String request = mapper.writeValueAsString(rootNode);
 
 		log.info(request);
@@ -131,7 +125,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 		ArrayNode dataNode = rootNode.putArray("data");
 		dataNode.add(data);
 		rootNode.put("config", config);
-		rootNode.put("schemaType", (String) "FHIR");
+		rootNode.put("schemaType", "FHIR");
 		String request = mapper.writeValueAsString(rootNode);
 
 		log.info(request);
