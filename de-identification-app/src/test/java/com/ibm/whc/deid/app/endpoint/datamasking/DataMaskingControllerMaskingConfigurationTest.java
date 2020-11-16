@@ -109,11 +109,6 @@ public class DataMaskingControllerMaskingConfigurationTest {
 				.andExpect(content().string("The JSON masking rule does not refer to a valid rule: HASH:null. There are 1 invalid rules."));
 	}
 	
-	/** 
-	 * Missing Message Type should not break application
-	 * It should return user the un-masked output in the return body
-	 * @throws Exception
-	 */
 	@Test
 	public void testMaskingConfigMissingMessageType() throws Exception {
 		String data = new String(
