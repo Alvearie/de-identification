@@ -44,13 +44,13 @@ import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 @ActiveProfiles(profiles = { "test" })
 @AutoConfigureMockMvc
 @SpringBootTest(classes = Application.class)
-public class DataMaskingControllerMaskingConfiguration {
+public class DataMaskingControllerMaskingConfigurationTest {
 
 	private final String basePath = "/api/v1";
 
 	private MockMvc mockMvc;
 
-	private static final Logger log = LoggerFactory.getLogger(DataMaskingControllerMaskingConfiguration.class);
+	private static final Logger log = LoggerFactory.getLogger(DataMaskingControllerMaskingConfigurationTest.class);
 
 	@Autowired
 	private WebApplicationContext wac;
