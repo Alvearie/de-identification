@@ -54,13 +54,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
-
-	/**
-	 * Localization should not fail if Database or tables are missing. It should use
-	 * the default list of providers
-	 * 
-	 * @throws Exception
-	 */
+	
 	@Test
 	public void testLocalizationMaskingConfig() throws Exception {
 		String data = new String(
@@ -82,6 +76,11 @@ public class DataMaskingControllerMaskingConfigurationTest {
 				.andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
 	}
 
+	/**
+	 * Masking rules no longer support "<RULE>:null"
+	 * Returns error in return body 
+	 * @throws Exception
+	 */
 	@Test
 	public void testInvalidMaskingConfig() throws Exception {
 		String data = new String(
