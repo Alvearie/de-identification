@@ -110,7 +110,7 @@
 			},
 			{
 				"jsonPath": "/fhir/Device/patient/display",
-				"rule": "HASH:null"
+				"rule": "HASH:invalid"
 			},
 			{
 				"jsonPath": "/fhir/Location/continent",

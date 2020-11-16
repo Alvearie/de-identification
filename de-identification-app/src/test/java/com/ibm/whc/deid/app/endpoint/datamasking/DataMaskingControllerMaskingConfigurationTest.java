@@ -77,7 +77,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 	}
 
 	/**
-	 * Masking rules no longer support "<RULE>:null"
+	 * Masking rules no longer support "<RULE>:invalid"
 	 * Returns error in return body 
 	 * @throws Exception
 	 */
@@ -100,7 +100,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 				.perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
 						.content(request))
 				.andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
-				.andExpect(content().string("The JSON masking rule does not refer to a valid rule: HASH:null. There are 1 invalid rules."));
+				.andExpect(content().string("The JSON masking rule does not refer to a valid rule: HASH:invalid. There are 1 invalid rules."));
 	}
 	
 	/** 
