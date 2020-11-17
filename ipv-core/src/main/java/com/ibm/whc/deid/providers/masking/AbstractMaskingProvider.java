@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -103,7 +103,7 @@ public abstract class AbstractMaskingProvider implements MaskingProvider, Serial
   }
 
   @Override
-  public List<IdentifiedData> maskWithBatch(List<IdentifiedData> payloadData,
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
       String jobId) {
     return null;
   }

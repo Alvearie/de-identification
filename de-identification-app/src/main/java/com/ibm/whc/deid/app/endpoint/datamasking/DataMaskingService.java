@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.ibm.whc.deid.masking.DataMaskingCore;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
-import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -42,7 +42,7 @@ public class DataMaskingService {
     List<String> outputRecords = new ArrayList<>();
     try {
       outputRecords.addAll(dataMaskingCore.maskData(configuration, list.stream().map(input -> {
-        return new IdentifiedData(input);
+        return new ReferableData(input);
       }).collect(Collectors.toList()), schemaType).stream().map(input -> {
         return input.getData();
       }).collect(Collectors.toList()));

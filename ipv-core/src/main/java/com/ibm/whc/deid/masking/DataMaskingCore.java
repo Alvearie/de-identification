@@ -10,7 +10,7 @@ import java.util.List;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
-import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 
 public class DataMaskingCore {
 
@@ -22,7 +22,7 @@ public class DataMaskingCore {
    * @param maskingOptions
    * @return
    */
-  protected List<IdentifiedData> protectRecord(List<IdentifiedData> input,
+  protected List<ReferableData> protectRecord(List<ReferableData> input,
       final MaskingProvider maskingProvider) {
 
     return maskingProvider.maskWithBatch(input, "REST");
@@ -38,8 +38,8 @@ public class DataMaskingCore {
    * @throws IOException
    * @throws DeidException
    */
-  public List<IdentifiedData> maskData(final String configuration,
-      final List<IdentifiedData> inputData,
+  public List<ReferableData> maskData(final String configuration,
+      final List<ReferableData> inputData,
       ConfigSchemaTypes schemaType) throws IOException, DeidException {
 
     MaskingProvider complexMaskingProvider = maskingProviderCache.getMaskingProvider(configuration,

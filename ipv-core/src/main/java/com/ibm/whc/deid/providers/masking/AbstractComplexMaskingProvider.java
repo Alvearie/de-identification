@@ -20,7 +20,7 @@ import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -158,7 +158,7 @@ public String mask(String identifier) {
    * @return
    */
   @Override
-  public List<IdentifiedData> maskWithBatch(List<IdentifiedData> batch,
+  public List<ReferableData> maskWithBatch(List<ReferableData> batch,
       String jobId) {
 
   ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
@@ -175,7 +175,7 @@ public String mask(String identifier) {
       return null;
     }).collect(Collectors.toList())).stream().map(input -> {
       try {
-        return new IdentifiedData(input._1(), mapper.writeValueAsString(input._2()));
+        return new ReferableData(input._1(), mapper.writeValueAsString(input._2()));
       } catch (JsonProcessingException e) {
         log.logError(LogCodes.WPH1013E, e);
       }

@@ -5,17 +5,20 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-public class IdentifiedData {
+/*
+ * The model class which holds a reference string identifier and some data
+ */
+public class ReferableData {
 
   private String identifier;
   private String data;
 
-  public IdentifiedData(String data) {
+  public ReferableData(String data) {
     this.identifier = null;
     this.data = data;
   }
 
-  public IdentifiedData(String identifier, String data) {
+  public ReferableData(String identifier, String data) {
     this.identifier = identifier;
     this.data = data;
   }

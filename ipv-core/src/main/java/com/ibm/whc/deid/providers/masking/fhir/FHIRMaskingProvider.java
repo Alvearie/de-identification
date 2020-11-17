@@ -17,7 +17,7 @@ import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.masking.IdentifiedData;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
@@ -93,7 +93,7 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
     this.copyFieldList = copyFieldList;
   }
 
-  public List<IdentifiedData> maskWithBatch(List<IdentifiedData> payloadData,
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
       String jobId) {
     List<Tuple2<String, JsonNode>> toMask = payloadData.stream().map(input -> {
       JsonNode node = null;
@@ -107,10 +107,10 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
       return new Tuple2<String, JsonNode>(input.getIdentifier(), node);
     }).collect(Collectors.toList());
     toMask = maskJsonNode(toMask);
-    List<IdentifiedData> toReturn = toMask.stream().map(input -> {
-      IdentifiedData serializedNode = null;
+    List<ReferableData> toReturn = toMask.stream().map(input -> {
+      ReferableData serializedNode = null;
       try {
-        serializedNode = new IdentifiedData(input._1(),
+        serializedNode = new ReferableData(input._1(),
             ObjectMapperFactory.getObjectMapper().writeValueAsString(input._2()));
       } catch (JsonProcessingException e) {
         log.logError(LogCodes.WPH1013E, e);
