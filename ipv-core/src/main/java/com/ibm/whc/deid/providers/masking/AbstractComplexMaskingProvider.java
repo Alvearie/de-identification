@@ -20,6 +20,7 @@ import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -157,23 +158,24 @@ public String mask(String identifier) {
    * @return
    */
   @Override
-public List<Tuple2<String, String>> maskWithBatch(List<Tuple2<String, String>> batch,
+  public List<ReferableData> maskWithBatch(List<ReferableData> batch,
       String jobId) {
 
   ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     return maskJsonNode(batch.stream().map(input -> {
       try {
-        return new Tuple2<String, JsonNode>(input._1, mapper.readTree(input._2));
+        return new Tuple2<String, JsonNode>(input.getIdentifier(),
+            mapper.readTree(input.getData()));
       } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input._2());
+        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
       } catch (IOException e) {
-        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input._2());
+        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
       }
       return null;
     }).collect(Collectors.toList())).stream().map(input -> {
       try {
-        return new Tuple2<String, String>(input._1(), mapper.writeValueAsString(input._2()));
+        return new ReferableData(input._1(), mapper.writeValueAsString(input._2()));
       } catch (JsonProcessingException e) {
         log.logError(LogCodes.WPH1013E, e);
       }

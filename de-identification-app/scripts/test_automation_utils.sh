@@ -128,7 +128,7 @@ function doNotMatch() {
 			rc=$?
 			
 			if [ $rc == 1  ]; then
-				echo -e "\n##### Original value: $string is masked in output #####"
+				echo -e "\n##### Output masked. Test Passed #####"
 				echo ""
 				echo $output
 			else

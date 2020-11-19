@@ -1,0 +1,59 @@
+{
+	"rules": [
+		{
+			"name": "HASH",
+			"maskingProviders": [
+				{
+					"type": "HASH"
+				}
+			]
+		},
+		{
+			"name": "RANDOM",
+			"maskingProviders": [
+				{
+					"type": "RANDOM"
+				}
+			]
+		},
+		{
+			"name": "GENDER",
+			"maskingProviders": [
+				{
+					"type": "GENDER"
+				}
+			]
+		},
+		{
+			"name": "NAME",
+			"maskingProviders": [
+				{
+					"type": "NAME",
+					"maskGenderPreserve" : true
+				}
+			]
+		}
+	],
+	"defaultNoRuleResolution": true,
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Location",
+			"Person",
+			"Patient",
+			"Contract",
+			"RelatedPerson"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Person/link[*]/target/display",
+				"rule": "NAME"
+			},
+			{
+				"jsonPath": "/fhir/Person/gender",
+				"rule": "GENDER"
+			}
+		]
+	}
+}

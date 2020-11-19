@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
-import scala.Tuple2;
 
 /**
  * The type Abstract masking provider.
@@ -103,7 +103,7 @@ public abstract class AbstractMaskingProvider implements MaskingProvider, Serial
   }
 
   @Override
-  public List<Tuple2<String, String>> maskWithBatch(List<Tuple2<String, String>> payloadData,
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
       String jobId) {
     return null;
   }
