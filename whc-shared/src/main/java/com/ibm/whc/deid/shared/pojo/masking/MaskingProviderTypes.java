@@ -14,8 +14,6 @@ public interface MaskingProviderTypes {
   
   public String getIdentifier();
 
-  public default MaskingProviderCategory getCategory() {
-    return MaskingProviderCategory.CategoryII;
-  }
+  public MaskingProviderCategory getCategory();
   
 }
