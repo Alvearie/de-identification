@@ -14,6 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.app.endpoint.Application;
+import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,12 +41,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.app.endpoint.Application;
-import com.ibm.whc.deid.shared.exception.DeidException;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
-import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
@@ -63,8 +63,7 @@ public class DataMaskingControllerTest {
   public Filter noCacheHeadersFilter;
 
   @Before
-  public void setup() throws DeidException {
-
+  public void setup() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).addFilter(noCacheHeadersFilter).build();
   }
 
@@ -99,10 +98,8 @@ public class DataMaskingControllerTest {
     String data = new String(Files
         .readAllBytes(Paths.get(getClass().getResource("/masking/data/simple_fhir.json").toURI())));
 
-    String maskingFilePath = "/config/generic/masking_config.json";
-
-    Path resPath = Paths.get(this.getClass().getResource(maskingFilePath).toURI());
-    String config = new String(Files.readAllBytes(resPath), "UTF8");
+    Path resPath = Paths.get(getClass().getResource("/config/generic/masking_config.json").toURI());
+    String config = new String(Files.readAllBytes(resPath), StandardCharsets.UTF_8);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(data);
@@ -118,6 +115,30 @@ public class DataMaskingControllerTest {
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].id").value(containsString("1234")))
         .andExpect(jsonPath("$.data[0].patient.display").value(not("Patient Zero")));
+  }
+
+  @Test
+  public void testGenericMaskDataDefaultType() throws Exception {
+    String data = new String(Files
+        .readAllBytes(Paths.get(getClass().getResource("/masking/data/simple_gen.json").toURI())));
+
+    Path resPath = Paths.get(getClass().getResource("/config/generic/simple_config.json").toURI());
+    String config = new String(Files.readAllBytes(resPath), StandardCharsets.UTF_8);
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(data);
+    DataMaskingModel dataMaskingModel =
+        new DataMaskingModel(config, inputList, ConfigSchemaType.GEN);
+    ObjectMapper mapper = new ObjectMapper();
+    String request = mapper.writeValueAsString(dataMaskingModel);
+
+    log.info(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification")
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+        .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
+        .andExpect(jsonPath("$.data[0].phone").value(equalTo("00000000")))
+        .andExpect(jsonPath("$.data[0].numbers.ssn").value(equalTo("X")));
   }
 
   @Test

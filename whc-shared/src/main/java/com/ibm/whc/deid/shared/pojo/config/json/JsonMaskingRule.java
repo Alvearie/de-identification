@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 /*
@@ -12,16 +13,19 @@ import java.io.Serializable;
  */
 public class JsonMaskingRule implements Serializable {
 
-  /** */
   private static final long serialVersionUID = -1439174548688111947L;
 
-  String jsonPath;
-  String rule;
+  public static final String PATH_PROPERTY_NAME = "jsonPath";
+  public static final String RULE_PROPERTY_NAME = "rule";
+  
+  @JsonProperty(PATH_PROPERTY_NAME)  
+  private String jsonPath;
+  @JsonProperty(RULE_PROPERTY_NAME)
+  private String rule;
 
-  public JsonMaskingRule() {};
+  public JsonMaskingRule() {}
 
   public JsonMaskingRule(String jsonPath, String rule) {
-    super();
     this.jsonPath = jsonPath;
     this.rule = rule;
   }

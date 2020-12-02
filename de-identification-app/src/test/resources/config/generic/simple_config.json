@@ -1,0 +1,36 @@
+
+{
+    "rules": [
+        {
+            "name": "phoneRule",
+            "maskingProviders": [
+                {
+                    "type": "REDACT",
+                    "replaceCharacter": "0"
+                }
+            ]
+        },
+        {
+            "name": "redactor",
+            "maskingProviders": [
+                {
+                    "type": "REDACT"
+                }
+            ]
+        }
+    ],
+    "defaultNoRuleResolution": true,
+    "json": {
+        "schemaType": "GEN",
+        "maskingRules": [
+            {
+                "jsonPath": "/gen/default/phone",
+                "rule": "phoneRule"
+            },
+            {
+                "jsonPath": "/gen/default/numbers/ssn",
+                "rule": "redactor"
+            }
+        ]
+    }
+}

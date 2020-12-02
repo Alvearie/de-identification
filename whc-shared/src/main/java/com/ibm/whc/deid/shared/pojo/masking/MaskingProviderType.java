@@ -78,8 +78,25 @@ public enum MaskingProviderType implements MaskingProviderTypes {
   }
 
   public static enum MaskingProviderCategory {
-    CategoryI, // masks a particular type of sensitive data
-    CategoryII // masks generic identifiers
+    /**
+     * Providers that work with a specific type of protected information.
+     */
+    CategoryI("CategoryI"),
+    
+    /**
+     * Providers that work with many types of information.
+     */
+    CategoryII("CategoryII");
+    
+    private final String displayName;
+
+    private MaskingProviderCategory(String dn) {
+      displayName = dn;
+    }
+
+    public String getMetadataDisplayName() {
+      return displayName;
+    }
   }
 
   public static class Constants {

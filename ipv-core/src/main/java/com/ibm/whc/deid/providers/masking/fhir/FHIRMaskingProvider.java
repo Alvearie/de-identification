@@ -42,6 +42,12 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
     this.certificateID = certificateID;
 
     List<String> messageTypes = maskingConfiguration.getJson().getMessageTypes();
+    if (messageTypes == null) {
+      messageTypes = new ArrayList<>();
+    }
+    if (messageTypes.isEmpty()) {
+      messageTypes.add(AbstractComplexMaskingProvider.DISABLE_TYPES_VALUE);
+    }
     messageTypes.forEach(type -> {
       String basePath = basePathPrefix + type;
 
