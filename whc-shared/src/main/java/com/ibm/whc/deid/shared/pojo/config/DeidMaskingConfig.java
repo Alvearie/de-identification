@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -38,7 +39,8 @@ public class DeidMaskingConfig implements Serializable {
   @JsonProperty(JSON_CONFIGURATION_PROPERTY_NAME)
   private JsonConfig json;
 
-  private String certificateID;
+  @JsonAlias({"certificateID"})
+  String certificateId;
 
   private boolean defaultNoRuleResolution;
 
@@ -85,12 +87,12 @@ public class DeidMaskingConfig implements Serializable {
     this.defaultNoRuleResolution = defaultNoRuleResolution;
   }
 
-  public String getCertificateID() {
-    return certificateID;
+  public String getCertificateId() {
+    return certificateId;
   }
 
-  public void setCertificateID(String certificateID) {
-    this.certificateID = certificateID;
+  public void setCertificateId(String certificateId) {
+    this.certificateId = certificateId;
   }
 
   public Map<String, String> getStringValueWithPrefixMatch(String prefix) {
