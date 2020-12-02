@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -26,7 +27,7 @@ public class DeidMaskingConfig implements Serializable {
 
   public static final String JSON_CONFIGURATION_PROPERTY_NAME = "json";
   public static final String RULES_CONFIGURATION_PROPERTY_NAME = "rules";
-  
+
   // The rules are configured in the json as an array. So we use List<Rule> in
   // the POJO.
   // But for quicker access, we also store the rule as a map.
@@ -38,7 +39,8 @@ public class DeidMaskingConfig implements Serializable {
   @JsonProperty(JSON_CONFIGURATION_PROPERTY_NAME)
   private JsonConfig json;
 
-  private String certificateID;
+  @JsonAlias({"certificateID"})
+  String certificateId;
 
   private boolean defaultNoRuleResolution;
 
@@ -57,11 +59,11 @@ public class DeidMaskingConfig implements Serializable {
 
   public void setRules(List<Rule> rules) {
     this.rules = rules;
-    
+
     // Add all the rules to a hashmap for quicker access
     rulesMap = new HashMap<>(rules == null ? 10 : rules.size() * 2);
     if (rules != null) {
-      for (Rule rule : rules) {        
+      for (Rule rule : rules) {
         if (rule != null) {
           rulesMap.put(rule.getName(), rule);
         }
@@ -85,17 +87,17 @@ public class DeidMaskingConfig implements Serializable {
     this.defaultNoRuleResolution = defaultNoRuleResolution;
   }
 
-  public String getCertificateID() {
-    return certificateID;
+  public String getCertificateId() {
+    return certificateId;
   }
 
-  public void setCertificateID(String certificateID) {
-    this.certificateID = certificateID;
+  public void setCertificateId(String certificateId) {
+    this.certificateId = certificateId;
   }
 
   public Map<String, String> getStringValueWithPrefixMatch(String prefix) {
     Map<String, String> values = new ConcurrentHashMap<>();
-    
+
     if (getJson() != null && getJson().getMaskingRules() != null) {
       getJson().getMaskingRules().forEach(rule -> {
         if (rule.getJsonPath().startsWith(prefix)) {

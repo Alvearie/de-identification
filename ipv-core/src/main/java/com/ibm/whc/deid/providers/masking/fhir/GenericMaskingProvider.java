@@ -16,14 +16,14 @@ public class GenericMaskingProvider extends FHIRMaskingProvider {
 
   public GenericMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
-    this(maskingConfiguration, maskingConfiguration.getCertificateID(), true,
+    this(maskingConfiguration, maskingConfiguration.getCertificateId(), true,
         true, maskingProviderFactory, tenantId);
   }
 
   public GenericMaskingProvider(DeidMaskingConfig maskingConfiguration,
-      String certificateID, boolean arrayAllRules, boolean defNoRuleRes,
+      String certificateId, boolean arrayAllRules, boolean defNoRuleRes,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
-    super(maskingConfiguration, certificateID, arrayAllRules, defNoRuleRes,
+    super(maskingConfiguration, certificateId, arrayAllRules, defNoRuleRes,
         maskingProviderFactory, BASE_PATH_PREFIX, tenantId);
   }
 }
