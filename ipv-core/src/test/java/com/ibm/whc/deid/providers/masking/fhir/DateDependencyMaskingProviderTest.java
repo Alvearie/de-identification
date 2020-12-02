@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class DateDependencyMaskingProviderTest {
     maskingConfiguration.setDatetimeYearDeleteNIntervalMaskDate("birthDate");
     maskingConfiguration.setDatetimeYearDeleteNIntervalCompareDate("deceasedDateTime");
     DateDependencyMaskingProvider maskingProvider =
-        new DateDependencyMaskingProvider(maskingConfiguration, new DeidMaskingConfig());
+        new DateDependencyMaskingProvider(maskingConfiguration, buildMaskingConfig()); 
 
     JsonNode maskedNode = maskingProvider.mask(originalNode);
 
@@ -60,7 +61,7 @@ public class DateDependencyMaskingProviderTest {
     maskingConfiguration.setDateYearDeleteNDaysValue(500);
 
     DateDependencyMaskingProvider maskingProvider =
-        new DateDependencyMaskingProvider(maskingConfiguration, new DeidMaskingConfig());
+        new DateDependencyMaskingProvider(maskingConfiguration, buildMaskingConfig()); 
 
     JsonNode maskedNode = maskingProvider.mask(originalNode);
 
@@ -84,7 +85,7 @@ public class DateDependencyMaskingProviderTest {
     maskingConfiguration.setDatetimeYearDeleteNIntervalCompareDate("deceasedDateTime");
 
     DateDependencyMaskingProvider maskingProvider =
-        new DateDependencyMaskingProvider(maskingConfiguration, new DeidMaskingConfig());
+        new DateDependencyMaskingProvider(maskingConfiguration, buildMaskingConfig()); 
 
     JsonNode maskedNode = maskingProvider.mask(originalNode);
 
@@ -109,7 +110,7 @@ public class DateDependencyMaskingProviderTest {
     maskingConfiguration.setDatetimeYearDeleteNIntervalCompareDate("deceasedDateTime");
 
     DateDependencyMaskingProvider maskingProvider =
-        new DateDependencyMaskingProvider(maskingConfiguration, new DeidMaskingConfig());
+        new DateDependencyMaskingProvider(maskingConfiguration, buildMaskingConfig()); 
 
     JsonNode maskedNode = maskingProvider.mask(originalNode);
 
@@ -134,11 +135,18 @@ public class DateDependencyMaskingProviderTest {
     maskingConfiguration.setDatetimeYearDeleteNIntervalMaskDate("birthDate");
 
     DateDependencyMaskingProvider maskingProvider =
-        new DateDependencyMaskingProvider(maskingConfiguration, new DeidMaskingConfig());
+        new DateDependencyMaskingProvider(maskingConfiguration, buildMaskingConfig()); 
 
     JsonNode maskedNode = maskingProvider.mask(originalNode);
 
     // Should return null
     assertEquals(null, maskedNode);
   }
+  
+  private DeidMaskingConfig buildMaskingConfig() {
+    DeidMaskingConfig config = new DeidMaskingConfig();
+    config.setJson(new JsonConfig());
+    return config;
+  }
+    
 }

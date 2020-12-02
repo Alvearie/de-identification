@@ -12,6 +12,8 @@ public class InvalidMaskingConfigurationException extends Exception {
 
   private static final long serialVersionUID = 8510810871073867687L;
 
+  private String location = null;
+  
   public InvalidMaskingConfigurationException(String message) {
     super(message);
   }
@@ -19,4 +21,19 @@ public class InvalidMaskingConfigurationException extends Exception {
   public InvalidMaskingConfigurationException(String message, Throwable cause) {
     super(message, cause);
   }
+
+  public InvalidMaskingConfigurationException(String message, String location) {
+    super(message);
+    this.location = location; 
+  }
+
+  public InvalidMaskingConfigurationException(String message, Throwable cause, String location) {
+    super(message, cause);
+    this.location = location;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+  
 }
