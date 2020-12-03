@@ -9,6 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Provider for masking a data element based on the value of another data element
@@ -17,7 +18,8 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -5097975333785542411L;
-  List<ConditionalMaskRuleSet> maskRuleSet;
+
+  private List<ConditionalMaskRuleSet> maskRuleSet;
 
   public ConditionalMaskingProviderConfig() {
     type = MaskingProviderType.CONDITIONAL;
@@ -29,6 +31,20 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskRuleSet(List<ConditionalMaskRuleSet> maskRuleSet) {
     this.maskRuleSet = maskRuleSet;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (maskRuleSet == null || maskRuleSet.isEmpty()) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskRuleSet` must be specified with at least one entry");
+    }
+    for (ConditionalMaskRuleSet ruleSet : maskRuleSet) {
+      if (ruleSet == null) {
+        throw new InvalidMaskingConfigurationException("`maskRuleSet` is null");
+      }
+      ruleSet.validate("maskRuleSet");
+    }
   }
 
   @Override

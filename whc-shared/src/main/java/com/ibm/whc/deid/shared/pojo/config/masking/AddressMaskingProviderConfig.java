@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks an input postal address with a random one. Various elements of the address can be
@@ -17,17 +18,18 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class AddressMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1835358022810146037L;
-  boolean postalCodeNearest;
-  boolean roadTypeMask = true;
-  int postalCodeNearestK = 10;
-  boolean countryMask = true;
-  boolean postalCodeMask = true;
-  boolean numberMask = true;
-  boolean cityMask = true;
-  boolean maskPseudorandom;
-  boolean streetNameMask = true;
-  boolean countryMaskPseudorandom;
-  boolean cityMaskPseudorandom;
+
+  private boolean postalCodeNearest;
+  private boolean roadTypeMask = true;
+  private int postalCodeNearestK = 10;
+  private boolean countryMask = true;
+  private boolean postalCodeMask = true;
+  private boolean numberMask = true;
+  private boolean cityMask = true;
+  private boolean maskPseudorandom;
+  private boolean streetNameMask = true;
+  private boolean countryMaskPseudorandom;
+  private boolean cityMaskPseudorandom;
 
   CityMaskingProviderConfig cityMaskingConfig = new CityMaskingProviderConfig();
 
@@ -141,6 +143,13 @@ public class AddressMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setCountryMaskingConfig(CountryMaskingProviderConfig countryMaskingConfig) {
     this.countryMaskingConfig = countryMaskingConfig;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (getPostalCodeNearestK() < 1) {
+      throw new InvalidMaskingConfigurationException("`postalCodeNearestK` must be greater than 0");
+    }
   }
 
   @Override

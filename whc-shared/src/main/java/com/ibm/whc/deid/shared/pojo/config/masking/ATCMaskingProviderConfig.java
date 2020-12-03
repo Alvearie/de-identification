@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks an ATC code with the option to preserve certain levels.
@@ -16,7 +17,8 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class ATCMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1350698900871815535L;
-  int maskLevelsToKeep = 4;
+
+  private int maskLevelsToKeep = 4;
 
   public ATCMaskingProviderConfig() {
     type = MaskingProviderType.ATC;
@@ -28,6 +30,14 @@ public class ATCMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskLevelsToKeep(int maskLevelsToKeep) {
     this.maskLevelsToKeep = maskLevelsToKeep;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (maskLevelsToKeep < 1 || maskLevelsToKeep > 4) {
+      throw new InvalidMaskingConfigurationException("`maskLevelsToKeep` must be 1..4");
+    }
+    super.validate();
   }
 
   @Override

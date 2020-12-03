@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Replaces a country with a randomly chosen country, or with its nearest one (calculated based on
@@ -17,9 +18,10 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class CountryMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -2983934913605538276L;
-  int maskClosestK = 10;
-  boolean maskClosest;
-  boolean maskPseudorandom;
+
+  private int maskClosestK = 10;
+  private boolean maskClosest;
+  private boolean maskPseudorandom;
 
   public CountryMaskingProviderConfig() {
     type = MaskingProviderType.COUNTRY;
@@ -47,6 +49,13 @@ public class CountryMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskPseudorandom(boolean maskPseudorandom) {
     this.maskPseudorandom = maskPseudorandom;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (maskClosestK < 1) {
+      throw new InvalidMaskingConfigurationException("`maskClosestK` must be greater than 0");
+    }
   }
 
   @Override
