@@ -16,7 +16,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class SSNUKMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 2452766437179367170L;
-  boolean maskPreservePrefix = true;
+  private boolean maskPreservePrefix = true;
 
   public SSNUKMaskingProviderConfig() {
     type = MaskingProviderType.SSN_UK;

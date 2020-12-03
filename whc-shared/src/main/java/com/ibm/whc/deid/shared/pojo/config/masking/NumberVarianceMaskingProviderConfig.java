@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks a numeric data value by adding a random offset.
@@ -16,13 +17,13 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class NumberVarianceMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -7424497174746790486L;
-  boolean augmentMask = false;
-  double augmentLowerBound = 1.0;
-  double augmentUpperBound = 10.0;
-  boolean resultWithPrecision = false;
-  int precisionDigits = -1;
-  double maskLimitUp = 10.0;
-  double maskLimitDown = 10.0;
+  private boolean augmentMask = false;
+  private double augmentLowerBound = 1.0;
+  private double augmentUpperBound = 10.0;
+  private boolean resultWithPrecision = false;
+  private int precisionDigits = -1;
+  private double maskLimitUp = 10.0;
+  private double maskLimitDown = 10.0;
 
   public NumberVarianceMaskingProviderConfig() {
     type = MaskingProviderType.NUMBERVARIANCE;
@@ -84,6 +85,24 @@ public class NumberVarianceMaskingProviderConfig extends MaskingProviderConfig {
     this.maskLimitDown = maskLimitDown;
   }
 
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (augmentLowerBound < 0.0) {
+      throw new InvalidMaskingConfigurationException("`augmentLowerBound` must be greater than 0");
+    }
+    if (augmentUpperBound < 0.0) {
+      throw new InvalidMaskingConfigurationException("`augmentUpperBound` must be greater than 0");
+    }
+    if (augmentMask && augmentLowerBound > augmentUpperBound) {
+      throw new InvalidMaskingConfigurationException(
+          "`augmentLowerBound` must be less than `augmentUpperBound` when `augmentMask` is true");
+    }
+    if (augmentMask && augmentLowerBound == augmentUpperBound && !resultWithPrecision) {
+      throw new InvalidMaskingConfigurationException(
+          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `augmentMask` is true");
+    }
+  }
+    
   @Override
   public int hashCode() {
     final int prime = 31;

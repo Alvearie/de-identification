@@ -17,8 +17,8 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class VINMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -3617565031465171733L;
-  boolean wmiPreserve = true;
-  boolean vdsPreserve = false;
+  private boolean wmiPreserve = true;
+  private boolean vdsPreserve = false;
 
   public VINMaskingProviderConfig() {
     type = MaskingProviderType.VIN;

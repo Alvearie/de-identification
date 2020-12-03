@@ -16,10 +16,10 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class NameMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1111084929864098883L;
-  boolean maskingAllowUnisex = false;
-  boolean tokenConsistence = false;
-  boolean maskPseudorandom = false;
-  boolean maskGenderPreserve = true;
+  private boolean maskingAllowUnisex = false;
+  private boolean tokenConsistence = false;
+  private boolean maskPseudorandom = false;
+  private boolean maskGenderPreserve = true;
 
   public NameMaskingProviderConfig() {
     type = MaskingProviderType.NAME;

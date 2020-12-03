@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks an original data value by replacing it with a randomly generated data pseudonym.
@@ -16,19 +17,19 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1084054409781390000L;
-  boolean generateViaOptionsEnabled = true;
-  int generateViaOptionsMinLength = 10;
-  int generateViaOptionsMaxLength = 10;
-  boolean generateViaOptionsGenerateUppercase = true;
-  boolean generateViaOptionsGenerateLowercase = true;
-  boolean generateViaOptionsGenerateDigit = true;
-  boolean generateViaOptionsGenerateSpecial = false;
-  boolean generateViaPatternEnabled = true;
-  String generateViaPatternPattern = null;
-  String generateViaPatternLanguageCode = "EN";
-  String generateViaPatternPatternName = null;
-  boolean generateViaHashEnabled = false;
-  boolean generateViaHashUseSHA256 = false;
+  private boolean generateViaOptionsEnabled = true;
+  private int generateViaOptionsMinLength = 10;
+  private int generateViaOptionsMaxLength = 10;
+  private boolean generateViaOptionsGenerateUppercase = true;
+  private boolean generateViaOptionsGenerateLowercase = true;
+  private boolean generateViaOptionsGenerateDigit = true;
+  private boolean generateViaOptionsGenerateSpecial = false;
+  private boolean generateViaPatternEnabled = true;
+  private String generateViaPatternPattern = null;
+  private String generateViaPatternLanguageCode = "EN";
+  private String generateViaPatternPatternName = null;
+  private boolean generateViaHashEnabled = false;
+  private boolean generateViaHashUseSHA256 = false;
 
   public PseudonymMaskingProviderConfig() {
     type = MaskingProviderType.PSEUDONYM;
@@ -136,6 +137,22 @@ public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setGenerateViaHashUseSHA256(boolean generateViaHashUseSHA256) {
     this.generateViaHashUseSHA256 = generateViaHashUseSHA256;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (generateViaPatternLanguageCode == null) {
+      throw new InvalidMaskingConfigurationException(
+          "`generateViaPatternLanguageCode` must not be null");
+    }
+    if (generateViaOptionsMinLength < 0.0) {
+      throw new InvalidMaskingConfigurationException(
+          "`generateViaOptionsMinLength` must be greater than 0");
+    }
+    if (generateViaOptionsMaxLength < 0.0) {
+      throw new InvalidMaskingConfigurationException(
+          "`generateViaOptionsMaxLength` must be greater than 0");
+    }
   }
 
   @Override

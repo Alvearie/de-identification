@@ -16,7 +16,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class OccupationMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 4922864365288665229L;
-  boolean maskGeneralize = false;
+  private boolean maskGeneralize = false;
 
   public OccupationMaskingProviderConfig() {
     type = MaskingProviderType.OCCUPATION;
