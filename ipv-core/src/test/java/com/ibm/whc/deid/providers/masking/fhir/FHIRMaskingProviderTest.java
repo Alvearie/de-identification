@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactoryUtil;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -54,12 +55,12 @@ public class FHIRMaskingProviderTest {
 
     try (
         InputStream is = this.getClass().getResourceAsStream("/fhir/MedicationOrder-230986.json")) {
-      JsonNode node = FHIRMaskingUtils.getObjectMapper().readTree(is);
+      JsonNode node = ObjectMapperFactory.getObjectMapper().readTree(is);
 
       assertTrue(node.get("dispenseRequest").get("numberOfRepeatsAllowed").isInt());
       assertEquals(2, node.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue());
 
-      ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+      ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
       // We are using random to mask the value. to avoid the masked value
       // happens to be the original, try 10 times.
       String masked = mapper.writeValueAsString(IntStream.range(0, 10)
@@ -71,7 +72,7 @@ public class FHIRMaskingProviderTest {
                 maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue();
             return numberOfRepeatsAllowed != 2;
           }).findFirst().get().get(0)._2);
-      JsonNode maskedNode = FHIRMaskingUtils.getObjectMapper().readTree(masked);
+      JsonNode maskedNode = ObjectMapperFactory.getObjectMapper().readTree(masked);
 
       assertTrue(maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue() != 2);
 
@@ -86,7 +87,7 @@ public class FHIRMaskingProviderTest {
         new FHIRMaskingProvider(defaultFhirConfig, maskingProviderFactory, tenantId);
     try (InputStream is =
         this.getClass().getResourceAsStream("/fhir/MedicationAdministration-239202.json")) {
-      JsonNode node = FHIRMaskingUtils.getObjectMapper().readTree(is);
+      JsonNode node = ObjectMapperFactory.getObjectMapper().readTree(is);
       JsonNode maskedNode = fhirMaskingProvider
           .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))).get(0)._2();
 
@@ -101,10 +102,10 @@ public class FHIRMaskingProviderTest {
     FHIRMaskingProvider fhirMaskingProvider =
         new FHIRMaskingProvider(defaultFhirConfig, maskingProviderFactory, tenantId);
 
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     try (InputStream is =
         this.getClass().getResourceAsStream("/fhir/MedicationOrder-arrays-230986.json")) {
-      JsonNode node = FHIRMaskingUtils.getObjectMapper().readTree(is);
+      JsonNode node = ObjectMapperFactory.getObjectMapper().readTree(is);
 
       assertTrue(node.get("dispenseRequest").get("numberOfRepeatsAllowed").isArray());
       assertEquals(2, node.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue());
@@ -120,7 +121,7 @@ public class FHIRMaskingProviderTest {
                 maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue();
             return numberOfRepeatsAllowed != 2;
           }).findFirst().get().get(0)._2);
-      JsonNode maskedNode = FHIRMaskingUtils.getObjectMapper().readTree(masked);
+      JsonNode maskedNode = ObjectMapperFactory.getObjectMapper().readTree(masked);
 
       assertTrue(
           maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue() != 2);
@@ -173,7 +174,7 @@ public class FHIRMaskingProviderTest {
     FHIRMaskingProvider fhirMaskingProvider =
         new FHIRMaskingProvider(fhirConfig, maskingProviderFactory, tenantId);
 
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     String filename = "/fhir/patientExample.json";
 
