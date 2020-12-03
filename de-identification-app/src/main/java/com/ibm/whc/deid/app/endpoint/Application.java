@@ -16,13 +16,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /*
  * Main SpringBoot application class
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@EnableSwagger2
 @EnableScheduling
 @EnableAsync
 @ComponentScan(basePackages = {"com.ibm.whc.deid.app.endpoint", "com.ibm.whc.deid.endpoint"})
