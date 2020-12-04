@@ -31,9 +31,8 @@ public class AddressMaskingProviderConfig extends MaskingProviderConfig {
   private boolean countryMaskPseudorandom;
   private boolean cityMaskPseudorandom;
 
-  CityMaskingProviderConfig cityMaskingConfig = new CityMaskingProviderConfig();
-
-  CountryMaskingProviderConfig countryMaskingConfig = new CountryMaskingProviderConfig();;
+  private CityMaskingProviderConfig cityMaskingConfig = new CityMaskingProviderConfig();
+  private CountryMaskingProviderConfig countryMaskingConfig = new CountryMaskingProviderConfig();
 
   public AddressMaskingProviderConfig() {
     type = MaskingProviderType.ADDRESS;

@@ -56,7 +56,6 @@ public class BinningMaskingProviderConfigTest {
   @Test
   public void testEqualsHashCode() {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    System.out.println(config.getUnspecifiedValueHandling());
     assertFalse(config.equals(null));
     assertFalse(config.equals("test"));
     assertFalse(config.equals(new AddressMaskingProviderConfig()));

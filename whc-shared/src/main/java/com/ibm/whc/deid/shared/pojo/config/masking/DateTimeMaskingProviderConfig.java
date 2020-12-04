@@ -8,6 +8,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
+import java.time.format.DateTimeFormatterBuilder;
 
 /*
  * Provider for masking DateTime (timestamp) objects
@@ -16,55 +18,54 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private static final long serialVersionUID = -2155188165694612384L;
 
-  int hourRangeDown = 100;
-  boolean minutesMask = true;
-  int dayRangeUpMin = 0;
-  int dayRangeUp = 0;
-  boolean hourMask = true;
-  int yearRangeDown = 10;
-  int dayRangeDownMin = 0;
-  int dayRangeDown = 7;
-  int monthRangeDown = 12;
-  boolean yearMask = true;
-  int yearRangeUp = 0;
-  boolean generalizeYear = false;
-  int secondsRangeUp = 0;
-  boolean maskShiftDate = false;
-  int secondsRangeDown = 100;
-  int minutesRangeUp = 0;
-  boolean monthMask = true;
-  boolean generalizeNyearinterval = false;
-  boolean secondsMask = true;
-  int hourRangeUp = 0;
-  String formatFixed = null;
-  boolean generalizeWeekyear = false;
-  boolean generalizeMonthyear = false;
-  boolean dayMask = true;
-  boolean generalizeQuarteryear = false;
-  int generalizeNyearintervalvalue = 0;
-  int generalizeNyearintervalstart = 0;
-  int generalizeNyearintervalend = 0;
-  boolean yearDeleteNinterval = false;
-  String yearDeleteNointervalComparedateValue = null;
-  int monthRangeUp = 0;
-  int maskShiftSeconds = 0;
-  int minutesRangeDown = 100;
-  boolean yearMaxYearsAgoMask = false;
-  int yearMaxYearsAgo = 0;
-  boolean yearMaxYearsAgoOnlyYear = false;
-  int yearShiftFromCurrentYear = 0;
-  boolean dayMaxDaysAgoMask = false;
-  int dayMaxDaysAgo = 0;
-  int dayShiftFromCurrentDay = 0;
-  boolean overrideMask = false;
-  int overrideYearsPassed = 0;
-  String overrideValue = null;
-  boolean generalizeYearMaskAgeOver90 = false;
-  boolean generalizeMonthyearMaskAgeOver90 = false;
-
-  boolean yearDelete = false;
-  boolean yearDeleteNdays = false;
-  int yearDeleteNdaysValue = 365;
+  private int hourRangeDown = 100;
+  private boolean minutesMask = true;
+  private int dayRangeUpMin = 0;
+  private int dayRangeUp = 0;
+  private boolean hourMask = true;
+  private int yearRangeDown = 10;
+  private int dayRangeDownMin = 0;
+  private int dayRangeDown = 7;
+  private int monthRangeDown = 12;
+  private boolean yearMask = true;
+  private int yearRangeUp = 0;
+  private boolean generalizeYear = false;
+  private int secondsRangeUp = 0;
+  private boolean maskShiftDate = false;
+  private int secondsRangeDown = 100;
+  private int minutesRangeUp = 0;
+  private boolean monthMask = true;
+  private boolean generalizeNyearinterval = false;
+  private boolean secondsMask = true;
+  private int hourRangeUp = 0;
+  private String formatFixed = null;
+  private boolean generalizeWeekyear = false;
+  private boolean generalizeMonthyear = false;
+  private boolean dayMask = true;
+  private boolean generalizeQuarteryear = false;
+  private int generalizeNyearintervalvalue = 0;
+  private int generalizeNyearintervalstart = 0;
+  private int generalizeNyearintervalend = 0;
+  private boolean yearDeleteNinterval = false;
+  private String yearDeleteNointervalComparedateValue = null;
+  private int monthRangeUp = 0;
+  private int maskShiftSeconds = 0;
+  private int minutesRangeDown = 100;
+  private boolean yearMaxYearsAgoMask = false;
+  private int yearMaxYearsAgo = 0;
+  private boolean yearMaxYearsAgoOnlyYear = false;
+  private int yearShiftFromCurrentYear = 0;
+  private boolean dayMaxDaysAgoMask = false;
+  private int dayMaxDaysAgo = 0;
+  private int dayShiftFromCurrentDay = 0;
+  private boolean overrideMask = false;
+  private int overrideYearsPassed = 0;
+  private String overrideValue = null;
+  private boolean generalizeYearMaskAgeOver90 = false;
+  private boolean generalizeMonthyearMaskAgeOver90 = false;
+  private boolean yearDelete = false;
+  private boolean yearDeleteNdays = false;
+  private int yearDeleteNdaysValue = 365;
 
   public DateTimeMaskingProviderConfig() {
     type = MaskingProviderType.DATETIME;
@@ -452,6 +453,49 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setYearDeleteNdaysValue(int yearDeleteNdaysValue) {
     this.yearDeleteNdaysValue = yearDeleteNdaysValue;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (formatFixed != null) {
+      try {
+        new DateTimeFormatterBuilder().appendPattern(formatFixed);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidMaskingConfigurationException(
+            "`formatFixed` is not valid: " + e.getMessage(), e);
+      }
+    }
+    validateNotNegative(hourRangeDown, "hourRangeDown");
+    validateNotNegative(dayRangeUpMin, "dayRangeUpMin");
+    validateNotNegative(dayRangeUp, "dayRangeUp");
+    validateNotNegative(yearRangeDown, "yearRangeDown");
+    validateNotNegative(dayRangeDownMin, "dayRangeDownMin");
+    validateNotNegative(dayRangeDown, "dayRangeDown");
+    validateNotNegative(monthRangeDown, "monthRangeDown");
+    validateNotNegative(yearRangeUp, "yearRangeUp");
+    validateNotNegative(secondsRangeUp, "secondsRangeUp");
+    validateNotNegative(secondsRangeDown, "secondsRangeDown");
+    validateNotNegative(minutesRangeUp, "minutesRangeUp");
+    validateNotNegative(hourRangeUp, "hourRangeUp");
+    validateNotNegative(monthRangeUp, "monthRangeUp");
+    validateNotNegative(minutesRangeDown, "minutesRangeDown");
+    validateNotNegative(generalizeNyearintervalvalue, "generalizeNyearintervalvalue");
+    validateNotNegative(generalizeNyearintervalstart, "generalizeNyearintervalstart");
+    validateNotNegative(generalizeNyearintervalend, "generalizeNyearintervalend");
+    validateNotNegative(yearMaxYearsAgo, "yearMaxYearsAgo");
+    validateNotNegative(yearShiftFromCurrentYear, "yearShiftFromCurrentYear");
+    validateNotNegative(overrideYearsPassed, "overrideYearsPassed");
+    validateNotNegative(dayMaxDaysAgo, "dayMaxDaysAgo");
+    validateNotNegative(dayShiftFromCurrentDay, "dayShiftFromCurrentDay");
+    validateNotNegative(yearDeleteNdaysValue, "yearDeleteNdaysValue");
+  }
+
+  private void validateNotNegative(int value, String name)
+      throws InvalidMaskingConfigurationException {
+    if (value < 0) {
+      throw new InvalidMaskingConfigurationException(
+          "`" + name + "` must be greater than or equal to 0");
+    }
   }
 
   @Override
