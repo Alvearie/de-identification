@@ -69,6 +69,7 @@ public class LatitudeLongitudeMaskingProviderConfig extends MaskingProviderConfi
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (offsetMaximumRadius < 0) {
       throw new InvalidMaskingConfigurationException(
           "`offsetMaximumRadius` must be greater than 0");

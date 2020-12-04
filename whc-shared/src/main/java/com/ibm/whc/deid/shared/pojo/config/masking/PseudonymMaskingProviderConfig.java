@@ -141,6 +141,7 @@ public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (generateViaPatternLanguageCode == null) {
       throw new InvalidMaskingConfigurationException(
           "`generateViaPatternLanguageCode` must not be null");
@@ -155,7 +156,7 @@ public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
     }
     if (generateViaOptionsMinLength > generateViaOptionsMaxLength) {
       throw new InvalidMaskingConfigurationException(
-          "`generateViaOptionsMaxLength` must be greater than `generateViaOptionsMinLength`");
+          "`generateViaOptionsMaxLength` must be greater than or equal to `generateViaOptionsMinLength`");
     }
   }
 

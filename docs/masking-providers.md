@@ -554,7 +554,7 @@ This privacy provider supports these options:
 | yearDeleteNdays                                   | Boolean  | Remove the year and return only the day and month, if the date and time is after the given number of days ago                                                                                                                                                                                                                       | false             |
 | yearDeleteNinterval                               | Boolean  | Remove the year and return only the day and month, if the date and time is within the given number of days from a given date and time                                                                                                                                                                                                                       | false             |
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
-| yearDeleteNointervalComparedateValue              | Integer  | The date and time to compare                                                                                                                                                                                                                                | 0                 |
+| yearDeleteNointervalComparedateValue              | String   | The date and time to compare                                                                                                                                                                                                                                | null              |
 
 #### EMAIL
 
@@ -1280,14 +1280,14 @@ Here are the options and their default values for the PSEUDONYM  provider:
 ### Applying multiple data protection methods to the same data element
 
    The IBM Data De-Identification Service supports the application of multiple data
-   protection methods and rules to a FHIR data element. This is a
+   protection methods and rules to a data element. This is a
    powerful and useful feature, which works similarly to a UNIX pipe command,
    for example: ls –al \| grep ‘\^d’
 
    When multiple data protection methods are specified for the same data element,
    the first method is applied on the original value of the element, and its output
    is provided as input to the next data protection method. The output of the
-   last data protection method determines the new value of the FHIR data element.
+   last data protection method determines the new value of the data element.
 
    The Data De-Identification Service supports two approaches for applying
    multiple data protection methods to a data element. The first approach is
@@ -1299,16 +1299,16 @@ Here are the options and their default values for the PSEUDONYM  provider:
 #### Provide multiple values in the maskingProviders array
 
    The Data De-Identification Service allows the application of more than one
-   data protection method to the same FHIR data element. This applies when
+   data protection method to the same data element. This applies when
    multiple values are specified in the maskingProviders parameter of a rule.
    The data protection methods are applied in the sequence that they are listed
    in the data de-identification configuration file.
 
-   **Note:** This functionality is available for both array and non-array FHIR data elements.
+   **Note:** This functionality is available for both array and non-array data elements.
 
    This examples shows the supported syntax.
 
-   **Example 12: Masking a FHIR data element using two privacy providers**
+   **Example 12: Masking a data element using two privacy providers**
 ```
     {
       "rules": [
@@ -1424,26 +1424,11 @@ Here are the options and their default values for the PSEUDONYM  provider:
    providers that can be applied to the same FHIR data element, when using the
    comma-separated format.
 
-   Specifically, **only two privacy providers can be assigned to a single data element**.
-   If this condition is violated, then an IllegalArgumentException is
-   generated and this error message is written to the platform log file:
+   Firstly, **only two privacy providers can be assigned to a single data element**.
 
-| **Message ID** | **Message text**                                                                                      | **Replacement variables**                                       |
-|----------------|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| WPH2012E       | {0} – The rule {1} provided for key {2} contains an invalid combination of chained masking providers. | {0}: Provider class name {1}: Masking rule used {2}: Field path |
-
-   Here is an example of a produced log message:
-
->   17/07/17 17:00:57 - 100.10.100.10 - WPHDeid - ipv-core - whc-lsf-tenant -
->   ERROR - LogManager -
->   com.ibm.research.drl.prima.providers.masking.fhir.FHIRGenericMaskingProvider
->   - The rule [RANDOM, HASH, HASH] provided for key /gender contains an invalid
->   combination of chained masking providers.
-
-   The second restriction that is enforced by the Data De-Identification
-   Service regards the type of the privacy providers that can be applied to the
+   The second restriction regards the type of the privacy providers that can be applied to the
    same data element, ensuring that the pair of providers that is used is
-   valid. For service separates the privacy providers into two categories:
+   valid. The service separates the privacy providers into two categories:
 
 1.  **Category I – PII-specific providers:** These providers mask a specific
     type of PII / PHI / SPI. Examples are ADDRESS, PHONE, VIN, SSN, COUNTY, URL,
@@ -1460,23 +1445,12 @@ Here are the options and their default values for the PSEUDONYM  provider:
    valid if the first provider belongs to Category I, and the second provider
    is from Category II.
 
-   If an invalid pair of privacy providers is specified, the
-   Data De-Identification Service generates an
-   IllegalArgumentException error and logs a WPH2011E message to the platform log
-   file. Here is an example of such a log message:
-
->   17/07/17 17:00:57 - 100.10.100.10 - WPHDeid - ipv-core - whc-lsf-tenant -
->   ERROR - LogManager -
->   com.ibm.research.drl.prima.providers.masking.fhir.FHIRGenericMaskingProvider
->   The rule [HASH, PHONE] provided for key /telecom[1]/value contains an
->   invalid combination of chained masking providers.
-
 #### Using separate rules for privacy providers
 
-   The same data elements of a FHIR array can be processed by multiple privacy
-   providers, when more than one rule is defined for these data elements in
+   The same data elements of an array can be processed by multiple privacy
+   providers when more than one rule is defined for these data elements in
    the data de-identification configuration file. In this case, the rules are
-   applied to the corresponding data elements of the FHIR array in the
+   applied to the corresponding data elements of the array in the
    sequence in which they have been defined:
 
    - The first rule is applied to the original value of the data element.
@@ -1486,7 +1460,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
    The next example shows a valid ruleset for processing data elements of a
    FHIR array with multiple privacy providers.
 
-   **Example 14: Masking elements of a FHIR array with multiple masking providers**
+   **Example 14: Masking elements of an array with multiple masking providers**
 
 ```
   {
@@ -1507,9 +1481,9 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
     In this example, both the first and the second rule are applied to the
    name[1]/use data element. The second rule is also applied to all
-   other name[\*]/use elements in the FHIR array. The third rule of the example
+   other name[\*]/use elements in the array. The third rule of the example
    leads to applying the HASH followed by the REPLACE privacy providers to
-   all name[\*]/given[0] data elements in the FHIR array.
+   all name[\*]/given[0] data elements in the array.
 
    To disable this default behavior, you can use a configuration option (flag),
    **arrayAllRules**, in the data de-identification configuration file.
@@ -1534,7 +1508,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
    **Note:** In the case of regular, non-array FHIR data elements, if multiple de-identification
    rules are specified, only the last rule is applied to the data. The previous rules are discarded.
 
-   **Example 15: Masking a regular FHIR data element using separate de-identification rules**
+   **Example 15: Masking a regular data element using separate de-identification rules**
 
 ```
   {

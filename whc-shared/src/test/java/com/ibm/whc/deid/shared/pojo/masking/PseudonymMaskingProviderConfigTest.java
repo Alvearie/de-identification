@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -17,6 +18,15 @@ public class PseudonymMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     PseudonymMaskingProviderConfig config = new PseudonymMaskingProviderConfig();
     config.validate();
+    config.setUnspecifiedValueHandling(-4);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(1);
+    config.validate();
     config.setGenerateViaPatternLanguageCode(null);
     try {
       config.validate();
@@ -26,7 +36,7 @@ public class PseudonymMaskingProviderConfigTest {
     }
     config.setGenerateViaPatternLanguageCode("EN");
     config.validate();
-    config.setGenerateViaOptionsMinLength(-1);
+    config.setGenerateViaOptionsMinLength(0);
     try {
       config.validate();
       fail("expected exception");
@@ -36,7 +46,7 @@ public class PseudonymMaskingProviderConfigTest {
     }
     config.setGenerateViaOptionsMinLength(2);
     config.validate();
-    config.setGenerateViaOptionsMaxLength(-1);
+    config.setGenerateViaOptionsMaxLength(0);
     try {
       config.validate();
       fail("expected exception");
@@ -51,9 +61,11 @@ public class PseudonymMaskingProviderConfigTest {
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage()
           .contains(
-              "`generateViaOptionsMaxLength` must be greater than `generateViaOptionsMinLength`"));
+              "`generateViaOptionsMaxLength` must be greater than or equal to `generateViaOptionsMinLength`"));
     }
     config.setGenerateViaOptionsMaxLength(2);
     config.validate();
+    config.setGenerateViaOptionsMaxLength(3);
+    config.validate();    
   }
 }

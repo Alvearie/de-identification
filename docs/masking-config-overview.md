@@ -468,7 +468,7 @@ This method allows the application of privacy providers to specific data element
    In the above example, the second rule triggers an
    IllegalArgumentException with the message
    **Cannot intermix FHIR arrays by index and arrays by query in the same masking rule.**
-   Subsequently, this logs an error message in the application audit log. The error message has the
+   Subsequently, this logs an error message in the application log. The error message has the
    following structure:
 
 | **Message ID** | **Message text**                                                                                        | **Replacement variables**                         |
@@ -488,8 +488,8 @@ This method allows the application of privacy providers to specific data element
    Array Query Condition method. **Do not use both methods.** It is the responsibility of the onboarder
    to never process the same FHIR data elements with both methods.
 
-### certificateID (String, Optional)
-Use the optional `certificateID` field to provide a string identifying the masking configuration file in the audit trail output. This can be useful to track which configuration was used to de-identify specific records.
+### certificateId (String, Optional)
+Use the optional `certificateId` field to provide a string identifying the masking configuration file in the audit trail output. This can be useful to track which configuration was used to de-identify specific records.
 
 ### defaultNoRuleResolution (Boolean, Optional)
 Set to **true** to maintain any field that is not associated with a masking rule. Set to **false** to redact fields that are not associated with a masking rule.  If not specified, the default value is **true**.

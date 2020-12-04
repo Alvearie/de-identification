@@ -87,6 +87,7 @@ public class NumberVarianceMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (augmentLowerBound < 0.0) {
       throw new InvalidMaskingConfigurationException("`augmentLowerBound` must be greater than 0");
     }
