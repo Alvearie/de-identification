@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Redacts a value by replacing it with a character (default is the letter X). The length of the
@@ -17,8 +18,11 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class RedactMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1418940833877275858L;
+  
+  private static final String DEFAULT_REPLACE_CHARACTER = "X";
+  
   private boolean preserveLength = true;
-  private String replaceCharacter = "X";
+  private String replaceCharacter = DEFAULT_REPLACE_CHARACTER;
 
   public RedactMaskingProviderConfig() {
     type = MaskingProviderType.REDACT;
@@ -37,7 +41,15 @@ public class RedactMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   public void setReplaceCharacter(String replaceCharacter) {
-    this.replaceCharacter = replaceCharacter;
+    this.replaceCharacter = replaceCharacter == null ? DEFAULT_REPLACE_CHARACTER : replaceCharacter;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (replaceCharacter.length() != 1) {
+      throw new InvalidMaskingConfigurationException("`replaceCharacter` must be a single character");
+    }
   }
 
   @Override
