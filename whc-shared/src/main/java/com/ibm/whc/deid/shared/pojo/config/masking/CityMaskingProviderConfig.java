@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks a city with a randomly selected city, or based on one of its neighboring cities
@@ -17,9 +18,10 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class CityMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 4513266739679517581L;
-  boolean maskClosest;
-  int maskClosestK = 10;
-  boolean maskPseudorandom;
+
+  private boolean maskClosest;
+  private int maskClosestK = 10;
+  private boolean maskPseudorandom;
 
   public CityMaskingProviderConfig() {
     type = MaskingProviderType.CITY;
@@ -47,6 +49,14 @@ public class CityMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskPseudorandom(boolean maskPseudorandom) {
     this.maskPseudorandom = maskPseudorandom;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (getMaskClosestK() < 1) {
+      throw new InvalidMaskingConfigurationException("`maskClosestK` must be greater than 0");
+    }
   }
 
   @Override

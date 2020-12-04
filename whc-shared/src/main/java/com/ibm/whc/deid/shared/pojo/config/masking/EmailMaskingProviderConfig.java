@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks e-mail addresses with the option to preserve certain levels of the host domain.
@@ -16,8 +17,9 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class EmailMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -6728740718420993380L;
-  int preserveDomains = 1;
-  int nameLength = -1;
+
+  private int preserveDomains = 1;
+  private int nameLength = -1;
 
   public EmailMaskingProviderConfig() {
     type = MaskingProviderType.EMAIL;
@@ -37,6 +39,17 @@ public class EmailMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setNameLength(int nameLength) {
     this.nameLength = nameLength;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (nameLength < -1 || nameLength == 0) {
+      throw new InvalidMaskingConfigurationException("`nameLength` must be -1 or greater than 0");
+    }
+    if (preserveDomains < -1) {
+      throw new InvalidMaskingConfigurationException("`preserveDomains` must not be less than -1");
+    }
   }
 
   @Override

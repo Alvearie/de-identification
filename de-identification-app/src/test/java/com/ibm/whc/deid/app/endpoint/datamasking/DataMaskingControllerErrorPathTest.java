@@ -20,6 +20,7 @@ import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
+import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.CityMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
@@ -676,6 +677,30 @@ public class DataMaskingControllerErrorPathTest {
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the rule at offset 2 in `rules` contains multiple masking providers, but the second masking provider is not a Category II provider")));
+  }
+
+  @Test
+  public void testConfigInvalidProviderConfig() throws Exception {
+    List<String> dataList = new ArrayList<>();
+    dataList.add(TEST_DATA);
+
+    ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
+    AddressMaskingProviderConfig provider = new AddressMaskingProviderConfig();
+    provider.setPostalCodeNearestK(-1);
+    DeidMaskingConfig config = objectMapper.readValue(TEST_CONFIG, DeidMaskingConfig.class);
+    config.getRules().add(1, new Rule("invalidRuleX", Arrays.asList(provider)));
+
+    DataMaskingModel dataMaskingModel = new DataMaskingModel(
+        objectMapper.writeValueAsString(config), dataList, ConfigSchemaType.FHIR);
+    String request = objectMapper.writeValueAsString(dataMaskingModel);
+
+    log.info(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification")
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString(
+            "invalid masking configuration: the masking provider at offset 0 in `maskingProviders` for the rule at offset 1 in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
   }
 
 }

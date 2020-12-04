@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Provider for masking a field based on two related dates
@@ -17,11 +18,17 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 7784240554858910715L;
 
-  String datetimeYearDeleteNIntervalMaskDate;
-  String datetimeYearDeleteNIntervalCompareDate;
-  String datetimeyearDeleteNIntervalCompareDateValue;
+  private String datetimeYearDeleteNIntervalMaskDate;
+  private String datetimeYearDeleteNIntervalCompareDate;
+  private int dateYearDeleteNDaysValue = 365;
+  
+  // set by code, not a documented, external configuration parameter
+  private String datetimeyearDeleteNIntervalCompareDateValue;
+  
 
-  int dateYearDeleteNDaysValue = 365;
+  public DateDependencyMaskingProviderConfig() {
+    type = MaskingProviderType.DATEDEPENDENCY;
+  }
 
   public String getDatetimeyearDeleteNIntervalCompareDateValue() {
     return datetimeyearDeleteNIntervalCompareDateValue;
@@ -34,10 +41,6 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
 
   public String getDatetimeYearDeleteNIntervalMaskDate() {
     return datetimeYearDeleteNIntervalMaskDate;
-  }
-
-  public DateDependencyMaskingProviderConfig() {
-    type = MaskingProviderType.DATEDEPENDENCY;
   }
 
   public void setDatetimeYearDeleteNIntervalMaskDate(String datetimeYearDeleteNIntervalMaskDate) {
@@ -59,6 +62,20 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setDateYearDeleteNDaysValue(int dateYearDeleteNDaysValue) {
     this.dateYearDeleteNDaysValue = dateYearDeleteNDaysValue;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (datetimeYearDeleteNIntervalMaskDate == null || datetimeYearDeleteNIntervalMaskDate.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException("`datetimeYearDeleteNIntervalMaskDate` is required");
+    }
+    if (datetimeYearDeleteNIntervalCompareDate == null || datetimeYearDeleteNIntervalCompareDate.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException("`datetimeYearDeleteNIntervalCompareDate` is required");
+    }
+    if (dateYearDeleteNDaysValue < 0) {
+      throw new InvalidMaskingConfigurationException("`dateYearDeleteNDaysValue` must be greater than or equal to 0"); 
+    }
   }
 
   @Override
