@@ -33,4 +33,19 @@ public class IMEIMaskingProviderConfig extends MaskingProviderConfig {
   public void setPreserveTac(boolean preserveTAC) {
     this.preserveTAC = preserveTAC;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + (preserveTAC ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return (this == obj) || (obj != null && super.equals(obj) && getClass() == obj.getClass()
+        && preserveTAC == ((IMEIMaskingProviderConfig) obj).preserveTAC);
+  }
+
 }

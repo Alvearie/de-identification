@@ -27,7 +27,7 @@ public class DeidMaskingConfig implements Serializable {
 
   public static final String JSON_CONFIGURATION_PROPERTY_NAME = "json";
   public static final String RULES_CONFIGURATION_PROPERTY_NAME = "rules";
-
+  
   // The rules are configured in the json as an array. So we use List<Rule> in
   // the POJO.
   // But for quicker access, we also store the rule as a map.
@@ -40,7 +40,7 @@ public class DeidMaskingConfig implements Serializable {
   private JsonConfig json;
 
   @JsonAlias({"certificateID"})
-  String certificateId;
+  private String certificateId;
 
   private boolean defaultNoRuleResolution;
 
@@ -59,11 +59,11 @@ public class DeidMaskingConfig implements Serializable {
 
   public void setRules(List<Rule> rules) {
     this.rules = rules;
-
+    
     // Add all the rules to a hashmap for quicker access
     rulesMap = new HashMap<>(rules == null ? 10 : rules.size() * 2);
     if (rules != null) {
-      for (Rule rule : rules) {
+      for (Rule rule : rules) {        
         if (rule != null) {
           rulesMap.put(rule.getName(), rule);
         }
@@ -97,7 +97,7 @@ public class DeidMaskingConfig implements Serializable {
 
   public Map<String, String> getStringValueWithPrefixMatch(String prefix) {
     Map<String, String> values = new ConcurrentHashMap<>();
-
+    
     if (getJson() != null && getJson().getMaskingRules() != null) {
       getJson().getMaskingRules().forEach(rule -> {
         if (rule.getJsonPath().startsWith(prefix)) {
