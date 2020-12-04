@@ -42,7 +42,7 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
     }
     for (ConditionalMaskRuleSet ruleSet : maskRuleSet) {
       if (ruleSet == null) {
-        throw new InvalidMaskingConfigurationException("`maskRuleSet` is null");
+        throw new InvalidMaskingConfigurationException("entry in `maskRuleSet` is null");
       }
       ruleSet.validate("maskRuleSet");
     }

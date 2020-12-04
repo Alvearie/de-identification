@@ -53,7 +53,7 @@ public class Condition {
   }
 
   public void validate(String parentName) throws InvalidMaskingConfigurationException {
-    if (field == null) {
+    if (field == null || field.trim().isEmpty()) {
       throw new InvalidMaskingConfigurationException(
           "`" + String.valueOf(parentName) + ".field` is missing");
     }

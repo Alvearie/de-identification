@@ -32,6 +32,13 @@ public class ConditionTest {
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`null.field` is missing", e.getMessage());
     }
+    condition.setField("  ");
+    try {
+      condition.validate("a.b");
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`a.b.field` is missing", e.getMessage());
+    }
     condition.setField("field3");
 
     condition.setOperator(null);

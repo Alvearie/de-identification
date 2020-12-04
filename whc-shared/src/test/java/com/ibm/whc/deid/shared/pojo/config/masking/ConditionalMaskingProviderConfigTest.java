@@ -66,7 +66,7 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`maskRuleSet` is null", e.getMessage());
+      assertEquals("entry in `maskRuleSet` is null", e.getMessage());
     }
   }
 
