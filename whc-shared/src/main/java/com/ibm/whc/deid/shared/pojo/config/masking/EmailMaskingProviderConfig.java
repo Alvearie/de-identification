@@ -43,6 +43,7 @@ public class EmailMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (nameLength < -1 || nameLength == 0) {
       throw new InvalidMaskingConfigurationException("`nameLength` must be -1 or greater than 0");
     }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,12 +17,22 @@ public class EmailMaskingProviderConfigTest {
     EmailMaskingProviderConfig config = new EmailMaskingProviderConfig();
     config.validate();
 
+    config.setUnspecifiedValueHandling(4);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(2);
+    config.validate();
+
     config.setNameLength(-2);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(e.getMessage(), "`nameLength` must be -1 or greater than 0");
+      assertEquals("`nameLength` must be -1 or greater than 0", e.getMessage());
     }
 
     config.setNameLength(-1);
@@ -33,7 +43,7 @@ public class EmailMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(e.getMessage(), "`nameLength` must be -1 or greater than 0");
+      assertEquals("`nameLength` must be -1 or greater than 0", e.getMessage());
     }
 
     config.setNameLength(1);
@@ -46,7 +56,7 @@ public class EmailMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(e.getMessage(), "`preserveDomains` must not be less than -1");
+      assertEquals("`preserveDomains` must not be less than -1", e.getMessage());
     }
 
     config.setPreserveDomains(-1);

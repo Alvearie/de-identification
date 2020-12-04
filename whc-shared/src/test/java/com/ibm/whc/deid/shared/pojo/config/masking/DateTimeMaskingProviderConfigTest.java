@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,6 +16,16 @@ public class DateTimeMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.validate();
+    
+    config.setUnspecifiedValueHandling(7);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(0);
     config.validate();
 
     config.setFormatFixed("TTT");
@@ -122,7 +132,6 @@ public class DateTimeMaskingProviderConfigTest {
     config.setYearDeleteNdaysValue(-1);
     validateNegativeError(config, "yearDeleteNdaysValue");
     config.setYearDeleteNdaysValue(0);
-
   }
 
   private void validateNegativeError(DateTimeMaskingProviderConfig config, String name) {
@@ -130,7 +139,7 @@ public class DateTimeMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(e.getMessage(), "`" + name + "` must be greater than or equal to 0");
+      assertEquals("`" + name + "` must be greater than or equal to 0", e.getMessage());
     }
   }
 

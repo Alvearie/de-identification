@@ -53,6 +53,7 @@ public class CityMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (getMaskClosestK() < 1) {
       throw new InvalidMaskingConfigurationException("`maskClosestK` must be greater than 0");
     }

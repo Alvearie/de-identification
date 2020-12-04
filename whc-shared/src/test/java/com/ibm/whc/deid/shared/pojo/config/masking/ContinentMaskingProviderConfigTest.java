@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,6 +15,16 @@ public class ContinentMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     ContinentMaskingProviderConfig config = new ContinentMaskingProviderConfig();
+    config.validate();
+
+    config.setUnspecifiedValueHandling(-4);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(3);
     config.validate();
 
     config.setMaskClosestK(0);

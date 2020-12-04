@@ -35,6 +35,7 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (maskRuleSet == null || maskRuleSet.isEmpty()) {
       throw new InvalidMaskingConfigurationException(
           "`maskRuleSet` must be specified with at least one entry");

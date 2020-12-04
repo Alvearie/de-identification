@@ -66,6 +66,7 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (datetimeYearDeleteNIntervalMaskDate == null || datetimeYearDeleteNIntervalMaskDate.trim().isEmpty()) {
       throw new InvalidMaskingConfigurationException("`datetimeYearDeleteNIntervalMaskDate` is required");
     }

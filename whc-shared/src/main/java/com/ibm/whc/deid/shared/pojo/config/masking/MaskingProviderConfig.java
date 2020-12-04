@@ -137,16 +137,19 @@ public abstract class MaskingProviderConfig implements Serializable {
 
   /**
    * Determines if this masking provider configuration is valid. A configuration might be invalid if
-   * it has been given conflicting information or is missing required information. Many masking
-   * provider configurations cannot have invalid states.
+   * it has been given conflicting information or is missing required information.
+   * 
+   * <p>
+   * Subclasses requiring additional validation should override this method, but should still ensure
+   * the validation done here is performed if applicable.
    * 
    * @throws InvalidMaskingConfigurationException if this masking provider configuration is
    *         currently invalid
    */
   public void validate() throws InvalidMaskingConfigurationException {
-    // Nothing required here. Many masking provider configurations cannot have invalid states.
-    // If a subclass could be invalid, it should override this method to be able to report that
-    // fact.
+    if (unspecifiedValueHandling < 0 || unspecifiedValueHandling > 3) {
+      throw new InvalidMaskingConfigurationException("`unspecifiedValueHandling` must be [0..3]");
+    }
   }
 
   /**

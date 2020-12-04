@@ -63,6 +63,7 @@ public class BinningMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (binSize < 1) {
       throw new InvalidMaskingConfigurationException("`binSize` must be greater than 0");
     }

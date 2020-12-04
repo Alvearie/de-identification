@@ -146,6 +146,7 @@ public class AddressMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (getPostalCodeNearestK() < 1) {
       throw new InvalidMaskingConfigurationException("`postalCodeNearestK` must be greater than 0");
     }

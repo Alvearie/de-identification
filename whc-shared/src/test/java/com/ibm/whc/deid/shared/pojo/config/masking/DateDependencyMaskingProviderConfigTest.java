@@ -1,12 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
@@ -20,7 +20,16 @@ public class DateDependencyMaskingProviderConfigTest {
     config.setDatetimeYearDeleteNIntervalCompareDate("compDate");
     config.setDateYearDeleteNDaysValue(0);
     assertNull(config.getDatetimeyearDeleteNIntervalCompareDateValue());
+    config.validate();
 
+    config.setUnspecifiedValueHandling(-1);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(1);
     config.validate();
 
     config.setDatetimeYearDeleteNIntervalMaskDate(null);
@@ -28,7 +37,7 @@ public class DateDependencyMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`datetimeYearDeleteNIntervalMaskDate` is required"));
+      assertEquals("`datetimeYearDeleteNIntervalMaskDate` is required", e.getMessage());
     }
     config.setDatetimeYearDeleteNIntervalMaskDate("maskDate2");
 
@@ -37,7 +46,7 @@ public class DateDependencyMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`datetimeYearDeleteNIntervalCompareDate` is required"));
+      assertEquals("`datetimeYearDeleteNIntervalCompareDate` is required", e.getMessage());
     }
     config.setDatetimeYearDeleteNIntervalCompareDate("compDate2");
 
@@ -46,8 +55,7 @@ public class DateDependencyMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(
-          e.getMessage().contains("`dateYearDeleteNDaysValue` must be greater than or equal to 0"));
+      assertEquals("`dateYearDeleteNDaysValue` must be greater than or equal to 0", e.getMessage());
     }
     config.setDateYearDeleteNDaysValue(55);
   }

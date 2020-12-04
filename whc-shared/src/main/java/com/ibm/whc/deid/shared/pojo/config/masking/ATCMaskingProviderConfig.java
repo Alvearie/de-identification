@@ -34,8 +34,9 @@ public class ATCMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (maskLevelsToKeep < 1 || maskLevelsToKeep > 4) {
-      throw new InvalidMaskingConfigurationException("`maskLevelsToKeep` must be 1..4");
+      throw new InvalidMaskingConfigurationException("`maskLevelsToKeep` must be [1..4]");
     }
     super.validate();
   }

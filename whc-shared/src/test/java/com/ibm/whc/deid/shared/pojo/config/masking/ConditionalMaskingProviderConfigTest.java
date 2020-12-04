@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -27,8 +27,7 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(
-          e.getMessage().contains("`maskRuleSet` must be specified with at least one entry"));
+      assertEquals("`maskRuleSet` must be specified with at least one entry", e.getMessage());
     }
 
     List<ConditionalMaskRuleSet> maskRuleSet = new ArrayList<>();
@@ -37,8 +36,7 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(
-          e.getMessage().contains("`maskRuleSet` must be specified with at least one entry"));
+      assertEquals("`maskRuleSet` must be specified with at least one entry", e.getMessage());
     }
 
     ConditionalMaskRuleSet ruleset = new ConditionalMaskRuleSet();
@@ -47,10 +45,20 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`maskRuleSet.maskingProvider` is missing"));
+      assertEquals("`maskRuleSet.maskingProvider` is missing", e.getMessage());
     }
 
     ruleset.setMaskingProvider(new HashMaskingProviderConfig());
+    config.validate();
+
+    config.setUnspecifiedValueHandling(5);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(1);
     config.validate();
 
     maskRuleSet.add(null);
@@ -58,7 +66,7 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`maskRuleSet` is null"));
+      assertEquals("`maskRuleSet` is null", e.getMessage());
     }
   }
 
@@ -73,6 +81,20 @@ public class ConditionalMaskingProviderConfigTest {
     assertEquals(config.hashCode(), config.hashCode()); // same value called twice
 
     ConditionalMaskingProviderConfig other = new ConditionalMaskingProviderConfig();
+    assertTrue(config.equals(other));
+    assertEquals(config.hashCode(), other.hashCode());
+
+    config.setUnspecifiedValueHandling(2);
+    assertFalse(config.equals(other));
+    assertNotEquals(config.hashCode(), other.hashCode());
+    other.setUnspecifiedValueHandling(2);
+    assertTrue(config.equals(other));
+    assertEquals(config.hashCode(), other.hashCode());
+
+    config.setUnspecifiedValueReturnMessage("x");
+    assertFalse(config.equals(other));
+    assertNotEquals(config.hashCode(), other.hashCode());
+    other.setUnspecifiedValueReturnMessage("x");
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 

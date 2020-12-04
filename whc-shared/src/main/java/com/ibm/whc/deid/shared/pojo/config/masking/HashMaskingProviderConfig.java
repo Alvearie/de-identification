@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Hashes the original value using an algorithm
@@ -83,6 +84,14 @@ public class HashMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setSalt(String salt) {
     this.salt = salt == null ? "" : salt;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (algorithmDefault == null  || algorithmDefault.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException("`algorithmDefault` is required");
+    }
   }
 
   @Override

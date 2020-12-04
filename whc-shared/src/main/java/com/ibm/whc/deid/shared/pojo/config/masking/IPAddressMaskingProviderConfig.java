@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks IP addresses with the option to preserve subnets.
@@ -28,6 +29,14 @@ public class IPAddressMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setSubnetsPreserve(int subnetsPreserve) {
     this.subnetsPreserve = subnetsPreserve;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (subnetsPreserve < 0) {
+      throw new InvalidMaskingConfigurationException("`subnetsPreserve` must be greater than or equal to 0");
+    }
   }
 
   @Override

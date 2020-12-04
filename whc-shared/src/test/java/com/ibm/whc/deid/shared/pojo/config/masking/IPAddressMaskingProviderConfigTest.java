@@ -10,41 +10,36 @@ import static org.junit.Assert.fail;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
 
-public class CountryMaskingProviderConfigTest {
+public class IPAddressMaskingProviderConfigTest {
 
   @Test
   public void testValidate() throws Exception {
-    CountryMaskingProviderConfig config = new CountryMaskingProviderConfig();
+    IPAddressMaskingProviderConfig config = new IPAddressMaskingProviderConfig();
     config.validate();
 
-    config.setUnspecifiedValueHandling(-4);
+    config.setUnspecifiedValueHandling(-1);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
-    config.setUnspecifiedValueHandling(3);
+    config.setUnspecifiedValueHandling(0);
     config.validate();
 
-    config.setMaskClosestK(0);
+    config.setSubnetsPreserve(-1);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`maskClosestK` must be greater than 0", e.getMessage());
+      assertEquals("`subnetsPreserve` must be greater than or equal to 0", e.getMessage());
     }
-
-    config.setMaskClosestK(5);
+    config.setSubnetsPreserve(0);
     config.validate();
-
-    config.setMaskClosestK(-1);
-    try {
-      config.validate();
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`maskClosestK` must be greater than 0", e.getMessage());
-    }
+    config.setSubnetsPreserve(1);
+    config.validate();
+    config.setSubnetsPreserve(1);
+    config.validate();
   }
 
 }

@@ -43,6 +43,7 @@ public class ContinentMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (maskClosestK < 1) {
       throw new InvalidMaskingConfigurationException("`maskClosestK` must be greater than 0");
     }

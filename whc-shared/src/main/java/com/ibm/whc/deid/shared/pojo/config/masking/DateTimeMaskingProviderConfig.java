@@ -457,6 +457,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (formatFixed != null) {
       try {
         new DateTimeFormatterBuilder().appendPattern(formatFixed);
