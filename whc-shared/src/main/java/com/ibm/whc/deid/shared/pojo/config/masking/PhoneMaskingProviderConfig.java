@@ -63,6 +63,7 @@ public class PhoneMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (invNdigitsReplaceWith == null) {
       throw new InvalidMaskingConfigurationException("`invNdigitsReplaceWith` must be not null");
     }

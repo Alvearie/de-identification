@@ -124,6 +124,7 @@ public class ZIPCodeMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (maskCountryCode == null) {
       throw new InvalidMaskingConfigurationException(
           "`maskCountryCode` must not be null");

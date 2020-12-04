@@ -60,6 +60,7 @@ public class ReplaceMaskingProviderConfig extends MaskingProviderConfig {
 
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
     if (maskOffset < 0) {
       throw new InvalidMaskingConfigurationException(
           "`maskOffset` must be greater than or equal to 0");

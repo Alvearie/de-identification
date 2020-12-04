@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -17,6 +18,15 @@ public class NumberVarianceMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     NumberVarianceMaskingProviderConfig config = new NumberVarianceMaskingProviderConfig();
     config.validate();
+    config.setUnspecifiedValueHandling(-1);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
+    }
+    config.setUnspecifiedValueHandling(3);
+    config.validate();    
     config.setAugmentLowerBound(-1.0);
     try {
       config.validate();
