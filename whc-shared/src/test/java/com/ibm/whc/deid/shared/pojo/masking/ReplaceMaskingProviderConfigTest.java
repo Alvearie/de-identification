@@ -22,7 +22,7 @@ public class ReplaceMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`maskOffset` must be greater than 0"));
+      assertTrue(e.getMessage().contains("`maskOffset` must be greater than or equal to 0"));
     }
     config.setMaskOffset(0);
     config.validate();
@@ -31,7 +31,7 @@ public class ReplaceMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`maskPreserve` must be greater than 0"));
+      assertTrue(e.getMessage().contains("`maskPreserve` must be greater than or equal to 0"));
     }
     config.setMaskPreserve(0);
     config.validate();

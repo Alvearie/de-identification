@@ -145,13 +145,17 @@ public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
       throw new InvalidMaskingConfigurationException(
           "`generateViaPatternLanguageCode` must not be null");
     }
-    if (generateViaOptionsMinLength < 0.0) {
+    if (generateViaOptionsMinLength < 1) {
       throw new InvalidMaskingConfigurationException(
-          "`generateViaOptionsMinLength` must be greater than 0");
+          "`generateViaOptionsMinLength` must be greater than or equal to 1");
     }
-    if (generateViaOptionsMaxLength < 0.0) {
+    if (generateViaOptionsMaxLength < 1) {
       throw new InvalidMaskingConfigurationException(
-          "`generateViaOptionsMaxLength` must be greater than 0");
+          "`generateViaOptionsMaxLength` must be greater than or equal to 1");
+    }
+    if (generateViaOptionsMinLength > generateViaOptionsMaxLength) {
+      throw new InvalidMaskingConfigurationException(
+          "`generateViaOptionsMaxLength` must be greater than `generateViaOptionsMinLength`");
     }
   }
 

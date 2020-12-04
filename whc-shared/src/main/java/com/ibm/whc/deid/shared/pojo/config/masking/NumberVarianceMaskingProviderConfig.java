@@ -95,11 +95,11 @@ public class NumberVarianceMaskingProviderConfig extends MaskingProviderConfig {
     }
     if (augmentMask && augmentLowerBound > augmentUpperBound) {
       throw new InvalidMaskingConfigurationException(
-          "`augmentLowerBound` must be less than `augmentUpperBound` when `augmentMask` is true");
+          "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `augmentMask` is true");
     }
     if (augmentMask && augmentLowerBound == augmentUpperBound && !resultWithPrecision) {
       throw new InvalidMaskingConfigurationException(
-          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `augmentMask` is true");
+          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `resultWithPrecision` is false");
     }
   }
     

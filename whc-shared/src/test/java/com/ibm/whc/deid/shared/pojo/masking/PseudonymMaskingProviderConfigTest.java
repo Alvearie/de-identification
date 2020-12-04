@@ -31,18 +31,29 @@ public class PseudonymMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`generateViaOptionsMinLength` must be greater than 0"));
+      assertTrue(e.getMessage()
+          .contains("`generateViaOptionsMinLength` must be greater than or equal to 1"));
     }
-    config.setGenerateViaOptionsMinLength(0);
+    config.setGenerateViaOptionsMinLength(2);
     config.validate();
     config.setGenerateViaOptionsMaxLength(-1);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`generateViaOptionsMaxLength` must be greater than 0"));
+      assertTrue(e.getMessage()
+          .contains("`generateViaOptionsMaxLength` must be greater than or equal to 1"));
     }
-    config.setGenerateViaOptionsMaxLength(0);
+    config.setGenerateViaOptionsMaxLength(1);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertTrue(e.getMessage()
+          .contains(
+              "`generateViaOptionsMaxLength` must be greater than `generateViaOptionsMinLength`"));
+    }
+    config.setGenerateViaOptionsMaxLength(2);
     config.validate();
   }
 }

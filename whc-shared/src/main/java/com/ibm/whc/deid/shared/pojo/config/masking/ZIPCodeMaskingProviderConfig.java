@@ -128,18 +128,19 @@ public class ZIPCodeMaskingProviderConfig extends MaskingProviderConfig {
       throw new InvalidMaskingConfigurationException(
           "`maskCountryCode` must not be null");
     }
-    if (maskReplaceWithNeighborNearestCount < 0.0) {
+    if (maskReplaceWithNeighborNearestCount < 1) {
       throw new InvalidMaskingConfigurationException(
           "`maskReplaceWithNeighborNearestCount` must be greater than 0");
     }
-    if (maskPrefixLength < 0.0) {
-      throw new InvalidMaskingConfigurationException("`maskPrefixLength` must be greater than 0");
+    if (maskPrefixLength < 1) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskPrefixLength` must be greater than 0");
     }
-    if (maskPrefixMinPopulation < 0.0) {
+    if (maskPrefixMinPopulation < 1) {
       throw new InvalidMaskingConfigurationException(
           "`maskPrefixMinPopulation` must be greater than 0");
     }
-    if (maskTruncateLengthIfNotMinPopulation < 0.0) {
+    if (maskTruncateLengthIfNotMinPopulation < 1) {
       throw new InvalidMaskingConfigurationException(
           "`maskTruncateLengthIfNotMinPopulation` must be greater than 0");
     }

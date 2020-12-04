@@ -41,7 +41,7 @@ public class NumberVarianceMaskingProviderConfigTest {
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains(
-          "`augmentLowerBound` must be less than `augmentUpperBound` when `augmentMask` is true"));
+          "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `augmentMask` is true"));
     }
     config.setAugmentUpperBound(5.0);
     config.validate();
@@ -52,7 +52,7 @@ public class NumberVarianceMaskingProviderConfigTest {
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains(
-          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `augmentMask` is true"));
+          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `resultWithPrecision` is false"));
     }
     config.setResultWithPrecision(true);
     config.validate();

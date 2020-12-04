@@ -34,7 +34,7 @@ public class ZIPCodeMaskingProviderConfigTest {
       assertTrue(
           e.getMessage().contains("`maskReplaceWithNeighborNearestCount` must be greater than 0"));
     }
-    config.setMaskReplaceWithNeighborNearestCount(0);
+    config.setMaskReplaceWithNeighborNearestCount(1);
     config.validate();
     config.setMaskPrefixLength(-1);
     try {
@@ -43,7 +43,7 @@ public class ZIPCodeMaskingProviderConfigTest {
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`maskPrefixLength` must be greater than 0"));
     }
-    config.setMaskPrefixLength(0);
+    config.setMaskPrefixLength(1);
     config.validate();
     config.setMaskPrefixMinPopulation(-1);
     try {
@@ -52,7 +52,7 @@ public class ZIPCodeMaskingProviderConfigTest {
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`maskPrefixMinPopulation` must be greater than 0"));
     }
-    config.setMaskPrefixMinPopulation(0);
+    config.setMaskPrefixMinPopulation(1);
     config.validate();
     config.setMaskTruncateLengthIfNotMinPopulation(-1);
     try {
@@ -62,7 +62,7 @@ public class ZIPCodeMaskingProviderConfigTest {
       assertTrue(
           e.getMessage().contains("`maskTruncateLengthIfNotMinPopulation` must be greater than 0"));
     }
-    config.setMaskTruncateLengthIfNotMinPopulation(0);
+    config.setMaskTruncateLengthIfNotMinPopulation(1);
     config.validate();
   }
 }

@@ -61,10 +61,12 @@ public class ReplaceMaskingProviderConfig extends MaskingProviderConfig {
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
     if (maskOffset < 0) {
-      throw new InvalidMaskingConfigurationException("`maskOffset` must be greater than 0");
+      throw new InvalidMaskingConfigurationException(
+          "`maskOffset` must be greater than or equal to 0");
     }
     if (maskPreserve < 0) {
-      throw new InvalidMaskingConfigurationException("`maskPreserve` must be greater than 0");
+      throw new InvalidMaskingConfigurationException(
+          "`maskPreserve` must be greater than or equal to 0");
     }
   }
 
