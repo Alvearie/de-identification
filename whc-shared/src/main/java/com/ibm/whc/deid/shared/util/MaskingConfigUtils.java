@@ -5,18 +5,6 @@
  */
 package com.ibm.whc.deid.shared.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
-import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.config.Rule;
-import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
-import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
-import com.ibm.whc.deid.shared.pojo.config.masking.ConfigConstant;
-import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
-import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType.MaskingProviderCategory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +19,18 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.Rule;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
+import com.ibm.whc.deid.shared.pojo.config.masking.ConfigConstant;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType.MaskingProviderCategory;
 
 /*
  * Utility class for masking config functionality
@@ -43,10 +43,6 @@ public class MaskingConfigUtils {
 
   public static MaskingConfigUtils getInstance() {
     return _instance;
-  }
-
-  protected ObjectMapper getObjectMapper() {
-    return ObjectMapperFactory.getObjectMapper();
   }
 
   /**
@@ -89,7 +85,7 @@ public class MaskingConfigUtils {
    */
   public static List<Rule> getFhirRules(String maskingProviders) {
     List<Rule> rules = new ArrayList<>();
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     try {
       JsonNode providers = mapper.readTree(maskingProviders);
@@ -154,7 +150,7 @@ public class MaskingConfigUtils {
    */
   public static List<JsonMaskingRule> getDefaultFhirMaskingRules(String maskingRulesJson) {
     List<JsonMaskingRule> maskingRules = new ArrayList<>();
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     try {
 
       JsonNode providers = mapper.readTree(maskingRulesJson);
@@ -235,7 +231,8 @@ public class MaskingConfigUtils {
     }
 
     try {
-      deidMaskingConfig = getObjectMapper().readValue(configuration, DeidMaskingConfig.class);
+      deidMaskingConfig =
+          ObjectMapperFactory.getObjectMapper().readValue(configuration, DeidMaskingConfig.class);
     } catch (IOException e) {
       throw new InvalidMaskingConfigurationException("invalid configuration: " + e.getMessage(), e);
     }

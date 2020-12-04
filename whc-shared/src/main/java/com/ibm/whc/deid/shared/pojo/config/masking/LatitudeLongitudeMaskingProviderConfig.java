@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks latitude / longitude pairs, recognizing several location formats.
@@ -16,11 +17,11 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class LatitudeLongitudeMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1031774920782870184L;
-  boolean maskFixedRadiusRandomDirection = false;
-  boolean maskDonutMasking = false;
-  boolean maskRandomWithinCircle = true;
-  int offsetMaximumRadius = 100;
-  int offsetMinimumRadius = 50;
+  private boolean maskFixedRadiusRandomDirection = false;
+  private boolean maskDonutMasking = false;
+  private boolean maskRandomWithinCircle = true;
+  private int offsetMaximumRadius = 100;
+  private int offsetMinimumRadius = 50;
 
   public LatitudeLongitudeMaskingProviderConfig() {
     type = MaskingProviderType.LATITUDE_LONGITUDE;
@@ -65,6 +66,19 @@ public class LatitudeLongitudeMaskingProviderConfig extends MaskingProviderConfi
   public void setOffsetMinimumRadius(int offsetMinimumRadius) {
     this.offsetMinimumRadius = offsetMinimumRadius;
   }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (offsetMaximumRadius < 0) {
+      throw new InvalidMaskingConfigurationException(
+          "`offsetMaximumRadius` must be greater than 0");
+    }
+    if (offsetMinimumRadius < 0) {
+      throw new InvalidMaskingConfigurationException(
+          "`offsetMinimumRadius` must be greater than 0");
+    }
+  }
+
 
   @Override
   public int hashCode() {

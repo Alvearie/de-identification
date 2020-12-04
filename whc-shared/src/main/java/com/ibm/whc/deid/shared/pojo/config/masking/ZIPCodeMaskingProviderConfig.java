@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks original zip code values while offering a number of utility-preserving options
@@ -17,17 +18,17 @@ public class ZIPCodeMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 2253187136824335936L;
   public static final Integer MASK_PREFIX_LENGTH_DEFAULT = Integer.valueOf(3);
-  String maskCountryCode = "US";
-  boolean maskReplaceWithNeighbor = false;
-  int maskReplaceWithNeighborNearestCount = 10;
-  int maskPrefixLength = MASK_PREFIX_LENGTH_DEFAULT.intValue();
-  boolean maskPrefixRequireMinPopulation = false;
-  int maskPrefixMinPopulation = 20000;
-  boolean maskTruncateIfNotMinPopulation = false;
-  int maskTruncateLengthIfNotMinPopulation = 2;
-  boolean maskSuffixTruncate = true;
-  boolean maskSuffixReplaceWithRandom = false;
-  boolean maskSuffixReplaceWithValidOnly = false;
+  private String maskCountryCode = "US";
+  private boolean maskReplaceWithNeighbor = false;
+  private int maskReplaceWithNeighborNearestCount = 10;
+  private int maskPrefixLength = MASK_PREFIX_LENGTH_DEFAULT.intValue();
+  private boolean maskPrefixRequireMinPopulation = false;
+  private int maskPrefixMinPopulation = 20000;
+  private boolean maskTruncateIfNotMinPopulation = false;
+  private int maskTruncateLengthIfNotMinPopulation = 2;
+  private boolean maskSuffixTruncate = true;
+  private boolean maskSuffixReplaceWithRandom = false;
+  private boolean maskSuffixReplaceWithValidOnly = false;
 
   public ZIPCodeMaskingProviderConfig() {
     type = MaskingProviderType.ZIPCODE;
@@ -120,6 +121,31 @@ public class ZIPCodeMaskingProviderConfig extends MaskingProviderConfig {
   public void setMaskSuffixReplaceWithValidOnly(boolean maskSuffixReplaceWithValidOnly) {
     this.maskSuffixReplaceWithValidOnly = maskSuffixReplaceWithValidOnly;
   }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (maskCountryCode == null) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskCountryCode` must not be null");
+    }
+    if (maskReplaceWithNeighborNearestCount < 1) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskReplaceWithNeighborNearestCount` must be greater than 0");
+    }
+    if (maskPrefixLength < 1) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskPrefixLength` must be greater than 0");
+    }
+    if (maskPrefixMinPopulation < 1) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskPrefixMinPopulation` must be greater than 0");
+    }
+    if (maskTruncateLengthIfNotMinPopulation < 1) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskTruncateLengthIfNotMinPopulation` must be greater than 0");
+    }
+  }
+
 
   @Override
   public int hashCode() {
