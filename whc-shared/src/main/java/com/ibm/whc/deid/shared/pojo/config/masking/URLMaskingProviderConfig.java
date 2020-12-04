@@ -17,11 +17,11 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class URLMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -8611060486833375291L;
-  boolean maskPort = false;
-  boolean maskRemoveQuery = false;
-  int preserveDomains = 1;
-  boolean maskUsernamePassword = true;
-  boolean maskMaskQuery = false;
+  private boolean maskPort = false;
+  private boolean maskRemoveQuery = false;
+  private int preserveDomains = 1;
+  private boolean maskUsernamePassword = true;
+  private boolean maskMaskQuery = false;
 
   public URLMaskingProviderConfig() {
     type = MaskingProviderType.URL;

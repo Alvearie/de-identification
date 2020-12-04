@@ -16,7 +16,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class MACAddressMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 856743324574648158L;
-  boolean maskingPreserveVendor = true;
+  private boolean maskingPreserveVendor = true;
 
   public MACAddressMaskingProviderConfig() {
     type = MaskingProviderType.MAC_ADDRESS;

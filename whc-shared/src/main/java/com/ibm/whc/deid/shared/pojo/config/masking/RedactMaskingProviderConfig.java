@@ -17,8 +17,8 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class RedactMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1418940833877275858L;
-  boolean preserveLength = true;
-  String replaceCharacter = "X";
+  private boolean preserveLength = true;
+  private String replaceCharacter = "X";
 
   public RedactMaskingProviderConfig() {
     type = MaskingProviderType.REDACT;

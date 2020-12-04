@@ -15,7 +15,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 @JsonInclude(Include.NON_NULL)
 public class NullMaskingProviderConfig extends MaskingProviderConfig {
   private static final long serialVersionUID = -4334059186680999571L;
-  boolean maskReturnNull = true;
+  private boolean maskReturnNull = true;
 
   public NullMaskingProviderConfig() {
     type = MaskingProviderType.NULL;
