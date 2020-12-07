@@ -36,7 +36,7 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
   protected String keyForType;
 
-  protected String certificateID;
+  protected String certificateId;
 
   protected MaskingProviderFactory maskingProviderFactory;
 

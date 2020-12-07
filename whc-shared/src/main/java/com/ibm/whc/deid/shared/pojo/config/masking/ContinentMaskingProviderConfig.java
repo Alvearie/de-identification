@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks a continent by replacing it with a randomly selected, or with the closest continent.
@@ -16,8 +17,9 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class ContinentMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1341491397370614455L;
-  boolean maskClosest = false;
-  int maskClosestK = 5;
+
+  private boolean maskClosest = false;
+  private int maskClosestK = 5;
 
   public ContinentMaskingProviderConfig() {
     type = MaskingProviderType.CONTINENT;
@@ -37,6 +39,14 @@ public class ContinentMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskClosestK(int maskClosestK) {
     this.maskClosestK = maskClosestK;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (maskClosestK < 1) {
+      throw new InvalidMaskingConfigurationException("`maskClosestK` must be greater than 0");
+    }
   }
 
   @Override

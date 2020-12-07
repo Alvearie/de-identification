@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Hashes the original value using an algorithm
@@ -16,13 +17,14 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class HashMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -7825324395792039252L;
-  String algorithmDefault = "SHA-256";
-  boolean offsetOffsetMask = false;
-  boolean offsetOffsetMaskDelete = false;
-  int offsetBegin = -1;
-  int offsetEnd = -1;
-  String salt = "";
-  int offsetInvalidOffsetValue = 1;
+
+  private String algorithmDefault = "SHA-256";
+  private boolean offsetOffsetMask = false;
+  private boolean offsetOffsetMaskDelete = false;
+  private int offsetBegin = -1;
+  private int offsetEnd = -1;
+  private String salt = "";
+  private int offsetInvalidOffsetValue = 1;
 
   public HashMaskingProviderConfig() {
     type = MaskingProviderType.HASH;
@@ -81,7 +83,15 @@ public class HashMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   public void setSalt(String salt) {
-    this.salt = salt;
+    this.salt = salt == null ? "" : salt;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (algorithmDefault == null  || algorithmDefault.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException("`algorithmDefault` is required");
+    }
   }
 
   @Override

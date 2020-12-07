@@ -15,7 +15,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingUtils;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
@@ -70,7 +70,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     System.out.println(mapper.writeValueAsString(conditionalMaskingProviderConfig));
 
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
@@ -131,7 +131,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
@@ -192,7 +192,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
@@ -252,7 +252,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
@@ -309,7 +309,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
 
@@ -366,7 +366,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
 
@@ -427,7 +427,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
 
@@ -484,7 +484,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
 
@@ -545,7 +545,7 @@ public class ConditionalMaskingProviderTest {
         + "    }";
 
     // Define JSON data to parse
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
         conditionalMaskingProviderConfig, tenantId, deidMaskingConfig);
@@ -587,7 +587,7 @@ public class ConditionalMaskingProviderTest {
         + "{\"default.masking.provider\": \"HASH\"} " + "]";
 
     try {
-      ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+      ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
       mapper.readValue(maskingOptionValue, ConditionalMaskingProviderConfig.class);
 
     } catch (JsonMappingException e) {
@@ -606,7 +606,7 @@ public class ConditionalMaskingProviderTest {
     String maskingOptionValue =
         "{\"type\":\"CONDITIONAL\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"maskRuleSet\":[{\"condition\":{\"field\":\"text/status\",\"operator\":\"equals\",\"type\":\"INVALID_TYPE\",\"value\":\"mask_condition\"},\"maskingProvider\":{\"type\":\"PSEUDONYM\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"generateViaOptionsEnabled\":true,\"generateViaOptionsMinLength\":12,\"generateViaOptionsMaxLength\":12,\"generateViaOptionsGenerateUppercase\":true,\"generateViaOptionsGenerateLowercase\":true,\"generateViaOptionsGenerateDigit\":true,\"generateViaOptionsGenerateSpecial\":false,\"generateViaPatternEnabled\":true,\"generateViaPatternLanguageCode\":\"EN\",\"generateViaHashEnabled\":false,\"generateViaHashUseSHA256\":false}},{\"maskingProvider\":{\"type\":\"HASH\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"algorithmDefault\":\"SHA-256\",\"offsetOffsetMask\":false,\"offsetOffsetMaskDelete\":false,\"offsetBegin\":-1,\"offsetEnd\":-1,\"salt\":\"\",\"offsetInvalidOffsetValue\":1}}]}";
 
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     try {
       mapper.readValue(maskingOptionValue, ConditionalMaskingProviderConfig.class);
     } catch (JsonMappingException e) {
@@ -624,7 +624,7 @@ public class ConditionalMaskingProviderTest {
     String maskingOptionValue =
         "{\"type\":\"CONDITIONAL\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"maskRuleSet\":[{\"condition\":{\"field\":\"text/status\",\"operator\":\"INVALID_OPERATOR\",\"type\":\"string\",\"value\":\"mask_condition\"},\"maskingProvider\":{\"type\":\"PSEUDONYM\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"generateViaOptionsEnabled\":true,\"generateViaOptionsMinLength\":12,\"generateViaOptionsMaxLength\":12,\"generateViaOptionsGenerateUppercase\":true,\"generateViaOptionsGenerateLowercase\":true,\"generateViaOptionsGenerateDigit\":true,\"generateViaOptionsGenerateSpecial\":false,\"generateViaPatternEnabled\":true,\"generateViaPatternLanguageCode\":\"EN\",\"generateViaHashEnabled\":false,\"generateViaHashUseSHA256\":false}},{\"maskingProvider\":{\"type\":\"HASH\",\"unspecifiedValueHandling\":0,\"unspecifiedValueReturnMessage\":\"OTHER\",\"algorithmDefault\":\"SHA-256\",\"offsetOffsetMask\":false,\"offsetOffsetMaskDelete\":false,\"offsetBegin\":-1,\"offsetEnd\":-1,\"salt\":\"\",\"offsetInvalidOffsetValue\":1}}]}";
 
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     try {
       mapper.readValue(maskingOptionValue, ConditionalMaskingProviderConfig.class);
     } catch (JsonMappingException e) {

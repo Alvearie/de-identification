@@ -29,19 +29,25 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
 
   public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
-    this(maskingConfiguration, maskingConfiguration.getCertificateID(), true,
+    this(maskingConfiguration, maskingConfiguration.getCertificateId(), true,
         true, maskingProviderFactory, "/fhir/", tenantId);
   }
 
   protected FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
-      String certificateID, boolean arrayAllRules, boolean defNoRuleRes,
+      String certificateId, boolean arrayAllRules, boolean defNoRuleRes,
       MaskingProviderFactory maskingProviderFactory, String basePathPrefix, String tenantId) {
     super(maskingConfiguration);
 
     this.maskingProviderFactory = maskingProviderFactory;
-    this.certificateID = certificateID;
+    this.certificateId = certificateId;
 
     List<String> messageTypes = maskingConfiguration.getJson().getMessageTypes();
+    if (messageTypes == null) {
+      messageTypes = new ArrayList<>();
+    }
+    if (messageTypes.isEmpty()) {
+      messageTypes.add(AbstractComplexMaskingProvider.DISABLE_TYPES_VALUE);
+    }
     messageTypes.forEach(type -> {
       String basePath = basePathPrefix + type;
 

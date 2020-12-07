@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Masks URLs with the options to remove the query part, preserve domain levels, mask ports and
@@ -17,11 +18,11 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class URLMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -8611060486833375291L;
-  boolean maskPort = false;
-  boolean maskRemoveQuery = false;
-  int preserveDomains = 1;
-  boolean maskUsernamePassword = true;
-  boolean maskMaskQuery = false;
+  private boolean maskPort = false;
+  private boolean maskRemoveQuery = false;
+  private int preserveDomains = 1;
+  private boolean maskUsernamePassword = true;
+  private boolean maskMaskQuery = false;
 
   public URLMaskingProviderConfig() {
     type = MaskingProviderType.URL;
@@ -65,6 +66,14 @@ public class URLMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskMaskQuery(boolean maskMaskQuery) {
     this.maskMaskQuery = maskMaskQuery;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (preserveDomains < -1) {
+      throw new InvalidMaskingConfigurationException("`preserveDomains` must not be less than -1");
+    }
   }
 
   @Override

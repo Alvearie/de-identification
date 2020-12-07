@@ -9,6 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Replaces a phone or fax number with a random one.
@@ -18,9 +19,9 @@ public class PhoneMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -7578601586274424130L;
 
-  boolean countryCodePreserve = true;
-  boolean areaCodePreserve = true;
-  String invNdigitsReplaceWith = "1";
+  private boolean countryCodePreserve = true;
+  private boolean areaCodePreserve = true;
+  private String invNdigitsReplaceWith = "1";
 
   List<String> phoneRegexPatterns;
 
@@ -58,6 +59,14 @@ public class PhoneMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setPhoneRegexPatterns(List<String> phoneRegexPatterns) {
     this.phoneRegexPatterns = phoneRegexPatterns;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (invNdigitsReplaceWith == null) {
+      throw new InvalidMaskingConfigurationException("`invNdigitsReplaceWith` must be not null");
+    }
   }
 
   @Override

@@ -5,13 +5,14 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
-import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
+import java.io.Serializable;
 
 /*
  * Abstract class that all masking provider config classes should inherit from
@@ -132,6 +133,23 @@ public abstract class MaskingProviderConfig implements Serializable {
 
   public void setUnspecifiedValueReturnMessage(String unspecifiedValueReturnMessage) {
     this.unspecifiedValueReturnMessage = unspecifiedValueReturnMessage;
+  }
+
+  /**
+   * Determines if this masking provider configuration is valid. A configuration might be invalid if
+   * it has been given conflicting information or is missing required information.
+   * 
+   * <p>
+   * Subclasses requiring additional validation should override this method, but should still ensure
+   * the validation done here is performed if applicable.
+   * 
+   * @throws InvalidMaskingConfigurationException if this masking provider configuration is
+   *         currently invalid
+   */
+  public void validate() throws InvalidMaskingConfigurationException {
+    if (unspecifiedValueHandling < 0 || unspecifiedValueHandling > 3) {
+      throw new InvalidMaskingConfigurationException("`unspecifiedValueHandling` must be [0..3]");
+    }
   }
 
   /**

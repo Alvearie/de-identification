@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.BasicMaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
@@ -79,7 +80,7 @@ public class GenericMaskingProviderTest {
     ObjectMapper objectMapper = new ObjectMapper();
     logger.info(objectMapper.writeValueAsString(config));
 
-    ObjectMapper mapper = FHIRMaskingUtils.getObjectMapper();
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
     String filename = "/fhir/patientExample.json";
 

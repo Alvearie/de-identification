@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
  * Replaces an original value with either asterisks or with random characters.
@@ -16,10 +17,10 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 public class ReplaceMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1064469413046061087L;
-  boolean maskReplaceWithAsterisks = false;
-  int maskPreserve = 3;
-  int maskOffset = 0;
-  boolean maskReplaceWithRandom = false;
+  private boolean maskReplaceWithAsterisks = false;
+  private int maskPreserve = 3;
+  private int maskOffset = 0;
+  private boolean maskReplaceWithRandom = false;
 
   public ReplaceMaskingProviderConfig() {
     type = MaskingProviderType.REPLACE;
@@ -55,6 +56,19 @@ public class ReplaceMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskReplaceWithRandom(boolean maskReplaceWithRandom) {
     this.maskReplaceWithRandom = maskReplaceWithRandom;
+  }
+
+  @Override
+  public void validate() throws InvalidMaskingConfigurationException {
+    super.validate();
+    if (maskOffset < 0) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskOffset` must be greater than or equal to 0");
+    }
+    if (maskPreserve < 0) {
+      throw new InvalidMaskingConfigurationException(
+          "`maskPreserve` must be greater than or equal to 0");
+    }
   }
 
   @Override

@@ -7,6 +7,7 @@ package com.ibm.whc.deid.shared.pojo.config;
 
 import java.io.Serializable;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 
 /*
@@ -14,11 +15,15 @@ import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
  */
 public class Rule implements Serializable {
 
-  /** */
   private static final long serialVersionUID = -6263797438206665007L;
+  
+  public static final String NAME_PROPERTY_NAME = "name";
+  public static final String PROVIDERS_PROPERTY_NAME = "maskingProviders";
 
-  String name;
+  @JsonProperty(NAME_PROPERTY_NAME)
+  private String name;
 
+  @JsonProperty(PROVIDERS_PROPERTY_NAME)
   private List<MaskingProviderConfig> maskingProviders;
 
   public String getName() {

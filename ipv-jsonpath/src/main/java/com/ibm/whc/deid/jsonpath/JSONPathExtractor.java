@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.jsonpath;
 
 import java.io.IOException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -17,10 +16,11 @@ import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
+import com.ibm.whc.deid.ObjectMapperFactory;
 
 public final class JSONPathExtractor {
 
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private static final ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
   /** Given a json node and a json path, returns the value of the node */
   public static JsonNode extract(final JsonNode obj, final JSONPath pattern)
