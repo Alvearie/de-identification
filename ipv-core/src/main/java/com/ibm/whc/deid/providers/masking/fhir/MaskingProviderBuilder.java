@@ -245,8 +245,7 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   }
 
   /**
-   * Given a masking configuration, this gets the providers and the nodes to mask Depending on the
-   * masking action, it sets or puts the nodes accordingly
+   * Given a masking configuration, this gets the providers and the nodes to mask.
    *
    * @param resourceType
    * @param resourceId
@@ -258,9 +257,9 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
    * @param actualFullPath
    * @return
    */
-  private List<MaskingActionInputIdentifier> maskNode(String resourceType, String resourceId,
-      JsonNode node, String[] paths, int pathIndex, FHIRResourceMaskingAction maskingAction,
-      String actualFullPath, JsonNode root) {
+  private List<MaskingActionInputIdentifier> determineMaskingActionInputs(String resourceType,
+      String resourceId, JsonNode node, String[] paths, int pathIndex,
+      FHIRResourceMaskingAction maskingAction, String actualFullPath, JsonNode root) {
 
     List<MaskingActionInputIdentifier> returnList = new ArrayList<>();
     // Extract path
@@ -278,12 +277,12 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
       if (valueNode.isArray()) {
         Iterator<JsonNode> items = valueNode.elements();
         while (items.hasNext()) {
-          returnList.addAll(maskNode(resourceType, resourceId, items.next(), paths, pathIndex + 1,
-              maskingAction, actualFullPath, root));
+          returnList.addAll(determineMaskingActionInputs(resourceType, resourceId, items.next(),
+              paths, pathIndex + 1, maskingAction, actualFullPath, root));
         }
       } else if (valueNode.isObject()) {
-        returnList.addAll(maskNode(resourceType, resourceId, valueNode, paths, pathIndex + 1,
-            maskingAction, actualFullPath, root));
+        returnList.addAll(determineMaskingActionInputs(resourceType, resourceId, valueNode, paths,
+            pathIndex + 1, maskingAction, actualFullPath, root));
       }
     } else {
       if (maskingAction.getAbstractComplexMaskingProvider() != null) {
@@ -614,9 +613,9 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
               String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
 
               // Mask the node and add message to audit trail
-              listToMask
-                  .addAll(maskNode(unMasked.getResourceType(), resourceId, unMasked.getJsonNode(),
-                      brokenDownPathElements, 0, maskingAction, fullPath, unMasked.getJsonNode()));
+              listToMask.addAll(determineMaskingActionInputs(unMasked.getResourceType(), resourceId,
+                  unMasked.getJsonNode(), brokenDownPathElements, 0, maskingAction, fullPath,
+                  unMasked.getJsonNode()));
             }
           }
         }
@@ -765,8 +764,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         // Process the node, if it has not already been
         // masked by a specified condition name.
         String[] dataPath = dataPathList.toArray(new String[dataPathList.size()]);
-        inputList.addAll(maskNode(resourceType, resourceId, elementNode, dataPath, 0, maskingAction,
-            fullPath, node));
+        inputList.addAll(determineMaskingActionInputs(resourceType, resourceId, elementNode,
+            dataPath, 0, maskingAction, fullPath, node));
 
       } else if (elementNode.has(conditionName)) {
         JsonNode key = elementNode.get(conditionName);
@@ -775,8 +774,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
             || ("*".equals(conditionValue) && !maskedConditionNamedNodes.contains(elementNode))) {
           String[] dataPath = dataPathList.toArray(new String[dataPathList.size()]);
           maskedConditionNamedNodes.add(elementNode);
-          inputList.addAll(maskNode(resourceType, resourceId, elementNode, dataPath, 0,
-              maskingAction, fullPath, node));
+          inputList.addAll(determineMaskingActionInputs(resourceType, resourceId, elementNode,
+              dataPath, 0, maskingAction, fullPath, node));
         }
       }
     }
