@@ -5,11 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking.fhir;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -19,15 +14,44 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
 import com.ibm.whc.deid.utils.log.LogCodes;
-import scala.Tuple3;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Generic Masking Provider
+ * Provides orchestration of the masking process.
  *
  */
 public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonNode> {
 
   private static final long serialVersionUID = 21789736594606147L;
+
+  public static class MaskingResource {
+
+    private String identifier;
+    private JsonNode jsonNode;
+    private String resourceType;
+
+    public MaskingResource(String id, JsonNode node, String resType) {
+      identifier = id;
+      jsonNode = node;
+      resourceType = resType;
+    }
+
+    public String getIdentifier() {
+      return identifier;
+    }
+
+    public JsonNode getJsonNode() {
+      return jsonNode;
+    }
+
+    public String getResourceType() {
+      return resourceType;
+    }
+  }
 
   private final List<FHIRResourceMaskingAction> maskingActionList;
   private final boolean arrayAllRules;
@@ -39,8 +63,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
 
   public MaskingProviderBuilder(String schemaType,
       FHIRResourceMaskingConfiguration resourceConfiguration,
-      DeidMaskingConfig maskingConfiguration, boolean arrayAllRules,
-      boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory, String tenantId) {
+      DeidMaskingConfig maskingConfiguration, boolean arrayAllRules, boolean defNoRuleRes,
+      MaskingProviderFactory maskingProviderFactory, String tenantId) {
     super(maskingConfiguration);
 
     this.schemaType = schemaType;
@@ -538,20 +562,18 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   }
 
   @Override
-  public JsonNode mask(JsonNode identifier) {
-    List<Tuple3<String, JsonNode, String>> inputList = new ArrayList<>();
-    inputList.add(new Tuple3<String, JsonNode, String>("1", identifier,
-        identifier.get("resourceType").asText()));
-    return mask(inputList).get(0)._2();
+  public JsonNode mask(JsonNode node) {
+    List<MaskingResource> inputList = new ArrayList<>();
+    inputList.add(new MaskingResource("1", node, node.get("resourceType").asText()));
+    return orchestrateMasking(inputList).get(0).getJsonNode();
   }
 
-  public List<Tuple3<String, JsonNode, String>> mask(
-      List<Tuple3<String, JsonNode, String>> maskList) {
+  public List<MaskingResource> orchestrateMasking(List<MaskingResource> maskList) {
 
     for (FHIRResourceMaskingAction maskingAction : this.maskingActionList) {
       List<MaskingActionInputIdentifier> listToMask = new ArrayList<>();
-      for (Tuple3<String, JsonNode, String> unMaskedNode : maskList) {
-        JsonNode idNode = unMaskedNode._2().get("id");
+      for (MaskingResource unMasked : maskList) {
+        JsonNode idNode = unMasked.getJsonNode().get("id");
         String resourceId = "UNKNOWN";
         if (idNode != null && !idNode.isNull() && idNode.isTextual()) {
           resourceId = idNode.asText();
@@ -562,11 +584,11 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
 
         if (maskingAction.getShortRuleName().contains("==")) {
           // Rule contains array query condition.
-          listToMask.addAll(processArrayQueryCondition(unMaskedNode._2(), maskingAction,
-              maskedConditionNamedNodes, unMaskedNode._3(), resourceId));
+          listToMask.addAll(processArrayQueryCondition(unMasked.getJsonNode(), maskingAction,
+              maskedConditionNamedNodes, unMasked.getResourceType(), resourceId));
         } else {
           ArrayList<String> allPathsInRecord = getActualPaths(maskingAction.getPaths(), "", 0,
-              new ArrayList<String>(), unMaskedNode._2());
+              new ArrayList<String>(), unMasked.getJsonNode());
 
           for (String currentPath : allPathsInRecord) {
             String fullPath = currentPath;
@@ -592,22 +614,22 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
               String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
 
               // Mask the node and add message to audit trail
-              listToMask.addAll(maskNode(unMaskedNode._3(), resourceId, unMaskedNode._2(),
-                  brokenDownPathElements, 0, maskingAction, fullPath, unMaskedNode._2()));
+              listToMask
+                  .addAll(maskNode(unMasked.getResourceType(), resourceId, unMasked.getJsonNode(),
+                      brokenDownPathElements, 0, maskingAction, fullPath, unMasked.getJsonNode()));
             }
           }
         }
       }
       MaskingProvider currentProvider = maskingAction.getMaskingProvider();
       if (currentProvider != null) {
-        maskingAction.getMaskingProvider().maskIdentifierBatch(listToMask);
-      } else if (maskingAction.getAbstractComplexMaskingProvider() != null) {
-        maskingAction.getAbstractComplexMaskingProvider().maskIdentifierBatch(listToMask);
+        currentProvider.maskIdentifierBatch(listToMask);
+      } else {
+        currentProvider = maskingAction.getAbstractComplexMaskingProvider();
+        if (currentProvider != null) {
+          currentProvider.maskIdentifierBatch(listToMask);
+        }
       }
-      /*
-       * // sorting out maintain and masking list if (!isDefNoRuleRes()) { JsonNode result =
-       * processWhiteListJson(maskList); return result; }
-       */
     }
     return maskList;
   }
