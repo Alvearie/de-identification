@@ -22,7 +22,7 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
 public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> {
-  /** */
+
   private static final long serialVersionUID = 5945527984023679481L;
 
   private List<String> copyFieldList = new ArrayList<String>();
@@ -30,12 +30,13 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
   public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
     this(maskingConfiguration, maskingConfiguration.getCertificateId(), true,
-        true, maskingProviderFactory, "/fhir/", tenantId);
+        maskingConfiguration.isDefaultNoRuleResolution(), maskingProviderFactory, "/fhir/",
+        tenantId);
   }
 
-  protected FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
-      String certificateId, boolean arrayAllRules, boolean defNoRuleRes,
-      MaskingProviderFactory maskingProviderFactory, String basePathPrefix, String tenantId) {
+  protected FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration, String certificateId,
+      boolean arrayAllRules, boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory,
+      String basePathPrefix, String tenantId) {
     super(maskingConfiguration);
 
     this.maskingProviderFactory = maskingProviderFactory;
@@ -99,8 +100,7 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
     this.copyFieldList = copyFieldList;
   }
 
-  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
-      String jobId) {
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId) {
     List<Tuple2<String, JsonNode>> toMask = payloadData.stream().map(input -> {
       JsonNode node = null;
       try {

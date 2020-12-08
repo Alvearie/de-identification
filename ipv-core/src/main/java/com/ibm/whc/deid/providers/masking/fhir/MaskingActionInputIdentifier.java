@@ -10,9 +10,9 @@ import com.ibm.whc.deid.providers.masking.MaskingProvider;
 
 public class MaskingActionInputIdentifier {
 
-  MaskingProvider provider;
+  private MaskingProvider provider;
 
-  JsonNode node;
+  private JsonNode node;
 
   private JsonNode parent;
 
@@ -23,6 +23,18 @@ public class MaskingActionInputIdentifier {
   private String resourceType;
 
   private JsonNode root;
+
+  public MaskingActionInputIdentifier(MaskingProvider provider, JsonNode node, JsonNode parent,
+      String path, String resourceType, String resourceId, JsonNode root) {
+    super();
+    this.provider = provider;
+    this.node = node;
+    this.parent = parent;
+    this.path = path;
+    this.resourceId = resourceId;
+    this.resourceType = resourceType;
+    this.root = root;
+  }
 
   public MaskingProvider getProvider() {
     return provider;
@@ -38,22 +50,6 @@ public class MaskingActionInputIdentifier {
 
   public void setNode(JsonNode node) {
     this.node = node;
-  }
-
-  public MaskingActionInputIdentifier(MaskingProvider provider, JsonNode node, JsonNode parent,
-      String path, String resourceType, String resourceId, JsonNode root) {
-    super();
-    this.provider = provider;
-    this.node = node;
-    this.parent = parent;
-    this.path = path;
-    this.resourceId = resourceId;
-    this.resourceType = resourceType;
-    this.root = root;
-  }
-
-  public boolean isArray() {
-    return path == null;
   }
 
   public JsonNode getParent() {
