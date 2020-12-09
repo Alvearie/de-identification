@@ -64,13 +64,16 @@ public class NoRuleManager {
   private void findLeaves(JsonNode rootNode, String parentPath, JsonNode parentNode, String resourceId, String resourceType) {
     if (parentNode != null && !parentNode.isNull()) {
       
-      if (parentNode.isArray()) {
+      if (parentNode.isValueNode()) {
+        map.put(new JsonNodeMapWrapper(parentNode), new MaskingActionInputIdentifier(noRuleResProvider, parentNode, parentNode, "", resourceType, resourceId, rootNode));
+        
+      } else if (parentNode.isArray()) {
         int size = parentNode.size();
         for (int i=0; i < size; i++) {
           JsonNode childNode = parentNode.get(i);
           if (!childNode.isNull()) {
             StringBuilder buffer = new StringBuilder(parentPath.length() + 10);
-            buffer.append(parentNode).append('[').append(i).append(']');              
+            buffer.append(parentPath).append('[').append(i).append(']');              
             String childPath = buffer.toString();
             if (childNode.isArray() || childNode.isObject()) {
               findLeaves(rootNode, childPath, childNode, resourceId, resourceType);

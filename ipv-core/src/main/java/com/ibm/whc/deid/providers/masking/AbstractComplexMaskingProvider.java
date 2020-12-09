@@ -95,8 +95,10 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
       String resourceTypeName = "";
       if (!keyForType.equals(DISABLE_TYPES_VALUE)) {
         JsonNode resourceNode = input._2.get(keyForType);
-        String resourceType = resourceNode.asText();
-        resourceTypeName = resourceType.toLowerCase();
+        if (resourceNode != null && resourceNode.isValueNode() && !resourceNode.isNull()) {
+          String resourceType = resourceNode.asText();
+          resourceTypeName = resourceType.toLowerCase();
+        }
       } else {
         resourceTypeName = DISABLE_TYPES_VALUE;
       }
@@ -128,25 +130,15 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
     }).collect(Collectors.toList());
   }
 
-  /*
-   * The masking provider works on FHIR objects that look like this: {
-   * "resourceType":"ContactPoint", "system":"email", "value":"bob@gmail.com", "use":"home" }
-   */
-
   /**
-   * Given a resource, return the masked value in the input matching the resource
+   * Given a list of input, return the masked value in the input matching the resource
    *
-   * @param resource
+   * @param resources
    * @return
    */
-  public List<Tuple2<String, JsonNode>> maskJsonNode(List<Tuple2<String, JsonNode>> resource) {
-    List<Tuple2<String, JsonNode>> maskedValue = maskResource(resource);
-
-    return maskedValue.stream().filter(input -> {
-      if (input._2() == null)
-        return false;
-      return true;
-    }).collect(Collectors.toList());
+  public List<Tuple2<String, JsonNode>> maskJsonNode(List<Tuple2<String, JsonNode>> resources) {
+    List<Tuple2<String, JsonNode>> maskedValue = maskResource(resources);
+    return maskedValue.stream().filter(input -> input._2() != null).collect(Collectors.toList());
   }
 
   /**

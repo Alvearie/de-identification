@@ -100,6 +100,7 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
     this.copyFieldList = copyFieldList;
   }
 
+  @Override
   public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId) {
     List<Tuple2<String, JsonNode>> toMask = payloadData.stream().map(input -> {
       JsonNode node = null;
