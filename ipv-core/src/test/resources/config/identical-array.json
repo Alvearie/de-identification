@@ -8,6 +8,14 @@
 					"type": "REDACT"
 				}
 			]
+		},
+		{
+			"name": "maintainRule",
+			"maskingProviders": [
+				{
+					"type": "MAINTAIN"
+				}
+			]
 		}
 	],
 	"json": {
@@ -16,6 +24,10 @@
 			{
 				"jsonPath": "/gen/default/address/line[1]",
 				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/gen/default/address/line[3]",
+				"rule": "maintainRule"
 			}
 		]
 	}
