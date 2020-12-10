@@ -655,9 +655,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
           }
         }
         
-        NoRuleManager noRuleManager = unMasked.getNoRuleManager();
-        if (noRuleManager != null) {
-          noRuleManager.removeNodesAlreadyMasked(listToMaskPerResource);
+        if (!isDefNoRuleRes()) {
+            unMasked.getNoRuleManager().removeNodesAlreadyMasked(listToMaskPerResource);
         }
         listToMask.addAll(listToMaskPerResource);
       }
