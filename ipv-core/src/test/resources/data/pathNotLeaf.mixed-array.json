@@ -8,9 +8,10 @@
 				"102 University Dr",
 				"101 University Dr",
 				"103 University Dr",
+				null,
 				{"a":1,"b":2},
 				["box1","box2"],
-				[{"c":3,"d":4}]
+				[{"c":3,"d":4,"e":null}]
 			]
 		}
 	]
