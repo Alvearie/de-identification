@@ -1,0 +1,14 @@
+{
+	"resourceType": "Organization",
+	"id": "2",
+	"address": [
+		{
+			"line": [
+				"101 University Dr",
+				"102 University Dr",
+				"101 University Dr",
+				"103 University Dr"
+			]
+		}
+	]
+}

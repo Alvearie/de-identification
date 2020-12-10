@@ -5,29 +5,74 @@
  */
 package com.ibm.whc.deid.providers.masking.fhir;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
+import com.ibm.whc.deid.providers.masking.util.NoRuleManager;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
+import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.utils.log.LogCodes;
-import scala.Tuple3;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Generic Masking Provider
+ * Provides orchestration of the masking process.
  *
  */
 public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonNode> {
 
   private static final long serialVersionUID = 21789736594606147L;
+
+  public static class MaskingResource {
+
+    private String identifier;
+    private JsonNode jsonNode;
+    private String resourceType;
+    private String resourceId;
+    private NoRuleManager noRuleManager;
+
+    public MaskingResource(String id, JsonNode node, String resType) {
+      identifier = id;
+      jsonNode = node;
+      resourceType = resType;
+    }
+
+    public String getIdentifier() {
+      return identifier;
+    }
+
+    public JsonNode getJsonNode() {
+      return jsonNode;
+    }
+
+    public String getResourceType() {
+      return resourceType;
+    }
+    
+    private String getResourceId() {
+      return resourceId;
+    }
+
+    private void setResourceId(String resourceId) {
+      this.resourceId = resourceId;
+    }
+
+    private NoRuleManager getNoRuleManager() {
+      return noRuleManager;
+    }
+
+    private void setNoRuleManager(NoRuleManager noRuleManager) {
+      this.noRuleManager = noRuleManager;
+    }
+  }
 
   private final List<FHIRResourceMaskingAction> maskingActionList;
   private final boolean arrayAllRules;
@@ -36,18 +81,24 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   private List<String> maskingAuditTrailList;
 
   private final String schemaType;
+  
+  private MaskingProvider noRuleResProvider = null;
 
   public MaskingProviderBuilder(String schemaType,
       FHIRResourceMaskingConfiguration resourceConfiguration,
-      DeidMaskingConfig maskingConfiguration, boolean arrayAllRules,
-      boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory, String tenantId) {
+      DeidMaskingConfig maskingConfiguration, boolean arrayAllRules, boolean defNoRuleRes,
+      MaskingProviderFactory maskingProviderFactory, String tenantId) {
     super(maskingConfiguration);
 
     this.schemaType = schemaType;
     this.maskingProviderFactory = maskingProviderFactory;
     this.arrayAllRules = arrayAllRules;
+    
     this.defNoRuleRes = defNoRuleRes;
-
+    if (!this.defNoRuleRes) {
+      noRuleResProvider = this.maskingProviderFactory.getProviderFromType(MaskingProviderType.NULL, maskingConfiguration, new NullMaskingProviderConfig(), tenantId);
+    }
+    
     // TODO: verify setting keyForType to empty string is reasonable
     this.keyForType = "";
 
@@ -221,8 +272,7 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   }
 
   /**
-   * Given a masking configuration, this gets the providers and the nodes to mask Depending on the
-   * masking action, it sets or puts the nodes accordingly
+   * Given a masking configuration, this gets the providers and the nodes to mask.
    *
    * @param resourceType
    * @param resourceId
@@ -234,9 +284,9 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
    * @param actualFullPath
    * @return
    */
-  private List<MaskingActionInputIdentifier> maskNode(String resourceType, String resourceId,
-      JsonNode node, String[] paths, int pathIndex, FHIRResourceMaskingAction maskingAction,
-      String actualFullPath, JsonNode root) {
+  private List<MaskingActionInputIdentifier> determineMaskingActionInputs(String resourceType,
+      String resourceId, JsonNode node, String[] paths, int pathIndex,
+      FHIRResourceMaskingAction maskingAction, String actualFullPath, JsonNode root) {
 
     List<MaskingActionInputIdentifier> returnList = new ArrayList<>();
     // Extract path
@@ -254,12 +304,12 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
       if (valueNode.isArray()) {
         Iterator<JsonNode> items = valueNode.elements();
         while (items.hasNext()) {
-          returnList.addAll(maskNode(resourceType, resourceId, items.next(), paths, pathIndex + 1,
-              maskingAction, actualFullPath, root));
+          returnList.addAll(determineMaskingActionInputs(resourceType, resourceId, items.next(),
+              paths, pathIndex + 1, maskingAction, actualFullPath, root));
         }
       } else if (valueNode.isObject()) {
-        returnList.addAll(maskNode(resourceType, resourceId, valueNode, paths, pathIndex + 1,
-            maskingAction, actualFullPath, root));
+        returnList.addAll(determineMaskingActionInputs(resourceType, resourceId, valueNode, paths,
+            pathIndex + 1, maskingAction, actualFullPath, root));
       }
     } else {
       if (maskingAction.getAbstractComplexMaskingProvider() != null) {
@@ -538,35 +588,41 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   }
 
   @Override
-  public JsonNode mask(JsonNode identifier) {
-    List<Tuple3<String, JsonNode, String>> inputList = new ArrayList<>();
-    inputList.add(new Tuple3<String, JsonNode, String>("1", identifier,
-        identifier.get("resourceType").asText()));
-    return mask(inputList).get(0)._2();
+  public JsonNode mask(JsonNode node) {
+    List<MaskingResource> inputList = new ArrayList<>();
+    inputList.add(new MaskingResource("1", node, node.get("resourceType").asText()));
+    return orchestrateMasking(inputList).get(0).getJsonNode();
   }
 
-  public List<Tuple3<String, JsonNode, String>> mask(
-      List<Tuple3<String, JsonNode, String>> maskList) {
+  public List<MaskingResource> orchestrateMasking(List<MaskingResource> maskList) {
+
+    for (MaskingResource unMasked : maskList) {
+      JsonNode idNode = unMasked.getJsonNode().get("id");
+      String resourceId = "UNKNOWN";
+      if (idNode != null && !idNode.isNull() && idNode.isTextual()) {
+        resourceId = idNode.asText();
+      }
+      unMasked.setResourceId(resourceId);
+      
+      unMasked.setNoRuleManager(isDefNoRuleRes() ? null : new NoRuleManager(unMasked, resourceId, noRuleResProvider));
+    }
 
     for (FHIRResourceMaskingAction maskingAction : this.maskingActionList) {
       List<MaskingActionInputIdentifier> listToMask = new ArrayList<>();
-      for (Tuple3<String, JsonNode, String> unMaskedNode : maskList) {
-        JsonNode idNode = unMaskedNode._2().get("id");
-        String resourceId = "UNKNOWN";
-        if (idNode != null && !idNode.isNull() && idNode.isTextual()) {
-          resourceId = idNode.asText();
-        }
-
+      
+      for (MaskingResource unMasked : maskList) {
+        List<MaskingActionInputIdentifier> listToMaskPerResource = new ArrayList<>();
         maskingAuditTrailList = new ArrayList<>();
         List<JsonNode> maskedConditionNamedNodes = new ArrayList<>();
 
         if (maskingAction.getShortRuleName().contains("==")) {
           // Rule contains array query condition.
-          listToMask.addAll(processArrayQueryCondition(unMaskedNode._2(), maskingAction,
-              maskedConditionNamedNodes, unMaskedNode._3(), resourceId));
+          listToMaskPerResource.addAll(processArrayQueryCondition(unMasked.getJsonNode(), maskingAction,
+              maskedConditionNamedNodes, unMasked.getResourceType(), unMasked.getResourceId()));
+          
         } else {
           ArrayList<String> allPathsInRecord = getActualPaths(maskingAction.getPaths(), "", 0,
-              new ArrayList<String>(), unMaskedNode._2());
+              new ArrayList<String>(), unMasked.getJsonNode());
 
           for (String currentPath : allPathsInRecord) {
             String fullPath = currentPath;
@@ -592,23 +648,36 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
               String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
 
               // Mask the node and add message to audit trail
-              listToMask.addAll(maskNode(unMaskedNode._3(), resourceId, unMaskedNode._2(),
-                  brokenDownPathElements, 0, maskingAction, fullPath, unMaskedNode._2()));
+              listToMaskPerResource.addAll(determineMaskingActionInputs(unMasked.getResourceType(), unMasked.getResourceId(),
+                  unMasked.getJsonNode(), brokenDownPathElements, 0, maskingAction, fullPath,
+                  unMasked.getJsonNode()));
             }
           }
         }
+        
+        if (!isDefNoRuleRes()) {
+            unMasked.getNoRuleManager().removeNodesAlreadyMasked(listToMaskPerResource);
+        }
+        listToMask.addAll(listToMaskPerResource);
       }
+      
       MaskingProvider currentProvider = maskingAction.getMaskingProvider();
       if (currentProvider != null) {
-        maskingAction.getMaskingProvider().maskIdentifierBatch(listToMask);
-      } else if (maskingAction.getAbstractComplexMaskingProvider() != null) {
-        maskingAction.getAbstractComplexMaskingProvider().maskIdentifierBatch(listToMask);
+        currentProvider.maskIdentifierBatch(listToMask);
+      } else {
+        currentProvider = maskingAction.getAbstractComplexMaskingProvider();
+        if (currentProvider != null) {
+          currentProvider.maskIdentifierBatch(listToMask);
+        }
       }
-      /*
-       * // sorting out maintain and masking list if (!isDefNoRuleRes()) { JsonNode result =
-       * processWhiteListJson(maskList); return result; }
-       */
     }
+    
+    if (!isDefNoRuleRes()) {
+      for (MaskingResource resource : maskList) {
+        resource.getNoRuleManager().applyToRemainingNodes();
+      }
+    }
+      
     return maskList;
   }
 
@@ -646,7 +715,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
      */
     List<JsonNode> nodeList = new ArrayList<>();
     for (int i = 0; i < paths.length; i++) {
-
       /*
        * Goes through each paths elements to collect all the array nodes and the condition name and
        * value.
@@ -655,7 +723,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         // This is the paths element that has the condition, get the
         // condition name and value
         String[] arrayElementAndCondition = paths[i].split("\\(");
-
         String arrayElement = arrayElementAndCondition[0].trim();
         String conditionELement = arrayElementAndCondition[1].trim().replace(")", "");
         String[] condition = conditionELement.split("==");
@@ -743,8 +810,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         // Process the node, if it has not already been
         // masked by a specified condition name.
         String[] dataPath = dataPathList.toArray(new String[dataPathList.size()]);
-        inputList.addAll(maskNode(resourceType, resourceId, elementNode, dataPath, 0, maskingAction,
-            fullPath, node));
+        inputList.addAll(determineMaskingActionInputs(resourceType, resourceId, elementNode,
+            dataPath, 0, maskingAction, fullPath, node));
 
       } else if (elementNode.has(conditionName)) {
         JsonNode key = elementNode.get(conditionName);
@@ -753,8 +820,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
             || ("*".equals(conditionValue) && !maskedConditionNamedNodes.contains(elementNode))) {
           String[] dataPath = dataPathList.toArray(new String[dataPathList.size()]);
           maskedConditionNamedNodes.add(elementNode);
-          inputList.addAll(maskNode(resourceType, resourceId, elementNode, dataPath, 0,
-              maskingAction, fullPath, node));
+          inputList.addAll(determineMaskingActionInputs(resourceType, resourceId, elementNode,
+              dataPath, 0, maskingAction, fullPath, node));
         }
       }
     }
