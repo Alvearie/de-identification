@@ -183,7 +183,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
-  public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig) {
+  public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig, String compareDateValue) {
 
     // Set some default values needed for date dependency
     this.dateYearDelete = false;
@@ -197,8 +197,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.secondsMask = false;
 
     this.dateYearDeleteNDaysValue = dateDependencyConfig.getDateYearDeleteNDaysValue();
-    this.dateYearDeleteComparedValue =
-        dateDependencyConfig.getDatetimeyearDeleteNIntervalCompareDateValue();
+    this.dateYearDeleteComparedValue = compareDateValue;
 
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     String fixedDateFormatString = configuration.getFormatFixed();
