@@ -1,0 +1,35 @@
+{
+	"defaultNoRuleResolution": false,
+	"rules": [
+		{
+			"name": "redactRule",
+			"maskingProviders": [
+				{
+					"type": "REDACT"
+				}
+			]
+		},
+		{
+			"name": "maintainRule",
+			"maskingProviders": [
+				{
+					"type": "MAINTAIN"
+				}
+			]
+		}
+	],
+	"json": {
+		"schemaType": "GEN",
+		"maskingRules": [
+			{
+				"jsonPath": "/gen/default/address/line[1]",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/gen/default/address/line[3]",
+				"rule": "maintainRule"
+			}
+		]
+	}
+}
+	
