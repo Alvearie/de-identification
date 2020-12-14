@@ -9,14 +9,18 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /*
  * The model class which represents the post data for deidentification rest api
  */
+@Schema(name = "dataMaskingModel", description = "De-identification input object")
 public class DataMaskingModel {
 
+  @Schema(description = "Masking configuration")
   protected final String config;
 
+  @Schema(description = "A list of data to be masked")
   protected final List<String> data;
 
   protected final ConfigSchemaTypes schemaType;
