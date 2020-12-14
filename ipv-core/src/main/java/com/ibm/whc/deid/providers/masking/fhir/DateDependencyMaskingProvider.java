@@ -12,20 +12,19 @@ import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.DateTimeMaskingProvider;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
+import java.util.List;
 
 /**
  * Date dependency masking provider This complex masking provider is used as an intermediate step to
- * date time masking provider. It requires two date type fields in one resource type; one for
+ * date time masking provider. It requires two date type fields in the same JSON object; one for
  * masking and the other one to compare with the masked value. This compared value is attached to
  * the masking configuration and sent to date time masking provider. The comparison operation is
- * done in date time masking provider
- *
+ * done in date time masking provider.
  */
 public class DateDependencyMaskingProvider extends AbstractComplexMaskingProvider<JsonNode> {
 
   private static final long serialVersionUID = 4938913531249878291L;
 
-  private final String dateToMask;
   private final String dateToCompare;
 
   private final DateDependencyMaskingProviderConfig dateDependencyMaskingProviderConfig;
@@ -37,55 +36,56 @@ public class DateDependencyMaskingProvider extends AbstractComplexMaskingProvide
    */
   public DateDependencyMaskingProvider(String type, MaskingConfiguration maskingConfiguration) {
     super(type, maskingConfiguration);
-
-    this.dateToMask =
-        maskingConfiguration.getStringValue(type + ".datetime.year.delete.ninterval.maskdate");
     this.dateToCompare =
         maskingConfiguration.getStringValue(type + ".datetime.year.delete.ninterval.comparedate");
-
     this.dateDependencyMaskingProviderConfig = new DateDependencyMaskingProviderConfig();
   }
 
   public DateDependencyMaskingProvider(DateDependencyMaskingProviderConfig maskingConfiguration,
       DeidMaskingConfig deidMaskingConfig) {
     super(deidMaskingConfig);
-
-    this.dateToMask = maskingConfiguration.getDatetimeYearDeleteNIntervalMaskDate();
     this.dateToCompare = maskingConfiguration.getDatetimeYearDeleteNIntervalCompareDate();
-
     this.dateDependencyMaskingProviderConfig = maskingConfiguration;
   }
 
-  /**
-   * This is the masking function for DateDependencyMaskingProvider
-   *
-   * @param node : contains an entire tree of the resource type
-   * @return returning the updated node
-   */
-  public JsonNode mask(JsonNode node) {
-
-    if (node == null || !node.has(dateToMask) || !node.has(dateToCompare)) {
-      return null;
+  @Override
+  public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
+    for (MaskingActionInputIdentifier i : identifiers) {
+      mask(i.getParent(), i.getPath());
     }
+  }
 
-    String maskDateValue = node.path(dateToMask).asText();
-    String compareDateValue = node.path(dateToCompare).asText();
+  /**
+   * This is the masking function for DateDependencyMaskingProvider.
+   *
+   * @param node the parent JSON object node which is expected to contain the property
+   *        being masked and the property to which the current value of the property being masked is
+   *        compared.
+   * 
+   * @param dateToMask the name of the property being masked
+   * 
+   * @return the updated node
+   */
+  protected JsonNode mask(JsonNode node, String dateToMask) {    
+    if (node != null && node.has(dateToMask) && node.has(dateToCompare)) {      
+      JsonNode maskNode = node.get(dateToMask);
+      JsonNode compareNode = node.get(dateToCompare);      
+      if (!maskNode.isNull() && !compareNode.isNull()) {
+        
+        String maskDateValue = maskNode.asText();
+        String compareDateValue = compareNode.asText();
 
-    // Add compared date value to the masking configuration for date time
-    // masking provider process
-    dateDependencyMaskingProviderConfig
-        .setDatetimeyearDeleteNIntervalCompareDateValue(compareDateValue);
-
-    // The rest of the configuration values, together with the compared
-    // value, are passed down to date time masking provider
-    DateTimeMaskingProvider maskingProvider =
-        new DateTimeMaskingProvider(dateDependencyMaskingProviderConfig);
-    String maskedValue = maskingProvider.mask(maskDateValue);
-
-    // Update the field with the masked value returned from
-    // DateTimeMaskingProvider
-    ((ObjectNode) node).put(dateToMask, maskedValue);
-
+        // The configuration values and the compare date value are passed to datetime masking provider
+        DateTimeMaskingProvider maskingProvider =
+            new DateTimeMaskingProvider(dateDependencyMaskingProviderConfig, compareDateValue);
+        String maskedValue = maskingProvider.mask(maskDateValue);
+    
+        // Update the field with the masked value returned from
+        // DateTimeMaskingProvider
+        ((ObjectNode) node).put(dateToMask, maskedValue);
+      }
+    }  
+    
     return node;
   }
 }

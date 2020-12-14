@@ -428,13 +428,11 @@ public class MaskingProviderBuilderTest {
     assertEquals(originalReference, maskedDevice.get("expiry").asText());
   }
 
-  // This calls MaskingProviderBuilder.maskFinalPathComplex
-  @Ignore
   @Test
   public void testBasicMaskDateDependency() throws Exception {
     String dateDependencyRuleName = "dateDependency";
     Map<String, String> patientMaskConf = new HashMap<>();
-    patientMaskConf.put("/", dateDependencyRuleName);
+    patientMaskConf.put("/birthDate", dateDependencyRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Patient", patientMaskConf);
@@ -449,18 +447,13 @@ public class MaskingProviderBuilderTest {
 
     DateDependencyMaskingProviderConfig maskingConfiguration =
         new DateDependencyMaskingProviderConfig();
-
-    maskingConfiguration.setDatetimeYearDeleteNIntervalMaskDate("birthDate");
     maskingConfiguration.setDatetimeYearDeleteNIntervalCompareDate("deceasedDateTime");
 
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
-
     Rule dateRule =
         MaskingConfigUtils.createRuleWithOneProvider(dateDependencyRuleName, maskingConfiguration);
-
     List<Rule> rules = testMaskingConfig.getRules();
     rules.add(dateRule);
-
     testMaskingConfig.setRules(rules);
 
     JsonConfig jsonConfig = testMaskingConfig.getJson();
@@ -471,8 +464,8 @@ public class MaskingProviderBuilderTest {
             arrayAllRules, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedPatient = genericMaskingProvider.mask(patient);
-    assertTrue(maskedPatient.get("birthDate").asText().equals("08/12"));
-    assertTrue(maskedPatient.get("deceasedDateTime").asText().equals("05-11-2011 00:00:00"));
+    assertEquals("08/12", maskedPatient.get("birthDate").asText());
+    assertEquals("05-11-2011 00:00:00", maskedPatient.get("deceasedDateTime").asText());
   }
 
   @Test
