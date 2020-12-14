@@ -34,7 +34,7 @@ import com.ibm.whc.deid.utils.log.LogCodes;
  *
  */
 public class DateTimeMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -645486689214017719L;
 
   private static final DateTimeIdentifier dateTimeIdentifier = new DateTimeIdentifier();
@@ -183,7 +183,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
-  public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig, String compareDateValue) {
+  public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig,
+      String compareDateValue) {
 
     // Set some default values needed for date dependency
     this.dateYearDelete = false;
@@ -604,11 +605,27 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     if (dateYearDeleteNInterval) {
       if (dateYearDeleteComparedValue != null) {
         LocalDateTime givenDate = LocalDateTime.ofInstant(cal.toInstant(), ZoneId.systemDefault());
-        LocalDateTime comparedDate = LocalDateTime
-            .ofInstant(Instant.from(f.parse(dateYearDeleteComparedValue)), ZoneId.systemDefault());
-
-        if (Math
-            .abs(ChronoUnit.DAYS.between(givenDate, comparedDate)) <= dateYearDeleteNDaysValue) {
+        LocalDateTime comparedDate = null;
+        try {
+          Instant compareInstant;
+          if (f == DateTimeFormatter.ISO_OFFSET_DATE_TIME) {
+            compareInstant = Instant.from(f.parse(dateYearDeleteComparedValue));
+          } else {
+            compareInstant =
+                Instant.from(f.withZone(ZoneId.systemDefault()).parse(dateYearDeleteComparedValue));
+          }
+          comparedDate = LocalDateTime.ofInstant(compareInstant, ZoneId.systemDefault());
+        } catch (Exception e) {
+          if (unspecifiedValueHandling == 2) {
+            return RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC));
+          } else if (unspecifiedValueHandling == 3) {
+            return unspecifiedValueReturnMessage;
+          } else {
+            return null;
+          }
+        }
+        long daysBetween = Math.abs(ChronoUnit.DAYS.between(givenDate, comparedDate));
+        if (daysBetween <= dateYearDeleteNDaysValue) {
           int originalMonth = cal.get(Calendar.MONTH);
           int originalDay = cal.get(Calendar.DAY_OF_MONTH);
           return String.format("%02d/%02d", originalDay, originalMonth + 1);

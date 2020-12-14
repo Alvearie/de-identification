@@ -58,7 +58,7 @@ public class DateDependencyMaskingProvider extends AbstractComplexMaskingProvide
   /**
    * This is the masking function for DateDependencyMaskingProvider.
    *
-   * @param node : contains the parent JSON object node which is expected to contain the property
+   * @param node the parent JSON object node which is expected to contain the property
    *        being masked and the property to which the current value of the property being masked is
    *        compared.
    * 
@@ -67,20 +67,23 @@ public class DateDependencyMaskingProvider extends AbstractComplexMaskingProvide
    * @return the updated node
    */
   protected JsonNode mask(JsonNode node, String dateToMask) {    
-    if (node != null && node.has(dateToMask) && node.has(dateToCompare)) {
-      
-      String maskDateValue = node.path(dateToMask).asText();
-      String compareDateValue = node.path(dateToCompare).asText();
-  
-      // The rest of the configuration values, together with the compared
-      // value, are passed to date time masking provider
-      DateTimeMaskingProvider maskingProvider =
-          new DateTimeMaskingProvider(dateDependencyMaskingProviderConfig, compareDateValue);
-      String maskedValue = maskingProvider.mask(maskDateValue);
-  
-      // Update the field with the masked value returned from
-      // DateTimeMaskingProvider
-      ((ObjectNode) node).put(dateToMask, maskedValue);
+    if (node != null && node.has(dateToMask) && node.has(dateToCompare)) {      
+      JsonNode maskNode = node.get(dateToMask);
+      JsonNode compareNode = node.get(dateToCompare);      
+      if (!maskNode.isNull() && !compareNode.isNull()) {
+        
+        String maskDateValue = maskNode.asText();
+        String compareDateValue = compareNode.asText();
+
+        // The configuration values and the compare date value are passed to datetime masking provider
+        DateTimeMaskingProvider maskingProvider =
+            new DateTimeMaskingProvider(dateDependencyMaskingProviderConfig, compareDateValue);
+        String maskedValue = maskingProvider.mask(maskDateValue);
+    
+        // Update the field with the masked value returned from
+        // DateTimeMaskingProvider
+        ((ObjectNode) node).put(dateToMask, maskedValue);
+      }
     }  
     
     return node;
