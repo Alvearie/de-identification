@@ -32,7 +32,7 @@ public class IMEIMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskNoTACPreservation() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    config.setPreserveTac(Boolean.FALSE);
+    config.setPreserveTAC(Boolean.FALSE);
     MaskingProvider maskingProvider = new IMEIMaskingProvider(config);
 
     IMEIIdentifier identifier = new IMEIIdentifier();
