@@ -5,9 +5,12 @@
  */
 package com.ibm.whc.deid.shared.pojo.config;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /*
  * Interface for ConfigSchemaTypes - must use.
  */
+@Schema(name = "configSchemaTypes", description = "Type of config schema")
 public interface ConfigSchemaTypes {
   public String name();
 }

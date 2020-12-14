@@ -43,10 +43,10 @@ public class IMEIMaskingProviderConfigTest {
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setPreserveTac(!config.getPreserveTAC());
+    config.setPreserveTAC(!config.getPreserveTAC());
     assertFalse(config.equals(other));
     assertNotEquals(config.hashCode(), other.hashCode());
-    other.setPreserveTac(config.getPreserveTAC());
+    other.setPreserveTAC(config.getPreserveTAC());
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
   }
