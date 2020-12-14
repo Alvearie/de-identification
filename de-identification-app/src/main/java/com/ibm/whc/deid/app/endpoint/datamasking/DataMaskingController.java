@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "De-Identification", description = "Masking api")
+@Tag(name = "De-Identification", description = "Masking apis")
 public class DataMaskingController extends AbstractDataMaskingInvoker {
 
   private final DataMaskingService dataMaskingService;
@@ -49,7 +49,7 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
     this.dataMaskingService = dataMaskingService;
   }
 
-  @Operation(summary = "Deidentify batch",
+  @Operation(summary = "deidentify data",
       description = "Deidentify data using the configuration provided in the tenantConfigs API",
       tags = {"De-Identification"})
   @ApiResponses(value = {

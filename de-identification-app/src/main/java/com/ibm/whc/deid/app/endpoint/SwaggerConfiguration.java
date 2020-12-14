@@ -21,9 +21,7 @@ public class SwaggerConfiguration {
 
   Info info() {
     return new Info().title("IBM Data De-Identification").description(
-        "The Data De-Identification service provides a wide range of de-identification capabilities\r\n"
-            + "    // designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet\r\n"
-            + "    // their regulatory and privacy requirements.")
+        "The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.")
         .license(new License().name("IBM Data De-Identification")
             .url("https://github.com/Alvearie/de-identification/blob/master/LICENSE"))
         .version("1.0.0");

@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Health", description = "Health api")
+@Tag(name = "Health", description = "Health apis")
 public class HealthController {
 	static final LogManager log = LogManager.getInstance();
 
