@@ -11,40 +11,27 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /*
- * Provider for masking a field based on two related dates
+ * Provider for masking a field based on two related dates in the same JSON object.
  */
 @JsonInclude(Include.NON_NULL)
 public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 7784240554858910715L;
 
-  private String datetimeYearDeleteNIntervalMaskDate;
+  /**
+   * The name of the property that is being compared with the value of the property being masked.
+   * This property must exist within the same parent JSON object node as the property being masked.
+   */
   private String datetimeYearDeleteNIntervalCompareDate;
+
+  /**
+   * The maximum number of days that between the target property value and the compared property
+   * value for the masking action to occur.
+   */
   private int dateYearDeleteNDaysValue = 365;
-  
-  // set by code, not a documented, external configuration parameter
-  private String datetimeyearDeleteNIntervalCompareDateValue;
-  
 
   public DateDependencyMaskingProviderConfig() {
     type = MaskingProviderType.DATEDEPENDENCY;
-  }
-
-  public String getDatetimeyearDeleteNIntervalCompareDateValue() {
-    return datetimeyearDeleteNIntervalCompareDateValue;
-  }
-
-  public void setDatetimeyearDeleteNIntervalCompareDateValue(
-      String datetimeyearDeleteNIntervalCompareDateValue) {
-    this.datetimeyearDeleteNIntervalCompareDateValue = datetimeyearDeleteNIntervalCompareDateValue;
-  }
-
-  public String getDatetimeYearDeleteNIntervalMaskDate() {
-    return datetimeYearDeleteNIntervalMaskDate;
-  }
-
-  public void setDatetimeYearDeleteNIntervalMaskDate(String datetimeYearDeleteNIntervalMaskDate) {
-    this.datetimeYearDeleteNIntervalMaskDate = datetimeYearDeleteNIntervalMaskDate;
   }
 
   public String getDatetimeYearDeleteNIntervalCompareDate() {
@@ -67,14 +54,14 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
     super.validate();
-    if (datetimeYearDeleteNIntervalMaskDate == null || datetimeYearDeleteNIntervalMaskDate.trim().isEmpty()) {
-      throw new InvalidMaskingConfigurationException("`datetimeYearDeleteNIntervalMaskDate` is required");
-    }
-    if (datetimeYearDeleteNIntervalCompareDate == null || datetimeYearDeleteNIntervalCompareDate.trim().isEmpty()) {
-      throw new InvalidMaskingConfigurationException("`datetimeYearDeleteNIntervalCompareDate` is required");
+    if (datetimeYearDeleteNIntervalCompareDate == null
+        || datetimeYearDeleteNIntervalCompareDate.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException(
+          "`datetimeYearDeleteNIntervalCompareDate` is required");
     }
     if (dateYearDeleteNDaysValue < 0) {
-      throw new InvalidMaskingConfigurationException("`dateYearDeleteNDaysValue` must be greater than or equal to 0"); 
+      throw new InvalidMaskingConfigurationException(
+          "`dateYearDeleteNDaysValue` must be greater than or equal to 0");
     }
   }
 
@@ -85,10 +72,6 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
     result = prime * result + dateYearDeleteNDaysValue;
     result = prime * result + ((datetimeYearDeleteNIntervalCompareDate == null) ? 0
         : datetimeYearDeleteNIntervalCompareDate.hashCode());
-    result = prime * result + ((datetimeYearDeleteNIntervalMaskDate == null) ? 0
-        : datetimeYearDeleteNIntervalMaskDate.hashCode());
-    result = prime * result + ((datetimeyearDeleteNIntervalCompareDateValue == null) ? 0
-        : datetimeyearDeleteNIntervalCompareDateValue.hashCode());
     return result;
   }
 
@@ -108,18 +91,6 @@ public class DateDependencyMaskingProviderConfig extends MaskingProviderConfig {
         return false;
     } else if (!datetimeYearDeleteNIntervalCompareDate
         .equals(other.datetimeYearDeleteNIntervalCompareDate))
-      return false;
-    if (datetimeYearDeleteNIntervalMaskDate == null) {
-      if (other.datetimeYearDeleteNIntervalMaskDate != null)
-        return false;
-    } else if (!datetimeYearDeleteNIntervalMaskDate
-        .equals(other.datetimeYearDeleteNIntervalMaskDate))
-      return false;
-    if (datetimeyearDeleteNIntervalCompareDateValue == null) {
-      if (other.datetimeyearDeleteNIntervalCompareDateValue != null)
-        return false;
-    } else if (!datetimeyearDeleteNIntervalCompareDateValue
-        .equals(other.datetimeyearDeleteNIntervalCompareDateValue))
       return false;
     return true;
   }

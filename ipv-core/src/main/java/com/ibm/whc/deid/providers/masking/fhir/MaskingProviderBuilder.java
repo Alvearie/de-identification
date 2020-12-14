@@ -6,8 +6,6 @@
 package com.ibm.whc.deid.providers.masking.fhir;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
@@ -142,7 +140,7 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
             maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId);
         maskingProvider.setName(ruleName);
         maskingActions.add(new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier,
-            maskingProvider, null, false));
+            maskingProvider, null));
       });
     }
 
@@ -244,16 +242,11 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
 
     if (valueNode.isArray()) {
       Iterator<JsonNode> items = valueNode.elements();
-      ArrayNode arrayNode = new ArrayNode(JsonNodeFactory.instance);
-
       while (items.hasNext()) {
         JsonNode item = items.next();
-
         if (item.isNull() || item.isObject() || item.isArray()) {
-          arrayNode.add(item);
           continue;
         }
-
         returnRecords.add(new MaskingActionInputIdentifier(maskingProvider, item, valueNode, path,
             resourceType, resourceId, root));
       }
@@ -362,14 +355,9 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         // therefore, return null (subNode still unmodified and = null
         // at this point)
       } else {
-        // If the path is requesting a non-array node
-        if (path.equals("__ALL__")) {
-          subNode = node;
-        } else {
-          subNode = node.get(path);
-        }
+        subNode = node.get(path);
       }
-    } catch (Exception e) { // Including IndexOutOfBoundsException
+    } catch (Exception e) { // including IndexOutOfBoundsException
       subNode = null;
     }
     return subNode;
@@ -626,13 +614,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
 
           for (String currentPath : allPathsInRecord) {
             String fullPath = currentPath;
-            // Check if the element can be masked. Precedence:
-            // isPartofAList > arrayAllRules
 
-            // If there is more than 1 comma separated provider,
-            // apply all regardless of other conditions
-            if (maskingAction.getIsPartOfAList()
-                || (checkIfArrayPath(currentPath) && (arrayAllRules)) ||
+            if ( (checkIfArrayPath(currentPath) && (arrayAllRules)) ||
 
                 // If represents an array and arrayAllRules true
                 // OR the item has not been masked before, then mask.
