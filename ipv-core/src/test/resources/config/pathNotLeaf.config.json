@@ -1,0 +1,26 @@
+{
+	"rules": [
+		{
+			"name": "redactRule",
+			"maskingProviders": [
+				{
+					"type": "REDACT"
+				}
+			]
+		}
+	],
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Organization"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Organization/address/line",
+				"rule": "redactRule"
+			}
+		]
+	}
+}
+    

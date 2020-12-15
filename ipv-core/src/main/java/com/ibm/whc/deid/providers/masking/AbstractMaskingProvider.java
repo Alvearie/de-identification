@@ -5,10 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.io.Serializable;
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -18,13 +14,16 @@ import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type Abstract masking provider.
  *
  */
-public abstract class AbstractMaskingProvider implements MaskingProvider, Serializable {
-  /** */
+public abstract class AbstractMaskingProvider implements MaskingProvider {
+
   private static final long serialVersionUID = -6276716005726979282L;
 
   protected SecureRandom random;
@@ -89,6 +88,7 @@ public abstract class AbstractMaskingProvider implements MaskingProvider, Serial
    *
    * @param logManager the log manager
    */
+  @Override
   public void setTestingOnlyLogManager(LogManager logManager) {
     testingOnly_LogManager = logManager;
   }
@@ -121,10 +121,11 @@ public abstract class AbstractMaskingProvider implements MaskingProvider, Serial
     if (i.getParent().isObject()) {
       i.setParent(((ObjectNode) i.getParent()).set(i.getPath(), new TextNode(value)));
     } else if (i.getParent().isArray()) {
-      ArrayNode aNode = (ArrayNode) i.getParent();
+      ArrayNode aNode = (ArrayNode)i.getParent();
       int indexOfResult = -1;
-      for (int currentIndex = 0; currentIndex < aNode.size(); currentIndex++) {
-        if (aNode.get(currentIndex).equals(i.getNode())) {
+      int size = aNode.size();
+      for (int currentIndex = 0; currentIndex < size; currentIndex++) {
+        if (aNode.get(currentIndex) == i.getNode()) {
           indexOfResult = currentIndex;
           break;
         }
@@ -133,10 +134,12 @@ public abstract class AbstractMaskingProvider implements MaskingProvider, Serial
     }
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }

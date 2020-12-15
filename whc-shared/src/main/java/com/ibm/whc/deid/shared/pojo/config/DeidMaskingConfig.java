@@ -42,7 +42,7 @@ public class DeidMaskingConfig implements Serializable {
   @JsonAlias({"certificateID"})
   private String certificateId;
 
-  private boolean defaultNoRuleResolution;
+  private boolean defaultNoRuleResolution = true;
 
   public DeidMaskingConfig() {
     // nothing required here

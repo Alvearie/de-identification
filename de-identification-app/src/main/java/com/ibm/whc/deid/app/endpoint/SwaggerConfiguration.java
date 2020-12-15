@@ -7,13 +7,10 @@ package com.ibm.whc.deid.app.endpoint;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.google.common.base.Predicates;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 
 /**
  * Use @Configuration so that Spring creates a Spring bean in the application context
@@ -22,26 +19,17 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 public class SwaggerConfiguration {
 
-  ApiInfo apiInfo() {
-
-    return new ApiInfoBuilder().title("IBM Data De-Identification")
-    		   .description(
-    		            "The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.")
-        .license("IBM Data De-Identification")
-        .licenseUrl("https://github.com/Alvearie/de-identification/blob/master/LICENSE")
-        .version("1.0.0")
-        .build();
+  Info info() {
+    return new Info().title("IBM Data De-Identification").description(
+        "The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.")
+        .license(new License().name("IBM Data De-Identification")
+            .url("https://github.com/Alvearie/de-identification/blob/master/LICENSE"))
+        .version("1.0.0");
   }
 
   @Bean
-  public Docket customImplementation() {
-    // Scan the following directories and sub-directories within for annotated spring classes to
-    // include in swagger page
-    String packages = "com.ibm.whc.deid.app.endpoint";
-    String packages2 = "com.ibm.whc.deid.endpoint";
-    return new Docket(DocumentationType.SWAGGER_2).select()
-        .apis(Predicates.or(RequestHandlerSelectors.basePackage(packages),
-            RequestHandlerSelectors.basePackage(packages2)))
-        .paths(PathSelectors.regex("/api.*")).build().apiInfo(apiInfo());
+  public OpenAPI customImplementation() {
+    // Scan the following directories as described in the application.properties file
+    return new OpenAPI().components(new Components()).info(info());
   }
 }

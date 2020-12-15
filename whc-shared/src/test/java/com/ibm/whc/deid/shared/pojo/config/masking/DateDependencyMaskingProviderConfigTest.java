@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
@@ -16,10 +15,8 @@ public class DateDependencyMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     DateDependencyMaskingProviderConfig config = new DateDependencyMaskingProviderConfig();
-    config.setDatetimeYearDeleteNIntervalMaskDate("maskDate");
     config.setDatetimeYearDeleteNIntervalCompareDate("compDate");
     config.setDateYearDeleteNDaysValue(0);
-    assertNull(config.getDatetimeyearDeleteNIntervalCompareDateValue());
     config.validate();
 
     config.setUnspecifiedValueHandling(-1);
@@ -31,15 +28,6 @@ public class DateDependencyMaskingProviderConfigTest {
     }
     config.setUnspecifiedValueHandling(1);
     config.validate();
-
-    config.setDatetimeYearDeleteNIntervalMaskDate(null);
-    try {
-      config.validate();
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`datetimeYearDeleteNIntervalMaskDate` is required", e.getMessage());
-    }
-    config.setDatetimeYearDeleteNIntervalMaskDate("maskDate2");
 
     config.setDatetimeYearDeleteNIntervalCompareDate(null);
     try {
@@ -59,5 +47,4 @@ public class DateDependencyMaskingProviderConfigTest {
     }
     config.setDateYearDeleteNDaysValue(55);
   }
-
 }

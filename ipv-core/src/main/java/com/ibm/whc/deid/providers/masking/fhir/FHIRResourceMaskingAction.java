@@ -11,13 +11,12 @@ import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 
 public class FHIRResourceMaskingAction implements Serializable {
-  /** */
+
   private static final long serialVersionUID = 4703951735249581684L;
 
   private final String fullPath;
   private final String path;
   private final String[] paths;
-  private final boolean isPartOfAList; /* default = false */
 
   private final MaskingProvider maskingProvider;
   private final AbstractComplexMaskingProvider abstractComplexMaskingProvider;
@@ -42,27 +41,8 @@ public class FHIRResourceMaskingAction implements Serializable {
     return abstractComplexMaskingProvider;
   }
 
-  public boolean getIsPartOfAList() {
-    return isPartOfAList;
-  }
-
   public FHIRResourceMaskingAction(String fullPath, String path, MaskingProvider maskingProvider,
       AbstractComplexMaskingProvider abstractComplexMaskingProvider) {
-    this(fullPath, path, maskingProvider, abstractComplexMaskingProvider, false);
-  }
-
-  /**
-   * Takes in a masking.json file and parses it to find the masking provider
-   *
-   * @param fullPath
-   * @param path
-   * @param maskingProvider
-   * @param abstractComplexMaskingProvider
-   * @param delete
-   * @param isPartOfAList
-   */
-  public FHIRResourceMaskingAction(String fullPath, String path, MaskingProvider maskingProvider,
-      AbstractComplexMaskingProvider abstractComplexMaskingProvider, boolean isPartOfAList) {
     this.fullPath = fullPath;
     this.path = path;
     int eqeqIndex = path.indexOf("==");
@@ -80,13 +60,8 @@ public class FHIRResourceMaskingAction implements Serializable {
         this.paths = path.split("/");
       }
     }
-
     this.maskingProvider = maskingProvider;
     this.abstractComplexMaskingProvider = abstractComplexMaskingProvider;
-
-    // This specifies whether the default.masking.provider had more than one
-    // provider in the list (e.g. GENERALIZE,HASH)
-    this.isPartOfAList = isPartOfAList;
   }
 
   @Override

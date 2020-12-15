@@ -21,6 +21,7 @@
 		<commons-csv.version>1.8</commons-csv.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-compress.version>1.20</commons-compress.version>
+		<springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>

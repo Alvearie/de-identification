@@ -1,0 +1,12 @@
+{
+	"resourceType": "Organization",
+	"id": "3",
+	"address": [
+		{
+			"line": {
+				"city": "Hope",
+				"state": "ND"
+			}
+		}
+	]	
+}

@@ -1,0 +1,27 @@
+{
+    "defaultNoRuleResolution": false,
+	"rules": [
+		{
+			"name": "maintainRule",
+			"maskingProviders": [
+				{
+					"type": "MAINTAIN"
+				}
+			]
+		}
+	],
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Organization"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Organization/address/line",
+				"rule": "maintainRule"
+			}
+		]
+	}
+}
+    

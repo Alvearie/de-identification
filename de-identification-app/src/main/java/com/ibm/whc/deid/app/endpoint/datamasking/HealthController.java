@@ -19,17 +19,19 @@ import com.ibm.whc.deid.endpoint.exception.BadRequestException;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /*
  * Health check rest endpoint - this class is used to tell if the rest endpoints are up
  */
 @RestController
 @RequestMapping("/api/v1")
-@Api()
+@Tag(name = "Health", description = "Health apis")
 public class HealthController {
 	static final LogManager log = LogManager.getInstance();
 
@@ -37,9 +39,11 @@ public class HealthController {
 	HealthController() {
 	}
 
-	@ApiOperation(value = "Get the status of the server", tags = { "Health" })
+    @Operation(summary = "server status", description = "Get the status of the server",
+        tags = {"Health"})
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "The masked output, as a JSON array.", response = String.class) })
+        @ApiResponse(responseCode = "200", description = "The masked output, as a JSON array.",
+            content = @Content(schema = @Schema(implementation = String.class)))})
 	@GetMapping("/health")
 	public ResponseEntity<?> getStatus()
 			throws BadRequestException, DeidException {

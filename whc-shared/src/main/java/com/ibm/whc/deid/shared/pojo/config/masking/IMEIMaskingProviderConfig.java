@@ -30,7 +30,7 @@ public class IMEIMaskingProviderConfig extends MaskingProviderConfig {
     return preserveTAC;
   }
 
-  public void setPreserveTac(boolean preserveTAC) {
+  public void setPreserveTAC(boolean preserveTAC) {
     this.preserveTAC = preserveTAC;
   }
 
