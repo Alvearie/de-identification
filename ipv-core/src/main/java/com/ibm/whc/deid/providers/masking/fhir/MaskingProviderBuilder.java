@@ -76,8 +76,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   private final boolean arrayAllRules;
   private boolean defNoRuleRes = true;
 
-  private List<String> maskingAuditTrailList;
-
   private final String schemaType;
   
   private MaskingProvider noRuleResProvider = null;
@@ -600,7 +598,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
       
       for (MaskingResource unMasked : maskList) {
         List<MaskingActionInputIdentifier> listToMaskPerResource = new ArrayList<>();
-        maskingAuditTrailList = new ArrayList<>();
         List<JsonNode> maskedConditionNamedNodes = new ArrayList<>();
 
         if (maskingAction.getShortRuleName().contains("==")) {
@@ -630,7 +627,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
 
               String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
 
-              // Mask the node and add message to audit trail
               listToMaskPerResource.addAll(determineMaskingActionInputs(unMasked.getResourceType(), unMasked.getResourceId(),
                   unMasked.getJsonNode(), brokenDownPathElements, 0, maskingAction, fullPath,
                   unMasked.getJsonNode()));
@@ -810,10 +806,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
     }
 
     return inputList;
-  }
-
-  public List<String> getMaskingAuditTrailList() {
-    return maskingAuditTrailList;
   }
 
   public boolean isDefNoRuleRes() {
