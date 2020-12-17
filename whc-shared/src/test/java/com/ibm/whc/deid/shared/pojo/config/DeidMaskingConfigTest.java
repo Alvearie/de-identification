@@ -69,40 +69,6 @@ public class DeidMaskingConfigTest {
     assertEquals(0, config.getRulesMap().size());
   }
 
-  @Test
-  public void testGetStringValueWithPrefixMatch() {
-    DeidMaskingConfig config = new DeidMaskingConfig();
-    assertNull(config.getJson());
-    Map<String,String> map = config.getStringValueWithPrefixMatch("x");
-    assertNotNull(map);
-    assertEquals(0, map.size());
-
-    config.setJson(new JsonConfig());
-    config.getJson().getMaskingRules().add(new JsonMaskingRule("/fhir/path/data", "rule1"));
-    assertEquals(1, config.getJson().getMaskingRules().size());
-    map = config.getStringValueWithPrefixMatch("x");
-    assertNotNull(map);
-    assertEquals(0, map.size());
-    map = config.getStringValueWithPrefixMatch("/fhir/path");
-    assertNotNull(map);
-    assertEquals(1, map.size());
-    assertEquals("rule1", map.get("/fhir/path/data"));
-    
-    config.setJson(null);
-    assertNull(config.getJson());
-    map = config.getStringValueWithPrefixMatch("x");
-    assertNotNull(map);
-    assertEquals(0, map.size());
-
-    config.setJson(new JsonConfig());
-    assertNotNull(config.getJson());
-    assertNotNull(config.getJson().getMaskingRules());
-    assertEquals(0, config.getJson().getMaskingRules().size());
-    map = config.getStringValueWithPrefixMatch("x");
-    assertNotNull(map);
-    assertEquals(0, map.size());
-  }
-
   /**
    * Create a default deid masking configuration. Serialize to String, de-serialize to POJO, and
    * serialize again to make sure the two strings are the same.

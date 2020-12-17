@@ -1,0 +1,60 @@
+{
+	"resourceType": "Organization",
+	"id": "ACME",
+	"meta": {
+		"versionId": "1",
+		"lastUpdated": "2017-01-09T14:29:31.214Z"
+	},
+	"text": {
+		"status": "generated",
+		"div": "data concerning the organization"
+	},
+	"extension": [
+		{
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/studyid",
+			"valueString": "study1"
+		},
+		{
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/siteid",
+			"valueString": "site1"
+		},
+		{
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/patientid",
+			"valueString": "patient1"
+		}
+	],
+	"name": "Hospital Number 1",
+	"telecom": [
+		{
+			"system": "phone",
+			"value": "(+1) 507-867-5309"
+		},
+		{
+			"system": "fax",
+			"value": "(+1) 507-867-5309"
+		},
+		{
+			"system": "email",
+			"value": "doctor1@hospital1.org"
+		}
+	],
+	"address": [
+		{
+			"line": [
+				"1",
+				"22",
+				"22",
+				"22",
+				"55555",
+				"666666",
+				"7777777",
+				"88888888",
+				"999999999"
+			],
+			"city": "Hope",
+			"state": "ND",
+			"postalCode": "58046",
+			"country": "USA"
+		}
+	]
+}

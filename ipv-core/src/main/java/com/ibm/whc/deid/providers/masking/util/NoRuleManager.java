@@ -23,26 +23,7 @@ public class NoRuleManager {
 
   private MaskingProvider noRuleResProvider;
 
-  private class JsonNodeMapWrapper {
-
-    private final JsonNode node;
-
-    public JsonNodeMapWrapper(JsonNode n) {
-      node = n;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      return o instanceof JsonNodeMapWrapper && this.node == ((JsonNodeMapWrapper) o).node;
-    }
-
-    @Override
-    public int hashCode() {
-      return node.hashCode();
-    }
-  }
-
-  private HashMap<JsonNodeMapWrapper, MaskingActionInputIdentifier> map = new HashMap<>(1000);
+  private HashMap<JsonNodeIdentityWrapper, MaskingActionInputIdentifier> map = new HashMap<>(1000);
 
   public NoRuleManager(MaskingProviderBuilder.MaskingResource maskingResource, String resourceId,
       MaskingProvider noRuleResProvider) {
@@ -56,7 +37,7 @@ public class NoRuleManager {
       for (MaskingActionInputIdentifier inputIdentifier : listToMaskPerResource) {
         JsonNode maskedNode = inputIdentifier.getNode();
         if (maskedNode != null) {
-          map.remove(new JsonNodeMapWrapper(maskedNode));
+          map.remove(new JsonNodeIdentityWrapper(maskedNode));
         }
       }
     }
@@ -82,7 +63,7 @@ public class NoRuleManager {
             if (childNode.isArray() || childNode.isObject()) {
               findLeaves(rootNode, childPath, childNode, resourceId, resourceType);
             } else {
-              map.put(new JsonNodeMapWrapper(childNode),
+              map.put(new JsonNodeIdentityWrapper(childNode),
                   new MaskingActionInputIdentifier(noRuleResProvider, childNode, parentNode,
                       childPath, resourceType, resourceId, rootNode));
             }
@@ -99,7 +80,7 @@ public class NoRuleManager {
           } else if (childNode.isArray() || childNode.isObject()) {
             findLeaves(rootNode, entry.getKey(), childNode, resourceId, resourceType);
           } else {
-            map.put(new JsonNodeMapWrapper(childNode),
+            map.put(new JsonNodeIdentityWrapper(childNode),
                 new MaskingActionInputIdentifier(noRuleResProvider, childNode, parentNode,
                     entry.getKey(), resourceType, resourceId, rootNode));
           }

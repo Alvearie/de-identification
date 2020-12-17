@@ -28,7 +28,6 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
   private static final long serialVersionUID = -7270189743655406461L;
 
-  protected HashMap<String, List<String>> maskingAuditRecords = new HashMap<>();
   protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();
 
   public static final String DISABLE_TYPES_VALUE = "default";
@@ -69,9 +68,9 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
     this.keyForType = maskingConfiguration.getJson().getMessageTypeKey();
 
-    // if no Key is being passed into json.messageType.key then set to
+    // if no Key is being passed into json.messageTypeKey then set to
     // default
-    if (this.keyForType == null || this.keyForType.isEmpty()) {
+    if (this.keyForType == null || this.keyForType.trim().isEmpty()) {
       this.keyForType = DISABLE_TYPES_VALUE;
     }
   }
@@ -118,7 +117,6 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
       if (maskingProvider != null) {
         List<MaskingProviderBuilder.MaskingResource> maskingOutList =
             maskingProvider.orchestrateMasking(maskingInList);
-        maskingAuditRecords.put(identifier, maskingProvider.getMaskingAuditTrailList());
         finishedList.addAll(maskingOutList);
       } else {
         finishedList.addAll(maskingInList);
@@ -171,10 +169,6 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
       }
       return null;
     }).collect(Collectors.toList());
-  }
-
-  public List<String> getMaskingAuditListPerIdentifier(String identifier) {
-    return maskingAuditRecords.get(identifier);
   }
 
   public String getIdentifier() {
