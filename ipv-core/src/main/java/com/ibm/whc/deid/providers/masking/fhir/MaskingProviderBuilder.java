@@ -197,7 +197,6 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
    * @param path
    * @param maskingAction
    */
-  // TODO test this with arrays
   private List<MaskingActionInputIdentifier> maskFinalPathComplex(String resourceType,
       String resourceId, JsonNode node, JsonNode valueNode, String path,
       FHIRResourceMaskingAction maskingAction, JsonNode root) {
