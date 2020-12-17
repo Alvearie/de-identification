@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking.fhir;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,4 +56,34 @@ public class FHIRResourceMaskingConfiguration {
     this.basePath = basePath;
     this.fields = buildFieldList(configurations);
   }
+
+  public FHIRResourceMaskingConfiguration(String basePath, List<FHIRResourceField> fields) {
+    this.basePath = basePath;
+
+    if (fields == null || fields.isEmpty()) {
+      this.fields = new ArrayList<>();
+    } else {
+      // per documentation, if multiple rule assignments are made for same path, only the final one
+      // is used
+      ArrayList<FHIRResourceField> tempList = new ArrayList<>(fields.size());
+      HashMap<String, Integer> previouslyAddedMap = new HashMap<>(fields.size() * 2);
+      for (FHIRResourceField field : fields) {
+        Integer currentIndex = Integer.valueOf(tempList.size());
+        tempList.add(field);
+
+        Integer previousOffset = previouslyAddedMap.put(field.getKey(), currentIndex);
+        if (previousOffset != null) {
+          tempList.set(previousOffset.intValue(), null);
+        }
+      }
+      ArrayList<FHIRResourceField> keepList = new ArrayList<>(fields.size());
+      for (FHIRResourceField field : tempList) {
+        if (field != null) {
+          keepList.add(field);
+        }
+      }
+      this.fields = keepList;
+    }
+  }
+
 }
