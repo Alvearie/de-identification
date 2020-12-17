@@ -54,7 +54,7 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
     public String getResourceType() {
       return resourceType;
     }
-    
+
     private String getResourceId() {
       return resourceId;
     }
@@ -73,28 +73,27 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
   }
 
   private final List<FHIRResourceMaskingAction> maskingActionList;
-  private final boolean arrayAllRules;
   private boolean defNoRuleRes = true;
 
   private final String schemaType;
-  
+
   private MaskingProvider noRuleResProvider = null;
 
   public MaskingProviderBuilder(String schemaType,
       FHIRResourceMaskingConfiguration resourceConfiguration,
-      DeidMaskingConfig maskingConfiguration, boolean arrayAllRules, boolean defNoRuleRes,
+      DeidMaskingConfig maskingConfiguration, boolean defNoRuleRes,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
     super(maskingConfiguration);
 
     this.schemaType = schemaType;
     this.maskingProviderFactory = maskingProviderFactory;
-    this.arrayAllRules = arrayAllRules;
-    
+
     this.defNoRuleRes = defNoRuleRes;
     if (!this.defNoRuleRes) {
-      noRuleResProvider = this.maskingProviderFactory.getProviderFromType(MaskingProviderType.NULL, maskingConfiguration, new NullMaskingProviderConfig(), tenantId);
+      noRuleResProvider = this.maskingProviderFactory.getProviderFromType(MaskingProviderType.NULL,
+          maskingConfiguration, new NullMaskingProviderConfig(), tenantId);
     }
-    
+
     // TODO: verify setting keyForType to empty string is reasonable
     this.keyForType = "";
 
@@ -137,8 +136,8 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         MaskingProvider maskingProvider =
             maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId);
         maskingProvider.setName(ruleName);
-        maskingActions.add(new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier,
-            maskingProvider, null));
+        maskingActions.add(
+            new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier, maskingProvider, null));
       });
     }
 
@@ -589,22 +588,24 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         resourceId = idNode.asText();
       }
       unMasked.setResourceId(resourceId);
-      
-      unMasked.setNoRuleManager(isDefNoRuleRes() ? null : new NoRuleManager(unMasked, resourceId, noRuleResProvider));
+
+      unMasked.setNoRuleManager(
+          isDefNoRuleRes() ? null : new NoRuleManager(unMasked, resourceId, noRuleResProvider));
     }
 
     for (FHIRResourceMaskingAction maskingAction : this.maskingActionList) {
       List<MaskingActionInputIdentifier> listToMask = new ArrayList<>();
-      
+
       for (MaskingResource unMasked : maskList) {
         List<MaskingActionInputIdentifier> listToMaskPerResource = new ArrayList<>();
         List<JsonNode> maskedConditionNamedNodes = new ArrayList<>();
 
         if (maskingAction.getShortRuleName().contains("==")) {
           // Rule contains array query condition.
-          listToMaskPerResource.addAll(processArrayQueryCondition(unMasked.getJsonNode(), maskingAction,
-              maskedConditionNamedNodes, unMasked.getResourceType(), unMasked.getResourceId()));
-          
+          listToMaskPerResource
+              .addAll(processArrayQueryCondition(unMasked.getJsonNode(), maskingAction,
+                  maskedConditionNamedNodes, unMasked.getResourceType(), unMasked.getResourceId()));
+
         } else {
           ArrayList<String> allPathsInRecord = getActualPaths(maskingAction.getPaths(), "", 0,
               new ArrayList<String>(), unMasked.getJsonNode());
@@ -612,34 +613,25 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
           for (String currentPath : allPathsInRecord) {
             String fullPath = currentPath;
 
-            if ( (checkIfArrayPath(currentPath) && (arrayAllRules)) ||
+            // Remove the first '/' and split the path
+            String cleanedCurrentPath =
+                (currentPath.startsWith("/")) ? currentPath.substring(1, currentPath.length())
+                    : currentPath;
 
-                // If represents an array and arrayAllRules true
-                // OR the item has not been masked before, then mask.
-                (!checkIfArrayPath(currentPath))) {
+            String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
 
-              // If does not represent an array & has not been
-              // masked before
-              // Remove the first '/' and split the path
-              String cleanedCurrentPath =
-                  (currentPath.startsWith("/")) ? currentPath.substring(1, currentPath.length())
-                      : currentPath;
-
-              String[] brokenDownPathElements = cleanedCurrentPath.split("\\/");
-
-              listToMaskPerResource.addAll(determineMaskingActionInputs(unMasked.getResourceType(), unMasked.getResourceId(),
-                  unMasked.getJsonNode(), brokenDownPathElements, 0, maskingAction, fullPath,
-                  unMasked.getJsonNode()));
-            }
+            listToMaskPerResource.addAll(determineMaskingActionInputs(unMasked.getResourceType(),
+                unMasked.getResourceId(), unMasked.getJsonNode(), brokenDownPathElements, 0,
+                maskingAction, fullPath, unMasked.getJsonNode()));
           }
         }
-        
+
         if (!isDefNoRuleRes()) {
-            unMasked.getNoRuleManager().removeNodesAlreadyMasked(listToMaskPerResource);
+          unMasked.getNoRuleManager().removeNodesAlreadyMasked(listToMaskPerResource);
         }
         listToMask.addAll(listToMaskPerResource);
       }
-      
+
       MaskingProvider currentProvider = maskingAction.getMaskingProvider();
       if (currentProvider != null) {
         currentProvider.maskIdentifierBatch(listToMask);
@@ -650,13 +642,13 @@ public class MaskingProviderBuilder extends AbstractComplexMaskingProvider<JsonN
         }
       }
     }
-    
+
     if (!isDefNoRuleRes()) {
       for (MaskingResource resource : maskList) {
         resource.getNoRuleManager().applyToRemainingNodes();
       }
     }
-      
+
     return maskList;
   }
 

@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking.fhir;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
@@ -29,19 +32,20 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
 
   public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
-    this(maskingConfiguration, maskingConfiguration.getCertificateId(), true,
+    this(maskingConfiguration, maskingConfiguration.getCertificateId(),
         maskingConfiguration.isDefaultNoRuleResolution(), maskingProviderFactory, "/fhir/",
         tenantId);
   }
 
   protected FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration, String certificateId,
-      boolean arrayAllRules, boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory,
-      String basePathPrefix, String tenantId) {
+      boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory, String basePathPrefix,
+      String tenantId) {
     super(maskingConfiguration);
 
     this.maskingProviderFactory = maskingProviderFactory;
     this.certificateId = certificateId;
 
+    // if using "default" message type, given message types list is ignored per documentation
     List<String> messageTypes;
     if (AbstractComplexMaskingProvider.DISABLE_TYPES_VALUE.equals(this.keyForType)) {
       messageTypes = new ArrayList<>();
@@ -53,13 +57,13 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
     messageTypes.forEach(type -> {
       String basePath = basePathPrefix + type;
 
-      Map<String, String> maskingConfigurations =
+      List<FHIRResourceField> ruleAssignments =
           loadRulesForResource(type, maskingConfiguration, basePathPrefix);
       FHIRResourceMaskingConfiguration resourceConfiguration =
-          new FHIRResourceMaskingConfiguration(basePath, maskingConfigurations);
+          new FHIRResourceMaskingConfiguration(basePath, ruleAssignments);
       this.maskingProviderMap.put(type.toLowerCase(),
           new MaskingProviderBuilder("fhir", resourceConfiguration, maskingConfiguration,
-              arrayAllRules, defNoRuleRes, maskingProviderFactory, tenantId));
+              defNoRuleRes, maskingProviderFactory, tenantId));
     });
   }
 
@@ -76,18 +80,34 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
   }
 
   /**
-   * Given a masking configuration, load rules with given resource name.
+   * Load the rule assignments applicable for the given message type.
    *
-   * @param resourceName
-   * @param maskingConfiguration
-   * @return
+   * @param resourceName the message type for which rules are obtained
+   * @param maskingConfiguration the masking configuration
+   * 
+   * @return the applicable rule assignments
    */
-  public static Map<String, String> loadRulesForResource(String resourceName,
+  public static List<FHIRResourceField> loadRulesForResource(String resourceName,
       DeidMaskingConfig maskingConfiguration, String bashPathPrefix) {
-    return maskingConfiguration.getStringValueWithPrefixMatch(bashPathPrefix + resourceName + "/");
+    String matchPrefix = bashPathPrefix + resourceName + "/";
+    List<FHIRResourceField> values = Collections.emptyList();
+    JsonConfig jsonConfig = maskingConfiguration.getJson();
+    if (jsonConfig != null) {
+      List<JsonMaskingRule> ruleAssignments = jsonConfig.getMaskingRules();
+      if (ruleAssignments != null && !ruleAssignments.isEmpty()) {
+        values = new ArrayList<>(ruleAssignments.size());
+        for (JsonMaskingRule assignment : ruleAssignments) {
+          if (assignment.getJsonPath().startsWith(matchPrefix)) {
+            values.add(new FHIRResourceField(assignment.getJsonPath(), assignment.getRule()));
+          }
+        }
+      }
+    }
+    return values;
   }
 
   /** Given an identifier return the masked resource */
+  @Override
   public String mask(String identifier) {
     throw new RuntimeException(
         "FHIRMaskingProvider: Masking on a per-string basis is not enabled.");

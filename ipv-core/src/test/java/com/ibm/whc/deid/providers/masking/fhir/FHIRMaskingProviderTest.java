@@ -8,11 +8,14 @@ package com.ibm.whc.deid.providers.masking.fhir;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,6 +27,8 @@ import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactoryUtil;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
 import com.ibm.whc.deid.shared.util.MaskingConfigUtils;
 import scala.Tuple2;
@@ -36,14 +41,44 @@ public class FHIRMaskingProviderTest {
 
   private MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
-
+  
   @Test
-  public void testLoadsCorrectRules() throws Exception {
+  public void testLoadRulesForResource() {
+    DeidMaskingConfig config = new DeidMaskingConfig();
+    assertNull(config.getJson());
+    List<FHIRResourceField> list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
+    assertNotNull(list);
+    assertEquals(0, list.size());
 
-    DeidMaskingConfig defaultFhirConfig = (new ConfigGenerator()).getTestDeidConfig();
+    config.setJson(new JsonConfig());
+    config.getJson().getMaskingRules().add(new JsonMaskingRule("/fhir/path/data", "rule1"));
+    assertEquals(1, config.getJson().getMaskingRules().size());    
+    list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
+    assertNotNull(list);
+    assertEquals(0, list.size());
+    list = FHIRMaskingProvider.loadRulesForResource("path", config, "/fhir/");
+    assertNotNull(list);
+    assertEquals(1, list.size());
+    assertEquals("/fhir/path/data", list.get(0).getKey());
+    assertEquals("rule1", list.get(0).getShortRuleName());
+    
+    config.setJson(null);
+    assertNull(config.getJson());
+    list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
+    assertNotNull(list);
+    assertEquals(0, list.size());
+
+    config.setJson(new JsonConfig());
+    assertNotNull(config.getJson());
+    assertNotNull(config.getJson().getMaskingRules());
+    assertEquals(0, config.getJson().getMaskingRules().size());
+    list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
+    assertNotNull(list);
+    assertEquals(0, list.size());
+    
+    config = new ConfigGenerator().getTestDeidConfig();
     String basePathPrefix = "/fhir/";
-    assertEquals(39, FHIRMaskingProvider
-        .loadRulesForResource("Device", defaultFhirConfig, basePathPrefix).size());
+    assertEquals(39, FHIRMaskingProvider.loadRulesForResource("Device", config, basePathPrefix).size());
   }
 
   @Ignore

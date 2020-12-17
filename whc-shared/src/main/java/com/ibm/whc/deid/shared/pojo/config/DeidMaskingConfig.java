@@ -94,18 +94,4 @@ public class DeidMaskingConfig implements Serializable {
   public void setCertificateId(String certificateId) {
     this.certificateId = certificateId;
   }
-
-  public Map<String, String> getStringValueWithPrefixMatch(String prefix) {
-    Map<String, String> values = new ConcurrentHashMap<>();
-    
-    if (getJson() != null && getJson().getMaskingRules() != null) {
-      getJson().getMaskingRules().forEach(rule -> {
-        if (rule.getJsonPath().startsWith(prefix)) {
-          values.put(rule.getJsonPath(), rule.getRule());
-        }
-      });
-    }
-
-    return values;
-  }
 }
