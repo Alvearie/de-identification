@@ -22,6 +22,23 @@ import org.junit.Test;
 public class DataMaskingCoreAdditionalTest {
 
   @Test
+  public void testRulesAppliedInAssignmentOrder() throws Exception {
+    DataMaskingCore dataMask = new DataMaskingCore();
+
+    String config = readStringResource("/config/ruleOrderMaintained.config.json");
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
+
+    List<ReferableData> maskedDataList =
+        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+
+    String result = readStringResource("/result/ruleOrderMaintained.result.json");    
+    assertEquals(1, maskedDataList.size());
+    assertEquals(result, maskedDataList.get(0).getData());
+  }
+
+  @Test
   public void testIdenticalStringArrayMasking() throws Exception {
     DataMaskingCore dataMask = new DataMaskingCore();
 
