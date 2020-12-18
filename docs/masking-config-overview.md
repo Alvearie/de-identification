@@ -54,68 +54,33 @@ Table: Supported schema values
 | GEN       | GEN is set when the input message is any type of generic JSON.                    |
 
 #### messageTypeKey (Optional)
-The name of a field in the top level of the JSON input that assigns a type to the JSON input. Normally, this is specified for FHIR data where different JSON documents can represent objects of different FHIR resource types.  This allows an element at the same path in one resource type to be masked differently than an element at the same path in a different resource type.
+The name of a field in the top level of the JSON input that assigns a message type to the JSON document. This is equivalent to a FHIR resource type.  Normally, this value is specified when processing FHIR input data where different JSON documents can represent objects of different FHIR resource types.  This allows an element at the same path in one resource type to be masked differently than an element at the same path in a different resource type.  If this value is not provided, all input documents are assigned to the **default** message type.  
 
+| **Value**                    | **Description**                                                                                      |
+|------------------------------|------------------------------------------------------------------------------------------------------|
+| null or empty string         | All input uses the same set of rules, referred to as "default."                                      |
+| value                        | Input uses different sets of rules, based on the value in this property in each input document.      |
+
+If a `messageTypeKey` value is provided, each input document is expected to have a data value at that location.  If not, that input document is not processed and is included unaltered in the output.
+ 
 **Example**
-A field might be masked differently in a Patient FHIR resource than in an Organization FHIR resource. For FHIR data, this value is commonly set to resourceType.
+A field might be masked differently in a Patient FHIR resource than in an Organization FHIR resource. For FHIR data, this value is commonly set to **resourceType**.
 
 #### messageTypes (Array, Mandatory if `messageTypeKey` is present)
-| **Value**                    | **Description**                                                                   |
-|------------------------------|------------------------------------------------------------------------------------------------------|
-| null or empty string         | All input uses the same set of rules, referred to as "default."                                       |
-| value                        | Input uses different subsets of rules, based on the value in the messageTypeKey field in the document. |
+This is the list of the message types, also referred to as resource types for FHIR data, to be processed.  A message type is assigned to each input document as described for `messageTypeKey`.  Any document in the input that is not assigned to one of the message types listed here is not processed and is included unaltered in the output.  If `messageTypeKey` is not provided all input documents are automatically assigned to a message type named **default** and this list is not used and may be omitted.
 
 #### maskingRules (Array, Mandatory)
-A list of paths to an element in the JSON input and then the masking rule that is to be applied to that element. Each entry in the list consists of a `jsonPath` string and a `rule` string. The **jsonPath** value identifies an element in the JSON.  The syntax to specify various types of elements follows in this topic. The **rule** value is the **name** value from one of the entries in the `rules` section described earlier in this topic.
+A list of paths to an element in the JSON input and the masking rule that is to be applied to that element. Each entry in the list consists of a `jsonPath` string and a `rule` string. 
 
+The **jsonPath** value identifies a leaf element in the JSON document, which is an element with no children, such as a string, numeric, boolean, or date.  Each `jsonPath` value begins by identifying the schema and message type to which the rule applies followed by the path within the input to the target element.  The syntax to specify paths to various types of elements follows later in this topic. 
 
-**Example**
-In this example, the value in component/dataAbsentReason.coding.display in a FHIR Observation resource is masked, based on the masking rule with the name `hashRule` from the `rules` section:
-
-```
-    "json": {
-        "schemaType": "FHIR",
-        "messageTypeKey": "resourceType",
-        "messageTypes": [Observation],
-        "maskingRules": [
-      {
-        "jsonPath": "/fhir/Observation/component/dataAbsentReason.coding.display",
-           "rule": "hashRule"
-      },
-      {
-        "jsonPath": "/fhir/Observation/component/dataAbsentReason.text",
-           "rule": "hashRule"
-      },
-      {
-        "jsonPath": "/fhir/Observation/component/referenceRange",
-            "rule": "referenceRange"
-      }
-```
-
-If the schemaType is set to GEN, then the `jsonPath` values are:
-
-```
-      {
-        "jsonPath": "/gen/Observation/component/dataAbsentReason.coding.display",
-        "rule": "hashRule"
-      },
-      {
-        "jsonPath": "/gen/Observation/component/dataAbsentReason.text",
-        "rule": "hashRule"
-      },
-      {
-        "jsonPath": "/gen/Observation/component/referenceRange",
-        "rule": "referenceRange"
-      }
-```
-
-**Note:** FHIR messages can still be ingested even if the masking is configured to have generic JSON input. In that case, users cannot access FHIR-specific masking providers, and messages are masked only with the generic masking providers.
+The **rule** value is the **name** value from one of the entries in the `rules` section described earlier in this topic.
 
 Examples 1 - 3 show how to set messageTypeKey and messageTypes.
 
 **Example 1: All messages use the same rule set**
 
-In this example, all the default rule sets are loaded. The `messageTypes` string is ignored:
+In this example, all input is assigned to the default message type, since `messageTypeKey` is empty.  The `messageTypes` array is ignored.
 
 ```
   {
@@ -136,7 +101,7 @@ In this example, all the default rule sets are loaded. The `messageTypes` string
         ],
         "maskingRules": [
           {
-            "jsonPath": "/gen/default/Test",
+            "jsonPath": "/gen/default/test/result",
             "rule": "hashRule1"
           },
         ]
@@ -146,7 +111,7 @@ In this example, all the default rule sets are loaded. The `messageTypes` string
 
 **Example 2: FHIR messages**
 
-With FHIR messages, masking rules are usually tailored to specific FHIR resource types. To select a masking rule subset, this example uses the `resourceType` key at the root of the document:
+With FHIR messages, masking rules are usually tailored to specific FHIR resource types. To select a masking rule subset, this example uses the `resourceType` key at the root of each input document:
 
 ```
     {
@@ -165,21 +130,22 @@ With FHIR messages, masking rules are usually tailored to specific FHIR resource
         "messageTypeKey": "resourceType",
         "messageTypes": [
           "Device",
+          "Organization",
           "MedicationAdministration"
         ],
         "maskingRules": [
           {
-            "jsonPath": "/fhir/Device/Test",
+            "jsonPath": "/fhir/Organization/address/city",
             "rule": "hashRule1"
           }
         ]
       }
     }
-``` 
+```
+
 **Example 3: Custom message key**
 
-In each message, an arbitrary key defines the masking rule subset that should be used on that message. In this case, masking rules subsets depend on a document type:
-
+In each message, an arbitrary key defines the message type that should be assigned to that message. In this case, masking rules subsets depend on a document type:
 
 ```
     {
@@ -194,7 +160,7 @@ In each message, an arbitrary key defines the masking rule subset that should be
         }
       ],
       "json": {
-        "schemaType": "FHIR",
+        "schemaType": "GEN",
         "messageTypeKey": "documentinfo/type",
         "messageTypes": [
           "Clinical",
@@ -203,7 +169,7 @@ In each message, an arbitrary key defines the masking rule subset that should be
         ],
         "maskingRules": [
           {
-            "jsonPath": "/fhir/Clinical/Test",
+            "jsonPath": "/gen/Clinical/test/result",
             "rule": "HASH_RULE"
           }
         ]
@@ -489,8 +455,8 @@ This method allows the application of privacy providers to specific data element
    to never process the same FHIR data elements with both methods.
 
 ### certificateId (String, Optional)
-Use the optional `certificateId` field to provide a string identifying the masking configuration file in the audit trail output. This can be useful to track which configuration was used to de-identify specific records.
+Use the optional `certificateId` field to provide a string identifying the masking configuration file in the audit trail output. This can be useful to track which configuration was used to de-identify specific records.  If provided, the length of the certificateId value should not exceed 60 characters.
 
 ### defaultNoRuleResolution (Boolean, Optional)
-Set to **true** to maintain any field that is not associated with a masking rule. Set to **false** to redact fields that are not associated with a masking rule.  If not specified, the default value is **true**.
+Set to **true** to maintain any field that is not associated with a masking rule. Set to **false** to set fields that are not associated with a masking rule to null.  If not specified, the default value is **true**.  Note that an input message must be of one of the message types selected for processing for `defaultNoRuleResolution` to be applied. See the discussion for `messageTypeKey` and `messageTypes` for more information.
 

@@ -228,8 +228,7 @@ options and their default values.
 >   contained in the user specified-value.
 
 >   For information about the unspecifiedValueHandling and unspecifiedValueReturnMessage
->   properties, see “Handling of Unrecognized Input Values and of Exceptions Raised
->   by the Privacy Providers” below.
+>   properties, see “Handling unrecognized input values and exceptions raised by privacy providers” below.
 
    **Example 2: Conditional masking of a FHIR data element, based on another FHIR data element value in an array node**
 
@@ -326,37 +325,36 @@ options and their default values.
 
 #### DATEDEPENDENCY
 
->   Extracts two related dates (for example, the patient's date-of-birth and the
->   date-of-death of a patient) from the same input message:
->
->   - The “mask date”: The date to be masked
->   - The “compare date”: The date to which that the mask date is compared
->
->     Then, if a number of days comparison with the "compare date" is true,
->     it removes the year from the "mask date".
+>   Masks a date and time value if it is within a given number of days of another date and time value in the same input message.
+>   If masking occurs, the year and time, if any, are removed and the value returned in **dd/MM** format, as in *20/04*.
+>   
+>   Within the input message, the value to compare to the masked value must be present in the same parent JSON object 
+>   as the masked value.  In other words, the path to the comparison value must be the same as the path to the masked value
+>   except for the final element name.  If the comparison value is not found, no masking occurs.  If the comparison value is 
+>   found, but cannot be parsed, the masked value is protected according to the unspecified value handling configuration as 
+>   described in "Handling of null and unrecognized input data values" below.
 
 This privacy provider supports these options:
 
-| **Option name**                                 | **Type** | **Description**                                                                                    | **Default value** |
-|-------------------------------------------------|----------|----------------------------------------------------------------------------------------------------|-------------------|
-| datetimeYearDeleteNIntervalMaskDate             | String   | The FHIR element name of the date that will be masked                                              | null              |
-| datetimeYearDeleteNIntervalCompareDate          | String   | The FHIR element name of the date that will be compared with the mask date                         | null              |
-| dateYearDeleteNDaysValue                        | Integer  | This option must be set to the maximum allowable interval (number of days) between the two dates   | 365               |
+| **Option name**                                 | **Type** | **Description**                                                                                             | **Default value** |
+|-------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
+| datetimeYearDeleteNIntervalCompareDate          | String   | The FHIR element name of the date value that will be compared with the masked date                          | null              |
+| dateYearDeleteNDaysValue                        | Integer  | The maximum number of days separating the masked value and the comparison value for masking to occur        | 365               |
 
    The following provides an example that illustrates the use of the
-   DATEDEPENDENCY provider. Specifically, we consider both the Patient FHIR
+   DATEDEPENDENCY provider. Specifically, we consider the Patient FHIR
    Resource and the birthDate and deceaseDateTime FHIR data elements that it
    contains.
 
-   The rule that we want to apply regards deleting from the birthDate of a
-   patient the year of birth, for those patients who died when they were less than
+   The rule that we want to apply regards deleting the year of birth from the birthDate of a
+   patient for those patients who died when they were not more than 
    five years old. For this example, the interval between the birthDate and the
-   deceaseDateTime elements is calculated, and if it is found to be less than five
+   deceaseDateTime elements is calculated, and if it is found to be less than or equal to five
    years (≅ 1825 days), then the year is removed from the birthDate element.
 
    **Note:** The values in the example are for demonstration purposes only.
 
-**Example 3 – Protecting the year of birth for patients who died at an age below
+**Example 3 – Protecting the year of birth for patients who died at no more than 
 5 years old:**
 
 ````
@@ -367,7 +365,6 @@ This privacy provider supports these options:
           "maskingProviders": [
             {
               "type": "DATEDEPENDENCY",
-              "datetimeYearDeleteNIntervalMaskDate": "birthDate",
               "dateYearDeleteNDaysValue": 1825,
               "datetimeYearDeleteNIntervalCompareDate": "deceasedDateTime"
             }
@@ -379,7 +376,7 @@ This privacy provider supports these options:
         "schemaType": "FHIR",
         "messageTypeKey": "resourceType",
         "messageTypes": [
-          "Device"
+          "Patient"
         ],
         "maskingRules": [
           {
@@ -554,7 +551,7 @@ This privacy provider supports these options:
 | yearDeleteNdays                                   | Boolean  | Remove the year and return only the day and month, if the date and time is after the given number of days ago                                                                                                                                                                                                                       | false             |
 | yearDeleteNinterval                               | Boolean  | Remove the year and return only the day and month, if the date and time is within the given number of days from a given date and time                                                                                                                                                                                                                       | false             |
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
-| yearDeleteNointervalComparedateValue              | String   | The date and time to compare                                                                                                                                                                                                                                | null              |
+| yearDeleteNointervalComparedateValue              | String   | The date and time to compare to the value being masked                                                                                                                                                                                                                               | null              |
 
 #### EMAIL
 
@@ -1451,13 +1448,13 @@ Here are the options and their default values for the PSEUDONYM  provider:
    providers when more than one rule is defined for these data elements in
    the data de-identification configuration file. In this case, the rules are
    applied to the corresponding data elements of the array in the
-   sequence in which they have been defined:
+   sequence in which they have been defined.
 
    - The first rule is applied to the original value of the data element.
    - Each subsequent rule is applied to the transformed value produced for this element by the previous
    rule. This is similar to the behavior of a UNIX pipe command.
 
-   The next example shows a valid ruleset for processing data elements of a
+   The next example shows a valid rule set for processing data elements of a
    FHIR array with multiple privacy providers.
 
    **Example 14: Masking elements of an array with multiple masking providers**
@@ -1469,41 +1466,22 @@ Here are the options and their default values for the PSEUDONYM  provider:
   }
 
   {
-        "jsonPath": "/fhir/Patient/name[\*]/use",
+        "jsonPath": "/fhir/Patient/name[*]/use",
         "rule": "RANDOM"
   }
 
   {
-        "jsonPath": "/fhir/Patient/name[\*]/given[0]",
-        "rule": "HASH_REPLACE"
+        "jsonPath": "/fhir/Patient/name[*]/given[0]",
+        "rule": "REPLACE"
   }
 ```
 
-    In this example, both the first and the second rule are applied to the
-   name[1]/use data element. The second rule is also applied to all
-   other name[\*]/use elements in the array. The third rule of the example
-   leads to applying the HASH followed by the REPLACE privacy providers to
-   all name[\*]/given[0] data elements in the array.
-
-   To disable this default behavior, you can use a configuration option (flag),
-   **arrayAllRules**, in the data de-identification configuration file.
-
-   **When the arrayAllRules flag is set to false, only the first rule that is
-   defined for a FHIR array data element is enforced. Any additional rules
-   that involve the same FHIR array data element are not be applied to this
-   element.**
-
-   **Note:** arrayAllRules applies only to FHIR array data elements.
-
-   For instance, consider the rules in Example 14 (above) when **arrayAllRules = false**.
-   In this case, name[1]/use is processed by HASH, and all other
-   name[\*]/use data elements are processed by RANDOM. The third rule
-   applies first HASH and then REPLACE to all name[\*]/given[0] FHIR array
-   elements. In other words, the arrayAllRules flag changes the behavior of
-   the Data De-Identification Service only with respect to different de-identification
-   rules that are applied to the same FHIR array data element. However, it does not
-   change the behavior of the Service when two privacy providers are
-   defined as part of the de-identification rule.
+   In this example, both the first and the second rule are applied to the
+   _use_ element in the second member of the _name_ array.  Offsets start at 0
+   so [1] refers to the second array member. The second rule is also applied to 
+   the _use_ element in all other members of the _name_ array.
+   The third entry applies the REPLACE rule to
+   the first member of the _given_ array in all members of the _name_ array.
 
    **Note:** In the case of regular, non-array FHIR data elements, if multiple de-identification
    rules are specified, only the last rule is applied to the data. The previous rules are discarded.
@@ -1523,9 +1501,9 @@ Here are the options and their default values for the PSEUDONYM  provider:
 ```
 
   In this example, only the HASH (last) privacy provider is applied
-   to the gender data element of the Patient FHIR Resource.
+  to the gender data element of the Patient FHIR Resource.
 
-### Handling unrecognized input values, exceptions raised by privacy providers
+### Handling unrecognized input values and exceptions raised by privacy providers
 
    Next, this topic describes the operation of the various privacy providers
    that are offered by the Data De-Identification Service in the case of either null
@@ -1542,47 +1520,44 @@ Here are the options and their default values for the PSEUDONYM  provider:
    they do not proceed to falsify the data.
 
    If the input value to a privacy provider is not recognized by the privacy
-   provider, and it does not appear to be an accurate input value, the Data
-   De-Identification Service operates as specified in the data
-   de-identification configuration file. This applies to the options
-   unspecified.value.handling and unspecified.value.returnMessage. These
-   options are globally set and persist for all privacy providers:
+   provider and it does not appear to be an accurate input value, the Data
+   De-Identification Service operates as specified by these configuration 
+   parameters.
 
-| **Option name**               | **Type** | **Description**                                                                                                                                                                                  | **Default value** |
-|-------------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| unspecifiedValueHandling      | Integer  | Handling options: **1** : return null **2** : return fictionalized value produced by the corresponding privacy provider **3** : return the message (String) in unspecified.value.returnMessage | 1                 |
-| unspecifiedValueReturnMessage | String   | Value to be returned when unspecified.value.handling is set to **3**                                                                                                                           | **OTHER**      |
+| **Option name**               | **Type** | **Description**                                                                                                | **Default value** |
+|-------------------------------|----------|----------------------------------------------------------------------------------------------------------------|-------------------|
+| unspecifiedValueHandling      | Integer  | Handling options are **1**: return null **2**: return fictionalized value  **3**: return a configured value    | 1                 |
+| unspecifiedValueReturnMessage | String   | Value to be returned when `unspecifiedValueHandling` is set to **3**                                     | **OTHER**         |
 
    For providers that operate using regular expressions, for example, PHONE NUMBER,
    SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
    an unrecognized value is a value that does not conform to the
    specified regular expression.
 
-    Similarly, for providers that operate using lookup tables, for example, NAME,
+   Similarly, for providers that operate using lookup tables, for example, NAME,
    CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
    that is not part of the corresponding lookup table that is used by the
    privacy provider.
 
-   When unspecifiedValueHandling is set to **1** (or to a value other than either **2** or
+   When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
    **3**), any privacy provider that takes as input an unrecognized data value
    returns a null value.
 
-   When unspecifiedValueHandling is set to **2**, any privacy provider that
+   When `unspecifiedValueHandling` is set to **2**, any privacy provider that
    takes as input an unrecognized data value returns a randomly-generated,
    fictionalized value that is valid for the corresponding provider.
 
-   Finally, when unspecifiedValueHandling is set to **3**, any provider that takes
+   Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
    as input an unrecognized data value, stores to this value the message
-   that is specified in unspecified.value.returnMessage. By default, this
+   that is specified in `unspecifiedValueReturnMessage`.  By default, this
    message is set to **OTHER**.
 
    **Exceptions**
 
-   These privacy providers ignore the unspecified.value.handling option:
-   DATEDEPENDENCY, GENERALIZE, HASH, MAINTAIN, NULL, PSEUDONYM, RANDOM,
+   These privacy providers ignore the `unspecifiedValueHandling` option:
+   GENERALIZE, HASH, MAINTAIN, NULL, PSEUDONYM, RANDOM,
    REDACT, and REPLACE. The URL, NUMVARIANCE, and ATC providers
-   treat option 2 of unspecified.value.handling the same as option 1.
-   As a result, each returns null.
+   treat option 2 of `unspecifiedValueHandling` the same as option 1.
 
 #### Exception handling
 
@@ -1591,9 +1566,8 @@ Here are the options and their default values for the PSEUDONYM  provider:
    the Data De-Identification Service. If a data protection method encounters
    an exception while attempting to privacy-protect an input data value, it
    catches the exception, logs a WPH2002E error message to the application
-   audit log, and returns an empty (null) String as the value of the
-   corresponding data element. This is the case unless the unspecified.value.\* options
-   have been set.
+   log, and returns an empty (null) String as the value of the
+   corresponding data element. 
 
    Here is the structure for the error messages that are produced:
 
