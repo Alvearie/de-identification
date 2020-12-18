@@ -5,15 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
-import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
-import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
-import com.ibm.whc.deid.utils.log.LogCodes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,15 +13,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
+import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
 public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -7270189743655406461L;
 
-  protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();
-
   public static final String DISABLE_TYPES_VALUE = "default";
+  
+  protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();  
 
   protected String keyForType;
 
@@ -38,41 +37,21 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
   protected MaskingProviderFactory maskingProviderFactory;
 
-  private final String prefixGUID;
-
   protected String identifier;
 
-  public K mask(K obj) {
-    return obj;
-  }
-
-  protected String getSubfieldName(String declaredName) {
-    return prefixGUID + declaredName;
-  }
-
-  public AbstractComplexMaskingProvider() {
-    // TODO: verify setting prefixGUID to empty string is reasonable
-    this.prefixGUID = "";
-  }
-
-  public AbstractComplexMaskingProvider(String complexType,
-      MaskingConfiguration maskingConfiguration) {
-    this.prefixGUID = maskingConfiguration.getStringValue(complexType + ".prefixGUID");
-
-    this.keyForType = DISABLE_TYPES_VALUE;
-  }
+  public AbstractComplexMaskingProvider() {}
 
   public AbstractComplexMaskingProvider(DeidMaskingConfig maskingConfiguration) {
-    // TODO: verify setting prefixGUID to empty string is reasonable
-    this.prefixGUID = "";
-
     this.keyForType = maskingConfiguration.getJson().getMessageTypeKey();
-
     // if no Key is being passed into json.messageTypeKey then set to
     // default
     if (this.keyForType == null || this.keyForType.trim().isEmpty()) {
       this.keyForType = DISABLE_TYPES_VALUE;
     }
+  }
+
+  public K mask(K obj) {
+    return obj;
   }
 
   @Override

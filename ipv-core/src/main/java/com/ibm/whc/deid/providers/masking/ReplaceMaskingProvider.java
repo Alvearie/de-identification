@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.shared.pojo.config.masking.ReplaceMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
 
@@ -14,12 +13,12 @@ import com.ibm.whc.deid.util.RandomGenerators;
  *
  */
 public class ReplaceMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = 8734109695774758607L;
 
   private final int preservedCharacters;
   private final int offset;
-  private boolean replaceWithAsterisks;
+  private final boolean replaceWithAsterisks;
   private final boolean replaceWithRandom;
 
 
@@ -28,26 +27,11 @@ public class ReplaceMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    */
-  public ReplaceMaskingProvider(MaskingConfiguration configuration) {
-    this.offset = configuration.getIntValue("replace.mask.offset");
-    this.preservedCharacters = configuration.getIntValue("replace.mask.preserve");
-    this.replaceWithAsterisks = configuration.getBooleanValue("replace.mask.replaceWithAsterisks");
-    this.replaceWithRandom = configuration.getBooleanValue("replace.mask.replaceWithRandom");
-
-    if (this.replaceWithAsterisks && this.replaceWithRandom) {
-      this.replaceWithAsterisks = false;
-    }
-  }
-
   public ReplaceMaskingProvider(ReplaceMaskingProviderConfig configuration) {
     this.offset = configuration.getMaskOffset();
-    this.preservedCharacters = configuration.getMaskPreserve();
-    this.replaceWithAsterisks = configuration.isMaskReplaceWithAsterisks();
+    this.preservedCharacters = configuration.getMaskPreserve();    
     this.replaceWithRandom = configuration.isMaskReplaceWithRandom();
-
-    if (this.replaceWithAsterisks && this.replaceWithRandom) {
-      this.replaceWithAsterisks = false;
-    }
+    this.replaceWithAsterisks = this.replaceWithRandom ? false : configuration.isMaskReplaceWithAsterisks();
   }
 
   @Override

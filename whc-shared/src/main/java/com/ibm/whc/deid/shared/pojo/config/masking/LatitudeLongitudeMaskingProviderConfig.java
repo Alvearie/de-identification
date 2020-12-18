@@ -17,6 +17,9 @@ import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 public class LatitudeLongitudeMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1031774920782870184L;
+  
+  public static final int MINIMUM_OFFSET = 10;
+  
   private boolean maskFixedRadiusRandomDirection = false;
   private boolean maskDonutMasking = false;
   private boolean maskRandomWithinCircle = true;
@@ -70,13 +73,13 @@ public class LatitudeLongitudeMaskingProviderConfig extends MaskingProviderConfi
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
     super.validate();
-    if (offsetMaximumRadius < 0) {
+    if (offsetMaximumRadius <= MINIMUM_OFFSET) {
       throw new InvalidMaskingConfigurationException(
-          "`offsetMaximumRadius` must be greater than 0");
+          "`offsetMaximumRadius` must be greater than " + MINIMUM_OFFSET);
     }
-    if (offsetMinimumRadius < 0) {
+    if (offsetMinimumRadius <= MINIMUM_OFFSET) {
       throw new InvalidMaskingConfigurationException(
-          "`offsetMinimumRadius` must be greater than 0");
+          "`offsetMinimumRadius` must be greater than " + MINIMUM_OFFSET);
     }
   }
 

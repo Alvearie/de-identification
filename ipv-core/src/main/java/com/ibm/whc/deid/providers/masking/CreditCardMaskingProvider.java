@@ -5,9 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.security.SecureRandom;
-import java.text.StringCharacterIterator;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.shared.pojo.config.masking.CreditCardMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
 
@@ -16,22 +13,13 @@ import com.ibm.whc.deid.util.RandomGenerators;
  *
  */
 public class CreditCardMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = -5924474542829037368L;
 
   private final boolean preserveIssuer;
-  private int preservedDigits = 0;
+  private final int preservedDigits;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-
-  /**
-   * Instantiates a new Credit card masking provider.
-   *
-   * @param configuration the configuration
-   */
-  public CreditCardMaskingProvider(MaskingConfiguration configuration) {
-    this(new SecureRandom(), configuration);
-  }
 
   /**
    * Instantiates a new Credit card masking provider.
@@ -42,32 +30,11 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     this(new CreditCardMaskingProviderConfig());
   }
 
-  /**
-   * Instantiates a new Credit card masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
-   */
-  public CreditCardMaskingProvider(SecureRandom random, MaskingConfiguration configuration) {
-    this.random = random;
-    this.unspecifiedValueHandling = configuration.getIntValue("unspecified.value.handling");
-    this.unspecifiedValueReturnMessage =
-        configuration.getStringValue("unspecified.value.returnMessage");
-
-    this.preserveIssuer = (boolean) configuration.getValue("creditCard.issuer.preserve");
-    if (preserveIssuer) {
-      this.preservedDigits = 6;
-    }
-  }
-
   public CreditCardMaskingProvider(CreditCardMaskingProviderConfig configuration) {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-
     this.preserveIssuer = configuration.isIssuerPreserve();
-    if (preserveIssuer) {
-      this.preservedDigits = 6;
-    }
+    this.preservedDigits = this.preserveIssuer ? 6 : 0;
   }
 
   @Override
@@ -82,7 +49,6 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     }
 
     final StringBuilder buffer = new StringBuilder();
-    new StringCharacterIterator(identifier);
 
     int digitsEncountered = 0;
     int identifierLength = identifier.length();

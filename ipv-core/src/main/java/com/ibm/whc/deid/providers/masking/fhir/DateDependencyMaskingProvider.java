@@ -5,14 +5,13 @@
  */
 package com.ibm.whc.deid.providers.masking.fhir;
 
+import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.DateTimeMaskingProvider;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
-import java.util.List;
 
 /**
  * Date dependency masking provider This complex masking provider is used as an intermediate step to
@@ -28,18 +27,6 @@ public class DateDependencyMaskingProvider extends AbstractComplexMaskingProvide
   private final String dateToCompare;
 
   private final DateDependencyMaskingProviderConfig dateDependencyMaskingProviderConfig;
-
-  /**
-   * This is the constructor for date dependency masking provider
-   *
-   * @param maskingConfiguration : masking configuration for DateDependencyMaskingProvider
-   */
-  public DateDependencyMaskingProvider(String type, MaskingConfiguration maskingConfiguration) {
-    super(type, maskingConfiguration);
-    this.dateToCompare =
-        maskingConfiguration.getStringValue(type + ".datetime.year.delete.ninterval.comparedate");
-    this.dateDependencyMaskingProviderConfig = new DateDependencyMaskingProviderConfig();
-  }
 
   public DateDependencyMaskingProvider(DateDependencyMaskingProviderConfig maskingConfiguration,
       DeidMaskingConfig deidMaskingConfig) {
