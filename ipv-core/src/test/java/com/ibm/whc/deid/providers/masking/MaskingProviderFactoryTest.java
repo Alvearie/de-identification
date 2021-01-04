@@ -9,19 +9,14 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
-
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
@@ -29,19 +24,6 @@ import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-
-class FoobarMaskingProvider extends AbstractMaskingProvider {
-  /** */
-  private static final long serialVersionUID = 1716105939712248800L;
-
-  public FoobarMaskingProvider(SecureRandom random, MaskingConfiguration maskingConfiguration) {}
-
-  @Override
-  public String mask(String identifier) {
-    return "foobar123";
-  }
-}
-
 
 public class MaskingProviderFactoryTest {
 

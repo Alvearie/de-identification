@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.io.Serializable;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,12 +13,11 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.shared.pojo.config.masking.GeneralizeMaskingProviderConfig;
 import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 8003315754342350747L;
 
   private static final String GENERALIZE_MASK_RULESET = "generalize.mask.ruleSet";
@@ -27,8 +25,8 @@ public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
   private static final String JSON_SOURCE_VALUE_IN_TAG = "sourceValueIn";
   private static final String JSON_SOURCE_VALUE_NOTIN_TAG = "sourceValueNotIn";
 
-  private String generalizeMaskRuleSet;
-  List<GeneralizeRule> generalizeRuleSet = new ArrayList<>();
+  private final String generalizeMaskRuleSet;
+  private final List<GeneralizeRule> generalizeRuleSet;
 
   /**
    * Instantiates a new Generalize masking provider.
@@ -48,36 +46,18 @@ public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
    * Vietnamese, Thai, and Japanese will be combined into a category of "Asian".
    *
    * <p>
-   * Religion: Combine lesser practiced religionsinto a larger category of religion. For example,
+   * Religion: Combine lesser practiced religions into a larger category of religion. For example,
    * Daoism, Shinto, and Confucianism will be combined into "Eastern Asian Religions".
    */
   public GeneralizeMaskingProvider() {
     this(new GeneralizeMaskingProviderConfig());
   }
 
-  /**
-   * Instantiates a new Generalize masking provider.
-   *
-   * @param configuration the configuration
-   */
-  public GeneralizeMaskingProvider(MaskingConfiguration configuration) {
-    this(new SecureRandom(), configuration);
-  }
-
-  /**
-   * Instantiates a new Generalize masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
-   */
-  public GeneralizeMaskingProvider(SecureRandom random, MaskingConfiguration configuration) {
-    this.generalizeMaskRuleSet = configuration.getStringValue(GENERALIZE_MASK_RULESET);
-    if (this.generalizeMaskRuleSet == null) {
-      // No masking rules provided.
-      return;
-    }
-
-    generalizeRuleSet = parseMaskRuleSet(generalizeMaskRuleSet);
+  public GeneralizeMaskingProvider(GeneralizeMaskingProviderConfig configuration) {
+    this.generalizeMaskRuleSet = configuration.getMaskRuleSet();
+    this.generalizeRuleSet =
+        this.generalizeMaskRuleSet != null ? parseMaskRuleSet(generalizeMaskRuleSet)
+            : new ArrayList<>();
   }
 
   private List<GeneralizeRule> parseMaskRuleSet(String ruleSetStr) {
@@ -154,16 +134,6 @@ public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
     }
 
     return rulesetList;
-  }
-
-  public GeneralizeMaskingProvider(GeneralizeMaskingProviderConfig configuration) {
-    this.generalizeMaskRuleSet = configuration.getMaskRuleSet();
-    if (this.generalizeMaskRuleSet == null) {
-      // No masking rules provided.
-      return;
-    }
-
-    generalizeRuleSet = parseMaskRuleSet(generalizeMaskRuleSet);
   }
 
   /**

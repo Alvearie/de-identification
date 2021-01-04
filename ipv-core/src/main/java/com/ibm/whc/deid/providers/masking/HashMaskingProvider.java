@@ -7,14 +7,12 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import org.apache.commons.lang.StringUtils;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
 
 /** The type Hash masking provider. */
 public class HashMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = 7924730647129367168L;
 
   private final char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -25,7 +23,6 @@ public class HashMaskingProvider extends AbstractMaskingProvider {
   private final int hashingOffsetBegin;
   private final int hashingOffsetEnd;
   private final int hashingOffsetInvalidOffsetValue;
-
   private final String hashSaltValue;
 
   /** Instantiates a new Hash masking provider. */
@@ -38,45 +35,14 @@ public class HashMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    */
-  public HashMaskingProvider(MaskingConfiguration configuration) {
-    this(new SecureRandom(), configuration);
-  }
-
   public HashMaskingProvider(HashMaskingProviderConfig config) {
     this.algorithm = config.getAlgorithmDefault();
     this.hashingOffsetOffsetMask = config.isOffsetOffsetMask();
     this.hashingOffsetOffsetMaskDelete = config.isOffsetOffsetMaskDelete();
-
     this.hashingOffsetBegin = config.getOffsetBegin();
     this.hashingOffsetEnd = config.getOffsetEnd();
     this.hashingOffsetInvalidOffsetValue = config.getOffsetInvalidOffsetValue();
-
     this.hashSaltValue = config.getSalt();
-  }
-
-  /**
-   * Instantiates a new Hash masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
-   */
-  public HashMaskingProvider(SecureRandom random, MaskingConfiguration configuration) {
-    this.algorithm = configuration.getStringValue("hashing.algorithm.default");
-    this.hashingOffsetOffsetMask = configuration.getBooleanValue("hashing.offset.offsetMask");
-    this.hashingOffsetOffsetMaskDelete =
-        configuration.getBooleanValue("hashing.offset.offsetMask.delete");
-    this.hashingOffsetBegin = configuration.getIntValue("hashing.offset.begin");
-    this.hashingOffsetEnd = configuration.getIntValue("hashing.offset.end");
-    this.hashingOffsetInvalidOffsetValue =
-        configuration.getIntValue("hashing.offset.invalidOffsetValue");
-
-    // Get the salt, if it exists.
-    String hashSalt = configuration.getStringValue("hashing.salt");
-    if (hashSalt == null) {
-      this.hashSaltValue = "";
-    } else {
-      this.hashSaltValue = hashSalt;
-    }
   }
 
   private String bytesToHex(byte[] bytes) {

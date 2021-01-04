@@ -6,17 +6,16 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.identifiers.MACAddressIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MACAddressMaskingProviderConfig;
 
 public class MACAddressMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = -5049095866017699568L;
 
   private static final char[] allowedCharacters = "abcdef0123456789".toCharArray();
   private static final MACAddressIdentifier macAddressIdentifier = new MACAddressIdentifier();
+  
   private final boolean preserveVendor;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
@@ -29,17 +28,8 @@ public class MACAddressMaskingProvider extends AbstractMaskingProvider {
   /**
    * Instantiates a new Mac address masking provider.
    *
-   * @param random the random
    * @param configuration the configuration
    */
-  public MACAddressMaskingProvider(SecureRandom random, MaskingConfiguration configuration) {
-    this.random = random;
-    this.preserveVendor = configuration.getBooleanValue("mac.masking.preserveVendor");
-    this.unspecifiedValueHandling = configuration.getIntValue("unspecified.value.handling");
-    this.unspecifiedValueReturnMessage =
-        configuration.getStringValue("unspecified.value.returnMessage");
-  }
-
   public MACAddressMaskingProvider(MACAddressMaskingProviderConfig configuration) {
     this.random = new SecureRandom();
     this.preserveVendor = configuration.isMaskingPreserveVendor();
