@@ -6,13 +6,12 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.models.SSNUS;
 import com.ibm.whc.deid.providers.identifiers.SSNUSIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SSNUSMaskingProviderConfig;
 
 public class SSNUSMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = 1913380865876971674L;
 
   private static final SSNUSIdentifier ssnUSIdentifier = new SSNUSIdentifier();
@@ -32,25 +31,6 @@ public class SSNUSMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    */
-  public SSNUSMaskingProvider(MaskingConfiguration configuration) {
-    this(new SecureRandom(), configuration);
-  }
-
-  /**
-   * Instantiates a new Ssnus masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
-   */
-  public SSNUSMaskingProvider(SecureRandom random, MaskingConfiguration configuration) {
-    this.random = random;
-    this.preserveAreaNumber = configuration.getBooleanValue("ssnus.mask.preserveAreaNumber");
-    this.preserveGroup = configuration.getBooleanValue("ssnus.mask.preserveGroup");
-    this.unspecifiedValueHandling = configuration.getIntValue("unspecified.value.handling");
-    this.unspecifiedValueReturnMessage =
-        configuration.getStringValue("unspecified.value.returnMessage");
-  }
-
   public SSNUSMaskingProvider(SSNUSMaskingProviderConfig configuration) {
     this.random = new SecureRandom();
     this.preserveAreaNumber = configuration.isMaskPreserveAreaNumber();

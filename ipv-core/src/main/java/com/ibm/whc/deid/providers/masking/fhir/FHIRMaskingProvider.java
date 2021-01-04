@@ -9,12 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.configuration.MaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -65,18 +63,6 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
           new MaskingProviderBuilder("fhir", resourceConfiguration, maskingConfiguration,
               defNoRuleRes, maskingProviderFactory, tenantId));
     });
-  }
-
-  /**
-   * Given a masking configuration, parses and appends "/fhir/maskingconf" to the resource name
-   *
-   * @param resourceName
-   * @param maskingConfiguration
-   * @return
-   */
-  public static Map<String, String> loadRulesForResource(String resourceName,
-      MaskingConfiguration maskingConfiguration, String prefix) {
-    return maskingConfiguration.getStringValueWithPrefixMatch(prefix + resourceName + "/");
   }
 
   /**
