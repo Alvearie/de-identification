@@ -53,7 +53,11 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
       try {
         ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
         JsonNode ruleSetNode = mapper.readTree(ruleSetStr);
-        if (ruleSetNode != null && !ruleSetNode.isMissingNode()) {
+        if (ruleSetNode != null && !ruleSetNode.isMissingNode() && !ruleSetNode.isNull()) {
+          if (!ruleSetNode.isArray()) {
+            throw new InvalidMaskingConfigurationException(
+                "`maskRuleSet` value must be a valid json array");
+          }            
           int index = 0;
           for (JsonNode ruleNode : ruleSetNode) {
             String targetValue = null;
@@ -91,6 +95,14 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
               throw new InvalidMaskingConfigurationException(
                   "only one of `" + JSON_SOURCE_VALUE_IN_TAG + "` and `"
                       + JSON_SOURCE_VALUE_NOTIN_TAG + "` can be specified in value set " + index);
+            }
+            if (sourceValueInNode != null && !sourceValueInNode.isArray()) {
+              throw new InvalidMaskingConfigurationException(
+                  "`" + JSON_SOURCE_VALUE_IN_TAG + "` must be a json array in value set " + index);
+            }
+            if (sourceValueNotInNode != null && !sourceValueNotInNode.isArray()) {
+              throw new InvalidMaskingConfigurationException(
+                  "`" + JSON_SOURCE_VALUE_NOTIN_TAG + "` must be a json array in value set " + index);
             }
 
             GeneralizeRule rule = new GeneralizeRule(targetValue);
