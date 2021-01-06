@@ -45,7 +45,7 @@ public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
     try {
       generalizeRuleSet = configuration.parseMaskRuleSet(configuration.getMaskRuleSet());
     } catch (Exception e) {
-      // should not occur as validation has already checked done a parse
+      // should not occur as validation has already done a parse
       String message = "maskRuleSet, ruleSet: " + configuration.getMaskRuleSet();
       log.logError(LogCodes.WPH2011E, e, message);
       throw new RuntimeException(message, e);
