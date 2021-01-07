@@ -570,171 +570,149 @@ This privacy provider supports these options:
 
 #### GENERALIZE
 
->   Replaces one or more specified original values with a specified general
->   category term to which these values belong. If a general category term is
->   not defined for the input values, these can be optionally replaced with a
->   **default** term which is configurable by the data owner. The aim of
->   GENERALIZE is to protect infrequent data values that appear in a
->   data element by replacing them with a general category term.
+   Replaces one or more specified original values with a specified general
+   category term to which these values belong. If a general category term is
+   not defined for the input values, the input can optionally be replaced with a
+   default term.  The aim of
+   GENERALIZE is to protect infrequent data values that appear in a
+   data element by replacing them with a general category term.
 
->   When a small number of values must be replaced with a general category term,
->   the IBM onboarding team can specify these sets of values and their
->   corresponding replacement values as rules of the form R:
->
->   {*o*1, *o*2, …, o*n} *r*
->
->   where
->   *o*i is an original data value.
->   *r* is the replacement value.
->
->   Multiple such rules can be specified and provided as input to
->   GENERALIZE. For example, in a data element that stores the religion of
->   individuals, rule R: {“Daoism”, “Shinto”, “Confucianism”} “Eastern Asian
->   Religions”, can be used to protect the identity of the corresponding
->   individuals by associating them with the more-general category of “Eastern
->   Asian Religions”. All other original values that are not captured in a rule
->   can be maintained as-is.
+   The GENERALIZE provider supports rules with value sets of the form R:
 
->   When many values in a data element are expected to be infrequent, GENERALIZE
->   can be used to capture those original data values that must be maintained in
->   the output data. In this case, only those values that are **not** specified
->   are replaced with a configurable general category term. For example, in
->   a data element that stores the spoken languages of individuals, GENERALIZE
->   can be configured to replace all languages that are not listed as **Spanish**
->   or **English**, with value **Other**.
+   {*o*1, *o*2, …, o*n} *r*
+
+   where
+   * *o*i is an original data value
+   * *r* is the replacement value
+
+Multiple such rules can be specified and provided as input to
+GENERALIZE. For example, in a data element that stores the religion of
+individuals, rule R: {“Daoism”, “Shinto”, “Confucianism”} “Eastern Asian
+Religions”, can be used to protect the identity of the corresponding
+individuals by associating them with the more general category of “Eastern
+Asian Religions”. 
+
+   When many values in a data element are expected to be infrequent, GENERALIZE
+   can be used to capture those original data values that must be maintained in
+   the output data. In this case, only those values that are **not** specified
+   are replaced with a configurable general category term. For example, in
+   a data element that stores the spoken languages of individuals, GENERALIZE
+   can be configured to replace all languages that are not listed as **Spanish**
+   or **English**, with value **Other**.
 
    **Options supported by GENERALIZE**
 
 | **Option name**         | **Type** | **Description**                                                   | **Default value** |
 |-------------------------|----------|-------------------------------------------------------------------|-------------------|
-| maskRuleSet             | String   | The rule sets are defined in the masking JSON configuration file. | N/A               |
+| maskRuleSet             | String   | The value sets as a JSON array of objects in string format.       | N/A               |
 
-   Next, we describe the different modes of operation that are
-   supported by GENERALIZE for protecting infrequent data values.
 
-   As input, GENERALIZE can take a number of data generalization rules R1…Rm,
+   GENERALIZE can accept a number of data generalization value sets R1…Rm,
    each of which defines a set of original (or **source**) data values and a
    corresponding replacement (or **target**) value.
 
-   Assume that **u** is an incoming data value from a FHIR data element to which
-   GENERALIZE is applied and that R is a rule associated with this FHIR data
-   element. GENERALIZE checks **u** against rule R and replaces it with
-   the target value of R if **u** is found among the source values. Similarly, a
-   rule R’ can be specified to replace value **u** only if it does **not** belong
-   among the source values specified in that rule. If multiple rules are
-   specified for the same FHIR data element, each rule is tested in sequence
-   against the value **u** of the FHIR data element, and the first rule
-   that is found to contain **u** is triggered. For those values **u** of the
-   FHIR data element to which none of the rules apply, they can either be
-   maintained or be replaced with a pre-specified general category value, for
-   example, **Other**.
+   Assume that **u** is an incoming data value from a data element to which
+   GENERALIZE is applied and that R is a value set associated with this data
+   element. GENERALIZE checks **u** against value set R and replaces it with
+   the target value of R if **u** is found among the source values. Another value set
+   R’ could be specified to replace value **u** only if it is **not** found
+   among the source values specified in that value set. If multiple value sets are
+   specified for the same data element, each value set is tested in sequence
+   against the value **u** of the data element and the first value set
+   that is found to contain **u** is triggered. If the value **u** does not
+   match any of the value sets, the value **u** is retained.
 
-   The various rules that must be enforced by GENERALIZE are defined with the
-   FHIR Resource data element path in the JSON data de-identification
-   configuration file. The option generalize.mask.ruleSet is used for defining
-   the rules that must be applied to a FHIR data element. Each rule
-   consists of two JSON element names: the targetValue element, and either the
-   sourceValueIn element **or** the sourceValueNotIn element:
+   The value of the **maskRuleSet** parameter is a JSON array of objects written
+   as a single string.  Each member of the array is a value set.  Value sets are
+   evaluated in the order they appear in the array.  Each value set is a JSON object
+   containing a **targetValue** property and either a 
+   **sourceValueIn** **or** a **sourceValueNotIn** property.   
 
- -  **targetValue element**: This provides the replacement value that must be applied
-    to the original value of the FHIR data element.
+ -  **targetValue**: The value of this property is a string that is the replacement value 
+    that will replace the original value of the data element if the value set is matched.
 
- -  **sourceValueIn element**: This provides a set of original values that can be
-    associated with the corresponding FHIR data element. If the FHIR data
-    element that is currently examined by GENERALIZE has a value that belongs to
-    the sourceValueIn set, then the original value of the FHIR data element is
-    replaced with that of the corresponding targetValue element.
+ -  **sourceValueIn**: The value of this property is a JSON array of original values.  
+    If the incoming data
+    value appears in this array, the original value of the data element is
+    replaced with the **targetValue** property value.
 
-   **Note:** If needed, you can denote that **any** value of the corresponding FHIR
-   data element must be replaced with the value in the targetValue element. To do so,
-   use the special value asterisk (\*) instead of any specific data values in the
-   sourceValueIn set.
+   **Note:** If needed, you can denote that **any** value of the data element be replaced. 
+   To do this, use the special value asterisk **(\*)** instead of any specific data values 
+   in the sourceValueIn array.
 
--   **sourceValueNotIn element**: To support rules that enforce negation logic, you
-    can specify this instead of the sourceValueIn element. It captures a set of
-    original values that can be associated with the corresponding FHIR data
-    element and **must not** be replaced by the value of the targetValue element.
-    Any FHIR data element that has a value in the sourceValueNotIn set maintains
-        its original value. All other values of the FHIR data element that
-    do not belong in the sourceValueNotIn set are replaced by the
-    corresponding value of the targetValue element.
+-   **sourceValueNotIn**: The value of this property is the same as described for **sourceValueIn**
+    except that the values in this array are original values that must be retained.  The
+    original value is replaced with the **targetValue** property value only if the incoming
+    data value is not in this array.  Note that the asterisk special value is **not** supported
+    in this property.
 
->   Next, examples show the capabilities of the GENERALIZE privacy provider,
->   by applying different rulesets to FHIR resource type data elements.
->
->   **Note:** The values in the example are for demonstration purposes only.
+Here are some examples of how the GENERALIZE privacy provider may be used.  
+The values in the examples are for demonstration purposes only.
 
-**Example 4: Patient address city data element**
+**Example 4: Generalize example**
 
 ```
+   "rules": [
    {
-     "--/fhir/Patient/address/city": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"Asia City\", \"sourceValueIn\": [\"Bangkok\",\"Manila\",\"Shanghi\",\"TaiPei\",\"Mumbai\"]}, {\"targetValue\": \"African City\", \"sourceValueIn\": [\"Addis Ababa\",\"Cairo\",\"Cape Town\",\"Lagos\"]}]"
-     }
-   }
+      "name": "cityRule",
+      "maskingProviders": [{
+         "type": "GENERALIZE",
+         "maskRuleSet": "[{\"targetValue\": \"Asian City\", \"sourceValueIn\": [\"Bangkok\", \"Manila\", \"Shanghi\", \"TaiPei\", \"Mumbai\"]}, {\"targetValue\": \"African City\", \"sourceValueIn\": [\"Addis Ababa\", \"Cairo\", \"Cape Town\", \"Lagos\"]}]" 
+      }], 
+         
+         
+     "maskingRules": [{
+         "jsonPath": "/fhir/Patient/address/city",
+         "rule": "cityRule"
+     }],   
+   
 ```
 
->   In the example above, a ruleset consisting of two rules is applied to the
->   Patient address city data element. These rules are checked sequentially as
+>   In the example above, a rule consisting of two value sets is applied to the
+>   Patient address city data element. The value sets are examined sequentially as
 >   follows:
 
-> 1.  If the city value of the FHIR data element is any of the cities listed in
-    the sourceValueIn element of the first rule (that is, any of **Bangkok**,
+> 1.  If the city value of the data element is one of the cities listed in
+    the sourceValueIn property of the first value set (that is, any of **Bangkok**,
     **Manila**, **Shanghai**, **Taipei**, or **Mumbai**), then it is replaced with
-    the value specified in the targetValue element (that is, **Asian City**).
-        Then, no other rule will be examined.
+    the value specified in the targetValue property value (that is, **Asian City**).
+    No other value sets are examined.
+    
+> 2.  Otherwise, if the city value of the data element is one of the cities listed
+    in the sourceValueIn property of the second value set (that is, **Addis Ababa**,
+    **Cairo**, **Cape Town**, or **Lagos**), then it is replaced with the value
+    specified in the targetValue property (that is, **African City**). No other value 
+    sets, if any, are examined.
 
-> 2.  Otherwise, if the city value of the FHIR data element is one of those
-    listed in the sourceValueIn element of the second rule (that is, **Addis Ababa**,
-    **Cairo**, **Cape Town**, **Lagos**), then it is replaced with the value
-    specified in the targetValue element (that is, **African City**). No other rule
-    will be examined.
+> 3.  Otherwise, since the city value of the data element has not been matched and
+    there are no more value sets to examine, the original value is maintained.
 
-> 3.  Otherwise, if the city value of the FHIR data element is not among the cities
-    listed in the sourceValueIn element of the first rule and, in addition, is not
-    among the cities listed in the sourceValueIn element of the second rule, then the
-    original value of the FHIR data element is maintained.
-
-**Example 5: Practitioner address city data element**
+**Example 5: Generalize example with special value**
 
 ```
-   {
-     "--/fhir/Practitioner/address/city": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\",\"Chicago\",\"Houseton\",\"Minneapolis\",\"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\",\"Vancouver\",\"Montreal\",\"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"\\*\"]}]"
-     }
-   }
-```
-
->   In the example above, a ruleset consisting of three rules is applied to the
->   Practitioner address city data element. As in the Example 4, these
->   rules are checked sequentially, and the first rule that applies to the value
->   of the FHIR data element is invoked. In this example, we demonstrate the
->   application of the third rule, wherein if the value of the input FHIR data
->   element is not among those listed in the sourceValueIn elements of the first
->   and the second rules, it is replaced with the value **Other**.
-
-**Example 6: Device component language code text data element**
+     "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\", \"Chicago\", \"Dallas\", \"Minneapolis\", \"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\", \"Vancouver\",\"Montreal\", \"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"\\*\"]}]"
 
 ```
-{
-     "--/fhir/DeviceComponent/languageCode/text": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]"
-     }
-   }
+
+>   In the example above, a rule consisting of three value sets is specified.  
+>   As in Example 4, the value sets are evaluated sequentially and the first 
+>   value set that applies to the data element value is used.  
+>   If the incoming data value is not one of the cities listed in either of the
+>   first two value sets, the incoming data value is replaced with the targetValue property 
+>   (**Other**) of the third value set, since any incoming data value will match the asterisk
+>   special value.
+
+**Example 6: Generalize example with negation**
+
+```
+     "maskRuleSet": "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]"
 ```
 
->   In the example above, a ruleset consisting of a single rule is applied to
->   the Device component language code text data element. This example
->   illustrates the negation logic that can be enforced in rules specified under
->   the GENERALIZE privacy provider. Specifically, if the value of the FHIR data
->   element is any of the languages listed in the sourceValueNotIn element of
->   the rule (that is, **French** or **Spanish**), then this value is maintained
->   in the FHIR data element. Otherwise, for example, if the value of the FHIR data
->   element is **English**, then it is replaced by the value specified in the
->   targetValue element, that is, **Other**.
+>   In the example above, a rule with one value set is specified.  The value set 
+>   contains the **sourceValueNotIn** property.  Therefore, if the value of the incoming data
+>   element is any of the languages listed in the sourceValueNotIn property (**French** 
+>   or **Spanish**), then the original value is maintained.  If the incoming
+>   data element has any other value, it is replaced with the targetValue (**Other**).
 
 #### GUID
 
