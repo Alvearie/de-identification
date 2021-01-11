@@ -26,7 +26,7 @@ public class PseudonymMaskingProviderConfig extends MaskingProviderConfig {
   private boolean generateViaOptionsGenerateSpecial = false;
   private boolean generateViaPatternEnabled = true;
   private String generateViaPatternPattern = null;
-  private String generateViaPatternLanguageCode = "EN";
+  private String generateViaPatternLanguageCode = "en";
   private String generateViaPatternPatternName = null;
   private boolean generateViaHashEnabled = false;
   private boolean generateViaHashUseSHA256 = false;

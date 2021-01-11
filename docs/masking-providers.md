@@ -690,7 +690,7 @@ The values in the examples are for demonstration purposes only.
 **Example 5: Generalize example with special value**
 
 ```
-     "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\", \"Chicago\", \"Dallas\", \"Minneapolis\", \"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\", \"Vancouver\",\"Montreal\", \"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"\\*\"]}]"
+     "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\", \"Chicago\", \"Dallas\", \"Minneapolis\", \"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\", \"Vancouver\",\"Montreal\", \"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"*\"]}]"
 
 ```
 
@@ -1051,7 +1051,7 @@ The named groups countryCode/areaCode are used to identify the position of count
 
 >   generateViaPatternPattern = null
 
->   generateViaPatternLanguageCode = "EN"
+>   generateViaPatternLanguageCode = "en"
 
 >   generateViaPatternPatternName = "phoneNumber"
 
@@ -1085,7 +1085,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 | generateViaOptionsGenerateSpecial   | Boolean  | Generated pseudonym may contain the following special characters: !, \@, \#, \$, %, \^, &, \*, [, ], \\, /, ?, {, }, +, -, or \_ | false             |
 | generateViaPatternEnabled           | Boolean  | Generate pseudonym using a pattern                                                                                                   | false             |
 | generateViaPatternPattern           | String   | Pattern used to generate pseudonym                                                                                               | null              |
-| generateViaPatternLanguageCode      | String   | Language code (two-digit ISO code) of pattern used to generate pseudonym                                                           | EN                |
+| generateViaPatternLanguageCode      | String   | Language code (two-digit ISO code) of pattern used to generate pseudonym                                                           | en                |
 | generateViaPatternPatternName       | String   | Name of the pattern used to generate pseudonym                                                                                       | null              |
 | generateViaHashEnabled              | Boolean  | Generate pseudonym using a hash algorithm                                                                                            | false             |
 | generateViaHashUseSHA256            | Boolean  | Use the SHA-256 hash algorithm to generate pseudonym, instead of SHA-512                                                          | false             |
