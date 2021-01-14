@@ -841,7 +841,7 @@ The values in the examples are for demonstration purposes only.
 | maskingAllowUnisex        | Boolean  | Allow unisex names to be used for masking | false             |
 | tokenConsistence          | Boolean  | Provide consistence per token             | false             |
 | maskPseudorandom          | Boolean  | Provide pseudorandom consistence          | false             |
-| namesMaskGenderPreserve   | Boolean  | Preserve gender while masking             | true              |
+| maskGenderPreserve        | Boolean  | Preserve gender while masking             | true              |
 
 #### NULL
 
