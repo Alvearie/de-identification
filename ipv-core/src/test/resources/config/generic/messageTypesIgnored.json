@@ -1,0 +1,27 @@
+{
+		"rules": [
+			{
+				"name": "bin",
+				"maskingProviders": [
+					{
+						"type": "BINNING"
+					}
+				]
+			}
+		],
+		"json": {
+			"schemaType": "GEN",
+			"messageTypeKey": " ",
+			"messageTypes": [
+				"Observation",
+				"Patient",
+				"Device"
+			],
+			"maskingRules": [
+				{
+					"jsonPath": "/gen/default/a",
+					"rule": "bin"
+				}
+			]
+		}
+}

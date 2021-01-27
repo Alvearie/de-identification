@@ -27,23 +27,23 @@ public class LatitudeLongitudeMaskingProviderConfigTest {
     }
     config.setUnspecifiedValueHandling(2);
     config.validate();
-    config.setOffsetMaximumRadius(-1);
+    config.setOffsetMaximumRadius(10);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`offsetMaximumRadius` must be greater than 0"));
+      assertTrue(e.getMessage().contains("`offsetMaximumRadius` must be greater than 10"));
     }
-    config.setOffsetMaximumRadius(0);
+    config.setOffsetMaximumRadius(11);
     config.validate();
-    config.setOffsetMinimumRadius(-1);
+    config.setOffsetMinimumRadius(10);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`offsetMinimumRadius` must be greater than 0"));
+      assertTrue(e.getMessage().contains("`offsetMinimumRadius` must be greater than 10"));
     }
-    config.setOffsetMinimumRadius(0);
+    config.setOffsetMinimumRadius(11);
     config.validate();
   }
 }

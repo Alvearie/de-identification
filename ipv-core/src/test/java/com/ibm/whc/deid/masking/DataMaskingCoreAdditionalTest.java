@@ -19,7 +19,42 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
 
-public class DataMaskingCoreTest2 {
+public class DataMaskingCoreAdditionalTest {
+
+  @Test
+  public void testRulesAppliedInAssignmentOrder() throws Exception {
+    DataMaskingCore dataMask = new DataMaskingCore();
+
+    String config = readStringResource("/config/ruleOrderMaintained.config.json");
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
+
+    List<ReferableData> maskedDataList =
+        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+
+    String result = readStringResource("/result/ruleOrderMaintained.result.json");    
+    assertEquals(1, maskedDataList.size());
+    assertEquals(result, maskedDataList.get(0).getData());
+  }
+
+  @Test
+  public void testRulesAppliedInAssignmentOrderNoRule() throws Exception {
+    DataMaskingCore dataMask = new DataMaskingCore();
+
+    String config = readStringResource("/config/ruleOrderMaintained.config.json");
+    config = config.replace("\"defaultNoRuleResolution\": true,", "\"defaultNoRuleResolution\": false,");
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
+
+    List<ReferableData> maskedDataList =
+        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+
+    String result = readStringResource("/result/ruleOrderMaintained.norule.result.json");    
+    assertEquals(1, maskedDataList.size());
+    assertEquals(result, maskedDataList.get(0).getData());
+  }
 
   @Test
   public void testIdenticalStringArrayMasking() throws Exception {
@@ -134,6 +169,23 @@ public class DataMaskingCoreTest2 {
     assertTrue(foundListed);
     assertTrue(foundNotListed);
     assertTrue(foundNotPresent);
+  }
+
+  @Test
+  public void testMessageTypesIgnoredWhenDefault() throws Exception {
+    String config = readStringResource("/config/generic/messageTypesIgnored.json");
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(readStringResource("/data/messageTypesIgnored.json"));
+    List<ReferableData> convertedList = convertList(inputList);
+    
+    String resultList = readStringResource("/result/messageTypesIgnored.json");
+
+    DataMaskingCore dataMask = new DataMaskingCore();
+    List<ReferableData> maskedDataList = dataMask.maskData(config, convertedList, ConfigSchemaType.GEN);
+
+    assertEquals(1, maskedDataList.size());
+    assertEquals(resultList, maskedDataList.get(0).getData());
   }
 
   private List<ReferableData> convertList(List<String> inputList) {

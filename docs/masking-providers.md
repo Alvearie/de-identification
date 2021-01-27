@@ -228,8 +228,7 @@ options and their default values.
 >   contained in the user specified-value.
 
 >   For information about the unspecifiedValueHandling and unspecifiedValueReturnMessage
->   properties, see “Handling of Unrecognized Input Values and of Exceptions Raised
->   by the Privacy Providers” below.
+>   properties, see “Handling unrecognized input values and exceptions raised by privacy providers” below.
 
    **Example 2: Conditional masking of a FHIR data element, based on another FHIR data element value in an array node**
 
@@ -326,37 +325,36 @@ options and their default values.
 
 #### DATEDEPENDENCY
 
->   Extracts two related dates (for example, the patient's date-of-birth and the
->   date-of-death of a patient) from the same input message:
->
->   - The “mask date”: The date to be masked
->   - The “compare date”: The date to which that the mask date is compared
->
->     Then, if a number of days comparison with the "compare date" is true,
->     it removes the year from the "mask date".
+>   Masks a date and time value if it is within a given number of days of another date and time value in the same input message.
+>   If masking occurs, the year and time, if any, are removed and the value returned in **dd/MM** format, as in *20/04*.
+>   
+>   Within the input message, the value to compare to the masked value must be present in the same parent JSON object 
+>   as the masked value.  In other words, the path to the comparison value must be the same as the path to the masked value
+>   except for the final element name.  If the comparison value is not found, no masking occurs.  If the comparison value is 
+>   found, but cannot be parsed, the masked value is protected according to the unspecified value handling configuration as 
+>   described in "Handling of null and unrecognized input data values" below.
 
 This privacy provider supports these options:
 
-| **Option name**                                 | **Type** | **Description**                                                                                    | **Default value** |
-|-------------------------------------------------|----------|----------------------------------------------------------------------------------------------------|-------------------|
-| datetimeYearDeleteNIntervalMaskDate             | String   | The FHIR element name of the date that will be masked                                              | null              |
-| datetimeYearDeleteNIntervalCompareDate          | String   | The FHIR element name of the date that will be compared with the mask date                         | null              |
-| dateYearDeleteNDaysValue                        | Integer  | This option must be set to the maximum allowable interval (number of days) between the two dates   | 365               |
+| **Option name**                                 | **Type** | **Description**                                                                                             | **Default value** |
+|-------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
+| datetimeYearDeleteNIntervalCompareDate          | String   | The FHIR element name of the date value that will be compared with the masked date                          | null              |
+| dateYearDeleteNDaysValue                        | Integer  | The maximum number of days separating the masked value and the comparison value for masking to occur        | 365               |
 
    The following provides an example that illustrates the use of the
-   DATEDEPENDENCY provider. Specifically, we consider both the Patient FHIR
+   DATEDEPENDENCY provider. Specifically, we consider the Patient FHIR
    Resource and the birthDate and deceaseDateTime FHIR data elements that it
    contains.
 
-   The rule that we want to apply regards deleting from the birthDate of a
-   patient the year of birth, for those patients who died when they were less than
+   The rule that we want to apply regards deleting the year of birth from the birthDate of a
+   patient for those patients who died when they were not more than 
    five years old. For this example, the interval between the birthDate and the
-   deceaseDateTime elements is calculated, and if it is found to be less than five
+   deceaseDateTime elements is calculated, and if it is found to be less than or equal to five
    years (≅ 1825 days), then the year is removed from the birthDate element.
 
    **Note:** The values in the example are for demonstration purposes only.
 
-**Example 3 – Protecting the year of birth for patients who died at an age below
+**Example 3 – Protecting the year of birth for patients who died at no more than 
 5 years old:**
 
 ````
@@ -367,7 +365,6 @@ This privacy provider supports these options:
           "maskingProviders": [
             {
               "type": "DATEDEPENDENCY",
-              "datetimeYearDeleteNIntervalMaskDate": "birthDate",
               "dateYearDeleteNDaysValue": 1825,
               "datetimeYearDeleteNIntervalCompareDate": "deceasedDateTime"
             }
@@ -379,7 +376,7 @@ This privacy provider supports these options:
         "schemaType": "FHIR",
         "messageTypeKey": "resourceType",
         "messageTypes": [
-          "Device"
+          "Patient"
         ],
         "maskingRules": [
           {
@@ -554,7 +551,7 @@ This privacy provider supports these options:
 | yearDeleteNdays                                   | Boolean  | Remove the year and return only the day and month, if the date and time is after the given number of days ago                                                                                                                                                                                                                       | false             |
 | yearDeleteNinterval                               | Boolean  | Remove the year and return only the day and month, if the date and time is within the given number of days from a given date and time                                                                                                                                                                                                                       | false             |
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
-| yearDeleteNointervalComparedateValue              | String   | The date and time to compare                                                                                                                                                                                                                                | null              |
+| yearDeleteNointervalComparedateValue              | String   | The date and time to compare to the value being masked                                                                                                                                                                                                                               | null              |
 
 #### EMAIL
 
@@ -573,171 +570,149 @@ This privacy provider supports these options:
 
 #### GENERALIZE
 
->   Replaces one or more specified original values with a specified general
->   category term to which these values belong. If a general category term is
->   not defined for the input values, these can be optionally replaced with a
->   **default** term which is configurable by the data owner. The aim of
->   GENERALIZE is to protect infrequent data values that appear in a
->   data element by replacing them with a general category term.
+   Replaces one or more specified original values with a specified general
+   category term to which these values belong. If a general category term is
+   not defined for the input values, the input can optionally be replaced with a
+   default term.  The aim of
+   GENERALIZE is to protect infrequent data values that appear in a
+   data element by replacing them with a general category term.
 
->   When a small number of values must be replaced with a general category term,
->   the IBM onboarding team can specify these sets of values and their
->   corresponding replacement values as rules of the form R:
->
->   {*o*1, *o*2, …, o*n} *r*
->
->   where
->   *o*i is an original data value.
->   *r* is the replacement value.
->
->   Multiple such rules can be specified and provided as input to
->   GENERALIZE. For example, in a data element that stores the religion of
->   individuals, rule R: {“Daoism”, “Shinto”, “Confucianism”} “Eastern Asian
->   Religions”, can be used to protect the identity of the corresponding
->   individuals by associating them with the more-general category of “Eastern
->   Asian Religions”. All other original values that are not captured in a rule
->   can be maintained as-is.
+   The GENERALIZE provider supports rules with value sets of the form R:
 
->   When many values in a data element are expected to be infrequent, GENERALIZE
->   can be used to capture those original data values that must be maintained in
->   the output data. In this case, only those values that are **not** specified
->   are replaced with a configurable general category term. For example, in
->   a data element that stores the spoken languages of individuals, GENERALIZE
->   can be configured to replace all languages that are not listed as **Spanish**
->   or **English**, with value **Other**.
+   {*o*1, *o*2, …, o*n} *r*
+
+   where
+   * *o*i is an original data value
+   * *r* is the replacement value
+
+Multiple such rules can be specified and provided as input to
+GENERALIZE. For example, in a data element that stores the religion of
+individuals, rule R: {“Daoism”, “Shinto”, “Confucianism”} “Eastern Asian
+Religions”, can be used to protect the identity of the corresponding
+individuals by associating them with the more general category of “Eastern
+Asian Religions”. 
+
+   When many values in a data element are expected to be infrequent, GENERALIZE
+   can be used to capture those original data values that must be maintained in
+   the output data. In this case, only those values that are **not** specified
+   are replaced with a configurable general category term. For example, in
+   a data element that stores the spoken languages of individuals, GENERALIZE
+   can be configured to replace all languages that are not listed as **Spanish**
+   or **English**, with value **Other**.
 
    **Options supported by GENERALIZE**
 
 | **Option name**         | **Type** | **Description**                                                   | **Default value** |
 |-------------------------|----------|-------------------------------------------------------------------|-------------------|
-| maskRuleSet             | String   | The rule sets are defined in the masking JSON configuration file. | N/A               |
+| maskRuleSet             | String   | The value sets as a JSON array of objects in string format.       | N/A               |
 
-   Next, we describe the different modes of operation that are
-   supported by GENERALIZE for protecting infrequent data values.
 
-   As input, GENERALIZE can take a number of data generalization rules R1…Rm,
+   GENERALIZE can accept a number of data generalization value sets R1…Rm,
    each of which defines a set of original (or **source**) data values and a
    corresponding replacement (or **target**) value.
 
-   Assume that **u** is an incoming data value from a FHIR data element to which
-   GENERALIZE is applied and that R is a rule associated with this FHIR data
-   element. GENERALIZE checks **u** against rule R and replaces it with
-   the target value of R if **u** is found among the source values. Similarly, a
-   rule R’ can be specified to replace value **u** only if it does **not** belong
-   among the source values specified in that rule. If multiple rules are
-   specified for the same FHIR data element, each rule is tested in sequence
-   against the value **u** of the FHIR data element, and the first rule
-   that is found to contain **u** is triggered. For those values **u** of the
-   FHIR data element to which none of the rules apply, they can either be
-   maintained or be replaced with a pre-specified general category value, for
-   example, **Other**.
+   Assume that **u** is an incoming data value from a data element to which
+   GENERALIZE is applied and that R is a value set associated with this data
+   element. GENERALIZE checks **u** against value set R and replaces it with
+   the target value of R if **u** is found among the source values. Another value set
+   R’ could be specified to replace value **u** only if it is **not** found
+   among the source values specified in that value set. If multiple value sets are
+   specified for the same data element, each value set is tested in sequence
+   against the value **u** of the data element and the first value set
+   that is found to contain **u** is triggered. If the value **u** does not
+   match any of the value sets, the value **u** is retained.
 
-   The various rules that must be enforced by GENERALIZE are defined with the
-   FHIR Resource data element path in the JSON data de-identification
-   configuration file. The option generalize.mask.ruleSet is used for defining
-   the rules that must be applied to a FHIR data element. Each rule
-   consists of two JSON element names: the targetValue element, and either the
-   sourceValueIn element **or** the sourceValueNotIn element:
+   The value of the **maskRuleSet** parameter is a JSON array of objects written
+   as a single string.  Each member of the array is a value set.  Value sets are
+   evaluated in the order they appear in the array.  Each value set is a JSON object
+   containing a **targetValue** property and either a 
+   **sourceValueIn** **or** a **sourceValueNotIn** property.   
 
- -  **targetValue element**: This provides the replacement value that must be applied
-    to the original value of the FHIR data element.
+ -  **targetValue**: The value of this property is a string that is the replacement value 
+    that will replace the original value of the data element if the value set is matched.
 
- -  **sourceValueIn element**: This provides a set of original values that can be
-    associated with the corresponding FHIR data element. If the FHIR data
-    element that is currently examined by GENERALIZE has a value that belongs to
-    the sourceValueIn set, then the original value of the FHIR data element is
-    replaced with that of the corresponding targetValue element.
+ -  **sourceValueIn**: The value of this property is a JSON array of original values.  
+    If the incoming data
+    value appears in this array, the original value of the data element is
+    replaced with the **targetValue** property value.
 
-   **Note:** If needed, you can denote that **any** value of the corresponding FHIR
-   data element must be replaced with the value in the targetValue element. To do so,
-   use the special value asterisk (\*) instead of any specific data values in the
-   sourceValueIn set.
+   **Note:** If needed, you can denote that **any** value of the data element be replaced. 
+   To do this, use the special value asterisk **(\*)** instead of any specific data values 
+   in the sourceValueIn array.
 
--   **sourceValueNotIn element**: To support rules that enforce negation logic, you
-    can specify this instead of the sourceValueIn element. It captures a set of
-    original values that can be associated with the corresponding FHIR data
-    element and **must not** be replaced by the value of the targetValue element.
-    Any FHIR data element that has a value in the sourceValueNotIn set maintains
-        its original value. All other values of the FHIR data element that
-    do not belong in the sourceValueNotIn set are replaced by the
-    corresponding value of the targetValue element.
+-   **sourceValueNotIn**: The value of this property is the same as described for **sourceValueIn**
+    except that the values in this array are original values that must be retained.  The
+    original value is replaced with the **targetValue** property value only if the incoming
+    data value is not in this array.  Note that the asterisk special value is **not** supported
+    in this property.
 
->   Next, examples show the capabilities of the GENERALIZE privacy provider,
->   by applying different rulesets to FHIR resource type data elements.
->
->   **Note:** The values in the example are for demonstration purposes only.
+Here are some examples of how the GENERALIZE privacy provider may be used.  
+The values in the examples are for demonstration purposes only.
 
-**Example 4: Patient address city data element**
+**Example 4: Generalize example**
 
 ```
+   "rules": [
    {
-     "--/fhir/Patient/address/city": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"Asia City\", \"sourceValueIn\": [\"Bangkok\",\"Manila\",\"Shanghi\",\"TaiPei\",\"Mumbai\"]}, {\"targetValue\": \"African City\", \"sourceValueIn\": [\"Addis Ababa\",\"Cairo\",\"Cape Town\",\"Lagos\"]}]"
-     }
-   }
+      "name": "cityRule",
+      "maskingProviders": [{
+         "type": "GENERALIZE",
+         "maskRuleSet": "[{\"targetValue\": \"Asian City\", \"sourceValueIn\": [\"Bangkok\", \"Manila\", \"Shanghi\", \"TaiPei\", \"Mumbai\"]}, {\"targetValue\": \"African City\", \"sourceValueIn\": [\"Addis Ababa\", \"Cairo\", \"Cape Town\", \"Lagos\"]}]" 
+      }], 
+         
+         
+     "maskingRules": [{
+         "jsonPath": "/fhir/Patient/address/city",
+         "rule": "cityRule"
+     }],   
+   
 ```
 
->   In the example above, a ruleset consisting of two rules is applied to the
->   Patient address city data element. These rules are checked sequentially as
+>   In the example above, a rule consisting of two value sets is applied to the
+>   Patient address city data element. The value sets are examined sequentially as
 >   follows:
 
-> 1.  If the city value of the FHIR data element is any of the cities listed in
-    the sourceValueIn element of the first rule (that is, any of **Bangkok**,
+> 1.  If the city value of the data element is one of the cities listed in
+    the sourceValueIn property of the first value set (that is, any of **Bangkok**,
     **Manila**, **Shanghai**, **Taipei**, or **Mumbai**), then it is replaced with
-    the value specified in the targetValue element (that is, **Asian City**).
-        Then, no other rule will be examined.
+    the value specified in the targetValue property value (that is, **Asian City**).
+    No other value sets are examined.
+    
+> 2.  Otherwise, if the city value of the data element is one of the cities listed
+    in the sourceValueIn property of the second value set (that is, **Addis Ababa**,
+    **Cairo**, **Cape Town**, or **Lagos**), then it is replaced with the value
+    specified in the targetValue property (that is, **African City**). No other value 
+    sets, if any, are examined.
 
-> 2.  Otherwise, if the city value of the FHIR data element is one of those
-    listed in the sourceValueIn element of the second rule (that is, **Addis Ababa**,
-    **Cairo**, **Cape Town**, **Lagos**), then it is replaced with the value
-    specified in the targetValue element (that is, **African City**). No other rule
-    will be examined.
+> 3.  Otherwise, since the city value of the data element has not been matched and
+    there are no more value sets to examine, the original value is maintained.
 
-> 3.  Otherwise, if the city value of the FHIR data element is not among the cities
-    listed in the sourceValueIn element of the first rule and, in addition, is not
-    among the cities listed in the sourceValueIn element of the second rule, then the
-    original value of the FHIR data element is maintained.
-
-**Example 5: Practitioner address city data element**
+**Example 5: Generalize example with special value**
 
 ```
-   {
-     "--/fhir/Practitioner/address/city": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\",\"Chicago\",\"Houseton\",\"Minneapolis\",\"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\",\"Vancouver\",\"Montreal\",\"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"\\*\"]}]"
-     }
-   }
-```
-
->   In the example above, a ruleset consisting of three rules is applied to the
->   Practitioner address city data element. As in the Example 4, these
->   rules are checked sequentially, and the first rule that applies to the value
->   of the FHIR data element is invoked. In this example, we demonstrate the
->   application of the third rule, wherein if the value of the input FHIR data
->   element is not among those listed in the sourceValueIn elements of the first
->   and the second rules, it is replaced with the value **Other**.
-
-**Example 6: Device component language code text data element**
+     "maskRuleSet": "[{\"targetValue\": \"US City\", \"sourceValueIn\": [\"New York\", \"Chicago\", \"Dallas\", \"Minneapolis\", \"Boston\"]}, {\"targetValue\": \"Canadian City\", \"sourceValueIn\": [\"Toronto\", \"Vancouver\",\"Montreal\", \"Calgary\"]}, {\"targetValue\": \"Other\", \"sourceValueIn\": [\"*\"]}]"
 
 ```
-{
-     "--/fhir/DeviceComponent/languageCode/text": {
-       "type": "GENERALIZE",
-       "maskRuleSet": "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]"
-     }
-   }
+
+>   In the example above, a rule consisting of three value sets is specified.  
+>   As in Example 4, the value sets are evaluated sequentially and the first 
+>   value set that applies to the data element value is used.  
+>   If the incoming data value is not one of the cities listed in either of the
+>   first two value sets, the incoming data value is replaced with the targetValue property 
+>   (**Other**) of the third value set, since any incoming data value will match the asterisk
+>   special value.
+
+**Example 6: Generalize example with negation**
+
+```
+     "maskRuleSet": "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]"
 ```
 
->   In the example above, a ruleset consisting of a single rule is applied to
->   the Device component language code text data element. This example
->   illustrates the negation logic that can be enforced in rules specified under
->   the GENERALIZE privacy provider. Specifically, if the value of the FHIR data
->   element is any of the languages listed in the sourceValueNotIn element of
->   the rule (that is, **French** or **Spanish**), then this value is maintained
->   in the FHIR data element. Otherwise, for example, if the value of the FHIR data
->   element is **English**, then it is replaced by the value specified in the
->   targetValue element, that is, **Other**.
+>   In the example above, a rule with one value set is specified.  The value set 
+>   contains the **sourceValueNotIn** property.  Therefore, if the value of the incoming data
+>   element is any of the languages listed in the sourceValueNotIn property (**French** 
+>   or **Spanish**), then the original value is maintained.  If the incoming
+>   data element has any other value, it is replaced with the targetValue (**Other**).
 
 #### GUID
 
@@ -866,7 +841,7 @@ This privacy provider supports these options:
 | maskingAllowUnisex        | Boolean  | Allow unisex names to be used for masking | false             |
 | tokenConsistence          | Boolean  | Provide consistence per token             | false             |
 | maskPseudorandom          | Boolean  | Provide pseudorandom consistence          | false             |
-| namesMaskGenderPreserve   | Boolean  | Preserve gender while masking             | true              |
+| maskGenderPreserve        | Boolean  | Preserve gender while masking             | true              |
 
 #### NULL
 
@@ -1076,7 +1051,7 @@ The named groups countryCode/areaCode are used to identify the position of count
 
 >   generateViaPatternPattern = null
 
->   generateViaPatternLanguageCode = "EN"
+>   generateViaPatternLanguageCode = "en"
 
 >   generateViaPatternPatternName = "phoneNumber"
 
@@ -1110,7 +1085,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 | generateViaOptionsGenerateSpecial   | Boolean  | Generated pseudonym may contain the following special characters: !, \@, \#, \$, %, \^, &, \*, [, ], \\, /, ?, {, }, +, -, or \_ | false             |
 | generateViaPatternEnabled           | Boolean  | Generate pseudonym using a pattern                                                                                                   | false             |
 | generateViaPatternPattern           | String   | Pattern used to generate pseudonym                                                                                               | null              |
-| generateViaPatternLanguageCode      | String   | Language code (two-digit ISO code) of pattern used to generate pseudonym                                                           | EN                |
+| generateViaPatternLanguageCode      | String   | Language code (two-digit ISO code) of pattern used to generate pseudonym                                                           | en                |
 | generateViaPatternPatternName       | String   | Name of the pattern used to generate pseudonym                                                                                       | null              |
 | generateViaHashEnabled              | Boolean  | Generate pseudonym using a hash algorithm                                                                                            | false             |
 | generateViaHashUseSHA256            | Boolean  | Use the SHA-256 hash algorithm to generate pseudonym, instead of SHA-512                                                          | false             |
@@ -1451,13 +1426,13 @@ Here are the options and their default values for the PSEUDONYM  provider:
    providers when more than one rule is defined for these data elements in
    the data de-identification configuration file. In this case, the rules are
    applied to the corresponding data elements of the array in the
-   sequence in which they have been defined:
+   sequence in which they have been defined.
 
    - The first rule is applied to the original value of the data element.
    - Each subsequent rule is applied to the transformed value produced for this element by the previous
    rule. This is similar to the behavior of a UNIX pipe command.
 
-   The next example shows a valid ruleset for processing data elements of a
+   The next example shows a valid rule set for processing data elements of a
    FHIR array with multiple privacy providers.
 
    **Example 14: Masking elements of an array with multiple masking providers**
@@ -1469,41 +1444,22 @@ Here are the options and their default values for the PSEUDONYM  provider:
   }
 
   {
-        "jsonPath": "/fhir/Patient/name[\*]/use",
+        "jsonPath": "/fhir/Patient/name[*]/use",
         "rule": "RANDOM"
   }
 
   {
-        "jsonPath": "/fhir/Patient/name[\*]/given[0]",
-        "rule": "HASH_REPLACE"
+        "jsonPath": "/fhir/Patient/name[*]/given[0]",
+        "rule": "REPLACE"
   }
 ```
 
-    In this example, both the first and the second rule are applied to the
-   name[1]/use data element. The second rule is also applied to all
-   other name[\*]/use elements in the array. The third rule of the example
-   leads to applying the HASH followed by the REPLACE privacy providers to
-   all name[\*]/given[0] data elements in the array.
-
-   To disable this default behavior, you can use a configuration option (flag),
-   **arrayAllRules**, in the data de-identification configuration file.
-
-   **When the arrayAllRules flag is set to false, only the first rule that is
-   defined for a FHIR array data element is enforced. Any additional rules
-   that involve the same FHIR array data element are not be applied to this
-   element.**
-
-   **Note:** arrayAllRules applies only to FHIR array data elements.
-
-   For instance, consider the rules in Example 14 (above) when **arrayAllRules = false**.
-   In this case, name[1]/use is processed by HASH, and all other
-   name[\*]/use data elements are processed by RANDOM. The third rule
-   applies first HASH and then REPLACE to all name[\*]/given[0] FHIR array
-   elements. In other words, the arrayAllRules flag changes the behavior of
-   the Data De-Identification Service only with respect to different de-identification
-   rules that are applied to the same FHIR array data element. However, it does not
-   change the behavior of the Service when two privacy providers are
-   defined as part of the de-identification rule.
+   In this example, both the first and the second rule are applied to the
+   _use_ element in the second member of the _name_ array.  Offsets start at 0
+   so [1] refers to the second array member. The second rule is also applied to 
+   the _use_ element in all other members of the _name_ array.
+   The third entry applies the REPLACE rule to
+   the first member of the _given_ array in all members of the _name_ array.
 
    **Note:** In the case of regular, non-array FHIR data elements, if multiple de-identification
    rules are specified, only the last rule is applied to the data. The previous rules are discarded.
@@ -1523,9 +1479,9 @@ Here are the options and their default values for the PSEUDONYM  provider:
 ```
 
   In this example, only the HASH (last) privacy provider is applied
-   to the gender data element of the Patient FHIR Resource.
+  to the gender data element of the Patient FHIR Resource.
 
-### Handling unrecognized input values, exceptions raised by privacy providers
+### Handling unrecognized input values and exceptions raised by privacy providers
 
    Next, this topic describes the operation of the various privacy providers
    that are offered by the Data De-Identification Service in the case of either null
@@ -1542,47 +1498,44 @@ Here are the options and their default values for the PSEUDONYM  provider:
    they do not proceed to falsify the data.
 
    If the input value to a privacy provider is not recognized by the privacy
-   provider, and it does not appear to be an accurate input value, the Data
-   De-Identification Service operates as specified in the data
-   de-identification configuration file. This applies to the options
-   unspecified.value.handling and unspecified.value.returnMessage. These
-   options are globally set and persist for all privacy providers:
+   provider and it does not appear to be an accurate input value, the Data
+   De-Identification Service operates as specified by these configuration 
+   parameters.
 
-| **Option name**               | **Type** | **Description**                                                                                                                                                                                  | **Default value** |
-|-------------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| unspecifiedValueHandling      | Integer  | Handling options: **1** : return null **2** : return fictionalized value produced by the corresponding privacy provider **3** : return the message (String) in unspecified.value.returnMessage | 1                 |
-| unspecifiedValueReturnMessage | String   | Value to be returned when unspecified.value.handling is set to **3**                                                                                                                           | **OTHER**      |
+| **Option name**               | **Type** | **Description**                                                                                                | **Default value** |
+|-------------------------------|----------|----------------------------------------------------------------------------------------------------------------|-------------------|
+| unspecifiedValueHandling      | Integer  | Handling options are **1**: return null **2**: return fictionalized value  **3**: return a configured value    | 1                 |
+| unspecifiedValueReturnMessage | String   | Value to be returned when `unspecifiedValueHandling` is set to **3**                                     | **OTHER**         |
 
    For providers that operate using regular expressions, for example, PHONE NUMBER,
    SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
    an unrecognized value is a value that does not conform to the
    specified regular expression.
 
-    Similarly, for providers that operate using lookup tables, for example, NAME,
+   Similarly, for providers that operate using lookup tables, for example, NAME,
    CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
    that is not part of the corresponding lookup table that is used by the
    privacy provider.
 
-   When unspecifiedValueHandling is set to **1** (or to a value other than either **2** or
+   When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
    **3**), any privacy provider that takes as input an unrecognized data value
    returns a null value.
 
-   When unspecifiedValueHandling is set to **2**, any privacy provider that
+   When `unspecifiedValueHandling` is set to **2**, any privacy provider that
    takes as input an unrecognized data value returns a randomly-generated,
    fictionalized value that is valid for the corresponding provider.
 
-   Finally, when unspecifiedValueHandling is set to **3**, any provider that takes
+   Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
    as input an unrecognized data value, stores to this value the message
-   that is specified in unspecified.value.returnMessage. By default, this
+   that is specified in `unspecifiedValueReturnMessage`.  By default, this
    message is set to **OTHER**.
 
    **Exceptions**
 
-   These privacy providers ignore the unspecified.value.handling option:
-   DATEDEPENDENCY, GENERALIZE, HASH, MAINTAIN, NULL, PSEUDONYM, RANDOM,
+   These privacy providers ignore the `unspecifiedValueHandling` option:
+   GENERALIZE, HASH, MAINTAIN, NULL, PSEUDONYM, RANDOM,
    REDACT, and REPLACE. The URL, NUMVARIANCE, and ATC providers
-   treat option 2 of unspecified.value.handling the same as option 1.
-   As a result, each returns null.
+   treat option 2 of `unspecifiedValueHandling` the same as option 1.
 
 #### Exception handling
 
@@ -1591,9 +1544,8 @@ Here are the options and their default values for the PSEUDONYM  provider:
    the Data De-Identification Service. If a data protection method encounters
    an exception while attempting to privacy-protect an input data value, it
    catches the exception, logs a WPH2002E error message to the application
-   audit log, and returns an empty (null) String as the value of the
-   corresponding data element. This is the case unless the unspecified.value.\* options
-   have been set.
+   log, and returns an empty (null) String as the value of the
+   corresponding data element. 
 
    Here is the structure for the error messages that are produced:
 

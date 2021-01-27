@@ -1,0 +1,103 @@
+{
+	"defaultNoRuleResolution": true,
+	"rules": [
+		{
+			"name": "lastUpdatedRule",
+			"maskingProviders": [
+				{
+					"type": "DATETIME",
+					"generalizeMonthyear": true
+				}
+			]
+		},
+		{
+			"name": "hashRule",
+			"maskingProviders": [
+				{
+					"type": "HASH"
+				}
+			]
+		},
+        {
+            "name": "maintainRule",
+            "maskingProviders": [
+                {
+                    "type": "MAINTAIN"
+                }
+            ]
+        },		
+		{
+			"name": "redactRule",
+			"maskingProviders": [
+				{
+					"type": "REDACT"
+				}
+			]
+		},
+		{
+			"name": "postRule",
+			"maskingProviders": [
+				{
+					"type": "ZIPCODE"
+				}
+			]
+		}
+	],
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Organization"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Organization/meta/lastUpdated",
+				"rule": "lastUpdatedRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/text/div",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/extension/valueString",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/name",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/telecom/value(system==phone)",
+				"rule": "maintainRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/telecom/value(system==email)",
+				"rule": "maintainRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/telecom/value(*==*)",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/address/line[1]",
+				"rule": "hashRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/address/line[5]",
+				"rule": "hashRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/address/line[*]",
+				"rule": "redactRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/address/city",
+				"rule": "maintainRule"
+			},
+			{
+				"jsonPath": "/fhir/Organization/address/postalCode",
+				"rule": "postRule"
+			}
+		]
+	}
+}

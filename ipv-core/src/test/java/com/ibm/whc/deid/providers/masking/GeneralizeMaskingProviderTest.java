@@ -8,6 +8,7 @@ package com.ibm.whc.deid.providers.masking;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.ibm.whc.deid.shared.pojo.config.masking.GeneralizeMaskingProviderConfig;
@@ -173,6 +174,12 @@ public class GeneralizeMaskingProviderTest extends TestLogSetUp {
       return;
     }
     assertTrue(false);
+  }
+
+  @Test
+  public void testEmptyConfig() {
+    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(new GeneralizeMaskingProviderConfig());
+    assertNull(maskingProvider.mask("value1"));
   }
 
   @Test
