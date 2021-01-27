@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.CountyIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountyMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 
 public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   /*
@@ -22,6 +23,7 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testPseudorandom() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
+    assertEquals(MaskingProviderType.COUNTY, configuration.getType());
     configuration.setMaskPseudorandom(true);
 
     MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
@@ -43,6 +45,7 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     // county.mask.pseudorandom by default is off
     Identifier identifier = new CountyIdentifier();
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
+    assertEquals(MaskingProviderType.COUNTY, configuration.getType());
 
     MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
 
