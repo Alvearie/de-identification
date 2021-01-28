@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "deid.fullname" . }}-test"
+  labels:
+    {{- include "deid.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: test
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "deid.fullname" . }}:{{ .Values.service.port }}/api/v1/health']
+  restartPolicy: Never

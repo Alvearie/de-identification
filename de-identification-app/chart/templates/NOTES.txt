@@ -1,0 +1,35 @@
+The De-Identification Services can be accessed from within your cluster at the following location:
+
+  {{ include "deid.fullname" .}}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain}}
+ 
+To connect to your NiFi Registry from outside the cluster, follow the instructions below:
+ 
+Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.service.type }}
+
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "deid.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")  
+  echo NiFi Registry: http://$NODE_IP:$NODE_PORT/api/v1/deidentification
+  
+{{- else if contains "LoadBalancer" .Values.service.type }}
+
+It may take a few minutes for the LoadBalancer IP to be available.
+
+You can watch the status by running the following command and wait unti the external IP address appears: 
+
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "deid.fullname" . }}
+
+Once the external IP has been assigned run the following:
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "deid.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') 
+  echo NiFi Registry: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/deidentification
+
+{{- else if contains "ClusterIP" .Values.service.type }}
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "deid.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo De-Identification Service Health endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/health
+  echo De-Identification Service DeId endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/deidentification
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.port }}:{{ .Values.service.port }}
+  
+
+{{- end }}
