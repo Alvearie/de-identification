@@ -18,7 +18,7 @@ public class CountyMaskingProviderConfig extends MaskingProviderConfig {
   boolean maskPseudorandom = false;
 
   public CountyMaskingProviderConfig() {
-    type = MaskingProviderType.CITY;
+    type = MaskingProviderType.COUNTY;
   }
 
   public boolean isMaskPseudorandom() {

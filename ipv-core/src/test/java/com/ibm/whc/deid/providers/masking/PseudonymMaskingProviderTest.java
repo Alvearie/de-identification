@@ -250,13 +250,19 @@ public class PseudonymMaskingProviderTest extends TestLogSetUp {
 
     PseudonymMaskingProviderConfig configuration = new PseudonymMaskingProviderConfig();
     setAllPseudonymMaskingToFalse(configuration);
-    configuration.setGenerateViaPatternEnabled(true);
+    configuration.setGenerateViaPatternEnabled(true);    
     configuration.setGenerateViaPatternPatternName("DOES_NOT_EXIST");
     configuration.setGenerateViaPatternLanguageCode("EN");
     PseudonymMaskingProvider maskingProvider = new PseudonymMaskingProvider(configuration);
 
     String maskedValue = maskingProvider.mask(originalValue);
 
+    assertTrue("".equals(maskedValue));
+    
+    // whitespace (missing) pattern instead of null
+    configuration.setGenerateViaPatternPattern("  ");
+    maskingProvider = new PseudonymMaskingProvider(configuration);
+    maskedValue = maskingProvider.mask(originalValue);
     assertTrue("".equals(maskedValue));
   }
 

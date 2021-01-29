@@ -1,13 +1,13 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.whc.deid.models.FirstName;
 import com.ibm.whc.deid.models.LastName;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
@@ -18,7 +18,7 @@ import com.ibm.whc.deid.util.NamesManager;
  *
  */
 public class NameMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = 3798105506081000286L;
 
   protected NamesManager.NameManager names;
@@ -41,7 +41,7 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
     this.consistent = configuration.isTokenConsistence();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.tokenCache = this.consistent ? new HashMap<String, String>() : null;
+    this.tokenCache = this.consistent ? new ConcurrentHashMap<String, String>() : null;
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
@@ -119,7 +119,9 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
         }
 
         if (consistent)
-          tokenCache.put(token, maskedToken);
+          if (maskedToken != null) {
+            tokenCache.put(token, maskedToken);
+          }
       }
 
       builder.append(maskedToken);

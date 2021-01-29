@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,7 +17,7 @@ import com.ibm.whc.deid.util.ReversePatternManager;
  *
  */
 public class PseudonymMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = -185505347822379112L;
 
   private final boolean generateViaOptions;
@@ -87,7 +87,7 @@ public class PseudonymMaskingProvider extends AbstractMaskingProvider {
     if (this.generateViaPattern) {
 
       ReversePatternGenerator patternGenerator;
-      if (this.pattern != null) {
+      if (this.pattern != null && !this.pattern.trim().isEmpty()) {
         patternGenerator = ReversePatternManager.getInstance().getPatternByPattern(this.pattern,
             this.patternLanguageCode);
       } else {
