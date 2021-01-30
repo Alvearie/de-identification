@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -41,6 +41,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.MACAddressMaskingProviderConf
 import com.ibm.whc.deid.shared.pojo.config.masking.MaritalStatusMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NumberVarianceMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.OccupationMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
@@ -64,7 +65,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
  *
  */
 public class BasicMaskingProviderFactory implements Serializable, MaskingProviderFactory {
-  /** */
+  
   private static final long serialVersionUID = -7454645556196383954L;
 
   private final HashMap<String, HashMap<MaskingProviderConfig, MaskingProvider>> maskingProvidersCache;
@@ -220,7 +221,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId);
         break;
       case NULL:
-        provider = new NullMaskingProvider();
+        provider = new NullMaskingProvider((NullMaskingProviderConfig) config);
         break;
       case NUMBERVARIANCE:
         provider = new NumberVarianceMaskingProvider((NumberVarianceMaskingProviderConfig) config);

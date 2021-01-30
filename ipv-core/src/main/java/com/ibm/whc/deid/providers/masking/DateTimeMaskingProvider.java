@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -103,21 +103,17 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final String dateYearDeleteComparedValue;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-
-  private DateTimeFormatter fixedDateFormat = null;
+  private final DateTimeFormatter fixedDateFormat;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
     String fixedDateFormatString = configuration.getFormatFixed();
-
-    if (fixedDateFormatString != null) {
-      fixedDateFormat = new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
-          .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-          .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-          .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
-
-    } else {
-      this.fixedDateFormat = null;
-    }
+    this.fixedDateFormat =
+        (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())
+            ? new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter()
+            : null;
 
     this.shiftDate = configuration.isMaskShiftDate();
     this.shiftSeconds = configuration.getMaskShiftSeconds();
@@ -201,17 +197,15 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.dateYearDeleteComparedValue = compareDateValue;
 
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
+    
     String fixedDateFormatString = configuration.getFormatFixed();
-
-    if (fixedDateFormatString != null) {
-      fixedDateFormat = new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
-          .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-          .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-          .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
-
-    } else {
-      this.fixedDateFormat = null;
-    }
+    this.fixedDateFormat =
+        (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())
+            ? new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter()
+            : null;
 
     this.shiftDate = configuration.isMaskShiftDate();
     this.shiftSeconds = configuration.getMaskShiftSeconds();

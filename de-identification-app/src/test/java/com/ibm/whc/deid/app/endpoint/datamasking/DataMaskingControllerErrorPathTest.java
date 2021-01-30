@@ -11,20 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.app.endpoint.Application;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
-import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.config.Rule;
-import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
-import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.CityMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,6 +32,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.app.endpoint.Application;
+import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.Rule;
+import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
+import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.CityMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
@@ -88,14 +88,14 @@ public class DataMaskingControllerErrorPathTest {
     log.info(noContent);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(noContent))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(noContent))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string(startsWith("Required request body is missing")));
 
     log.info(emptyObject);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(emptyObject))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(emptyObject))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string("no configuration data"));
   }
@@ -114,7 +114,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string("Invalid input error data[0]"));
   }
@@ -130,7 +130,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string("Invalid input error data"));
 
@@ -141,7 +141,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string("Invalid input error data"));
   }
@@ -160,7 +160,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string("no configuration data"));
   }
@@ -178,7 +178,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string(startsWith("Invalid input error schemaType")));
   }
@@ -196,7 +196,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
         .andExpect(content().string(startsWith("JSON parse error")));
   }
@@ -217,7 +217,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the value of the `json` property is missing")));
@@ -239,7 +239,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andExpect(status().isBadRequest()).andDo(print())
         .andExpect(content().string(containsString("`json.schemaType` property is missing")));
   }
@@ -260,7 +260,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
@@ -282,7 +282,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
@@ -304,7 +304,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: value at offset 0 in `json.messageTypes` is missing")));
@@ -326,7 +326,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: value at offset 1 in `json.messageTypes` is missing")));
@@ -348,7 +348,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: value at offset 2 in `json.messageTypes` is missing")));
@@ -370,7 +370,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `rule` property is missing from the rule assignment at offset 0 in `json.maskingRules`")));
@@ -392,7 +392,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `rule` property is missing from the rule assignment at offset 1 in `json.maskingRules`")));
@@ -414,7 +414,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `jsonPath` property in the rule assignment at offset 2 in `json.maskingRules` must start with `/`")));
@@ -437,7 +437,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: `jsonPath` property in the rule assignment at offset "
@@ -463,7 +463,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "The JSON masking rule does not refer to a valid rule: no_1. There are 4 invalid rules.")));
@@ -486,7 +486,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the rule at offset " + count + " in `rules` is null")));
@@ -509,7 +509,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the `name` property is missing from the rule at offset 1 in `rules`")));
@@ -532,7 +532,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the `name` property is missing from the rule at offset 2 in `rules`")));
@@ -557,7 +557,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the value of the `name` property in the rule at offset "
@@ -581,7 +581,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the `maskingProviders` property is missing from the rule at offset 2 in `rules`")));
@@ -604,7 +604,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the masking provider at offset 1 in `maskingProviders` for the rule at offset 2 in `rules` is null")));
@@ -628,7 +628,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: too many entries in `maskingProviders` for the rule at offset 0 in `rules` - the maximum allowed is 2")));
@@ -650,7 +650,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the rule at offset 0 in `rules` contains multiple masking providers, but the first masking provider is not a Category I provider")));
@@ -673,7 +673,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the rule at offset 2 in `rules` contains multiple masking providers, but the second masking provider is not a Category II provider")));
@@ -697,7 +697,7 @@ public class DataMaskingControllerErrorPathTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
             "invalid masking configuration: the masking provider at offset 0 in `maskingProviders` for the rule at offset 1 in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));

@@ -629,7 +629,7 @@ public class ConditionalMaskingProviderTest {
       mapper.readValue(maskingOptionValue, ConditionalMaskingProviderConfig.class);
     } catch (JsonMappingException e) {
       assertTrue(e.getMessage().contains(
-          "String \"INVALID_OPERATOR\": value not one of declared Enum instance names: [containedIn, equalsIgnoreCase, contains, equals]"));
+          "String \"INVALID_OPERATOR\": not one of the values accepted for Enum class: [containedIn, equalsIgnoreCase, contains, equals]"));
       throw e;
     }
   }
