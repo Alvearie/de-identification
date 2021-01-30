@@ -71,7 +71,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 
 		log.info(request);
 		this.mockMvc
-				.perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
 						.content(request))
 				.andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
 	}
@@ -96,7 +96,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 
 		log.info(request);
 		this.mockMvc
-				.perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
 						.content(request))
 				.andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
 				.andExpect(content().string("The JSON masking rule does not refer to a valid rule: HASH:invalid. There are 1 invalid rules."));
@@ -123,7 +123,7 @@ public class DataMaskingControllerMaskingConfigurationTest {
 
 		log.info(request);
 		this.mockMvc
-				.perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
 						.content(request))
 				.andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
 		}

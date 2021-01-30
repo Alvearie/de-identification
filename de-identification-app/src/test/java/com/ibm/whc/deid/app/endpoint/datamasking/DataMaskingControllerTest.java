@@ -14,11 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.app.endpoint.Application;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
-import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +36,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.app.endpoint.Application;
+import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
@@ -85,7 +85,7 @@ public class DataMaskingControllerTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].id").value(containsString("1234")))
         .andExpect(jsonPath("$.data[0].patient.display").value(not("Patient Zero")));
@@ -111,7 +111,7 @@ public class DataMaskingControllerTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].id").value(containsString("1234")))
         .andExpect(jsonPath("$.data[0].patient.display").value(not("Patient Zero")));
@@ -135,7 +135,7 @@ public class DataMaskingControllerTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].phone").value(equalTo("00000000")))
         .andExpect(jsonPath("$.data[0].numbers.ssn").value(equalTo("X")));
@@ -158,7 +158,7 @@ public class DataMaskingControllerTest {
 
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].hashTestOne")
             .value(equalTo("31D03C3D7A9F70E679CA00C047E033D5A29210F6BF5B2FF12B9FC4962C102357")));
@@ -193,7 +193,7 @@ public class DataMaskingControllerTest {
     for (int i = 0; i < 20; i++) {
       this.mockMvc
           .perform(post(basePath + "/deidentification")
-              .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+              .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
           .andExpect(status().isOk()).andDo(MockMvcResultHandlers.print());
     }
     long endTime = System.currentTimeMillis();
@@ -234,7 +234,7 @@ public class DataMaskingControllerTest {
 
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].continent")
             .value(equalTo("FF588B4101673E2DFDD21041B6D5BF583703FF5D296FE5C606C5489132220EF7")));
@@ -250,7 +250,7 @@ public class DataMaskingControllerTest {
     // Make sure the continent data is not hashed
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].continent").value(
             not(equalTo("FF588B4101673E2DFDD21041B6D5BF583703FF5D296FE5C606C5489132220EF7"))));
@@ -274,7 +274,7 @@ public class DataMaskingControllerTest {
     log.info(request);
     this.mockMvc
         .perform(post(basePath + "/deidentification")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request))
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(header().string("cache-control", "no-cache, no-store, no-transform"))
         .andExpect(header().string("pragma", "no-cache")).andExpect(header().string("expires", "0"))
