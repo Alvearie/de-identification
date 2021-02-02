@@ -1,56 +1,54 @@
 # Masking Providers
 ## Overview
 
-> To preserve utility in the data being de-identified, the IBM Data De-Identification service supports the following data protection methods:
+To preserve utility in the data being de-identified, the IBM Data De-Identification service supports the following data protection methods:
 
-```
-   ADDRESS 
-   ATC
-   BINNING
-   CITY
-   CONDITIONAL
-   CONTINENT
-   COUNTRY
-   COUNTY
-   CREDIT_CARD
-   DATEDEPENDENCY   
-   DATETIME
-   EMAIL
-   GENDER
-   GENERALIZE
-   GUID
-   HASH
-   HOSPITAL
-   IBAN
-   ICDV9
-   ICDV10
-   IMEI
-   IP_ADDRESS
-   LATITUDE_LONGITUDE
-   MAC_ADDRESS
-   MAINTAIN
-   MARITAL
-   NAME
-   NULL
-   NUMBERVARIANCE
-   OCCUPATION
-   PHONE
-   PSEUDONYM
-   RACE
-   RANDOM
-   REDACT
-   RELIGION
-   REPLACE
-   SSN_UK
-   SSN_US
-   STATE_US
-   SWIFT
-   URL
-   VIN
-   ZIPCODE
-```
+* [ADDRESS](#address)
+* [ATC](#atc)
+* [BINNING](#binning)
+* [CITY](#city)
+* [CONDITIONAL](#conditional)
+* [CONTINENT](#continent)
+* [COUNTRY](#country)
+* [COUNTY](#county)
+* [CREDIT_CARD](#credit_card)
+* [DATEDEPENDENCY](#datedependency)
+* [DATETIME](#datetime)
+* [EMAIL](#email)
+* [GENDER](#gender)
+* [GENERALIZE](#generalize)
+* [GUID](#guid)
+* [HASH](#hash)
+* [HOSPITAL](#hospital)
+* [IBAN](#iban)
+* [ICDV9](#icdv9)
+* [ICDV10](#icdv10)
+* [IMEI](#imei)
+* [IP_ADDRESS](#ip_address)
+* [LATITUDE_LONGITUDE](#latitude_longitude)
+* [MAC_ADDRESS](#mac_address)
+* [MAINTAIN](#maintain)
+* [MARITAL](#marital)
+* [NAME](#name)
+* [NULL](#null)
+* [NUMBERVARIANCE](#numbervariance)
+* [OCCUPATION](#occupation)
+* [PHONE](#phone)
+* [PSEUDONYM](#pseudonym)
+* [RACE](#race)
+* [RANDOM](#random)
+* [REDACT](#redact)
+* [RELIGION](#religion)
+* [REPLACE](#replace)
+* [SSN_UK](#ssn_uk)
+* [SSN_US](#ssn_us)
+* [STATE_US](#state_us)
+* [SWIFT](#swift)
+* [URL](#url)
+* [VIN](#vin)
+* [ZIPCODE](#zipcode)
 
-# Data protection methods with configuration options, defaults
+## Data protection methods with configuration options and defaults
 
 The following sections provide information about the various
 field-level data protection methods that are currently supported by the Data
@@ -78,9 +76,9 @@ options and their default values.
 
 >   Masks an Anatomical Therapeutic Chemical (ATC) code with the option to preserve certain levels.
 
-| **Option name**       | **Type** | **Description**            | **Default value** |
-|-----------------------|----------|----------------------------|-------------------|
-|  maskLevelsToKeep     | Integer  | Number of levels to retain | 4                 |
+| **Option name**       | **Type** | **Description**                  | **Default value** |
+|-----------------------|----------|----------------------------------|-------------------|
+|  maskLevelsToKeep     | Integer  | Number of levels to retain (1-4) | 4                 |
 
 #### BINNING
 
@@ -839,7 +837,6 @@ The values in the examples are for demonstration purposes only.
 | **Option name**           | **Type** | **Description**                           | **Default value** |
 |---------------------------|----------|-------------------------------------------|-------------------|
 | maskingAllowUnisex        | Boolean  | Allow unisex names to be used for masking | false             |
-| tokenConsistence          | Boolean  | Provide consistence per token             | false             |
 | maskPseudorandom          | Boolean  | Provide pseudorandom consistence          | false             |
 | maskGenderPreserve        | Boolean  | Preserve gender while masking             | true              |
 
@@ -947,9 +944,9 @@ The named groups countryCode/areaCode are used to identify the position of count
    The length of the computed pseudonym is within an interval, the borders
    of which are defined using these options:
 
->  generateViaOptionsMinLength = \<value\>
+>  generateViaOptionsMinLength
 
->  generateViaOptionsMaxLength = \<value\>
+>  generateViaOptionsMaxLength
 
    To select the types of characters that can be used to produce the
    pseudonym, set the following flags to true or false. Doing this, in
@@ -1132,13 +1129,17 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >   Digits are replaced with randomly-selected digits, and alpha characters are
 >   replaced with random alpha characters. Other characters are preserved, for
 >   example, dashes and commas.
+
 >   If non-English characters are replaced with the maskReplaceWithRandom option,
 >   the characters are replaced with an appropriately-cased Latin letter.
 >   If the character does not have an associated case, such as Chinese or Japanese characters,
 >   it is replaced with an uppercase Latin letter.
 
 >   If neither maskReplaceWithAsterisks nor maskReplaceWithRandom is selected,
->   no masking occurs since there is no specified replacement.
+>   the preserved portion of the value is returned.
+
+>   If a value encountered in the data is not long enough to meet the starting offset
+>   for preservation, null is returned.
 
 | **Option name**          | **Type** | **Description**                                               | **Default value** |
 |--------------------------|----------|---------------------------------------------------------------|-------------------|
@@ -1184,13 +1185,13 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >   Masks URLs with the options to remove the query part, preserve domain
 >   levels, and mask any existing ports and username / passwords.
 
-| **Option name**      | **Type** | **Description**               | **Default value** |
-|----------------------|----------|-------------------------------|-------------------|
-| maskPort             | Boolean  | Mask port                     | false             |
-| maskRemoveQuery      | Boolean  | Remove query part             | false             |
-| preserveDomains      | Integer  | Number of domains to preserve | 1                 |
-| maskUsernamePassword | Boolean  | Mask username and password    | true              |
-| maskMaskQuery        | Boolean  | Mask query part               | false             |
+| **Option name**      | **Type** | **Description**                            | **Default value** |
+|----------------------|----------|--------------------------------------------|-------------------|
+| maskPort             | Boolean  | Mask port                                  | false             |
+| maskRemoveQuery      | Boolean  | Remove query part                          | false             |
+| preserveDomains      | Integer  | Number of domains to preserve (-1 for all) | 1                 |
+| maskUsernamePassword | Boolean  | Mask username and password                 | true              |
+| maskMaskQuery        | Boolean  | Mask query part                            | false             |
 
 #### VIN
 
@@ -1252,7 +1253,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 | maskSuffixReplaceWithValidOnly       | Boolean  | Replace the postal code suffix resulting in valid postal code only                          | false             |
 
 
-### Applying multiple data protection methods to the same data element
+## Applying multiple data protection methods to the same data element
 
    The IBM Data De-Identification Service supports the application of multiple data
    protection methods and rules to a data element. This is a
@@ -1481,7 +1482,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
   In this example, only the HASH (last) privacy provider is applied
   to the gender data element of the Patient FHIR Resource.
 
-### Handling unrecognized input values and exceptions raised by privacy providers
+## Handling unrecognized input values and exceptions raised by privacy providers
 
    Next, this topic describes the operation of the various privacy providers
    that are offered by the Data De-Identification Service in the case of either null
@@ -1507,35 +1508,46 @@ Here are the options and their default values for the PSEUDONYM  provider:
 | unspecifiedValueHandling      | Integer  | Handling options are **1**: return null **2**: return fictionalized value  **3**: return a configured value    | 1                 |
 | unspecifiedValueReturnMessage | String   | Value to be returned when `unspecifiedValueHandling` is set to **3**                                     | **OTHER**         |
 
-   For providers that operate using regular expressions, for example, PHONE NUMBER,
-   SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
-   an unrecognized value is a value that does not conform to the
-   specified regular expression.
+For providers that operate using regular expressions, for example, PHONE NUMBER,
+SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
+an unrecognized value is a value that does not conform to the
+specified regular expression.
 
-   Similarly, for providers that operate using lookup tables, for example, NAME,
-   CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
-   that is not part of the corresponding lookup table that is used by the
-   privacy provider.
+Similarly, for providers that operate using lookup tables, for example, NAME,
+CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
+that is not part of the corresponding lookup table that is used by the
+privacy provider.
 
-   When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
-   **3**), any privacy provider that takes as input an unrecognized data value
-   returns a null value.
+When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
+**3**), any privacy provider that takes as input an unrecognized data value
+returns a null value.
 
-   When `unspecifiedValueHandling` is set to **2**, any privacy provider that
-   takes as input an unrecognized data value returns a randomly-generated,
-   fictionalized value that is valid for the corresponding provider.
+When `unspecifiedValueHandling` is set to **2**, any privacy provider that
+takes as input an unrecognized data value returns a randomly-generated,
+fictionalized value that is valid for the corresponding provider.
 
-   Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
-   as input an unrecognized data value, stores to this value the message
-   that is specified in `unspecifiedValueReturnMessage`.  By default, this
-   message is set to **OTHER**.
+Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
+as input an unrecognized data value, stores to this value the message
+that is specified in `unspecifiedValueReturnMessage`.  By default, this
+message is set to **OTHER**.
 
-   **Exceptions**
+**Exceptions**
 
-   These privacy providers ignore the `unspecifiedValueHandling` option:
-   GENERALIZE, HASH, MAINTAIN, NULL, PSEUDONYM, RANDOM,
-   REDACT, and REPLACE. The URL, NUMVARIANCE, and ATC providers
-   treat option 2 of `unspecifiedValueHandling` the same as option 1.
+These privacy providers ignore the `unspecifiedValueHandling` option:
+* GENERALIZE
+* HASH
+* MAINTAIN
+* NULL
+* PSEUDONYM
+* RANDOM
+* REDACT
+* REPLACE
+   
+These privacy providers treat option 2 of `unspecifiedValueHandling` the same as option 1:
+* ATC
+* BINNING
+* NUMBERVARIANCE   
+* URL
 
 #### Exception handling
 
