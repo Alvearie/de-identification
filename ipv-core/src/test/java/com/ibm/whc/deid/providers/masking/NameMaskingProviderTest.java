@@ -1,15 +1,13 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
@@ -281,47 +279,11 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   }
 
   @Test
-  public void testTokenConsistence() throws Exception {
-    NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setTokenConsistence(true);
-    MaskingProvider mp = new NameMaskingProvider(configuration, tenantId);
-
-    String name1 = "Mary Jane Smith";
-    String name2 = "Mary Smith";
-    String name3 = "Mary J. Smith";
-
-    String masked1 = mp.mask(name1);
-    String masked2 = mp.mask(name2);
-    String masked3 = mp.mask(name3);
-
-    assertNotEquals(masked1, name1);
-    assertNotEquals(masked2, name2);
-    assertNotEquals(masked3, name3);
-
-    assertNotEquals(masked1, masked2);
-    assertNotEquals(masked1, masked3);
-    assertNotEquals(masked2, masked3);
-
-    String[] m1 = masked1.split(" "), m2 = masked2.split(" "), m3 = masked3.split(" ");
-
-    // name
-    assertThat(m1[0], is(m2[0]));
-    assertThat(m1[0], is(m3[0]));
-    assertThat(m2[0], is(m3[0]));
-
-    // surname
-    assertThat(m1[2], is(m2[1]));
-    assertThat(m1[2], is(m3[m3.length - 1]));
-    assertThat(m2[1], is(m3[m3.length - 1]));
-  }
-
-  @Test
   public void pseudoRandom() throws Exception {
     String original1 = "John Doe";
     String original2 = "John James Smith";
 
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setTokenConsistence(false);
     configuration.setMaskPseudorandom(true);
 
     MaskingProvider mp = new NameMaskingProvider(configuration, tenantId);

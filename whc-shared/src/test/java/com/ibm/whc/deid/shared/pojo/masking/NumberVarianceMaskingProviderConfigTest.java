@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -28,43 +28,51 @@ public class NumberVarianceMaskingProviderConfigTest {
     config.setUnspecifiedValueHandling(3);
     config.validate();    
     config.setAugmentLowerBound(-1.0);
-    try {
-      config.validate();
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`augmentLowerBound` must be greater than 0"));
-    }
-    config.setAugmentLowerBound(1.0);
-    config.validate();
-    config.setAugmentUpperBound(-1.0);
-    try {
-      config.validate();
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`augmentUpperBound` must be greater than 0"));
-    }
-    config.setAugmentUpperBound(0.0);
     config.validate();
     config.setAugmentMask(true);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains(
-          "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `augmentMask` is true"));
+      assertTrue(e.getMessage().contains("`augmentLowerBound` must be greater than 0"));
     }
-    config.setAugmentUpperBound(5.0);
+    config.setAugmentLowerBound(2.0);
     config.validate();
+    config.setAugmentMask(false);
+    config.setAugmentUpperBound(-1.0);
+    config.validate();
+    config.setAugmentMask(true);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertTrue(e.getMessage().contains("`augmentUpperBound` must be greater than 0"));
+    }
+    config.setResultWithPrecision(true);
     config.setAugmentUpperBound(1.0);
-    config.setResultWithPrecision(false);
     try {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains(
-          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `resultWithPrecision` is false"));
+          "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `resultWithPrecision` is true"));
     }
-    config.setResultWithPrecision(true);
+    config.setAugmentMask(false);
+    config.validate();
+    config.setAugmentMask(true);
+    config.setAugmentUpperBound(2.0);
+    config.validate();
+    config.setResultWithPrecision(false);
+    try {
+      config.validate();
+      fail("expected exception");      
+    } catch (InvalidMaskingConfigurationException e) {
+      assertTrue(e.getMessage().contains(
+          "`augmentLowerBound` must be less than `augmentUpperBound` when `resultWithPrecision` is false"));
+    }
+    config.setAugmentMask(false);
+    config.validate();
+    config.setAugmentUpperBound(3.0);
     config.validate();
   }
 }

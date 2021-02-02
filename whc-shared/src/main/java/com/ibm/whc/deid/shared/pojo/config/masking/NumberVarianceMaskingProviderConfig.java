@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -88,19 +88,24 @@ public class NumberVarianceMaskingProviderConfig extends MaskingProviderConfig {
   @Override
   public void validate() throws InvalidMaskingConfigurationException {
     super.validate();
-    if (augmentLowerBound < 0.0) {
-      throw new InvalidMaskingConfigurationException("`augmentLowerBound` must be greater than 0");
-    }
-    if (augmentUpperBound < 0.0) {
-      throw new InvalidMaskingConfigurationException("`augmentUpperBound` must be greater than 0");
-    }
-    if (augmentMask && augmentLowerBound > augmentUpperBound) {
-      throw new InvalidMaskingConfigurationException(
-          "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `augmentMask` is true");
-    }
-    if (augmentMask && augmentLowerBound == augmentUpperBound && !resultWithPrecision) {
-      throw new InvalidMaskingConfigurationException(
-          "`augmentUpperBound` must not be equal to `augmentLowerBound` when `resultWithPrecision` is false");
+    if (augmentMask) {
+      if (augmentLowerBound < 0.0) {
+        throw new InvalidMaskingConfigurationException("`augmentLowerBound` must be greater than 0");
+      }
+      if (augmentUpperBound < 0.0) {
+        throw new InvalidMaskingConfigurationException("`augmentUpperBound` must be greater than 0");
+      }
+      if (resultWithPrecision) {
+        if (augmentLowerBound > augmentUpperBound) {
+          throw new InvalidMaskingConfigurationException(
+              "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `resultWithPrecision` is true");
+        }
+      } else {
+        if (augmentLowerBound >= augmentUpperBound) {
+          throw new InvalidMaskingConfigurationException(
+              "`augmentLowerBound` must be less than `augmentUpperBound` when `resultWithPrecision` is false");
+        }
+      }
     }
   }
     

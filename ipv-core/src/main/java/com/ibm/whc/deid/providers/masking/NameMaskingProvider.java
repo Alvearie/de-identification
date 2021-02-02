@@ -18,13 +18,11 @@ import com.ibm.whc.deid.util.NamesManager;
  *
  */
 public class NameMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 3798105506081000286L;
 
   protected NamesManager.NameManager names;
   private final boolean allowUnisex;
-  private final Map<String, String> tokenCache;
-  private final boolean consistent;
   private final boolean genderPreserve;
   private static final String[] initials = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
@@ -38,10 +36,8 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
     this.random = new SecureRandom();
     this.names = new NamesManager.NameManager(null);
     this.allowUnisex = configuration.isMaskingAllowUnisex();
-    this.consistent = configuration.isTokenConsistence();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.tokenCache = this.consistent ? new ConcurrentHashMap<String, String>() : null;
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
@@ -64,64 +60,55 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
       final String maskedToken;
 
-      if (consistent && tokenCache.containsKey(token)) {
-        maskedToken = tokenCache.get(token);
+      if (1 == token.length()) {
+        if (Character.isAlphabetic(token.charAt(0))) {
+          // initial: randomize it
+          maskedToken = initials[random.nextInt(initials.length)];
+        } else {
+          // preserve it
+          maskedToken = token;
+        }
       } else {
-        if (1 == token.length()) {
-          if (Character.isAlphabetic(token.charAt(0))) {
-            // initial: randomize it
-            maskedToken = initials[random.nextInt(initials.length)];
+        FirstName lookup = names.getFirstName(token);
+        if (lookup != null) {
+          if (getPseudorandom) {
+            maskedToken = names.getPseudoRandomFirstName(lookup.getGender(), allowUnisex, token);
+          } else if (!genderPreserve) {
+            if (allowUnisex)
+              maskedToken = names.getRandomFirstNameWithoutPreservingGender(true,
+                  lookup.getNameCountryCode());
+            else
+              maskedToken = names.getRandomFirstNameWithoutPreservingGender(false,
+                  lookup.getNameCountryCode());
           } else {
-            // preserve it
-            maskedToken = token;
+            maskedToken = names.getRandomFirstName(lookup.getGender(), allowUnisex,
+                lookup.getNameCountryCode());
           }
         } else {
-          FirstName lookup = names.getFirstName(token);
-          if (lookup != null) {
+          LastName lookupLastName = names.getLastName(token);
+          if (lookupLastName != null) {
             if (getPseudorandom) {
-              maskedToken = names.getPseudoRandomFirstName(lookup.getGender(), allowUnisex, token);
-            } else if (!genderPreserve) {
-              if (allowUnisex)
-                maskedToken = names.getRandomFirstNameWithoutPreservingGender(true,
-                    lookup.getNameCountryCode());
-              else
-                maskedToken = names.getRandomFirstNameWithoutPreservingGender(false,
-                    lookup.getNameCountryCode());
+              maskedToken = names.getPseudoRandomLastName(token);
             } else {
-              maskedToken = names.getRandomFirstName(lookup.getGender(), allowUnisex,
-                  lookup.getNameCountryCode());
+              maskedToken = names.getRandomLastName(lookupLastName.getNameCountryCode());
             }
           } else {
-            LastName lookupLastName = names.getLastName(token);
-            if (lookupLastName != null) {
+            debugFaultyInput("lookupLastName");
+            if (unspecifiedValueHandling == 2) {
               if (getPseudorandom) {
-                maskedToken = names.getPseudoRandomLastName(token);
+                return builder.append(names.getPseudoRandomFirstName(token)).append(' ')
+                    .append(names.getPseudoRandomLastName(token)).toString().trim();
               } else {
-                maskedToken = names.getRandomLastName(lookupLastName.getNameCountryCode());
+                return builder.append(names.getRandomFirstName()).append(' ')
+                    .append(names.getRandomLastName()).toString().trim();
               }
+            } else if (unspecifiedValueHandling == 3) {
+              return unspecifiedValueReturnMessage;
             } else {
-              debugFaultyInput("lookupLastName");
-              if (unspecifiedValueHandling == 2) {
-                if (getPseudorandom) {
-                  return builder.append(names.getPseudoRandomFirstName(token)).append(' ')
-                      .append(names.getPseudoRandomLastName(token)).toString().trim();
-                } else {
-                  return builder.append(names.getRandomFirstName()).append(' ')
-                      .append(names.getRandomLastName()).toString().trim();
-                }
-              } else if (unspecifiedValueHandling == 3) {
-                return unspecifiedValueReturnMessage;
-              } else {
-                return null;
-              }
+              return null;
             }
           }
         }
-
-        if (consistent)
-          if (maskedToken != null) {
-            tokenCache.put(token, maskedToken);
-          }
       }
 
       builder.append(maskedToken);
