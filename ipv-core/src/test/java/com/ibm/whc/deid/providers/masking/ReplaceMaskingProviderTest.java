@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,8 +23,8 @@ public class ReplaceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMask() {
-		ReplaceMaskingProviderConfig configuration = new ReplaceMaskingProviderConfig();
-		MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
+        ReplaceMaskingProviderConfig configuration = new ReplaceMaskingProviderConfig();
+        MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
     String originalValue = "asdasdad";
     String maskedValue = maskingProvider.mask(originalValue);
     assertTrue(maskedValue.equals("asd"));
@@ -48,6 +48,17 @@ public class ReplaceMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskOffset(10);
     MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
     String originalValue = "asdasdad";
+    String maskedValue = maskingProvider.mask(originalValue);
+    assertEquals(null, maskedValue);
+  }
+
+  @Test
+  public void testMaskOffsetEqualsDataLength() {
+    // check when offset is equal to data length
+    ReplaceMaskingProviderConfig configuration = new ReplaceMaskingProviderConfig();
+    configuration.setMaskOffset(8);
+    MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
+    String originalValue = "12345678";
     String maskedValue = maskingProvider.mask(originalValue);
     assertEquals(null, maskedValue);
   }
