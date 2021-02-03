@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -42,7 +42,7 @@ public class ReplaceMaskingProvider extends AbstractMaskingProvider {
     }
 
     int identifierLength = identifier.length();
-    if (offset > identifierLength) {
+    if (offset >= identifierLength) {
       return null;
     }
 

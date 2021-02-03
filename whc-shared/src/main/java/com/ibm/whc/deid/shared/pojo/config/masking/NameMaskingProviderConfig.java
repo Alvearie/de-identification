@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,7 +17,6 @@ public class NameMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = -1111084929864098883L;
   private boolean maskingAllowUnisex = false;
-  private boolean tokenConsistence = false;
   private boolean maskPseudorandom = false;
   private boolean maskGenderPreserve = true;
 
@@ -31,14 +30,6 @@ public class NameMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setMaskingAllowUnisex(boolean maskingAllowUnisex) {
     this.maskingAllowUnisex = maskingAllowUnisex;
-  }
-
-  public boolean isTokenConsistence() {
-    return tokenConsistence;
-  }
-
-  public void setTokenConsistence(boolean tokenConsistence) {
-    this.tokenConsistence = tokenConsistence;
   }
 
   public boolean isMaskPseudorandom() {
@@ -64,7 +55,6 @@ public class NameMaskingProviderConfig extends MaskingProviderConfig {
     result = prime * result + (maskGenderPreserve ? 1231 : 1237);
     result = prime * result + (maskPseudorandom ? 1231 : 1237);
     result = prime * result + (maskingAllowUnisex ? 1231 : 1237);
-    result = prime * result + (tokenConsistence ? 1231 : 1237);
     return result;
   }
 
@@ -82,8 +72,6 @@ public class NameMaskingProviderConfig extends MaskingProviderConfig {
     if (maskPseudorandom != other.maskPseudorandom)
       return false;
     if (maskingAllowUnisex != other.maskingAllowUnisex)
-      return false;
-    if (tokenConsistence != other.tokenConsistence)
       return false;
     return true;
   }
