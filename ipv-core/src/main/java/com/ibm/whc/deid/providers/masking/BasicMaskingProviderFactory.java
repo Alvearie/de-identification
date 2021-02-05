@@ -8,7 +8,7 @@ package com.ibm.whc.deid.providers.masking;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
@@ -65,45 +65,48 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
  *
  */
 public class BasicMaskingProviderFactory implements Serializable, MaskingProviderFactory {
-  
+
   private static final long serialVersionUID = -7454645556196383954L;
 
-  private final HashMap<String, HashMap<MaskingProviderConfig, MaskingProvider>> maskingProvidersCache;
+  /**
+   * Per-tenant map of masking provider configurations to masking provider objects
+   */
+  private final Map<String,ConcurrentHashMap<MaskingProviderConfig,MaskingProvider>> maskingProvidersCache;
 
   public BasicMaskingProviderFactory() {
-		this(null, null);
+    this(null, null);
   }
 
   /**
-   * Instantiates a new Masking provider factory.
+   * Instantiates a new masking provider factory.
    *
    * @param deidMaskingConfig
    * @param configurationManager the configuration manager
    * @param identifiedTypes the identified types
    */
   public BasicMaskingProviderFactory(DeidMaskingConfig deidMaskingConfig,
-			Map<String, ProviderType> identifiedTypes) {
+      Map<String, ProviderType> identifiedTypes) {
+    // note - NULL is a possible key for this map
     maskingProvidersCache = new HashMap<>();
   }
-
 
   /**
    * Remove masking provider cache for a tenant.
    *
    * @param tenantId
    */
-  public void invalidateCache(String tenantId) {
+  public synchronized void invalidateCache(String tenantId) {
     maskingProvidersCache.remove(tenantId);
   }
 
-  protected HashMap<MaskingProviderConfig, MaskingProvider> getPerTenantCache(String tenantId) {
-    HashMap<MaskingProviderConfig, MaskingProvider> maskingProviders =
+  private synchronized ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> getPerTenantCache(
+      String tenantId) {
+    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviders =
         maskingProvidersCache.get(tenantId);
     if (maskingProviders == null) {
-      maskingProviders = new HashMap<>();
+      maskingProviders = new ConcurrentHashMap<>();
       maskingProvidersCache.put(tenantId, maskingProviders);
     }
-
     return maskingProviders;
   }
 
@@ -111,10 +114,12 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
   public MaskingProvider getProviderFromType(MaskingProviderTypes providerType,
       DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId) {
 
+    // Note - as per documentation of the MaskingProviderFactory interface, allow
+    // NullPointerException to be thrown if providerType or config are null
+    
     // Check the cache first
 
-    HashMap<MaskingProviderConfig, MaskingProvider> maskingProviderCache =
-        getPerTenantCache(tenantId);
+    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviderCache = getPerTenantCache(tenantId);
     MaskingProvider provider = maskingProviderCache.get(config);
     if (provider != null) {
       return provider;
@@ -274,11 +279,9 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
       case ZIPCODE:
         provider = new ZIPCodeMaskingProvider((ZIPCodeMaskingProviderConfig) config, tenantId);
         break;
-
       default:
         throw new IllegalArgumentException("Unsupported provider type" + providerType);
     }
-
     return provider;
   }
 }
