@@ -10,14 +10,11 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
@@ -38,7 +35,7 @@ public class LocalizationManagerTest {
   @Test
   public void getAllResources() throws Exception {
     for (Resource resource : Resource.values()) {
-      if (resource != Resource.PATTERN) {
+      if (resource != Resource.PATTERN && !resource.isAdvanced()) {
         Collection<ResourceEntry> resources = manager.getResources(resource);
 
         assertNotNull(resources);
@@ -74,7 +71,7 @@ public class LocalizationManagerTest {
   @Test
   public void getResourcesWithCountry() throws Exception {
     for (Resource resource : Resource.values()) {
-      if (resource != Resource.PATTERN) {
+      if (resource != Resource.PATTERN && !resource.isAdvanced()) {
         Collection<ResourceEntry> resources =
             manager.getResources(resource, Collections.singleton("us"));
 

@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.util.localization;
 
-import com.ibm.whc.deid.shared.localization.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import com.ibm.whc.deid.shared.localization.Resource;
 
 public class ResourceDescriptionFactory {
   /**
@@ -32,10 +32,6 @@ public class ResourceDescriptionFactory {
         return new ResourceDescription(resource, ResourceFormat.CSV,
             Arrays.asList("delimiter: ','", "quote: '\"'"), "Occupation",
             Arrays.asList("occupation", "category"));
-      case MEDICINES:
-        return new ResourceDescription(resource, ResourceFormat.CSV,
-            Arrays.asList("delimiter: ','", "quote: '\"'"), "Medicines",
-            Arrays.asList("medicine", "category"));
       case MARITAL_STATUS:
         return new ResourceDescription(resource, ResourceFormat.CSV,
             Arrays.asList("delimiter: ','", "quote: '\"'"), "Marital Status",

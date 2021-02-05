@@ -51,13 +51,10 @@ List of the files included:
 │   ├── continents.csv
 │   ├── country_list.csv
 │   ├── credit_card_types.csv
-│   ├── days.csv
-│   ├── dependent.csv
 │   ├── genders.csv
 │   ├── icd_list.csv
 │   ├── icd_v10.csv
 │   ├── marital_status.csv
-│   ├── medicines.csv
 │   ├── months.csv
 │   ├── occupations.csv
 │   ├── phone_country_calling_codes.csv
@@ -76,7 +73,6 @@ List of the files included:
 │   ├── last_names.csv
 │   ├── male_names.csv
 │   ├── marital_status.csv
-│   ├── medicines.csv
 │   ├── occupations.csv
 │   ├── races.csv
 │   └── religions.csv
