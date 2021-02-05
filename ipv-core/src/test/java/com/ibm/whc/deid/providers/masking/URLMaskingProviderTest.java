@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -286,12 +286,12 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskMaskQuery(true);
     MaskingProvider urlMaskingProvider =
         new URLMaskingProvider(configuration, tenantId, deidMaskingConfig);
-    String url = "http://www.nba.com?q=John&q2=Mary&q3=foobar&q4=";
+    String url = "http://www.nba.com?q=John&q2=Mary&q3=foobar&q4=&q5&q6=33&q7=true&state=Montana";
     String maskedResult = urlMaskingProvider.mask(url);
     URL maskedURL = new URL(maskedResult);
     String maskedFile = maskedURL.getFile();
     System.out.println(maskedResult);
-    assertFalse(maskedFile.equals("?q=John"));
+    assertEquals("?q=X&q2=X&q3=X&q4=&q5&q6=X&q7=X&state=X", maskedFile);
   }
 
   @Test
