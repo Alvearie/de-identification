@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -125,6 +126,52 @@ public class LocalizationManager {
 
       logger.logInfo(LogCodes.WPH1009I, enabledCountries.size(), countryCommonMap.size(),
           registeredResources.size());
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+    }
+  }
+
+  /**
+   * Register an advanced custom resource
+   *
+   * @param cl The class loader of the origin package
+   * @param resource The resource type to load
+   * @param localizationProperties The list of available resources per country
+   * @return the boolean
+   */
+  public synchronized void registerResourceForSupportedCountries(Manager manager,
+      Resource resource, String localizationProperties) {
+
+    try (InputStream is = manager.getClass().getResourceAsStream(localizationProperties)) {
+      if (null != is) {
+        Properties properties = new Properties();
+        properties.load(is);
+
+        // Load resource if it has a definition for the given country
+        for (final String country : enabledCountries) {
+          final String path = properties.getProperty(country + '.' + resource.name());
+          if (null != path) {
+            registerResource(Resource.DEPENDENT, country,
+                manager.getClass().getResource(path).getFile());
+          }
+        }
+
+        // Load resource if it has a definition for the given country
+        for (final String country : new HashSet<>(countryCommonMap.values())) {
+          final String path = properties.getProperty(country + '.' + resource.name());
+          if (null != path) {
+            registerResource(Resource.DEPENDENT, country,
+                manager.getClass().getResource(path).getFile());
+          }
+        }
+
+        // Load resource if it has a common definition
+        final String path = properties.getProperty(COMMON + '.' + resource.name());
+        if (null != path) {
+          registerResource(Resource.DEPENDENT, COMMON,
+              manager.getClass().getResource(path).getFile());
+        }
+      }
     } catch (IOException e) {
       logger.logError(LogCodes.WPH1013E, e);
     }
