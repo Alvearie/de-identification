@@ -151,8 +151,7 @@ public class LocalizationManager {
         for (final String country : enabledCountries) {
           final String path = properties.getProperty(country + '.' + resource.name());
           if (null != path) {
-            registerResource(Resource.DEPENDENT, country,
-                manager.getClass().getResource(path).getFile());
+            registerResource(resource, country, path);
           }
         }
 
@@ -160,16 +159,14 @@ public class LocalizationManager {
         for (final String country : new HashSet<>(countryCommonMap.values())) {
           final String path = properties.getProperty(country + '.' + resource.name());
           if (null != path) {
-            registerResource(Resource.DEPENDENT, country,
-                manager.getClass().getResource(path).getFile());
+            registerResource(resource, country, path);
           }
         }
 
         // Load resource if it has a common definition
         final String path = properties.getProperty(COMMON + '.' + resource.name());
         if (null != path) {
-          registerResource(Resource.DEPENDENT, COMMON,
-              manager.getClass().getResource(path).getFile());
+          registerResource(resource, COMMON, path);
         }
       }
     } catch (IOException e) {
