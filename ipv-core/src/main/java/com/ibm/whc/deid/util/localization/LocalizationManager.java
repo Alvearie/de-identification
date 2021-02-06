@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -139,35 +138,33 @@ public class LocalizationManager {
    * @param localizationProperties The list of available resources per country
    * @return the boolean
    */
-  public synchronized void registerResourceForSupportedCountries(Manager manager,
-      Resource resource, String localizationProperties) {
+  public synchronized void registerResourceForSupportedCountries(InputStream localizationProps,
+      Resource resource) {
 
-    try (InputStream is = manager.getClass().getResourceAsStream(localizationProperties)) {
-      if (null != is) {
-        Properties properties = new Properties();
-        properties.load(is);
+    try {
+      Properties properties = new Properties();
+      properties.load(localizationProps);
 
-        // Load resource if it has a definition for the given country
-        for (final String country : enabledCountries) {
-          final String path = properties.getProperty(country + '.' + resource.name());
-          if (null != path) {
-            registerResource(resource, country, path);
-          }
-        }
-
-        // Load resource if it has a definition for the given country
-        for (final String country : new HashSet<>(countryCommonMap.values())) {
-          final String path = properties.getProperty(country + '.' + resource.name());
-          if (null != path) {
-            registerResource(resource, country, path);
-          }
-        }
-
-        // Load resource if it has a common definition
-        final String path = properties.getProperty(COMMON + '.' + resource.name());
+      // Load resource if it has a definition for the given country
+      for (final String country : enabledCountries) {
+        final String path = properties.getProperty(country + '.' + resource.name());
         if (null != path) {
-          registerResource(resource, COMMON, path);
+          registerResource(resource, country, path);
         }
+      }
+
+      // Load resource if it has a definition for the given country
+      for (final String country : new HashSet<>(countryCommonMap.values())) {
+        final String path = properties.getProperty(country + '.' + resource.name());
+        if (null != path) {
+          registerResource(resource, country, path);
+        }
+      }
+
+      // Load resource if it has a common definition
+      final String path = properties.getProperty(COMMON + '.' + resource.name());
+      if (null != path) {
+        registerResource(resource, COMMON, path);
       }
     } catch (IOException e) {
       logger.logError(LogCodes.WPH1013E, e);
