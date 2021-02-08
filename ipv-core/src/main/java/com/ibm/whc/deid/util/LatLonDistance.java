@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,10 +13,20 @@ import com.ibm.whc.deid.models.Location;
 import scala.Tuple2;
 
 /**
- * @param <T> the type parameter
+ * A calculator for distances between points expressed as latitude and longitude coordinates.
  */
 public class LatLonDistance<K extends Location> {
+
   private final Collection<K> locations;
+
+  /**
+   * Instantiates a new distance calculator.
+   *
+   * @param locationList the list of possible locations
+   */
+  public LatLonDistance(Collection<K> locationList) {
+    locations = locationList;
+  }
 
   /**
    * Finds the euclidean distance between two points
@@ -31,27 +41,20 @@ public class LatLonDistance<K extends Location> {
   }
 
   /**
-   * Instantiates a new Lat lon distance calculator.
+   * Find nearest locations to a given starting location.
    *
-   * @param locationList the location list
-   * @throws Exception the exception
+   * @param latitude latitude of starting location
+   * @param longitude longitude of starting location
+   * @param k the number of nearby locations to include in the list
+   * 
+   * @return the non-null list of nearby locations
    */
-  public LatLonDistance(Collection<K> locationList) {
-    locations = locationList;
-  }
+  public List<K> findNearestK(double latitude, double longitude, int k) {
 
-  /**
-   * Find nearest k list.
-   *
-   * @param coordinates the coordinates
-   * @param k the k
-   * @return the list
-   */
-  public List<K> findNearestK(double[] coordinates, int k) {
-    LatitudeLongitude current = new LatitudeLongitude(coordinates[0], coordinates[1]);
+    LatitudeLongitude current = new LatitudeLongitude(latitude, longitude);
 
     // Find the euclidean distance between this point and others
-    List<Tuple2<Double, K>> closest = new ArrayList<>();
+    List<Tuple2<Double, K>> closest = new ArrayList<>(locations.size());
     for (K l : locations) {
       Double result = euclidean(l.getLocation(), current);
       closest.add(new Tuple2<Double, K>(result, l));
@@ -62,15 +65,16 @@ public class LatLonDistance<K extends Location> {
       return element1._1().compareTo(element2._1());
     });
 
-
     closest.removeIf(i -> (i._1().equals(0.0)));
+
     // Return the first k records
-
     if (k > closest.size()) {
-      k = closest.size() - 1;
+      k = closest.size();
     }
-
-    List<K> toReturn = new ArrayList<>();
+    if (k < 0) {
+      k = 0;
+    }
+    List<K> toReturn = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
       toReturn.add(closest.get(i)._2());
     }
@@ -79,10 +83,6 @@ public class LatLonDistance<K extends Location> {
   }
 
   public List<K> findNearestK(K l, int k) {
-    double[] location = new double[2];
-    location[0] = l.getLocation().getLatitude();
-    location[1] = l.getLocation().getLongitude();
-
-    return findNearestK(location, k);
+    return findNearestK(l.getLocation().getLatitude(), l.getLocation().getLongitude(), k);
   }
 }

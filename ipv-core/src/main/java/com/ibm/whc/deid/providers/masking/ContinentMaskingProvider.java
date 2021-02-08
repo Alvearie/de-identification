@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,7 +25,7 @@ import com.ibm.whc.deid.util.ManagerFactory;
  *
  */
 public class ContinentMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -4463664508295286291L;
 
   protected CountryManager countryManager;
@@ -55,8 +55,7 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
           (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null);
 
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null,
-          Resource.CITY, null);
+          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
 
       initialized = true;
     }
@@ -73,7 +72,7 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
     RelationshipOperand relationshipOperand = fieldRelationship.getOperands()[0];
 
-    String operandFieldName = fieldRelationship.getOperands()[0].getName();
+    String operandFieldName = relationshipOperand.getName();
     String operandMaskedValue = values.get(operandFieldName).getMasked();
 
     if (relationshipOperand.getType() == ProviderType.COUNTRY) {
@@ -87,8 +86,8 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
       if (country == null) {
         return mask(identifier);
       }
-
       return country.getContinent();
+
     } else if (relationshipOperand.getType() == ProviderType.CITY) {
       City city = cityManager.getKey(operandMaskedValue);
       if (city != null) {
@@ -98,7 +97,6 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
           return country.getContinent();
         }
       }
-
       return mask(identifier);
     }
 
@@ -114,16 +112,12 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
         return null;
       }
 
-      if (getClosest) {
-        return continentManager.getClosestContinent(identifier, getClosestK);
-      }
-
       Continent continent = continentManager.getKey(identifier);
-
       if (continent == null) {
         debugFaultyInput("continent");
         if (unspecifiedValueHandling == 2) {
-          return continentManager.getRandomKey();
+          Continent randomContinent = continentManager.getRandomValue();
+          return randomContinent == null ? null : randomContinent.getName();
         } else if (unspecifiedValueHandling == 3) {
           return unspecifiedValueReturnMessage;
         } else {
@@ -131,7 +125,13 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
         }
       }
 
-      return continentManager.getRandomKey(continent.getNameCountryCode());
+      if (getClosest) {
+        Continent selected = continentManager.getClosestContinent(continent, getClosestK);
+        return selected == null ? null : selected.getName();
+      }
+
+      Continent randomContinent = continentManager.getRandomValue(continent.getNameCountryCode());
+      return randomContinent == null ? null : randomContinent.getName();
 
     } catch (Exception e) {
       logException(e);
