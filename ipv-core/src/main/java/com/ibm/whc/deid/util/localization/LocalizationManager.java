@@ -133,9 +133,8 @@ public class LocalizationManager {
   /**
    * Register an advanced custom resource
    *
-   * @param cl The class loader of the origin package
+   * @param localizationProps The list of available resources per country
    * @param resource The resource type to load
-   * @param localizationProperties The list of available resources per country
    * @return the boolean
    */
   public synchronized void registerResourceForSupportedCountries(InputStream localizationProps,
