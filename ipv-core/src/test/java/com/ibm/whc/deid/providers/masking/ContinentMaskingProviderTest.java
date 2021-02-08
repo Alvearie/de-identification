@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,20 +8,17 @@ package com.ibm.whc.deid.providers.masking;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.junit.Ignore;
 import org.junit.Test;
+import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
@@ -30,65 +27,35 @@ import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.schema.RelationshipOperand;
 import com.ibm.whc.deid.schema.RelationshipType;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
-import com.ibm.whc.deid.util.Readers;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
+import com.ibm.whc.deid.util.ContinentManager;
 
 public class ContinentMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  /*
-   * Tests for continent mask closest and closestK options and their respective values. It also
-   * tests for localization and compound masking value.
-   */
-
-  @Test
-  public void testMask() throws Exception {
-    // By default, the continent mask closest flag is false and closestK is
-    // 5.
-    ContinentMaskingProviderConfig maskingConfiguration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(maskingConfiguration, tenantId);
-
-    // different values
-    String originalContinent = "Europe";
-    String maskedContinent = maskingProvider.mask(originalContinent);
-    assertFalse(originalContinent.equals(maskedContinent));
-  }
 
   @Test
   public void testLocalization() throws Exception {
     // this test assumes that GR is loaded by default
     // By default, the continent mask closest flag is false and closestK is
     // 5.
-
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
 
-    // different values
-    String originalContinent = "Europe";
-    String maskedContinent = maskingProvider.mask(originalContinent);
-    assertFalse(originalContinent.equals(maskedContinent));
-
-    String greekContinent = "Ευρώπη";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
-        .getResources(Resource.CONTINENT, Arrays.asList(new String[] {"gr"}));
-    Set<String> greekCities = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekCities.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
+    ContinentManager manager = new ContinentManager(tenantId);
+    Collection<Continent> greekContinents = manager.getValues("gr");
+    assertNotNull(greekContinents);
+    assertTrue(greekContinents.size() > 2);
+    HashSet<String> greekContinentNames = new HashSet<>(greekContinents.size() * 2);
+    for (Continent c : greekContinents) {
+      greekContinentNames.add(c.getName());
     }
 
+    String greekContinent = "Ευρώπη";
     for (int i = 0; i < 100; i++) {
-      maskedContinent = maskingProvider.mask(greekContinent);
-      assertTrue(greekCities.contains(maskedContinent.toUpperCase()));
+      String masked = maskingProvider.mask(greekContinent);
+      assertNotNull(masked);
+      assertTrue(
+          "unexpected name " + masked + " - should be one of " + greekContinentNames.toString(),
+          greekContinentNames.contains(masked));
     }
   }
 
@@ -96,18 +63,16 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskClosest() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setMaskClosest(true);
-    configuration.setMaskClosestK(2);
+    configuration.setMaskClosestK(4);
     MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
 
     String originalContinent = "Europe";
-
-    String[] validNeighbors = {"Europe", "Africa"};
-
-    List<String> neighborsList = Arrays.asList(validNeighbors);
+    HashSet<String> validNeighbors =
+        new HashSet<>(Arrays.asList("Africa", "Asia", "South America", "North America"));
 
     for (int i = 0; i < 100; i++) {
       String maskedContinent = maskingProvider.mask(originalContinent);
-      assertTrue(neighborsList.contains(maskedContinent));
+      assertTrue(validNeighbors.contains(maskedContinent));
     }
   }
 
@@ -188,6 +153,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
+    assertNotNull(maskedContinent);
     assertFalse(maskedContinent.equals(invalidContinent));
     assertTrue(identifier.isOfThisType(maskedContinent));
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));

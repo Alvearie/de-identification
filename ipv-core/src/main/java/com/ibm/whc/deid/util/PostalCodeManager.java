@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,7 +16,6 @@ import java.util.Map;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.LatitudeLongitude;
-import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -25,14 +24,14 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 public class PostalCodeManager implements Manager, Serializable {
-  /** */
+
   private static final long serialVersionUID = -5126260477789733871L;
 
   protected static final Collection<ResourceEntry> resourceList =
       LocalizationManager.getInstance().getResources(Resource.POSTAL_CODES);
   protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
-  protected List<Location> postalCodeList;
-  private LatLonDistance latLonTree = null;
+  protected List<PostalCode> postalCodeList;
+  private LatLonDistance<PostalCode> latLonTree = null;
 
   private static LogManager logger = LogManager.getInstance();
   protected final Resource resourceType = Resource.POSTAL_CODES;
@@ -49,7 +48,7 @@ public class PostalCodeManager implements Manager, Serializable {
     this.postalCodeMap.setKeyList();
 
     try {
-      this.latLonTree = new LatLonDistance(postalCodeList);
+      this.latLonTree = new LatLonDistance<>(postalCodeList);
     } catch (Exception e) {
       logger.logError(LogCodes.WPH1013E, e);
     }
@@ -97,7 +96,7 @@ public class PostalCodeManager implements Manager, Serializable {
   public String getPseudorandom(String identifier) {
     int position =
         (int) (Math.abs(HashUtils.longFromHash(identifier)) % this.postalCodeList.size());
-    return ((PostalCode) this.postalCodeList.get(position)).getName();
+    return this.postalCodeList.get(position).getName();
   }
 
   /**
@@ -107,7 +106,6 @@ public class PostalCodeManager implements Manager, Serializable {
    * @param k the k
    * @return the closest postal codes
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public List<PostalCode> getClosestPostalCodes(String postalCode, int k) {
     String key = postalCode.toUpperCase();
     PostalCode lookup = this.postalCodeMap.getMap().get(key);
@@ -117,18 +115,17 @@ public class PostalCodeManager implements Manager, Serializable {
     }
 
     LatitudeLongitude latlon = lookup.getLocation();
-    double[] latlonKey = new double[] {latlon.getLatitude(), latlon.getLongitude(), 0};
 
-    return (ArrayList) this.latLonTree.findNearestK(latlonKey, k);
+    return this.latLonTree.findNearestK(latlon.getLatitude(), latlon.getLongitude(), k);
   }
 
   @Override
-public String getRandomKey() {
+  public String getRandomKey() {
     return this.postalCodeMap.getRandomKey();
   }
 
   @Override
-public boolean isValidKey(String postalCode) {
+  public boolean isValidKey(String postalCode) {
     return postalCodeMap.getMap().containsKey(postalCode.toUpperCase());
   }
 
