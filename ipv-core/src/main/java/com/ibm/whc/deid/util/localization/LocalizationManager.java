@@ -132,7 +132,7 @@ public class LocalizationManager {
   }
 
   /**
-   * Register an advanced custom resource
+   * Register a single resource type described in a property file
    *
    * @param localizationProps The list of available resources per country
    * @param resource The resource type to load
