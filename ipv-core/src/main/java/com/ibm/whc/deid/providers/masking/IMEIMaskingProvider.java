@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,34 +10,57 @@ import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
 import com.ibm.whc.deid.util.IMEIManager;
 import com.ibm.whc.deid.util.RandomGenerators;
 
+/**
+ * Privacy provider to mask International Mobile Equipment Identity (IMEI) device identifiers.
+ */
 public class IMEIMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -5189348513611132622L;
 
-  private static final IMEIIdentifier identifier = new IMEIIdentifier();
+  private static final IMEIIdentifier imeiIdentifier = new IMEIIdentifier();
   private static final IMEIManager imeiManager = new IMEIManager();
+
   private final boolean preserveTAC;
+  private final int unspecifiedValueHandling;
+  private final String unspecifiedValueReturnMessage;
 
   /**
-   * Instantiates a new Imei masking provider.
+   * Instantiates a new IMEI masking provider.
    *
-   * @param config an IMEIMaskingProviderConfig instance
+   * @param config privacy provider configuration
    */
   public IMEIMaskingProvider(IMEIMaskingProviderConfig config) {
     this.preserveTAC = config.getPreserveTAC();
+    unspecifiedValueHandling = config.getUnspecifiedValueHandling();
+    unspecifiedValueReturnMessage = config.getUnspecifiedValueReturnMessage();
   }
 
   @Override
   public String mask(String identifier) {
-    String tac;
-    if (!IMEIMaskingProvider.identifier.isOfThisType(identifier)) {
+
+    if (identifier == null) {
+      debugFaultyInput("null");
       return null;
-    } else {
-      if (!this.preserveTAC) {
-        tac = imeiManager.getRandomKey();
+    }
+
+    boolean preserve = this.preserveTAC;
+
+    if (!IMEIMaskingProvider.imeiIdentifier.isOfThisType(identifier)) {
+      debugFaultyInput("imei");
+      if (unspecifiedValueHandling == 2) {
+        preserve = false;
+      } else if (unspecifiedValueHandling == 3) {
+        return unspecifiedValueReturnMessage;
       } else {
-        tac = identifier.substring(0, 8);
+        return null;
       }
+    }
+
+    String tac;
+    if (!preserve) {
+      tac = imeiManager.getRandomKey();
+    } else {
+      tac = identifier.substring(0, 8);
     }
 
     String body = tac + RandomGenerators.generateRandomDigitSequence(6);
