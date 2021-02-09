@@ -19,6 +19,7 @@ import java.util.Set;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -60,16 +61,16 @@ public class MSISDNManager implements Serializable {
     readResources(Resource.PHONE_NUM_DIGITS, tenantId);
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
-    switch (resourceType) {
-      case PHONE_CALLING_CODES:
+  protected void readResources(Resources resourceType, String tenantId) {
+    switch (resourceType.name()) {
+      case "PHONE_CALLING_CODES":
         this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
         this.countryCodeMap.setKeyList();
         break;
-      case PHONE_AREA_CODES:
+      case "PHONE_AREA_CODES":
         this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
         break;
-      case PHONE_NUM_DIGITS:
+      case "PHONE_NUM_DIGITS":
         this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
         break;
       default:

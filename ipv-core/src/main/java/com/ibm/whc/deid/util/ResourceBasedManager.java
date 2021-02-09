@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.ibm.whc.deid.models.LocalizedEntity;
-import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -30,7 +30,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
 
   protected final String tenantId;
 
-  protected final Resource resourceType;
+  protected final Resources resourceType;
 
   static final LogManager logger = LogManager.getInstance();
 
@@ -112,7 +112,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
    *
    * @param tenantId tenant id
    */
-  public ResourceBasedManager(String tenantId, Resource resourceType) {
+  public ResourceBasedManager(String tenantId, Resources resourceType) {
     this.tenantId = tenantId;
     this.resourceType = resourceType;
     init();
@@ -132,7 +132,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
     postInit();
   }
 
-  public Map<String, Map<String, K>> readResources(Resource resourceType, String tenantId) {
+  public Map<String, Map<String, K>> readResources(Resources resourceType, String tenantId) {
     return readResourcesFromFile(getResources());
   }
 

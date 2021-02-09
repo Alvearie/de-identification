@@ -35,7 +35,7 @@ public class LocalizationManagerTest {
   @Test
   public void getAllResources() throws Exception {
     for (Resource resource : Resource.values()) {
-      if (resource != Resource.PATTERN && !resource.isAdvanced()) {
+      if (resource != Resource.PATTERN) {
         Collection<ResourceEntry> resources = manager.getResources(resource);
 
         assertNotNull(resources);
@@ -71,7 +71,7 @@ public class LocalizationManagerTest {
   @Test
   public void getResourcesWithCountry() throws Exception {
     for (Resource resource : Resource.values()) {
-      if (resource != Resource.PATTERN && !resource.isAdvanced()) {
+      if (resource != Resource.PATTERN) {
         Collection<ResourceEntry> resources =
             manager.getResources(resource, Collections.singleton("us"));
 

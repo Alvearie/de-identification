@@ -15,6 +15,7 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -32,7 +33,7 @@ public class ICDv9Manager implements Manager, Serializable {
   protected final MapWithRandomPick<String, ICD> icdByNameMap;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.ICDV9;
+  protected final Resources resourceType = Resource.ICDV9;
 
   protected final String tenantId;
 
@@ -52,7 +53,7 @@ public class ICDv9Manager implements Manager, Serializable {
     this.icdByNameMap.setKeyList();
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     readICDList(resourceICDList);
   }
 

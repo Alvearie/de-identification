@@ -5,7 +5,7 @@
  */
 package com.ibm.whc.deid.shared.localization;
 
-public enum Resource {
+public enum Resource implements Resources {
   /** Public suffix list resource. */
   PUBLIC_SUFFIX_LIST,
   /** Swift resource. */
@@ -57,35 +57,10 @@ public enum Resource {
   /** types of stree. eg. St./blvd/Ave */
   STREET_TYPES,
   /** UK Social Security Number prefix. eg AB/ZE/YR */
-  SSNUK_PREFIXES,
-  /** Medicines resource. */
-  MEDICINES {
-    @Override
-    public boolean isAdvanced() {
-      return true;
-    };
-  },
-  /** Show dependent relationship. eg. daughter/son/wife */
-  DEPENDENT {
-    @Override
-    public boolean isAdvanced() {
-      return true;
-    };
-  },
-  /** Identifying day of the week. eg. Monday/Tuesday */
-  DAY {
-    @Override
-    public boolean isAdvanced() {
-      return true;
-    };
-  };
+  SSNUK_PREFIXES;
 
   @Override
   public String toString() {
     return name().toLowerCase();
-  }
-
-  public boolean isAdvanced() {
-    return false;
   }
 }
