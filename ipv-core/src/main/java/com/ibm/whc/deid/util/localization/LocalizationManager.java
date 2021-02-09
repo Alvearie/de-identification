@@ -136,7 +136,6 @@ public class LocalizationManager {
    *
    * @param localizationProps The list of available resources per country
    * @param resource The resource type to load
-   * @return the boolean
    */
   public synchronized void registerResourceForSupportedCountries(InputStream localizationProps,
       Resources resource) {
