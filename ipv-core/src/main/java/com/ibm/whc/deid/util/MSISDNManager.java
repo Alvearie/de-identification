@@ -62,20 +62,22 @@ public class MSISDNManager implements Serializable {
   }
 
   protected void readResources(Resources resourceType, String tenantId) {
-    switch (resourceType.name()) {
-      case "PHONE_CALLING_CODES":
-        this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
-        this.countryCodeMap.setKeyList();
-        break;
-      case "PHONE_AREA_CODES":
-        this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
-        break;
-      case "PHONE_NUM_DIGITS":
-        this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
-        break;
-      default:
-        // do nothing
-    }
+    if (resourceType instanceof Resource) {
+      switch ((Resource) resourceType) {
+        case PHONE_CALLING_CODES:
+          this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
+          this.countryCodeMap.setKeyList();
+          break;
+        case PHONE_AREA_CODES:
+          this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
+          break;
+        case PHONE_NUM_DIGITS:
+          this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
+          break;
+        default:
+          // do nothing
+      }
+    } // else do nothing
   }
 
   protected Map<? extends String, ? extends Set<String>> readAreaCodeListFromFile(

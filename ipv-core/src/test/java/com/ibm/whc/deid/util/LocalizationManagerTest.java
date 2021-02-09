@@ -16,6 +16,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 
@@ -34,7 +35,7 @@ public class LocalizationManagerTest {
 
   @Test
   public void getAllResources() throws Exception {
-    for (Resource resource : Resource.values()) {
+    for (Resources resource : Resource.values()) {
       if (resource != Resource.PATTERN) {
         Collection<ResourceEntry> resources = manager.getResources(resource);
 
@@ -70,7 +71,7 @@ public class LocalizationManagerTest {
 
   @Test
   public void getResourcesWithCountry() throws Exception {
-    for (Resource resource : Resource.values()) {
+    for (Resources resource : Resource.values()) {
       if (resource != Resource.PATTERN) {
         Collection<ResourceEntry> resources =
             manager.getResources(resource, Collections.singleton("us"));

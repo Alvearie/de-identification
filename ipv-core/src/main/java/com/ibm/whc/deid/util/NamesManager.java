@@ -19,6 +19,7 @@ import com.ibm.whc.deid.models.FirstName;
 import com.ibm.whc.deid.models.Gender;
 import com.ibm.whc.deid.models.LastName;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -37,7 +38,7 @@ public class NamesManager implements Serializable {
     /** */
     private static final long serialVersionUID = -4285989384152952167L;
 
-    protected NameResourceBasedManager(String tenantId, Resource resourceType) {
+    protected NameResourceBasedManager(String tenantId, Resources resourceType) {
       super(tenantId, resourceType);
     }
 

@@ -85,7 +85,7 @@ public class LocalizationManager {
           }
         }
 
-        for (final Resource resource : Resource.values()) {
+        for (final Resources resource : Resource.values()) {
           // logger.debug("Adding localization for {}", resource);
 
           // initialize resources
@@ -217,19 +217,21 @@ public class LocalizationManager {
     if (null == knownEntries)
       return entries;
 
-    switch (resource.name()) {
-      case "ATC_CODES":
-      case "TACDB":
-      case "PUBLIC_SUFFIX_LIST":
-      case "GENERALIZE":
-        return Collections.singletonList(knownEntries.get(COMMON));
-      case "PHONE_NUM_DIGITS":
-        return Collections.singletonList(knownEntries.get(COMMON));
+    if (resource instanceof Resource) {
+      switch ((Resource) resource) {
+        case ATC_CODES:
+        case TACDB:
+        case PUBLIC_SUFFIX_LIST:
+        case GENERALIZE:
+          return Collections.singletonList(knownEntries.get(COMMON));
+        case PHONE_NUM_DIGITS:
+          return Collections.singletonList(knownEntries.get(COMMON));
 
-      default:
-        // fall through and let the following code handle it.
-        break;
-    }
+        default:
+          // fall through and let the following code handle it.
+          break;
+      }
+    } // else go through code below as generic Resources
 
     for (String country : countries) {
       // logger.debug("Retriving country {}", country);

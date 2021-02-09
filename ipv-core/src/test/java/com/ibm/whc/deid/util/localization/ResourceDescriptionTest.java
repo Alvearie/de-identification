@@ -7,13 +7,13 @@ package com.ibm.whc.deid.util.localization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import com.ibm.whc.deid.shared.localization.Resource;
 import java.util.Collections;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 
 public class ResourceDescriptionTest {
-  private static final Resource RESOURCE = Resource.CITY;
+  private static final Resources RESOURCE = Resource.CITY;
   private static final ResourceFormat RESOURCE_FORMAT = ResourceFormat.CSV;
   private static final String DESCRIPTION = "description";
 
