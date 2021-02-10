@@ -18,6 +18,7 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -34,7 +35,7 @@ public class PostalCodeManager implements Manager, Serializable {
   private LatLonDistance<PostalCode> latLonTree = null;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.POSTAL_CODES;
+  protected final Resources resourceType = Resource.POSTAL_CODES;
 
   protected final String tenantId;
 
@@ -55,7 +56,7 @@ public class PostalCodeManager implements Manager, Serializable {
 
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     this.postalCodeMap.getMap().putAll(readPostalCodeCodeListFromFile(resourceList));
   }
 

@@ -65,4 +65,13 @@ public class ResourceEntry {
   public String getCountryCode() {
     return countryCode;
   }
+
+  /**
+   * Returns the resource file name
+   * 
+   * @return file name for resource entry
+   */
+  public String getFilename() {
+    return filename;
+  }
 }

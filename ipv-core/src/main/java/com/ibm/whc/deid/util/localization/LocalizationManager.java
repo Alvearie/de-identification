@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -27,7 +28,7 @@ public class LocalizationManager {
   /** The constant enabledCountries. */
   private static Collection<String> enabledCountries = new ArrayList<>();
 
-  private final Map<Resource, Map<String, ResourceEntry>> registeredResources;
+  private final Map<Resources, Map<String, ResourceEntry>> registeredResources;
   private final Map<String, String> countryCommonMap;
   private final Map<String, Properties> countryLocalizationOptions;
 
@@ -84,7 +85,7 @@ public class LocalizationManager {
           }
         }
 
-        for (final Resource resource : Resource.values()) {
+        for (final Resources resource : Resource.values()) {
           // logger.debug("Adding localization for {}", resource);
 
           // initialize resources
@@ -130,7 +131,46 @@ public class LocalizationManager {
     }
   }
 
-  private synchronized boolean registerResource(Resource resource, ResourceEntry entry) {
+  /**
+   * Register a single resource type described in a property file
+   *
+   * @param localizationProps The list of available resources per country
+   * @param resource The resource type to load
+   */
+  public synchronized void registerResourceForSupportedCountries(InputStream localizationProps,
+      Resources resource) {
+
+    try {
+      Properties properties = new Properties();
+      properties.load(localizationProps);
+
+      // Load resource if it has a definition for the given country
+      for (final String country : enabledCountries) {
+        final String path = properties.getProperty(country + '.' + resource.name());
+        if (null != path) {
+          registerResource(resource, country, path);
+        }
+      }
+
+      // Load resource if it has a definition for the given country
+      for (final String country : new HashSet<>(countryCommonMap.values())) {
+        final String path = properties.getProperty(country + '.' + resource.name());
+        if (null != path) {
+          registerResource(resource, country, path);
+        }
+      }
+
+      // Load resource if it has a common definition
+      final String path = properties.getProperty(COMMON + '.' + resource.name());
+      if (null != path) {
+        registerResource(resource, COMMON, path);
+      }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+    }
+  }
+
+  private synchronized boolean registerResource(Resources resource, ResourceEntry entry) {
     Map<String, ResourceEntry> entries = this.registeredResources.get(resource);
 
     if (entries == null) {
@@ -151,7 +191,7 @@ public class LocalizationManager {
    * @param filename the filename
    * @return the boolean
    */
-  public synchronized boolean registerResource(Resource resource, String countryCode,
+  public synchronized boolean registerResource(Resources resource, String countryCode,
       String filename) {
     return registerResource(resource,
         new ResourceEntry(filename, countryCode, ResourceEntryType.EXTERNAL_FILENAME));
@@ -164,7 +204,7 @@ public class LocalizationManager {
    * @param countries the countries
    * @return the resources
    */
-  public Collection<ResourceEntry> getResources(Resource resource, Collection<String> countries) {
+  public Collection<ResourceEntry> getResources(Resources resource, Collection<String> countries) {
     // logger.debug("Requesting {} for {}", resource,
     // Arrays.toString(countries.toArray()));
 
@@ -176,19 +216,21 @@ public class LocalizationManager {
     if (null == knownEntries)
       return entries;
 
-    switch (resource) {
-      case ATC_CODES:
-      case TACDB:
-      case PUBLIC_SUFFIX_LIST:
-      case GENERALIZE:
-        return Collections.singletonList(knownEntries.get(COMMON));
-      case PHONE_NUM_DIGITS:
-        return Collections.singletonList(knownEntries.get(COMMON));
+    if (resource instanceof Resource) {
+      switch ((Resource) resource) {
+        case ATC_CODES:
+        case TACDB:
+        case PUBLIC_SUFFIX_LIST:
+        case GENERALIZE:
+          return Collections.singletonList(knownEntries.get(COMMON));
+        case PHONE_NUM_DIGITS:
+          return Collections.singletonList(knownEntries.get(COMMON));
 
-      default:
-        // fall through and let the following code handle it.
-        break;
-    }
+        default:
+          // fall through and let the following code handle it.
+          break;
+      }
+    } // else go through code below as generic Resources
 
     for (String country : countries) {
       // logger.debug("Retriving country {}", country);
@@ -234,7 +276,7 @@ public class LocalizationManager {
    * @param resource the resource
    * @return the resources
    */
-  public Collection<ResourceEntry> getResources(Resource resource) {
+  public Collection<ResourceEntry> getResources(Resources resource) {
     return getResources(resource, enabledCountries);
   }
 

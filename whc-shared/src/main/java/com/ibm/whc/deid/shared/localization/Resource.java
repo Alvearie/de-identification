@@ -5,7 +5,7 @@
  */
 package com.ibm.whc.deid.shared.localization;
 
-public enum Resource {
+public enum Resource implements Resources {
   /** Public suffix list resource. */
   PUBLIC_SUFFIX_LIST,
   /** Swift resource. */
@@ -42,8 +42,6 @@ public enum Resource {
   LAST_NAME,
   /** Atc codes resource. */
   ATC_CODES,
-  /** Medicines resource. */
-  MEDICINES,
   /** Ic dv 10 resource. */
   ICDV10,
   /** Ic dv 9 resource. */
@@ -54,21 +52,12 @@ public enum Resource {
   TACDB,
   /** RACE_ETHNICITY resource */
   RACE_ETHNICITY,
-
   /** States us resource. */
-	STATES_US, GENDER, COUNTY, ZIPCODE, GENERALIZE, PATTERN, PHONE_NUM_DIGITS,
-
+  STATES_US, GENDER, COUNTY, ZIPCODE, GENERALIZE, PATTERN, PHONE_NUM_DIGITS,
   /** types of stree. eg. St./blvd/Ave */
   STREET_TYPES,
-
-  /** Show dependent relationship. eg. daughter/son/wife */
-  DEPENDENT,
-
-  /** Identifying day of the week. eg. Monday/Tuesday */
-  DAY,
-
-	/** UK Social Security Number prefix. eg AB/ZE/YR */
-	SSNUK_PREFIXES;
+  /** UK Social Security Number prefix. eg AB/ZE/YR */
+  SSNUK_PREFIXES;
 
   @Override
   public String toString() {

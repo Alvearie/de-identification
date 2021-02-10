@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.util.localization;
 
-import com.ibm.whc.deid.shared.localization.Resource;
 import java.util.Collection;
+import com.ibm.whc.deid.shared.localization.Resources;
 
 public class ResourceDescription {
-  private final Resource resource;
+  private final Resources resource;
   private final ResourceFormat format;
   private final String description;
   private Collection<String> fieldDescriptions;
@@ -19,7 +19,7 @@ public class ResourceDescription {
    *
    * @return the resource
    */
-  public Resource getResource() {
+  public Resources getResource() {
     return resource;
   }
 
@@ -59,7 +59,7 @@ public class ResourceDescription {
    * @param description the description
    * @param fieldDescriptions the field descriptions
    */
-  public ResourceDescription(Resource resource, ResourceFormat format,
+  public ResourceDescription(Resources resource, ResourceFormat format,
       Collection<String> formatOptions, String description, Collection<String> fieldDescriptions) {
     this.resource = resource;
     this.format = format;

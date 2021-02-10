@@ -82,7 +82,6 @@ public class BuiltInIdentifierFactory {
 		default:
 			throw new IllegalArgumentException("Unknown type " + type);
 		}
-
 	}
 
 	public Collection<Identifier> getAvailableIdentifiers(String tenantId) {

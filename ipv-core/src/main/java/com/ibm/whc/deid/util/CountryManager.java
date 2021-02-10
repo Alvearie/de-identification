@@ -18,6 +18,7 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -28,7 +29,7 @@ public class CountryManager extends AbstractManager<Country>
     implements Serializable {
   /** */
   private static final long serialVersionUID = -1974159797966269524L;
-  protected final Resource resourceType = Resource.COUNTRY;
+  protected final Resources resourceType = Resource.COUNTRY;
   protected final Collection<ResourceEntry> resourceCountryList =
       LocalizationManager.getInstance().getResources(resourceType);
   protected final SecureRandom random;
@@ -72,7 +73,7 @@ public class CountryManager extends AbstractManager<Country>
     this.distanceCalc = new LatLonDistance(getItemList());
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     readCountryListFromFile(resourceCountryList);
   }
 

@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -33,7 +34,7 @@ public class VINManager implements Manager, Serializable {
   protected final char[] excludedCharacters = {'I', 'O', 'Q', 'i', 'o', 'q'};
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
+  protected final Resources resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
 
   protected final String tenantId;
 
@@ -60,7 +61,7 @@ public class VINManager implements Manager, Serializable {
     }
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     this.wmiMap.putAll(readWMIListFromFile(resourceWMIList));
   }
 
