@@ -56,13 +56,7 @@ public class IMEIMaskingProvider extends AbstractMaskingProvider {
       }
     }
 
-    String tac;
-    if (!preserve) {
-      tac = imeiManager.getRandomKey();
-    } else {
-      tac = identifier.substring(0, 8);
-    }
-
+    String tac = preserve ? identifier.substring(0, 8) : imeiManager.getRandomKey();
     String body = tac + RandomGenerators.generateRandomDigitSequence(6);
     body += (char) ('0' + RandomGenerators.luhnCheckDigit(body));
 
