@@ -256,13 +256,25 @@ public class MaskingConfigUtils {
         int providerOffset = 0;
         for (MaskingProviderConfig provider : providers) {
           if (provider == null) {
-            throw new InvalidMaskingConfigurationException(
-                "invalid masking configuration: the masking provider at offset " + providerOffset
-                    + " in `" + Rule.PROVIDERS_PROPERTY_NAME + "` for the rule with `"
-                    + Rule.NAME_PROPERTY_NAME + "` value `" + ruleName + "` in `"
-                    + DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME + "` is null",
-                DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME + "."
-                    + Rule.PROVIDERS_PROPERTY_NAME);
+            StringBuilder buffer = new StringBuilder(200);
+            buffer.append(DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME);
+            buffer.append('.');
+            buffer.append(Rule.PROVIDERS_PROPERTY_NAME);
+            String location = buffer.toString();
+            buffer.setLength(0);
+            buffer.append("invalid masking configuration: the ");
+            buffer.append(providerOffset == 0 ? "first" : "second");
+            buffer.append(" masking provider in `");
+            buffer.append(Rule.PROVIDERS_PROPERTY_NAME);
+            buffer.append("` for the rule with `");
+            buffer.append(Rule.NAME_PROPERTY_NAME);
+            buffer.append("` value `");
+            buffer.append(ruleName);
+            buffer.append("` in `");
+            buffer.append(DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME);
+            buffer.append("` is null");
+            String message = buffer.toString();
+            throw new InvalidMaskingConfigurationException(message, location);
           }
 
           // the `type` property in each masking provider could not have been deserialized without
@@ -271,18 +283,29 @@ public class MaskingConfigUtils {
           try {
             provider.validate();
           } catch (InvalidMaskingConfigurationException e) {
-            String location = DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME + "."
-                + Rule.PROVIDERS_PROPERTY_NAME;
+            StringBuilder buffer = new StringBuilder(200);
+            buffer.append(DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME);
+            buffer.append('.');
+            buffer.append(Rule.PROVIDERS_PROPERTY_NAME);
             if (e.getLocation() != null) {
-              location += ("." + e.getLocation());
+              buffer.append('.').append(e.getLocation());
             }
-            throw new InvalidMaskingConfigurationException(
-                "invalid masking configuration: the masking provider at offset " + providerOffset
-                    + " in `" + Rule.PROVIDERS_PROPERTY_NAME + "` for the rule with `"
-                    + Rule.NAME_PROPERTY_NAME + "` value `" + ruleName + "` in `"
-                    + DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME + "` is not valid: "
-                    + e.getMessage(),
-                e, location);
+            String location = buffer.toString();
+            buffer.setLength(0);
+            buffer.append("invalid masking configuration: the ");
+            buffer.append(providerOffset == 0 ? "first" : "second");
+            buffer.append(" masking provider in `");
+            buffer.append(Rule.PROVIDERS_PROPERTY_NAME);
+            buffer.append("` for the rule with `");
+            buffer.append(Rule.NAME_PROPERTY_NAME);
+            buffer.append("` value `");
+            buffer.append(ruleName);
+            buffer.append("` in `");
+            buffer.append(DeidMaskingConfig.RULES_CONFIGURATION_PROPERTY_NAME);
+            buffer.append("` is not valid: ");
+            buffer.append(e.getMessage());
+            String message = buffer.toString();
+            throw new InvalidMaskingConfigurationException(message, e, location);
           }
 
           providerOffset++;

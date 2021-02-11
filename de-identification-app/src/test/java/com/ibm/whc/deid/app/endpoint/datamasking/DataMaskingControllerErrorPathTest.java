@@ -44,7 +44,9 @@ import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.CityMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.GenderMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
@@ -609,7 +611,23 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the masking provider at offset 1 in `maskingProviders` for the rule with `name` value `"
+            "invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `"
+                + ruleName + "` in `rules` is null")));
+
+    config.getRules().get(2).getMaskingProviders().remove(1);
+    config.getRules().get(2).getMaskingProviders().add(0, null);
+
+    dataMaskingModel = new DataMaskingModel(objectMapper.writeValueAsString(config), dataList,
+        ConfigSchemaType.FHIR);
+    request = objectMapper.writeValueAsString(dataMaskingModel);
+
+    log.info(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification")
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString(
+            "invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `"
                 + ruleName + "` in `rules` is null")));
   }
 
@@ -692,10 +710,12 @@ public class DataMaskingControllerErrorPathTest {
     dataList.add(TEST_DATA);
 
     ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
+    DeidMaskingConfig config = objectMapper.readValue(TEST_CONFIG, DeidMaskingConfig.class);
     AddressMaskingProviderConfig provider = new AddressMaskingProviderConfig();
     provider.setPostalCodeNearestK(-1);
-    DeidMaskingConfig config = objectMapper.readValue(TEST_CONFIG, DeidMaskingConfig.class);
-    config.getRules().add(1, new Rule("invalidRuleX", Arrays.asList(provider)));
+    ArrayList<MaskingProviderConfig> providers = new ArrayList<>();
+    providers.add(provider);
+    config.getRules().add(1, new Rule("invalidRuleX", providers));
 
     DataMaskingModel dataMaskingModel = new DataMaskingModel(
         objectMapper.writeValueAsString(config), dataList, ConfigSchemaType.FHIR);
@@ -707,7 +727,20 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the masking provider at offset 0 in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
-  }
+            "invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
 
+    providers.add(0, new GenderMaskingProviderConfig());
+
+    dataMaskingModel = new DataMaskingModel(objectMapper.writeValueAsString(config), dataList,
+        ConfigSchemaType.FHIR);
+    request = objectMapper.writeValueAsString(dataMaskingModel);
+
+    log.info(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(request))
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString(
+            "invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
+  }
 }

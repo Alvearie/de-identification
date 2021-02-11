@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -40,11 +40,19 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
       throw new InvalidMaskingConfigurationException(
           "`maskRuleSet` must be specified with at least one entry");
     }
+    int offset = 0;
     for (ConditionalMaskRuleSet ruleSet : maskRuleSet) {
       if (ruleSet == null) {
-        throw new InvalidMaskingConfigurationException("entry in `maskRuleSet` is null");
+        throw new InvalidMaskingConfigurationException(
+            "entry at offset " + Integer.toString(offset) + " in `maskRuleSet` is null");
       }
-      ruleSet.validate("maskRuleSet");
+      try {
+        ruleSet.validate("maskRuleSet");
+      } catch (InvalidMaskingConfigurationException e) {
+        throw new InvalidMaskingConfigurationException("entry at offset " + Integer.toString(offset)
+            + " in `maskRuleSet` is not valid: " + e.getMessage());
+      }
+      offset++;
     }
   }
 
