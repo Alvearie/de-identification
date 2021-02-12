@@ -29,17 +29,17 @@ public class CountryManager extends AbstractManager<Country>
     implements Serializable {
   /** */
   private static final long serialVersionUID = -1974159797966269524L;
-  protected final Resources resourceType = Resource.COUNTRY;
-  protected final Collection<ResourceEntry> resourceCountryList =
+  protected transient final Resources resourceType = Resource.COUNTRY;
+  protected transient final Collection<ResourceEntry> resourceCountryList =
       LocalizationManager.getInstance().getResources(resourceType);
   protected final SecureRandom random;
 
-  protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
-  protected Map<String, List<Location>> countryListMap;
+  protected transient final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
+  protected transient volatile Map<String, List<Location>> countryListMap;
   protected String tenantId;
 
   protected static final String allCountriesName = "__all__";
-  private LatLonDistance<Country> distanceCalc;
+  private transient volatile LatLonDistance<Country> distanceCalc;
 
 
   private static final LogManager logger = LogManager.getInstance();

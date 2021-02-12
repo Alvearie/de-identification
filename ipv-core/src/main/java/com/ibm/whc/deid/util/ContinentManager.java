@@ -27,7 +27,7 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
 
   private static final long serialVersionUID = -610638379564157663L;
 
-  protected Map<String, List<Location>> continentListMap;
+  protected transient volatile Map<String, List<Location>> continentListMap;
 
   private transient volatile ConcurrentHashMap<String, LatLonDistance<Continent>> distanceCalcMap =
       null;
@@ -40,7 +40,7 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
 
   @Override
   public void init() {
-    continentListMap = new HashMap<>();
+    continentListMap = new ConcurrentHashMap<>();
   }
 
   @Override

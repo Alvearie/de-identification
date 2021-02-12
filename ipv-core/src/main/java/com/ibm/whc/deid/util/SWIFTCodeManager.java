@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.Country;
@@ -31,12 +32,12 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
   }
 
   protected static final CountryManager countryManager = new CountryManager(null);
-  protected Map<String, List<SWIFTCode>> codeByCountryMap;
+  protected transient volatile Map<String, List<SWIFTCode>> codeByCountryMap;
   protected final SecureRandom random = new SecureRandom();
 
   @Override
   public void init() {
-    this.codeByCountryMap = new HashMap<>();
+    this.codeByCountryMap = new ConcurrentHashMap<>();
   }
 
   /**

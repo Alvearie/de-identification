@@ -32,7 +32,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   private static final MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
-  List<ConditionalMaskRuleSet> maskRuleSet;
+  private transient volatile List<ConditionalMaskRuleSet> maskRuleSet;
   private String tenantId;
   private DeidMaskingConfig deidMaskingConfig;
 

@@ -24,7 +24,7 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
   private final boolean removeQuery;
   private final boolean maskQuery;
   private final int preserveDomains;
-  private final MaskingProviderFactory maskingProviderFactory =
+  private transient final MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;

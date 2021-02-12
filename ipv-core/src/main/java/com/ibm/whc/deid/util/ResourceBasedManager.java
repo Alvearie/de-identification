@@ -30,7 +30,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
 
   protected final String tenantId;
 
-  protected final Resources resourceType;
+  protected transient final Resources resourceType;
 
   static final LogManager logger = LogManager.getInstance();
 

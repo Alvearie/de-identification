@@ -29,13 +29,14 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
   public static final String DISABLE_TYPES_VALUE = "default";
   
-  protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();  
+  protected transient final Map<String, MaskingProviderBuilder> maskingProviderMap =
+      new HashMap<>();
 
   protected String keyForType;
 
   protected String certificateId;
 
-  protected MaskingProviderFactory maskingProviderFactory;
+  protected transient volatile MaskingProviderFactory maskingProviderFactory;
 
   protected String identifier;
 

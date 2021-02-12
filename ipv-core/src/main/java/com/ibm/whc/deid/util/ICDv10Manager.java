@@ -36,7 +36,7 @@ public class ICDv10Manager implements Manager, Serializable {
   protected int resourceInDbCount = 0;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.ICDV10;
+  protected transient final Resources resourceType = Resource.ICDV10;
 
   protected final String tenantId;
 

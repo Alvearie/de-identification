@@ -33,7 +33,7 @@ public class ICDv9Manager implements Manager, Serializable {
   protected final MapWithRandomPick<String, ICD> icdByNameMap;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.ICDV9;
+  protected transient final Resources resourceType = Resource.ICDV9;
 
   protected final String tenantId;
 
