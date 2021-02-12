@@ -46,7 +46,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
 
   protected final AddressMaskingProviderConfig configuration;
 
-  protected final MaskingProviderFactory maskingProviderFactory;
+  protected transient final MaskingProviderFactory maskingProviderFactory;
 
   protected volatile boolean initialized = false;
 

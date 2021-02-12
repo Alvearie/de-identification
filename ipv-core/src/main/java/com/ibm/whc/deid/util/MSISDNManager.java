@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -35,8 +36,8 @@ public class MSISDNManager implements Serializable {
   protected static final Collection<ResourceEntry> phoneNumberDigitsList =
       LocalizationManager.getInstance().getResources(Resource.PHONE_NUM_DIGITS);
 
-  protected MapWithRandomPick<String, String> countryCodeMap;
-  protected Map<String, Set<String>> areaCodeMapByCountry;
+  protected transient volatile MapWithRandomPick<String, String> countryCodeMap;
+  protected transient volatile Map<String, Set<String>> areaCodeMapByCountry;
   protected Map<String, List<Integer>> phoneNumberDigitsMap;
   
   private static final SecureRandom random = new SecureRandom();
@@ -53,8 +54,8 @@ public class MSISDNManager implements Serializable {
   public MSISDNManager(String tenantId) {
     this.tenantId = tenantId;
     this.countryCodeMap = new MapWithRandomPick<>(new HashMap<String, String>());
-    this.areaCodeMapByCountry = new HashMap<>();
-    this.phoneNumberDigitsMap = new HashMap<>();
+    this.areaCodeMapByCountry = new ConcurrentHashMap<>();
+    this.phoneNumberDigitsMap = new ConcurrentHashMap<>();
 
     readResources(Resource.PHONE_CALLING_CODES, tenantId);
     readResources(Resource.PHONE_AREA_CODES, tenantId);

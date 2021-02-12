@@ -21,8 +21,8 @@ public class MapWithRandomPick<K, V> implements Serializable {
   /** */
   private static final long serialVersionUID = -1788413492014517734L;
 
-  private Map<K, V> map;
-  private List<K> keylist = new ArrayList<K>();
+  private transient volatile Map<K, V> map;
+  private transient volatile List<K> keylist = new ArrayList<K>();
   private final SecureRandom random;
 
   /**

@@ -31,11 +31,11 @@ public class PostalCodeManager implements Manager, Serializable {
   protected static final Collection<ResourceEntry> resourceList =
       LocalizationManager.getInstance().getResources(Resource.POSTAL_CODES);
   protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
-  protected List<PostalCode> postalCodeList;
-  private LatLonDistance<PostalCode> latLonTree = null;
+  protected transient volatile List<PostalCode> postalCodeList;
+  private transient volatile LatLonDistance<PostalCode> latLonTree = null;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.POSTAL_CODES;
+  protected transient final Resources resourceType = Resource.POSTAL_CODES;
 
   protected final String tenantId;
 

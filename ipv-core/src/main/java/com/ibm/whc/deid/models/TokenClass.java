@@ -24,7 +24,7 @@ public class TokenClass extends ReverseRegexParser implements TokenSet, Serializ
 // Sets of tokens in this class. Can include any instance of a class
   // implementing
   // TokenSet
-  private NavigableMap<Integer, TokenSet> characterSets;
+  private transient volatile NavigableMap<Integer, TokenSet> characterSets;
   private int totalSize = 0;
 
   /**

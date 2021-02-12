@@ -27,7 +27,7 @@ public class ATCManager extends ResourceBasedManager<String> {
     super(tenantId, Resource.ATC_CODES);
   }
 
-  protected List<String> codeList;
+  protected transient volatile List<String> codeList;
 
   @Override
   public void init() {

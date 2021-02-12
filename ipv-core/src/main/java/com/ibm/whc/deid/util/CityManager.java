@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.City;
@@ -28,10 +29,10 @@ public class CityManager extends ResourceBasedManager<City> {
 
   private final SecureRandom random = new SecureRandom();
 
-  private Map<String, List<Location>> cityListMap;
-  private Map<String, LatLonDistance> latLonTree = null;
+  private transient volatile Map<String, List<Location>> cityListMap;
+  private transient volatile Map<String, LatLonDistance> latLonTree = null;
 
-  private LatLonDistance<City> distanceCalc;
+  private transient volatile LatLonDistance<City> distanceCalc;
 
   public CityManager(String tenantId) {
     super(tenantId, Resource.CITY);
@@ -88,11 +89,11 @@ public class CityManager extends ResourceBasedManager<City> {
   }
 
   public void init() {
-    this.cityListMap = new HashMap<>();
+    this.cityListMap = new ConcurrentHashMap<>();
   }
 
   public void postInit() {
-    this.latLonTree = new HashMap<>();
+    this.latLonTree = new ConcurrentHashMap<>();
 
     for (String key : cityListMap.keySet()) {
       try {

@@ -18,7 +18,7 @@ public class BuildStep implements Serializable {
 	 */
 	private static final long serialVersionUID = -5103556882153858880L;
 // The token class to generate with
-  private TokenSet c;
+  private transient TokenSet c;
   // Number of characters to gen is determined from this
   private Multiplicity m;
 

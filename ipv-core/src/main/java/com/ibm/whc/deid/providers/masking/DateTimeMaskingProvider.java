@@ -103,7 +103,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final String dateYearDeleteComparedValue;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-  private final DateTimeFormatter fixedDateFormat;
+  private transient final DateTimeFormatter fixedDateFormat;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
     String fixedDateFormatString = configuration.getFormatFixed();

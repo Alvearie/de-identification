@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -28,13 +29,13 @@ public class VINManager implements Manager, Serializable {
 
   protected static final Collection<ResourceEntry> resourceWMIList =
       LocalizationManager.getInstance().getResources(Resource.WORLD_MANUFACTURERS_IDENTIFIER);
-  protected final Map<String, String> wmiMap;
+  protected transient final Map<String, String> wmiMap;
   protected final String[] wmiList;
   protected final SecureRandom random;
   protected final char[] excludedCharacters = {'I', 'O', 'Q', 'i', 'o', 'q'};
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
+  protected transient final Resources resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
 
   protected final String tenantId;
 
@@ -45,7 +46,7 @@ public class VINManager implements Manager, Serializable {
    */
   public VINManager(String tenantId) {
     this.tenantId = tenantId;
-    this.wmiMap = new HashMap<String, String>();
+    this.wmiMap = new ConcurrentHashMap<String, String>();
 
     readResources(resourceType, tenantId);
 

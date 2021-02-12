@@ -5,8 +5,6 @@
  */
 package com.ibm.whc.deid.providers.identifiers;
 
-import com.ibm.whc.deid.utils.log.LogCodes;
-import com.ibm.whc.deid.utils.log.LogManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -16,12 +14,14 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
 public class IdentifierFactoryHelper implements Serializable {
   private static final long serialVersionUID = 9183243223063761662L;
 
   private static LogManager log = LogManager.getInstance();
-  private Set<Identifier> identifiers = new HashSet<Identifier>();
+  private transient volatile Set<Identifier> identifiers = new HashSet<Identifier>();
 
   @SuppressWarnings("unchecked")
   public IdentifierFactoryHelper(final InputStream is) {
