@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -45,10 +45,29 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`maskRuleSet.maskingProvider` is missing", e.getMessage());
+      assertEquals(
+          "entry at offset 0 in `maskRuleSet` is not valid: `maskRuleSet.maskingProvider` is missing",
+          e.getMessage());
     }
 
     ruleset.setMaskingProvider(new HashMaskingProviderConfig());
+    config.validate();
+
+    ConditionalMaskRuleSet ruleset2 = new ConditionalMaskRuleSet();
+    maskRuleSet.add(ruleset2);
+    BinningMaskingProviderConfig provider = new BinningMaskingProviderConfig();
+    provider.setBinSize(-2);
+    ruleset2.setMaskingProvider(provider);
+    try {
+      config.validate();
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals(
+          "entry at offset 1 in `maskRuleSet` is not valid: `maskRuleSet.maskingProvider` is invalid: `binSize` must be greater than 0",
+          e.getMessage());
+    }
+
+    provider.setBinSize(10);
     config.validate();
 
     config.setUnspecifiedValueHandling(5);
@@ -66,7 +85,7 @@ public class ConditionalMaskingProviderConfigTest {
       config.validate();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("entry in `maskRuleSet` is null", e.getMessage());
+      assertEquals("entry at offset 2 in `maskRuleSet` is null", e.getMessage());
     }
   }
 
