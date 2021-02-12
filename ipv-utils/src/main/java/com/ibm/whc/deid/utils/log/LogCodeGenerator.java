@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -34,9 +34,6 @@ public class LogCodeGenerator {
 
     getFileBasePath();
     Properties properties = new Properties() {
-      /**
-       * 
-       */
       private static final long serialVersionUID = -2144747756976051516L;
 
       @Override
@@ -77,7 +74,7 @@ public class LogCodeGenerator {
   /** Generates log error codes for de-id */
   public static void generate(Properties properties, String filePath) {
     try (FileWriter aWriter = new FileWriter(filePath, true)) {
-      aWriter.write("/*\n" + " * (C) Copyright IBM Corp. 2016,2020\n" + " *\n"
+      aWriter.write("/*\n" + " * (C) Copyright IBM Corp. 2016,2021\n" + " *\n"
           + " * SPDX-License-Identifier: Apache-2.0\n" + " */\n\n");
 
       aWriter.write("package com.ibm.whc.deid.utils.log;\n\n");
