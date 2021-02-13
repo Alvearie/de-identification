@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -35,96 +35,100 @@ import com.ibm.whc.deid.shared.exception.DeidException;
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
 // we do not have a real application-test.properties.
-@ActiveProfiles(profiles = { "test" })
+@ActiveProfiles(profiles = {"test"})
 @AutoConfigureMockMvc
 @SpringBootTest(classes = Application.class)
 public class DataMaskingControllerMaskingConfigurationTest {
 
-	private final String basePath = "/api/v1";
+  private final String basePath = "/api/v1";
 
-	private MockMvc mockMvc;
+  private MockMvc mockMvc;
 
-	private static final Logger log = LoggerFactory.getLogger(DataMaskingControllerMaskingConfigurationTest.class);
+  private static final Logger log =
+      LoggerFactory.getLogger(DataMaskingControllerMaskingConfigurationTest.class);
 
-	@Autowired
-	private WebApplicationContext wac;
+  @Autowired
+  private WebApplicationContext wac;
 
-	@Before
-	public void setup() throws DeidException {
+  @Before
+  public void setup() throws DeidException {
 
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-	}
-	
-	@Test
-	public void testLocalizationMaskingConfig() throws Exception {
-		String data = new String(
-				Files.readAllBytes(Paths.get(getClass().getResource("/masking/data/fhir_location2.json").toURI())));
-		String config = new String(Files
-				.readAllBytes(Paths.get(getClass().getResource("/config/fhir/localization_masking.json").toURI())));
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode rootNode = mapper.createObjectNode();
-		ArrayNode dataNode = rootNode.putArray("data");
-		dataNode.add(data);
-		rootNode.put("config", config);
-		rootNode.put("schemaType", "FHIR");
-		String request = mapper.writeValueAsString(rootNode);
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+  }
 
-		log.info(request);
-		this.mockMvc
+  @Test
+  public void testLocalizationMaskingConfig() throws Exception {
+    String data = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/masking/data/fhir_location2.json").toURI())));
+    String config = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/config/fhir/localization_masking.json").toURI())));
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode rootNode = mapper.createObjectNode();
+    ArrayNode dataNode = rootNode.putArray("data");
+    dataNode.add(data);
+    rootNode.put("config", config);
+    rootNode.put("schemaType", "FHIR");
+    String request = mapper.writeValueAsString(rootNode);
+
+    log.info(request);
+    this.mockMvc
         .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
-						.content(request))
-				.andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
-	}
+            .content(request))
+        .andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
+  }
 
-	/**
-	 * Verifying invalid masking rule returns 400
-	 * @throws Exception
-	 */
-	@Test
-	public void testInvalidMaskingConfig() throws Exception {
-		String data = new String(
-				Files.readAllBytes(Paths.get(getClass().getResource("/masking/data/simple_fhir.json").toURI())));
-		String config = new String(Files
-				.readAllBytes(Paths.get(getClass().getResource("/config/fhir/invalid_masking_config.json").toURI())));
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode rootNode = mapper.createObjectNode();
-		ArrayNode dataNode = rootNode.putArray("data");
-		dataNode.add(data);
-		rootNode.put("config", config);
-		rootNode.put("schemaType", "FHIR");
-		String request = mapper.writeValueAsString(rootNode);
+  /**
+   * Verifying invalid masking rule returns 400
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void testInvalidMaskingConfig() throws Exception {
+    String data = new String(Files
+        .readAllBytes(Paths.get(getClass().getResource("/masking/data/simple_fhir.json").toURI())));
+    String config = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/config/fhir/invalid_masking_config.json").toURI())));
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode rootNode = mapper.createObjectNode();
+    ArrayNode dataNode = rootNode.putArray("data");
+    dataNode.add(data);
+    rootNode.put("config", config);
+    rootNode.put("schemaType", "FHIR");
+    String request = mapper.writeValueAsString(rootNode);
 
-		log.info(request);
-		this.mockMvc
+    log.info(request);
+    this.mockMvc
         .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
-						.content(request))
-				.andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
-				.andExpect(content().string("The JSON masking rule does not refer to a valid rule: HASH:invalid. There are 1 invalid rules."));
-	}
-	
-	/** 
-	 * Missing Message Type should not break application
-	 * It should return user the un-masked output in the return body
-	 * @throws Exception
-	 */
-	@Test
-	public void testMaskingConfigMissingMessageType() throws Exception {
-		String data = new String(
-				Files.readAllBytes(Paths.get(getClass().getResource("/masking/data/fhir_location1.json").toURI())));
-		String config = new String(Files
-				.readAllBytes(Paths.get(getClass().getResource("/config/fhir/invalid_masking_config_missing_messageType.json").toURI())));
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode rootNode = mapper.createObjectNode();
-		ArrayNode dataNode = rootNode.putArray("data");
-		dataNode.add(data);
-		rootNode.put("config", config);
-		rootNode.put("schemaType", "FHIR");
-		String request = mapper.writeValueAsString(rootNode);
+            .content(request))
+        .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
+        .andExpect(content().string(
+            "Invalid masking configuration: the rule assignment with `rule` value `HASH:invalid` does not refer to a valid rule.  There are 1 such invalid rules."));
+  }
 
-		log.info(request);
-		this.mockMvc
+  /**
+   * Missing Message Type should not break application It should return user the un-masked output in
+   * the return body
+   * 
+   * @throws Exception
+   */
+  @Test
+  public void testMaskingConfigMissingMessageType() throws Exception {
+    String data = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/masking/data/fhir_location1.json").toURI())));
+    String config = new String(Files.readAllBytes(Paths.get(getClass()
+        .getResource("/config/fhir/invalid_masking_config_missing_messageType.json").toURI())));
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode rootNode = mapper.createObjectNode();
+    ArrayNode dataNode = rootNode.putArray("data");
+    dataNode.add(data);
+    rootNode.put("config", config);
+    rootNode.put("schemaType", "FHIR");
+    String request = mapper.writeValueAsString(rootNode);
+
+    log.info(request);
+    this.mockMvc
         .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
-						.content(request))
-				.andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
-		}
+            .content(request))
+        .andDo(print()).andExpect(status().is2xxSuccessful()).andDo(MockMvcResultHandlers.print());
+  }
 }

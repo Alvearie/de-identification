@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -222,7 +222,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the value of the `json` property is missing")));
+            "Invalid masking configuration: the value of the `json` property is missing")));
   }
 
   @Test
@@ -265,7 +265,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
+            "Invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
   }
 
   @Test
@@ -287,7 +287,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
+            "Invalid masking configuration: `json.messageTypes` must be provided when `json.messageTypeKey` is provided")));
   }
 
   @Test
@@ -309,7 +309,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: value at offset 0 in `json.messageTypes` is missing")));
+            "Invalid masking configuration: value at offset 0 in `json.messageTypes` is missing")));
   }
 
   @Test
@@ -331,7 +331,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: value at offset 1 in `json.messageTypes` is missing")));
+            "Invalid masking configuration: value at offset 1 in `json.messageTypes` is missing")));
   }
 
   @Test
@@ -353,7 +353,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: value at offset 2 in `json.messageTypes` is missing")));
+            "Invalid masking configuration: value at offset 2 in `json.messageTypes` is missing")));
   }
 
   @Test
@@ -375,7 +375,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `rule` property is missing from the rule assignment at offset 0 in `json.maskingRules`")));
+            "Invalid masking configuration: `rule` property is missing from the rule assignment at offset 0 in `json.maskingRules`")));
   }
 
   @Test
@@ -397,7 +397,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `rule` property is missing from the rule assignment at offset 1 in `json.maskingRules`")));
+            "Invalid masking configuration: `rule` property is missing from the rule assignment at offset 1 in `json.maskingRules`")));
   }
 
   @Test
@@ -419,7 +419,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `jsonPath` property in the rule assignment at offset 2 in `json.maskingRules` must start with `/`")));
+            "Invalid masking configuration: `jsonPath` property in the rule assignment at offset 2 in `json.maskingRules` must start with `/`")));
   }
 
   @Test
@@ -442,7 +442,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: `jsonPath` property in the rule assignment at offset "
+            "Invalid masking configuration: `jsonPath` property in the rule assignment at offset "
                 + offset + " in `json.maskingRules` must start with `/`")));
   }
 
@@ -468,7 +468,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "The JSON masking rule does not refer to a valid rule: no_1. There are 4 invalid rules.")));
+            "Invalid masking configuration: the rule assignment with `rule` value `no_1` does not refer to a valid rule.  There are 4 such invalid rules.")));
   }
 
   @Test
@@ -491,7 +491,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the rule at offset " + count + " in `rules` is null")));
+            "Invalid masking configuration: the rule at offset " + count + " in `rules` is null")));
   }
 
   @Test
@@ -514,7 +514,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the `name` property is missing from the rule at offset 1 in `rules`")));
+            "Invalid masking configuration: the `name` property is missing from the rule at offset 1 in `rules`")));
   }
 
   @Test
@@ -537,7 +537,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the `name` property is missing from the rule at offset 2 in `rules`")));
+            "Invalid masking configuration: the `name` property is missing from the rule at offset 2 in `rules`")));
   }
 
   @Test
@@ -560,7 +560,7 @@ public class DataMaskingControllerErrorPathTest {
         .perform(post(basePath + "/deidentification")
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
-        .andExpect(content().string(containsString("invalid masking configuration: the value `"
+        .andExpect(content().string(containsString("Invalid masking configuration: the value `"
             + ruleName
             + "` is used for the `name` property on multiple rules in the `rules` list - rule names must be unique")));
   }
@@ -586,7 +586,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the `maskingProviders` property is missing from the rule with `name` value `"
+            "Invalid masking configuration: the `maskingProviders` property is missing from the rule with `name` value `"
                 + ruleName + "` in `rules`")));
   }
 
@@ -611,7 +611,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `"
+            "Invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `"
                 + ruleName + "` in `rules` is null")));
 
     config.getRules().get(2).getMaskingProviders().remove(1);
@@ -627,7 +627,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `"
+            "Invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `"
                 + ruleName + "` in `rules` is null")));
   }
 
@@ -653,7 +653,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: too many entries in `maskingProviders` for the rule with `name` value `"
+            "Invalid masking configuration: too many entries in `maskingProviders` for the rule with `name` value `"
                 + ruleName + "` in `rules` - the maximum allowed is 2")));
   }
 
@@ -677,7 +677,7 @@ public class DataMaskingControllerErrorPathTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(
-            containsString("invalid masking configuration: the rule with `name` value `" + ruleName
+            containsString("Invalid masking configuration: the rule with `name` value `" + ruleName
                 + "` in `rules` contains multiple masking providers, but the first masking provider is not a Category I provider")));
   }
 
@@ -701,7 +701,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the rule with `name` value `multiRuleX` in `rules` contains multiple masking providers, but the second masking provider is not a Category II provider")));
+            "Invalid masking configuration: the rule with `name` value `multiRuleX` in `rules` contains multiple masking providers, but the second masking provider is not a Category II provider")));
   }
 
   @Test
@@ -727,7 +727,7 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
+            "Invalid masking configuration: the first masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
 
     providers.add(0, new GenderMaskingProviderConfig());
 
@@ -741,6 +741,6 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(containsString(
-            "invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
+            "Invalid masking configuration: the second masking provider in `maskingProviders` for the rule with `name` value `invalidRuleX` in `rules` is not valid: `postalCodeNearestK` must be greater than 0")));
   }
 }
