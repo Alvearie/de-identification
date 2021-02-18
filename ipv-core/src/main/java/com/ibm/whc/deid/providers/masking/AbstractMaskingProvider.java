@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The type Abstract masking provider.
- *
+ * Common base class for all classes providing privacy protection functions.
  */
 public abstract class AbstractMaskingProvider implements MaskingProvider {
 
@@ -35,23 +34,8 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   private String name = "";
 
   @Override
-  public String[] mask(String[] data) {
-    final String[] maskedData = new String[data.length];
-
-    for (int i = 0; i < data.length; ++i)
-      maskedData[i] = mask(data[i]);
-
-    return maskedData;
-  }
-
-  @Override
   public String mask(String identifier, String fieldName) {
     return mask(identifier);
-  }
-
-  @Override
-  public byte[] mask(byte[] data) {
-    return mask(new String(data)).getBytes();
   }
 
   @Override

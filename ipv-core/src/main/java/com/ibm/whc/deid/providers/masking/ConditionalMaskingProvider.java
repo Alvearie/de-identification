@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -27,38 +27,45 @@ import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
  *
  */
 public class ConditionalMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -13830496083023321L;
+
+  private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
   private static final MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
-  List<ConditionalMaskRuleSet> maskRuleSet;
-  private String tenantId;
-  private DeidMaskingConfig deidMaskingConfig;
 
-  private JsonNode root;
-  String resourceType;
-  private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
+  private final List<ConditionalMaskRuleSet> maskRuleSet;
+  private final String tenantId;
+  private final DeidMaskingConfig deidMaskingConfig;
 
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
       DeidMaskingConfig deidMaskingConfig) {
     this.tenantId = tenantId;
     this.deidMaskingConfig = deidMaskingConfig;
-    maskRuleSet = configuration.getMaskRuleSet();
+    this.maskRuleSet = configuration.getMaskRuleSet();
   }
 
-  MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
-    return maskingProviderFactory.getProviderFromType(config.getType(), deidMaskingConfig, config,
-        tenantId);
+  @Override
+  public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
+    for (MaskingActionInputIdentifier i : identifiers) {
+      String value = mask(i);
+      putField(i, value);
+    }
   }
 
   /**
    * Masks the specified identifier by the masking provider of the condition that is met.
    *
-   * @param identifier
-   * @return mask value
+   * @param the input to be masked
+   * 
+   * @return the updated value as a string
    */
-  public String mask(String identifier) {
+  protected String mask(MaskingActionInputIdentifier maii) {
+    JsonNode root = maii.getRoot();
+    String resourceType = maii.getResourceType();
+    String identifier = maii.getNode().asText();
+
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
@@ -70,11 +77,16 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     }
 
     return maskRuleSet.stream().filter(rule -> {
-      return evaluateConditionTypeString(identifier, rule);
+      return evaluateConditionTypeString(identifier, rule, root, resourceType);
     }).findFirst().map(rule -> {
       MaskingProvider maskingProvider = getMaskingProvider(rule.getMaskingProvider());
       return maskingProvider.mask(identifier);
     }).orElse(identifier);
+  }
+
+  private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
+    return maskingProviderFactory.getProviderFromType(config.getType(), deidMaskingConfig, config,
+        tenantId);
   }
 
   /**
@@ -85,7 +97,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    * @return
    */
   private boolean evaluateConditionTypeString(String identifier,
-      ConditionalMaskRuleSet conditionalMaskRuleSet) {
+      ConditionalMaskRuleSet conditionalMaskRuleSet, JsonNode root, String resourceType) {
 
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition =
         conditionalMaskRuleSet.getCondition();
@@ -102,10 +114,10 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     Set<String> valueSet;
     if (condition.getField().contains("==")) {
       // Array query path
-      valueSet = getConditionArrayFieldValue(condition);
+      valueSet = getConditionArrayFieldValue(condition, root, resourceType);
     } else {
       // Regular path
-      valueSet = getConditionRegularFieldValues(condition);
+      valueSet = getConditionRegularFieldValues(condition, root, resourceType);
     }
     boolean conditionMatch = false;
     String conditionValue = condition.getValue();
@@ -138,13 +150,14 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   private Set<String> getConditionRegularFieldValues(
-      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition) {
+      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition, JsonNode root,
+      String resourceType) {
     // System.out.println("\n\n========> getConditionRegularFieldValues");
 
     Set<String> valueSet = new HashSet<>();
     Map<String, String> fieldPath = new HashMap<>();
     fieldPath.put(condition.getField(), condition.getField());
-    String fhirResourceType = "/fhir/" + this.resourceType;
+    String fhirResourceType = "/fhir/" + resourceType;
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration(fhirResourceType, fieldPath);
 
@@ -180,7 +193,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       currentPath = paths[i];
       // System.out.println("========> " + i + " currentPath: " +
       // currentPath);
-      nodeList = getChildrenNodes(this.root, currentPath, nodeList);
+      nodeList = getChildrenNodes(root, currentPath, nodeList);
       if (nodeList == null) {
         return valueSet;
       }
@@ -225,13 +238,14 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    * @return set
    */
   private Set<String> getConditionArrayFieldValue(
-      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition) {
+      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition, JsonNode root,
+      String resourceType) {
     // System.out.println("\n\n========> getConditionArrayFieldValue");
 
     Set<String> valueSet = new HashSet<>();
     Map<String, String> fieldPath = new HashMap<>();
     fieldPath.put(condition.getField(), condition.getField());
-    String fhirResourceType = "/fhir/" + this.resourceType;
+    String fhirResourceType = "/fhir/" + resourceType;
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration(fhirResourceType, fieldPath);
 
@@ -312,7 +326,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
          */
         currentPath = paths[i];
 
-        nodeList = getChildrenNodes(this.root, currentPath, nodeList);
+        nodeList = getChildrenNodes(root, currentPath, nodeList);
         if (nodeList == null) {
           return valueSet;
         }
@@ -424,7 +438,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    * @param value
    * @return
    */
-  private static Object getValue(JsonNode value) {
+  private Object getValue(JsonNode value) {
     if (value == null || value.isNull()) {
       return null;
     }
@@ -439,13 +453,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   @Override
-  public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
-    for (MaskingActionInputIdentifier i : identifiers) {
-      this.root = i.getRoot();
-      this.resourceType = i.getResourceType();
-      String value = i.getNode().asText();
-      value = mask(value);
-      putField(i, value);
-    }
+  public String mask(String identifier) {
+    throw new IllegalStateException("should not be reached");
   }
 }
