@@ -49,8 +49,6 @@ public interface MaskingProvider extends Serializable {
   String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,
       Map<String, OriginalMaskedValuePair> values);
 
-  void setTestingOnlyLogManager(LogManager logManager);
-
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers);
 
   public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId);

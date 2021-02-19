@@ -19,9 +19,9 @@ import com.ibm.whc.deid.utils.log.LogManager;
 
 public class MaskingProviderFactoryUtil {
 
-  private static DeidConfig deidConfig = null;
+  private static volatile DeidConfig deidConfig = null;
 
-  private static MaskingProviderFactory maskingProviderFactory = null;
+  private static volatile MaskingProviderFactory maskingProviderFactory = null;
 
   private static LogManager log = LogManager.getInstance();
 

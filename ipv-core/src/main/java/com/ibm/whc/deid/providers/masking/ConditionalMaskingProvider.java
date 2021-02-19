@@ -29,9 +29,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
-  private static final MaskingProviderFactory maskingProviderFactory =
-      MaskingProviderFactoryUtil.getMaskingProviderFactory();
-
   private final List<ConditionalMaskRuleSet> maskRuleSet;
   private final String tenantId;
   private final DeidMaskingConfig deidMaskingConfig;
@@ -82,8 +79,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
-    return maskingProviderFactory.getProviderFromType(config.getType(), deidMaskingConfig, config,
-        tenantId);
+    return MaskingProviderFactoryUtil.getMaskingProviderFactory()
+        .getProviderFromType(config.getType(), deidMaskingConfig, config, tenantId);
   }
 
   /**
@@ -96,8 +93,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   private boolean evaluateConditionTypeString(String identifier,
       ConditionalMaskRuleSet conditionalMaskRuleSet, JsonNode root, String resourceType) {
 
-    com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition =
-        conditionalMaskRuleSet.getCondition();
+    Condition condition = conditionalMaskRuleSet.getCondition();
     if (condition == null) {
       // If there are no condition, but a masking provider is configured,
       // just return true so that masking provider is used.

@@ -26,7 +26,6 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   private static final long serialVersionUID = -6276716005726979282L;
 
   protected SecureRandom random;
-  protected LogManager testingOnly_LogManager;
   protected boolean debug_enabled;
 
   protected LogManager log = LogManager.getInstance();
@@ -68,16 +67,6 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   }
 
   /**
-   * For testing only.
-   *
-   * @param logManager the log manager
-   */
-  @Override
-  public void setTestingOnlyLogManager(LogManager logManager) {
-    testingOnly_LogManager = logManager;
-  }
-
-  /**
    * Sets to print only debug information
    *
    * @param value true or false
@@ -101,9 +90,11 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
     }
   }
 
-  protected void putField(MaskingActionInputIdentifier i, String value) {
+  protected final void putField(MaskingActionInputIdentifier i, String value) {
     if (i.getParent().isObject()) {
-      i.setParent(((ObjectNode) i.getParent()).set(i.getPath(), new TextNode(value)));
+      TextNode newNode = new TextNode(value);
+      i.setParent(((ObjectNode) i.getParent()).set(i.getPath(), newNode));
+      i.setCurrentNode(newNode);
     } else if (i.getParent().isArray()) {
       ArrayNode aNode = (ArrayNode)i.getParent();
       int indexOfResult = -1;
@@ -114,7 +105,9 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
           break;
         }
       }
-      aNode.set(indexOfResult, new TextNode(value));
+      TextNode newNode = new TextNode(value);
+      aNode.set(indexOfResult, newNode);
+      i.setCurrentNode(newNode);
     }
   }
 
