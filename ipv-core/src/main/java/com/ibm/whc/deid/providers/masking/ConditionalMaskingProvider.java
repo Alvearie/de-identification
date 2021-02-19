@@ -6,21 +6,18 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ibm.whc.deid.providers.masking.fhir.FHIRResourceField;
-import com.ibm.whc.deid.providers.masking.fhir.FHIRResourceMaskingConfiguration;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
 
 /**
  * The type Conditional masking provider.
@@ -149,28 +146,13 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     return conditionMatch;
   }
 
-  private Set<String> getConditionRegularFieldValues(
-      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition, JsonNode root,
+  private Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
       String resourceType) {
-    // System.out.println("\n\n========> getConditionRegularFieldValues");
 
     Set<String> valueSet = new HashSet<>();
-    Map<String, String> fieldPath = new HashMap<>();
-    fieldPath.put(condition.getField(), condition.getField());
-    String fhirResourceType = "/fhir/" + resourceType;
-    FHIRResourceMaskingConfiguration resourceConfiguration =
-        new FHIRResourceMaskingConfiguration(fhirResourceType, fieldPath);
 
-    List<FHIRResourceField> fields = resourceConfiguration.getFields();
-    // String basePath = resourceConfiguration.getBasePath();
-
-    String path = null;
+    String path = condition.getField();
     String[] paths = null;
-    for (FHIRResourceField field : fields) {
-      path = field.getShortRuleName();
-      // System.out.println("\n\n========> Path: " + path);
-    }
-
     if (path.startsWith("/")) {
       paths = path.substring(1).split("/");
     } else {
@@ -230,35 +212,18 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   /**
-   * getConditionArrayFieldValue - determines and returns the set of value(s) of a condition field,
-   * using the field array path, from the FHIR resource node if the field array path is found in the
-   * FHIR resource JSON; otherwise, returns an empty set.
-   *
-   * @param condition
-   * @return set
+   * @param condition the condition to be examined
+   * @param root the root of the document being processed
+   * 
+   * @return the set of value(s) of a condition field
    */
-  private Set<String> getConditionArrayFieldValue(
-      com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition, JsonNode root,
+  private Set<String> getConditionArrayFieldValue(Condition condition, JsonNode root,
       String resourceType) {
-    // System.out.println("\n\n========> getConditionArrayFieldValue");
 
     Set<String> valueSet = new HashSet<>();
-    Map<String, String> fieldPath = new HashMap<>();
-    fieldPath.put(condition.getField(), condition.getField());
-    String fhirResourceType = "/fhir/" + resourceType;
-    FHIRResourceMaskingConfiguration resourceConfiguration =
-        new FHIRResourceMaskingConfiguration(fhirResourceType, fieldPath);
 
-    List<FHIRResourceField> fields = resourceConfiguration.getFields();
-    resourceConfiguration.getBasePath();
-
-    String path = null;
+    String path = condition.getField();
     String[] paths = null;
-    for (FHIRResourceField field : fields) {
-      path = field.getShortRuleName();
-      // System.out.println("\n\n========> path: " + path);
-    }
-
     int eqeqIndex = path.indexOf("==");
     if (eqeqIndex > 0) {
       if (path.startsWith("/")) {

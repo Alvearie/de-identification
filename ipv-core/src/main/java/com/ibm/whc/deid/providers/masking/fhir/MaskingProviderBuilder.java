@@ -446,16 +446,17 @@ public class MaskingProviderBuilder implements Serializable {
    * This method returns a list of the paths that should be masked. e.g. given path =
    * "/extension[*]/value", it will break it down to a list of paths: "/extension[0]/value",
    * "/extension[1]/value", ... , "/extension[size-1]/value". So we know exactly which array
-   * elements should be masked in the output
+   * elements should be masked in the output.
    *
    * <p>
-   * If the input is for non-array, it will return the same path
+   * If the input is for non-array, it will return the same path.
    *
    * @param paths : from maskingAction.getPaths(), an array of the path split by '/'
    * @param actualPath : concatenated paths, accumulated form the recursive call
    * @param itemIndex : index of which path[] element is currently processed (for recursive call)
    * @param allActualPaths : the ArrayList, also accumulated from the recursive call
    * @param node : the root node for the resource
+   * 
    * @return an ArrayList of the distinct paths to process
    */
   private ArrayList<String> getActualPaths(String[] paths, String actualPath, int itemIndex,
