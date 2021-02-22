@@ -44,7 +44,7 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
     if (!initialized) {
       atcManager =
           (ATCManager) ManagerFactory.getInstance().getManager(null,
-          Resource.ATC_CODES, null);
+          Resource.ATC_CODES, null, localizationProperty);
 
       initialized = true;
     }

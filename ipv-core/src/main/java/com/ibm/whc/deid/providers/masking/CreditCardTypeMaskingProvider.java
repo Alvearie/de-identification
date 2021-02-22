@@ -13,12 +13,14 @@ import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.util.CreditCardManager;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = 3375383479009603851L;
 
-  private static final CreditCardTypeManager ccTypeManager = new CreditCardTypeManager();
+	private static final CreditCardTypeManager ccTypeManager = new CreditCardTypeManager(
+			LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   private static final CreditCardManager creditCardManager = new CreditCardManager();
 
   /** Instantiates a new Credit card type masking provider. */

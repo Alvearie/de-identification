@@ -33,10 +33,11 @@ public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Ser
    * Instantiates a ZIP code manager.
    *
    * @param prefixLength the prefix length of ZIP codes
-   * @param tenantId tenant id
+ * @param tenantId tenant id
+ * @param localizationProperty TODO
    */
-  public ZIPCodeManager(int prefixLength, String tenantId) {
-    super(tenantId, Resource.ZIPCODE);
+  public ZIPCodeManager(int prefixLength, String tenantId, String localizationProperty) {
+    super(tenantId, Resource.ZIPCODE, localizationProperty);
     this.prefixLength = prefixLength;
     buildPrefixMap(getResources());
   }
@@ -52,7 +53,7 @@ public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Ser
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.ZIPCODE);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.ZIPCODE);
   }
 
   /**
@@ -162,7 +163,7 @@ public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Ser
    *         the given country.
    */
   public Integer getZipCodeLength(String countryCode) {
-    Properties locProp = LocalizationManager.getInstance().getLocaleProperties(countryCode);
+    Properties locProp = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties(countryCode);
     if (locProp.size() != 0) {
       String zipcodeLengthString = locProp.getProperty("zipcode.length");
       if (null != zipcodeLengthString) {
@@ -181,7 +182,7 @@ public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Ser
    */
   public String getZipCodeReplacement(String countryCode) {
     // Get the localization properties for this country
-    Properties locProp = LocalizationManager.getInstance().getLocaleProperties(countryCode);
+    Properties locProp = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties(countryCode);
     if (locProp.size() != 0) {
       // If the localization properties exist, use the appropriate key
       String zipcodeReplacement = locProp.getProperty("zipcode.underPopulated");

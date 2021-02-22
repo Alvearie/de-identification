@@ -28,7 +28,7 @@ public class ICDv10Manager implements Manager, Serializable {
   private static final long serialVersionUID = -7207643604541499595L;
 
   protected static final Collection<ResourceEntry> resourceICDList =
-      LocalizationManager.getInstance().getResources(Resource.ICDV10);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.ICDV10);
 
   protected final MapWithRandomPick<String, ICD> icdByCodeMap;
   protected final MapWithRandomPick<String, ICD> icdByNameMap;

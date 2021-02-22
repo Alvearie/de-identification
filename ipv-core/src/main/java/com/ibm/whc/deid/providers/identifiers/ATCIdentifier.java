@@ -28,7 +28,7 @@ public class ATCIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			atcManager = (ATCManager) ManagerFactory.getInstance().getManager(null, Resource.ATC_CODES, null);
+			atcManager = (ATCManager) ManagerFactory.getInstance().getManager(null, Resource.ATC_CODES, null, localizationProperty);
 
 			initialized = true;
 		}

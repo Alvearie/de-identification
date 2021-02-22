@@ -62,7 +62,7 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
 
     String greekRace = "Ασιάτης";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.RACE_ETHNICITY, Collections.singletonList("gr"));
     Set<String> greekRaces = new HashSet<>();
 

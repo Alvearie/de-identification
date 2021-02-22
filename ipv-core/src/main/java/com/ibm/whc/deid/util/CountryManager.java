@@ -31,7 +31,7 @@ public class CountryManager extends AbstractManager<Country>
   private static final long serialVersionUID = -1974159797966269524L;
   protected final Resources resourceType = Resource.COUNTRY;
   protected final Collection<ResourceEntry> resourceCountryList =
-      LocalizationManager.getInstance().getResources(resourceType);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(resourceType);
   protected final SecureRandom random;
 
   protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;

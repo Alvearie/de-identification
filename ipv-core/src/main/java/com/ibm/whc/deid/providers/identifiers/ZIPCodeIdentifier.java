@@ -43,7 +43,7 @@ public class ZIPCodeIdentifier extends AbstractManagerBasedIdentifier {
 	protected Manager getManager() {
 		if (!initialized) {
 			zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(null, Resource.ZIPCODE,
-                ZIPCodeMaskingProviderConfig.MASK_PREFIX_LENGTH_DEFAULT);
+                ZIPCodeMaskingProviderConfig.MASK_PREFIX_LENGTH_DEFAULT, localizationProperty);
 
 			initialized = true;
 		}

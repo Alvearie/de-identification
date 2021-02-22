@@ -11,13 +11,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.models.ValueClass;
@@ -29,8 +32,11 @@ import com.ibm.whc.deid.schema.RelationshipOperand;
 import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
 import com.ibm.whc.deid.util.ContinentManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ContinentMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
+	protected String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testLocalization() throws Exception {
@@ -38,9 +44,9 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     // By default, the continent mask closest flag is false and closestK is
     // 5.
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
-    ContinentManager manager = new ContinentManager(tenantId);
+    ContinentManager manager = new ContinentManager(tenantId, localizationProperty);
     Collection<Continent> greekContinents = manager.getValues("gr");
     assertNotNull(greekContinents);
     assertTrue(greekContinents.size() > 2);
@@ -64,7 +70,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setMaskClosest(true);
     configuration.setMaskClosestK(4);
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalContinent = "Europe";
     HashSet<String> validNeighbors =
@@ -79,7 +85,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testCompoundMask() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalContinent = "Europe";
 
@@ -100,7 +106,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testCompoundMaskLinkWithCity() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalContinent = "Europe";
 
@@ -121,7 +127,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testMaskNullContinentInputReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = null;
     String maskedContinent = maskingProvider.mask(invalidContinent);
@@ -134,7 +140,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskInvalidContinentInputValidHandlingReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);
@@ -147,7 +153,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskInvalidContinentInputValidHandlingReturnRandom() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new ContinentIdentifier();
 
     String invalidContinent = "Invalid Continent";
@@ -164,7 +170,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
       throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);
@@ -179,7 +185,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Continent");
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);
@@ -192,7 +198,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskInvalidContinentInputInvalidHandlingReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);
@@ -217,7 +223,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
 
     for (ContinentMaskingProviderConfig maskingConfiguration : configurations) {
       ContinentMaskingProvider maskingProvider =
-          new ContinentMaskingProvider(maskingConfiguration, tenantId);
+          new ContinentMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       int N = 1000000;
 

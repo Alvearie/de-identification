@@ -51,7 +51,7 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      religionManager = new ReligionManager(null);
+      religionManager = new ReligionManager(null, localizationProperty);
       initialized = true;
     }
   }

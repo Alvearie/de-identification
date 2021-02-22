@@ -10,6 +10,7 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,12 +18,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.CityIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -58,7 +61,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMask() {
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     // different values
     String originalCity = "Dublin";
@@ -72,7 +75,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setMaskPseudorandom(true);
 
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalCity = "Dublin";
     String maskedCity = maskingProvider.mask(originalCity);
@@ -92,9 +95,9 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setMaskPseudorandom(true);
 
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.CITY, Collections.singletonList("gr"));
     Set<String> greekValues = new HashSet<>();
 
@@ -121,36 +124,6 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     }
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-
-    // this test assumes that GR is loaded by default
-
-    CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
-    CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
-    String greekOriginalValue = "Πάτρα";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
-        .getResources(Resource.CITY, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
 
   @Ignore
   @Test
@@ -160,10 +133,10 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setMaskClosest(true);
 
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     String greekOriginalValue = "Πάτρα";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.CITY, Collections.singletonList("gr"));
     Set<String> greekValues = new HashSet<>();
 
@@ -189,7 +162,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskNullCityInputReturnNull() throws Exception {
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String invalidCity = null;
     String maskedCity = maskingProvider.mask(invalidCity);
@@ -202,7 +175,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidCityInputValidHandlingReturnNull() throws Exception {
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     String invalidCity = "Invalid City";
     String maskedCity = maskingProvider.mask(invalidCity);
 
@@ -215,7 +188,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     Identifier identifier = new CityIdentifier();
 
     String invalidCity = "Invalid City";
@@ -231,7 +204,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     String invalidCity = "Invalid City";
     String maskedCity = maskingProvider.mask(invalidCity);
 
@@ -245,7 +218,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setUnspecifiedValueHandling(3);
     maskingConfiguration.setUnspecifiedValueReturnMessage("Test City");
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String invalidCity = "Invalid City";
     String maskedCity = maskingProvider.mask(invalidCity);
@@ -259,7 +232,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(4);
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     String invalidCity = "Invalid City";
     String maskedCity = maskingProvider.mask(invalidCity);
 
@@ -279,7 +252,8 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String originalCity = "Dublin";
 
     for (CityMaskingProviderConfig config : configurations) {
-      CityMaskingProvider maskingProvider = new CityMaskingProvider(config, tenantId);
+			CityMaskingProvider maskingProvider = new CityMaskingProvider(config, tenantId,
+					LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
       int N = 1000000;
 
@@ -303,7 +277,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setMaskClosest(true);
 
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
-        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId);
+        .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalCity = "Dublin";
     String[] neighbors = {"Lucan", "Tallaght", "Blanchardstown", "Wolverhampton", "Stoke-on-Trent",

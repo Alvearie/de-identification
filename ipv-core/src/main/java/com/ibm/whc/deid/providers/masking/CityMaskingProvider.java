@@ -29,18 +29,19 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId) {
+  public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+		this.localizationProperty = localizationProperty;
   }
 
   protected void initialize() {
     if (!initialized) {
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null, localizationProperty);
 
       initialized = true;
     }

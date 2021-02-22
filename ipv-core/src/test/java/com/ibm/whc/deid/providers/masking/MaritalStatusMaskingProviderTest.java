@@ -62,7 +62,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
 
     String greekOriginalValue = "Χήρα";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.MARITAL_STATUS, Arrays.asList(new String[] {"gr"}));
     Set<String> greekValues = new HashSet<>();
 

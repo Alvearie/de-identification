@@ -6,10 +6,13 @@
 package com.ibm.whc.deid.providers.identifiers;
 
 import com.ibm.whc.deid.util.Manager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public abstract class AbstractManagerBasedIdentifier extends AbstractIdentifier {
   /** */
   private static final long serialVersionUID = 2133606795721693469L;
+
+	protected String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   /**
    * Gets manager.

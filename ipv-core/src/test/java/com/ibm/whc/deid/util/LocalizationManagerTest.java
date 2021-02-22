@@ -25,7 +25,7 @@ public class LocalizationManagerTest {
 
   @Before
   public void setUp() {
-    manager = LocalizationManager.getInstance();
+    manager = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   @Test

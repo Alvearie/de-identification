@@ -81,7 +81,7 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       icdv10Manager =
-          (ICDv10Manager) ManagerFactory.getInstance().getManager(null, Resource.ICDV10, null);
+          (ICDv10Manager) ManagerFactory.getInstance().getManager(null, Resource.ICDV10, null, localizationProperty);
       initialized = true;
     }
   }

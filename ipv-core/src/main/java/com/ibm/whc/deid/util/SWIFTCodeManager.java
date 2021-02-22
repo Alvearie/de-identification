@@ -26,8 +26,8 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
   /** */
   private static final long serialVersionUID = 8621077436877031606L;
 
-  public SWIFTCodeManager(String tenantId) {
-    super(tenantId, Resource.SWIFT);
+  public SWIFTCodeManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.SWIFT, localizationProperty);
   }
 
   protected static final CountryManager countryManager = new CountryManager(null);
@@ -60,7 +60,7 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.SWIFT);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.SWIFT);
   }
 
   @Override

@@ -10,14 +10,17 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.VINIdentifier;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.VINMaskingProviderConfig;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.VINManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   private final VINIdentifier vinIdentifier = new VINIdentifier();
@@ -49,7 +52,7 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     configuration.setVdsPreserve(true);
     MaskingProvider vinMaskingProvider = new VINMaskingProvider(configuration, tenantId);
     VINManager vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+				Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String vin = "1B312345678901234";
     String maskedResult = vinMaskingProvider.mask(vin);

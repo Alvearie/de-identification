@@ -5,19 +5,22 @@
  */
 package com.ibm.whc.deid.providers.identifiers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
 import com.ibm.whc.deid.util.Manager;
-import java.util.Arrays;
-import java.util.Collection;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class CreditCardTypeIdentifier extends AbstractManagerBasedIdentifier {
   /** */
   private static final long serialVersionUID = 8292073040447713030L;
 
   private static final String[] appropriateNames = {"Credit Card Type"};
-  private static final CreditCardTypeManager creditCardTypeManager = new CreditCardTypeManager();
+	private static final CreditCardTypeManager creditCardTypeManager = new CreditCardTypeManager(
+			LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
   @Override
   protected Manager getManager() {

@@ -35,7 +35,7 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      countyManager = new CountyManager(null);
+      countyManager = new CountyManager(null, localizationProperty);
       initialized = true;
     }
   }

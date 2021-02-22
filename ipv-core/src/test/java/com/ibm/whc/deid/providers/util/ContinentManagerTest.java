@@ -7,23 +7,29 @@ package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Test;
+
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.util.ContinentManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ContinentManagerTest {
+
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testLocalization() {
     // this test assumes that GR is loaded by default
-    ContinentManager continentManager = new ContinentManager(null);
+    ContinentManager continentManager = new ContinentManager(null, localizationProperty);
 
     String english = "Europe";
     assertTrue(continentManager.isValidKey(english));
@@ -34,7 +40,7 @@ public class ContinentManagerTest {
 
   @Test
   public void testSerializable() throws Exception {
-    ContinentManager continentManager = new ContinentManager(null);
+    ContinentManager continentManager = new ContinentManager(null, localizationProperty);
     // populate distance calculator map
     continentManager.getClosestContinent(continentManager.getKey("europe"), 2);
 
@@ -56,7 +62,7 @@ public class ContinentManagerTest {
 
   @Test
   public void testGetClosest() throws Exception {
-    ContinentManager manager = new ContinentManager(null);
+    ContinentManager manager = new ContinentManager(null, localizationProperty);
     Continent source = manager.getKey("europe");
     assertNotNull(source);
     Collection<Continent> values = manager.getValues(source.getNameCountryCode());
@@ -83,7 +89,7 @@ public class ContinentManagerTest {
 
   @Test
   public void testGetClosest_badK() throws Exception {
-    ContinentManager manager = new ContinentManager(null);
+    ContinentManager manager = new ContinentManager(null, localizationProperty);
     Continent source = manager.getKey("europe");
     assertNotNull(source);
     assertNotNull(manager.getClosestContinent(source, 0));

@@ -36,7 +36,7 @@ public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			raceManager = (RaceManager) ManagerFactory.getInstance().getManager(null, Resource.RACE_ETHNICITY, null);
+			raceManager = (RaceManager) ManagerFactory.getInstance().getManager(null, Resource.RACE_ETHNICITY, null, localizationProperty);
 
 			initialized = true;
 		}

@@ -51,7 +51,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
 
     String greekOriginalValue = "Χτίστης";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.OCCUPATION, Collections.singletonList("gr"));
     Set<String> greekValues = new HashSet<>();
     Set<String> greekCategories = new HashSet<>();

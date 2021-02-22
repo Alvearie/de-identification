@@ -26,7 +26,7 @@ public class GeneralizeManager implements Manager {
   private final Map<String, Set<String>> generalizeCategoryMap;
 
   private static final Collection<ResourceEntry> resourceGeneralizeSets =
-      LocalizationManager.getInstance().getResources(Resource.GENERALIZE);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.GENERALIZE);
 
   private static final LogManager logger = LogManager.getInstance();
 

@@ -5,19 +5,21 @@
  */
 package com.ibm.whc.deid.providers.identifiers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.util.IMEIManager;
 import com.ibm.whc.deid.util.IdentifierUtils;
-import java.util.Arrays;
-import java.util.Collection;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class IMEIIdentifier extends AbstractIdentifier {
   /** */
   private static final long serialVersionUID = -8398288614698641845L;
 
   private static final String[] appropriateNames = new String[] {"IMEI"};
-  private static final IMEIManager imeiManager = new IMEIManager();
+	private static final IMEIManager imeiManager = new IMEIManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
   @Override
   protected Collection<String> getAppropriateNames() {

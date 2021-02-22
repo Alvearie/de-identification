@@ -27,7 +27,7 @@ public class OccupationIdentifier extends AbstractManagerBasedIdentifier {
 	protected Manager getManager() {
 		if (!initialized) {
 			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(null, Resource.OCCUPATION,
-					null);
+					null, localizationProperty);
 
 			initialized = true;
 		}

@@ -23,8 +23,8 @@ public class ATCManager extends ResourceBasedManager<String> {
   /** */
   private static final long serialVersionUID = -4026265397294623506L;
 
-  public ATCManager(String tenantId) {
-    super(tenantId, Resource.ATC_CODES);
+  public ATCManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.ATC_CODES, localizationProperty);
   }
 
   protected List<String> codeList;
@@ -36,7 +36,7 @@ public class ATCManager extends ResourceBasedManager<String> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.ATC_CODES);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.ATC_CODES);
   }
 
   @Override

@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.FirstName;
 import com.ibm.whc.deid.models.Gender;
 import com.ibm.whc.deid.models.LastName;
@@ -38,8 +40,8 @@ public class NamesManager implements Serializable {
     /** */
     private static final long serialVersionUID = -4285989384152952167L;
 
-    protected NameResourceBasedManager(String tenantId, Resources resourceType) {
-      super(tenantId, resourceType);
+    protected NameResourceBasedManager(String tenantId, Resources resourceType, String localizationProperty) {
+      super(tenantId, resourceType, localizationProperty);
     }
 
     /**
@@ -76,8 +78,8 @@ public class NamesManager implements Serializable {
   protected static class LastNameManager extends NameResourceBasedManager<LastName>
       implements Serializable {
 
-    protected LastNameManager(String tenantId) {
-      super(tenantId, Resource.LAST_NAME);
+    protected LastNameManager(String tenantId, String localizationProperty) {
+      super(tenantId, Resource.LAST_NAME, localizationProperty);
     }
 
     /** */
@@ -85,7 +87,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance().getResources(Resource.LAST_NAME);
+      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.LAST_NAME);
     }
 
     /**
@@ -130,8 +132,8 @@ public class NamesManager implements Serializable {
   protected static class MaleNameManager extends NameResourceBasedManager<FirstName>
       implements Serializable {
 
-    protected MaleNameManager(String tenantId) {
-      super(tenantId, Resource.FIRST_NAME_MALE);
+    protected MaleNameManager(String tenantId, String localizationProperty) {
+      super(tenantId, Resource.FIRST_NAME_MALE, localizationProperty);
     }
 
     /** */
@@ -139,7 +141,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance().getResources(Resource.FIRST_NAME_MALE);
+      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.FIRST_NAME_MALE);
     }
 
     /**
@@ -186,8 +188,8 @@ public class NamesManager implements Serializable {
   protected static class FemaleNameManager extends NameResourceBasedManager<FirstName>
       implements Serializable {
 
-    protected FemaleNameManager(String tenantId) {
-      super(tenantId, Resource.FIRST_NAME_FEMALE);
+    protected FemaleNameManager(String tenantId, String localizationProperty) {
+      super(tenantId, Resource.FIRST_NAME_FEMALE, localizationProperty);
     }
 
     /** */
@@ -195,7 +197,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance().getResources(Resource.FIRST_NAME_FEMALE);
+      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.FIRST_NAME_FEMALE);
     }
 
     /**
@@ -249,15 +251,16 @@ public class NamesManager implements Serializable {
 
     protected final SecureRandom random;
 
-    public NameManager(String tenantId) {
-      initializeManagers(tenantId);
+    public NameManager(String tenantId, String localizationProperty) {
+
+			initializeManagers(tenantId, localizationProperty);
       this.random = new SecureRandom();
     }
 
-    protected void initializeManagers(String tenantId) {
-      lastNameManager = new LastNameManager(tenantId);
-      maleNameManager = new MaleNameManager(tenantId);
-      femaleNameManager = new FemaleNameManager(tenantId);
+		protected void initializeManagers(String tenantId, String localizationProperty) {
+      lastNameManager = new LastNameManager(tenantId, localizationProperty);
+      maleNameManager = new MaleNameManager(tenantId, localizationProperty);
+      femaleNameManager = new FemaleNameManager(tenantId, localizationProperty);
     }
 
     /**

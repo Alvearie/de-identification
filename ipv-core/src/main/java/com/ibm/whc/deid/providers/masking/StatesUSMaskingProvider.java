@@ -17,7 +17,7 @@ public class StatesUSMaskingProvider extends AbstractMaskingProvider {
 
   protected StatesUSManager statesUSManager =
       (StatesUSManager) ManagerFactory
-      .getInstance().getManager(null, Resource.STATES_US, null);
+      .getInstance().getManager(null, Resource.STATES_US, null, localizationProperty);
 
   protected volatile boolean initialized = false;
 
@@ -33,7 +33,7 @@ public class StatesUSMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       statesUSManager =
-          (StatesUSManager) ManagerFactory.getInstance().getManager(null, Resource.STATES_US, null);
+          (StatesUSManager) ManagerFactory.getInstance().getManager(null, Resource.STATES_US, null, localizationProperty);
 
       initialized = true;
     }

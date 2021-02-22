@@ -29,11 +29,11 @@ public class MSISDNManager implements Serializable {
   /** */
   private static final long serialVersionUID = -7892640285929594432L;
   protected static final Collection<ResourceEntry> callingCodesList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_CALLING_CODES);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_CALLING_CODES);
   protected static final Collection<ResourceEntry> areaCodeResourceList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_AREA_CODES);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_AREA_CODES);
   protected static final Collection<ResourceEntry> phoneNumberDigitsList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_NUM_DIGITS);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_NUM_DIGITS);
 
   protected MapWithRandomPick<String, String> countryCodeMap;
   protected Map<String, Set<String>> areaCodeMapByCountry;

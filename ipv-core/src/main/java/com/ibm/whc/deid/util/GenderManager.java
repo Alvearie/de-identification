@@ -22,13 +22,13 @@ public class GenderManager extends ResourceBasedManager<Sex> {
   /** */
   private static final long serialVersionUID = -7343046175769273053L;
 
-  public GenderManager(String tenantId) {
-    super(tenantId, Resource.GENDER);
+  public GenderManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.GENDER, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.GENDER);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.GENDER);
   }
 
   @Override

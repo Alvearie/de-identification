@@ -156,10 +156,10 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.POSTAL_CODES, null);
+          .getManager(null, Resource.POSTAL_CODES, null, localizationProperty);
 
       zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.ZIPCODE, prefixLength);
+          .getManager(null, Resource.ZIPCODE, prefixLength, localizationProperty);
 
       initialized = true;
     }

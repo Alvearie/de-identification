@@ -8,12 +8,15 @@ package com.ibm.whc.deid.providers.masking;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
+
 import org.apache.commons.lang3.StringUtils;
+
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.URLMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.RandomGenerators;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class URLMaskingProvider extends AbstractMaskingProvider {
 
@@ -91,7 +94,7 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     RedactMaskingProviderConfig providerConfig = new RedactMaskingProviderConfig();
     providerConfig.setPreserveLength(false);
     return maskingProviderFactory.getProviderFromType(MaskingProviderType.REDACT, deidMaskingConfig,
-        providerConfig, tenantId);
+        providerConfig, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   private String maskQuery(String query) {

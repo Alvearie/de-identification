@@ -8,16 +8,19 @@ package com.ibm.whc.deid.providers.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.VINManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class VINManagerTest {
   @Test
   public void testLookupSuccessful() throws Exception {
     VINManager vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+				Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String wmi = "1C3";
     assertTrue(vinManager.isValidWMI(wmi));
@@ -30,7 +33,7 @@ public class VINManagerTest {
   @Test
   public void testInvalidWMI() throws Exception {
     VINManager vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+				Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String wmi = "12";
     assertFalse(vinManager.isValidWMI(wmi));
@@ -39,7 +42,7 @@ public class VINManagerTest {
   @Test
   public void testGetRandomKey() throws Exception {
     VINManager vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+				Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     assertNotNull(vinManager.getRandomKey());
   }

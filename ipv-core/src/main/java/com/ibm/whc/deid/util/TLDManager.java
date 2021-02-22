@@ -46,7 +46,7 @@ public class TLDManager {
   }
 
   private void buildList() {
-    ResourceEntry filename = LocalizationManager.getInstance()
+    ResourceEntry filename = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.PUBLIC_SUFFIX_LIST).iterator().next();
 
     String line = null;

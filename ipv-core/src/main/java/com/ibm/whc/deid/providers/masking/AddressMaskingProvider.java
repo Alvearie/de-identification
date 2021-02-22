@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.models.RoadTypes;
@@ -18,6 +19,7 @@ import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.PostalCodeManager;
 import com.ibm.whc.deid.util.StreetNameManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * The type Address masking provider.
@@ -188,18 +190,18 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
     if (!initialized) {
       // Initialize all the masking providers/managers needed.
       streetNameManager = (StreetNameManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.STREET_NAMES, null);
+          .getManager(null, Resource.STREET_NAMES, null, localizationProperty);
 
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
-          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null);
+          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
       countryMaskingProvider.initialize();
 
       cityMaskingProvider =
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
-              null, configuration.getCityMaskingConfig(), null);
+              null, configuration.getCityMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
       postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(null,
-          Resource.POSTAL_CODES, null);
+          Resource.POSTAL_CODES, null, localizationProperty);
       initialized = true;
     }
   }

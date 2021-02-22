@@ -15,15 +15,15 @@ public interface MaskingProviderFactory {
    * Get a masking provider based on type.
    * 
    * @param providerType the type of provider to create
-   * @param deidMaskingConfig the complete masking provider configuration
-   * @param config the configuration for the provider to create
-   * @param tenantId the current tenant
-   * 
+ * @param deidMaskingConfig the complete masking provider configuration
+ * @param config the configuration for the provider to create
+ * @param tenantId the current tenant
+ * @param localizationProperty TODO
    * @return the requested masking provider object
    * 
    * @throws NullPointerException if providerType or config are <i>null</i>
    */
   public MaskingProvider getProviderFromType(MaskingProviderTypes providerType,
-      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId);
+      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId, String localizationProperty);
 
 }

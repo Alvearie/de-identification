@@ -8,16 +8,21 @@ package com.ibm.whc.deid.providers.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 import com.ibm.whc.deid.util.SWIFTCodeManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookup() {
-    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId);
+    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId, localizationProperty);
 
     String key = "EMCRGRA1";
     assertTrue(swiftCodeManager.isValidKey(key));
@@ -29,7 +34,7 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
   @Test
   public void testCodeFromCountry() {
-    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId);
+    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId, localizationProperty);
 
     String validCode = "EMCRGRA1";
     assertTrue(swiftCodeManager.isValidKey(validCode));

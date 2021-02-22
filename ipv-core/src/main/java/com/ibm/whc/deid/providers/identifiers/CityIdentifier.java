@@ -46,7 +46,7 @@ public class CityIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			cityManager = (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+			cityManager = (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null, localizationProperty);
 
 			initialized = true;
 		}

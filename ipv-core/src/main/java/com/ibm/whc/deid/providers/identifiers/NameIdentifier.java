@@ -13,6 +13,7 @@ import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.util.NamesManager.NameManager;
 import com.ibm.whc.deid.util.NumberUtils;
 import com.ibm.whc.deid.util.Tuple;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /** The type Name identifier. */
 public class NameIdentifier extends AbstractIdentifier implements IdentifierWithOffset {
@@ -31,7 +32,7 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
 	protected NameManager getManager() {
 		if (!initialized) {
-			nameNanager = new NameManager(null);
+			nameNanager = new NameManager(null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 			initialized = true;
 		}
 		return nameNanager;

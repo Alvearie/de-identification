@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.util.Map;
+
 import com.ibm.whc.deid.models.City;
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.Country;
@@ -39,23 +40,24 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId) {
+  public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
     this.getClosest = configuration.isMaskClosest();
     this.getClosestK = configuration.getMaskClosestK();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+		this.localizationProperty = localizationProperty;
   }
 
   protected void initialize() {
     if (!initialized) {
       continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(null,
-          Resource.CONTINENT, null);
+          Resource.CONTINENT, null, localizationProperty);
 
       countryManager =
-          (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null);
+          (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null, localizationProperty);
 
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null, localizationProperty);
 
       initialized = true;
     }

@@ -22,13 +22,13 @@ public class HospitalManager extends ResourceBasedManager<Hospital> {
   /** */
   private static final long serialVersionUID = 7945071777848441928L;
 
-  public HospitalManager(String tenantId) {
-    super(tenantId, Resource.HOSPITAL_NAMES);
+  public HospitalManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.HOSPITAL_NAMES, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.HOSPITAL_NAMES);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.HOSPITAL_NAMES);
   }
 
   @Override

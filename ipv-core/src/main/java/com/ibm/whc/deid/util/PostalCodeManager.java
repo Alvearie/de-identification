@@ -29,7 +29,7 @@ public class PostalCodeManager implements Manager, Serializable {
   private static final long serialVersionUID = -5126260477789733871L;
 
   protected static final Collection<ResourceEntry> resourceList =
-      LocalizationManager.getInstance().getResources(Resource.POSTAL_CODES);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.POSTAL_CODES);
   protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
   protected List<PostalCode> postalCodeList;
   private LatLonDistance<PostalCode> latLonTree = null;

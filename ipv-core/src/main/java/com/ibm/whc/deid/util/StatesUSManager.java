@@ -23,14 +23,14 @@ public class StatesUSManager extends ResourceBasedManager<State> {
   /** */
   private static final long serialVersionUID = -5599163280173053663L;
 
-  public StatesUSManager(String tenantId) {
-    super(tenantId, Resource.STATES_US);
+  public StatesUSManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.STATES_US, localizationProperty);
   }
 
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.STATES_US);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.STATES_US);
   }
 
   @Override

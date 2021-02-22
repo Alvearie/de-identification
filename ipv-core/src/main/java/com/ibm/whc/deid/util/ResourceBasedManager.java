@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.ibm.whc.deid.models.LocalizedEntity;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
@@ -35,6 +36,8 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
   static final LogManager logger = LogManager.getInstance();
 
   protected int resourceInDbCount = 0;
+
+	protected String localizationProperty;
 
   /**
    * Gets all countries name.
@@ -111,9 +114,11 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
    * Instantiates a new Resource based manager.
    *
    * @param tenantId tenant id
+ * @param localizationProperty TODO
    */
-  public ResourceBasedManager(String tenantId, Resources resourceType) {
+  public ResourceBasedManager(String tenantId, Resources resourceType, String localizationProperty) {
     this.tenantId = tenantId;
+		this.localizationProperty = localizationProperty;
     this.resourceType = resourceType;
     init();
 
@@ -200,7 +205,8 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
     }
   }
 
-  public String getRandomKey() {
+  @Override
+public String getRandomKey() {
     return getRandomKey(allCountriesName);
   }
 
@@ -227,7 +233,8 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
     return null;
   }
 
-  public boolean isValidKey(String key) {
+  @Override
+public boolean isValidKey(String key) {
     MapWithRandomPick<String, K> map = resourceMap.get(allCountriesName);
     return map != null && map.getMap().containsKey(key.toUpperCase());
   }

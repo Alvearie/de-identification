@@ -23,8 +23,8 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class MaritalStatusManager extends ResourceBasedManager<MaritalStatus>
     implements Serializable {
-  public MaritalStatusManager(String tenantId) {
-    super(tenantId, Resource.MARITAL_STATUS);
+  public MaritalStatusManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.MARITAL_STATUS, localizationProperty);
   }
 
   /** */
@@ -44,7 +44,7 @@ public class MaritalStatusManager extends ResourceBasedManager<MaritalStatus>
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.MARITAL_STATUS);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.MARITAL_STATUS);
   }
 
   @Override

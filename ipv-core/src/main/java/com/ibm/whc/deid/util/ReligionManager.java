@@ -22,13 +22,13 @@ public class ReligionManager extends ResourceBasedManager<Religion> {
   /** */
   private static final long serialVersionUID = -2918967366667277711L;
 
-  public ReligionManager(String tenantId) {
-    super(tenantId, Resource.RELIGION);
+  public ReligionManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.RELIGION, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.RELIGION);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.RELIGION);
   }
 
   @Override

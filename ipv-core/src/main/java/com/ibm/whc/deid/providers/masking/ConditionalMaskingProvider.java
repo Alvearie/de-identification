@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRResourceField;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRResourceMaskingConfiguration;
@@ -21,6 +22,7 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * The type Conditional masking provider.
@@ -49,7 +51,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
     return maskingProviderFactory.getProviderFromType(config.getType(), deidMaskingConfig, config,
-        tenantId);
+        tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   /**
@@ -58,7 +60,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    * @param identifier
    * @return mask value
    */
-  public String mask(String identifier) {
+  @Override
+public String mask(String identifier) {
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;

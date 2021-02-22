@@ -62,7 +62,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
     String greekReligion = "Βουδιστής";
 
     Collection<ResourceEntry> entryCollection =
-        LocalizationManager.getInstance()
+        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
             .getResources(Resource.RELIGION, Arrays.asList(new String[] {"gr"}));
     Set<String> greekReligions = new HashSet<>();
 

@@ -54,7 +54,7 @@ public class VINIdentifier extends AbstractManagerBasedIdentifier {
 	protected Manager getManager() {
 		if (!initialized) {
 			vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-					Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+					Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
 
 			initialized = true;
 		}

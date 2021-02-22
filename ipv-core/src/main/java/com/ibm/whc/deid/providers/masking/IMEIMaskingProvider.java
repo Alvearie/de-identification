@@ -9,13 +9,14 @@ import com.ibm.whc.deid.providers.identifiers.IMEIIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
 import com.ibm.whc.deid.util.IMEIManager;
 import com.ibm.whc.deid.util.RandomGenerators;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class IMEIMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = -5189348513611132622L;
 
   private static final IMEIIdentifier identifier = new IMEIIdentifier();
-  private static final IMEIManager imeiManager = new IMEIManager();
+	private static final IMEIManager imeiManager = new IMEIManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   private final boolean preserveTAC;
 
   /**

@@ -18,7 +18,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
   private static final long serialVersionUID = -1898529887780962978L;
 
   protected MaritalStatusManager statusManager = (MaritalStatusManager) ManagerFactory
-      .getInstance().getManager(null, Resource.MARITAL_STATUS, null);
+      .getInstance().getManager(null, Resource.MARITAL_STATUS, null, localizationProperty);
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
@@ -63,7 +63,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(null,
-          Resource.MARITAL_STATUS, null);
+          Resource.MARITAL_STATUS, null, localizationProperty);
 
       initialized = true;
     }

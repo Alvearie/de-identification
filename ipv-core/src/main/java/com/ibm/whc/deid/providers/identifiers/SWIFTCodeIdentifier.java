@@ -27,7 +27,7 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
   @Override
   protected Manager getManager() {
 		if (!initialized) {
-			swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null);
+			swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null, localizationProperty);
 
 			initialized = true;
 		}

@@ -46,7 +46,7 @@ public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
   protected Manager getManager() {
 		if (!initialized) {
 			continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(null, Resource.CONTINENT,
-					null);
+					null, localizationProperty);
 
 			initialized = true;
 		}

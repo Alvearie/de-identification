@@ -34,8 +34,8 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
 
   protected final SecureRandom random = new SecureRandom();
 
-  public ContinentManager(String tenantId) {
-    super(tenantId, Resource.CONTINENT);
+  public ContinentManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.CONTINENT, localizationProperty);
   }
 
   @Override
@@ -45,7 +45,7 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.CONTINENT);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.CONTINENT);
   }
 
   @Override

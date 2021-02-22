@@ -24,13 +24,13 @@ public class OccupationManager extends ResourceBasedManager<Occupation> {
   /** */
   private static final long serialVersionUID = 1820857985982718471L;
 
-  public OccupationManager(String tenantId) {
-    super(tenantId, Resource.OCCUPATION);
+  public OccupationManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.OCCUPATION, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.OCCUPATION);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.OCCUPATION);
   }
 
   @Override

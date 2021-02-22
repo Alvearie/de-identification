@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
@@ -112,7 +113,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
 
   @Override
   public MaskingProvider getProviderFromType(MaskingProviderTypes providerType,
-      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId) {
+      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId, String localizationProperty) {
 
     // Note - as per documentation of the MaskingProviderFactory interface, allow
     // NullPointerException to be thrown if providerType or config are null
@@ -124,13 +125,13 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
     if (provider != null) {
       return provider;
     }
-    provider = getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId);
+		provider = getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId, localizationProperty);
     maskingProviderCache.put(config, provider);
     return provider;
   }
 
   protected MaskingProvider getNewProviderFromType(MaskingProviderTypes providerType,
-      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId) {
+      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId, String localizationProperty) {
     MaskingProvider provider = null;
     switch ((MaskingProviderType) providerType) {
       case ADDRESS:
@@ -144,14 +145,14 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new BinningMaskingProvider((BinningMaskingProviderConfig) config);
         break;
       case CITY:
-        provider = new CityMaskingProvider((CityMaskingProviderConfig) config, tenantId);
+        provider = new CityMaskingProvider((CityMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case CONDITIONAL:
         provider = new ConditionalMaskingProvider((ConditionalMaskingProviderConfig) config,
             tenantId, deidMaskingConfig);
         break;
       case CONTINENT:
-        provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId);
+        provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case COUNTY:
         provider = new CountyMaskingProvider((CountyMaskingProviderConfig) config, tenantId);
@@ -223,7 +224,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
             new MaritalStatusMaskingProvider((MaritalStatusMaskingProviderConfig) config, tenantId);
         break;
       case NAME:
-        provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId);
+        provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case NULL:
         provider = new NullMaskingProvider((NullMaskingProviderConfig) config);

@@ -27,7 +27,7 @@ public class VINManager implements Manager, Serializable {
   private static final long serialVersionUID = 8854083379768714880L;
 
   protected static final Collection<ResourceEntry> resourceWMIList =
-      LocalizationManager.getInstance().getResources(Resource.WORLD_MANUFACTURERS_IDENTIFIER);
+      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.WORLD_MANUFACTURERS_IDENTIFIER);
   protected final Map<String, String> wmiMap;
   protected final String[] wmiList;
   protected final SecureRandom random;

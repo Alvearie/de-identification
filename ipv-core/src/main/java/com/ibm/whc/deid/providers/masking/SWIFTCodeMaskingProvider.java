@@ -18,7 +18,7 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected SWIFTCodeManager swiftCodeManager =
       (SWIFTCodeManager) ManagerFactory
-      .getInstance().getManager(null, Resource.SWIFT, null);
+      .getInstance().getManager(null, Resource.SWIFT, null, localizationProperty);
   protected final boolean preserveCountry;
 
   /**
@@ -44,7 +44,7 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       swiftCodeManager =
-          (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null);
+          (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null, localizationProperty);
 
       initialized = true;
     }

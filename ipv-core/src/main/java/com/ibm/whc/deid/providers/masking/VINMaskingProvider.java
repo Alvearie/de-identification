@@ -78,7 +78,7 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-          Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+          Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
 
       initialized = true;
     }

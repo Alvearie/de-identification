@@ -22,13 +22,13 @@ public class CountyManager extends ResourceBasedManager<County> {
   /** */
   private static final long serialVersionUID = -7331835176814737907L;
 
-  public CountyManager(String tenantId) {
-    super(tenantId, Resource.COUNTY);
+  public CountyManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.COUNTY, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.COUNTY);
+    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.COUNTY);
   }
 
   @Override

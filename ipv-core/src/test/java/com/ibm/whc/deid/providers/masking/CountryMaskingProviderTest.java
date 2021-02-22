@@ -95,7 +95,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     String greekOriginalValue = "Ελλάδα";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
+    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.COUNTRY, Collections.singletonList("gr"));
     Set<String> greekValues = new HashSet<>();
 

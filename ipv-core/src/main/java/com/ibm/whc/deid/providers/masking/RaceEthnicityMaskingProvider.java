@@ -59,7 +59,7 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      raceManager = new RaceManager(null);
+      raceManager = new RaceManager(null, localizationProperty);
       initialized = true;
     }
   }

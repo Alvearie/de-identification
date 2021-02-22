@@ -29,7 +29,7 @@ public class HospitalIdentifier extends AbstractManagerBasedIdentifier {
 	protected Manager getManager() {
 		if (!initialized) {
 			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(null, Resource.HOSPITAL_NAMES,
-					null);
+					null, localizationProperty);
 
 			initialized = true;
 		}

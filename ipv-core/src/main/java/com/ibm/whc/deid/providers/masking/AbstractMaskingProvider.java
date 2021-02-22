@@ -5,6 +5,10 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -14,9 +18,6 @@ import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The type Abstract masking provider.
@@ -29,6 +30,8 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   protected SecureRandom random;
   protected LogManager testingOnly_LogManager;
   protected boolean debug_enabled;
+
+	protected String localizationProperty;
 
   protected LogManager log = LogManager.getInstance();
 
