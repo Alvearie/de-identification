@@ -447,6 +447,33 @@ public class DataMaskingControllerErrorPathTest {
   }
 
   @Test
+  public void testConfigJsonPathDuplicated() throws Exception {
+    List<String> dataList = new ArrayList<>();
+    dataList.add(TEST_DATA);
+
+    ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
+    DeidMaskingConfig config = objectMapper.readValue(TEST_CONFIG, DeidMaskingConfig.class);
+
+    List<JsonMaskingRule> assignments = config.getJson().getMaskingRules();
+    assignments.add(3, new JsonMaskingRule("/fhir/test/null1", "HASH"));
+    assignments.add(5, new JsonMaskingRule("/fhir/test/path2", "HASH"));
+    // complete duplicate - ignored
+    assignments.add(7, new JsonMaskingRule("/fhir/test/path1", "HASH"));
+    assignments.add(7, new JsonMaskingRule("/fhir/test/path2", "CONTINENT"));
+    DataMaskingModel dataMaskingModel = new DataMaskingModel(
+        objectMapper.writeValueAsString(config), dataList, ConfigSchemaType.FHIR);
+    String request = objectMapper.writeValueAsString(dataMaskingModel);
+
+    log.info(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(request))
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString(
+            "Invalid masking configuration: the path `/fhir/test/path2` is assigned to the `CONTINENT` rule but that path is already assigned to the `HASH` rule")));
+  }
+
+  @Test
   public void testConfigRuleAssignmentMismatch() throws Exception {
     List<String> dataList = new ArrayList<>();
     dataList.add(TEST_DATA);
