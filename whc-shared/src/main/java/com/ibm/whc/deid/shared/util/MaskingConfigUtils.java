@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.shared.util;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,7 @@ public class MaskingConfigUtils {
     List<JsonMaskingRule> maskingRules = jsonConfig.getMaskingRules();
     if (maskingRules != null && !maskingRules.isEmpty()) {
       Map<String, Rule> rulesMap = deidMaskingConfig.getRulesMap();
+      HashMap<String, String> pathMap = new HashMap<>(maskingRules.size() * 2);
       int offset = 0;
       int mismatchCount = 0;
       String firstMismatch = null;
@@ -189,6 +191,22 @@ public class MaskingConfigUtils {
             if (firstMismatch == null) {
               firstMismatch = ruleName;
             }
+          }
+        }
+
+        // Rule assignments with null rule names will eventually be removed.
+        // Check for duplicate paths in rule assignments only for assignments specifying a rule.
+        // No error is generated if the assignment with the duplicate path also specifies the same
+        // rule (complete duplication). Later processing will ensure the rule isn't applied twice.
+        if (ruleName != null) {
+          String oldRuleName = pathMap.put(path, ruleName);
+          if (oldRuleName != null && !oldRuleName.equals(ruleName)) {
+            InvalidMaskingConfigurationException e = new InvalidMaskingConfigurationException(
+                Messages.getMessage(LogCodes.WPH8015E, path, ruleName, oldRuleName),
+                DeidMaskingConfig.JSON_CONFIGURATION_PROPERTY_NAME + "."
+                    + JsonConfig.RULES_PROPERTY_NAME + "." + JsonMaskingRule.PATH_PROPERTY_NAME);
+            e.setMessageKey(LogCodes.WPH8015E);
+            throw e;
           }
         }
 
