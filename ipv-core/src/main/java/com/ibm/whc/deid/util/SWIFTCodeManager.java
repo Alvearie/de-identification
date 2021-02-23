@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -30,13 +32,14 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
     super(tenantId, Resource.SWIFT, localizationProperty);
   }
 
-  protected static final CountryManager countryManager = new CountryManager(null);
+	protected CountryManager countryManager;
   protected Map<String, List<SWIFTCode>> codeByCountryMap;
   protected final SecureRandom random = new SecureRandom();
 
   @Override
   public void init() {
     this.codeByCountryMap = new HashMap<>();
+		countryManager = new CountryManager(tenantId, localizationProperty);
   }
 
   /**

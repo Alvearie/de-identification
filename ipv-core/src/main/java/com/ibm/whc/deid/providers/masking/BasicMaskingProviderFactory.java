@@ -136,10 +136,10 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
     switch ((MaskingProviderType) providerType) {
       case ADDRESS:
         provider =
-            new AddressMaskingProvider((AddressMaskingProviderConfig) config, tenantId, this);
+            new AddressMaskingProvider((AddressMaskingProviderConfig) config, tenantId, this, localizationProperty);
         break;
       case ATC:
-        provider = new ATCMaskingProvider((ATCMaskingProviderConfig) config, tenantId);
+        provider = new ATCMaskingProvider((ATCMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case BINNING:
         provider = new BinningMaskingProvider((BinningMaskingProviderConfig) config);
@@ -149,19 +149,19 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         break;
       case CONDITIONAL:
         provider = new ConditionalMaskingProvider((ConditionalMaskingProviderConfig) config,
-            tenantId, deidMaskingConfig);
+            tenantId, deidMaskingConfig, localizationProperty);
         break;
       case CONTINENT:
         provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case COUNTY:
-        provider = new CountyMaskingProvider((CountyMaskingProviderConfig) config, tenantId);
+        provider = new CountyMaskingProvider((CountyMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case COUNTRY:
-        provider = new CountryMaskingProvider((CountryMaskingProviderConfig) config, tenantId);
+        provider = new CountryMaskingProvider((CountryMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case CREDIT_CARD:
-        provider = new CreditCardMaskingProvider((CreditCardMaskingProviderConfig) config);
+        provider = new CreditCardMaskingProvider((CreditCardMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case DATEDEPENDENCY:
         provider = new DateDependencyMaskingProvider((DateDependencyMaskingProviderConfig) config,
@@ -180,7 +180,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new GenericMaskingProvider(deidMaskingConfig, this, tenantId);
         break;
       case GENDER:
-        provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId);
+        provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case GENERALIZE:
         provider = new GeneralizeMaskingProvider((GeneralizeMaskingProviderConfig) config);
@@ -192,7 +192,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new HashMaskingProvider((HashMaskingProviderConfig) config);
         break;
       case HOSPITAL:
-        provider = new HospitalMaskingProvider((HospitalMaskingProviderConfig) config, tenantId);
+        provider = new HospitalMaskingProvider((HospitalMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case IBAN:
         provider = new IBANMaskingProvider((IBANMaskingProviderConfig) config);
@@ -268,7 +268,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new StatesUSMaskingProvider((StatesUSMaskingProviderConfig) config, tenantId);
         break;
       case SWIFT:
-        provider = new SWIFTCodeMaskingProvider((SWIFTMaskingProviderConfig) config, tenantId);
+        provider = new SWIFTCodeMaskingProvider((SWIFTMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case URL:
         provider =

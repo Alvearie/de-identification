@@ -8,6 +8,11 @@ package com.ibm.whc.deid.providers.masking;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
@@ -15,14 +20,13 @@ import com.ibm.whc.deid.providers.identifiers.CreditCardTypeIdentifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.schema.RelationshipOperand;
 import com.ibm.whc.deid.schema.RelationshipType;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.Test;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
-public class CreditCardTypeMaskingProviderTest extends TestLogSetUp {
+public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   @Test
   public void testMask() {
-    CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider();
+		CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(
+				tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier();
 
     String originalValue = "VISA";
@@ -41,7 +45,8 @@ public class CreditCardTypeMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testCompoundMask() throws Exception {
-    CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider();
+		CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(
+				tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalCCType = "VISA";
 

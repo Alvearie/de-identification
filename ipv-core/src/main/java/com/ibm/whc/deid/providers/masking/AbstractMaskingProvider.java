@@ -32,10 +32,20 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   protected boolean debug_enabled;
 
 	protected String localizationProperty;
+	protected String tenantId;
 
   protected LogManager log = LogManager.getInstance();
 
   private String name = "";
+
+	public AbstractMaskingProvider() {
+
+	}
+
+	public AbstractMaskingProvider(String tenantId, String localizationProperty) {
+		this.tenantId = tenantId;
+		this.localizationProperty = localizationProperty;
+	}
 
   @Override
   public String[] mask(String[] data) {

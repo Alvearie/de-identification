@@ -23,7 +23,8 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId) {
+  public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.preserveCountry = configuration.isMaskPreserveCountry();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();

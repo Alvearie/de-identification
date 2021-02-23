@@ -22,7 +22,8 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public GenderMaskingProvider(GenderMaskingProviderConfig configuration, String tenantId) {
+  public GenderMaskingProvider(GenderMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }

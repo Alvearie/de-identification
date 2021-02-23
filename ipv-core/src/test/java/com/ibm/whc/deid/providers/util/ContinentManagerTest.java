@@ -27,18 +27,6 @@ public class ContinentManagerTest {
 	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
-  public void testLocalization() {
-    // this test assumes that GR is loaded by default
-    ContinentManager continentManager = new ContinentManager(null, localizationProperty);
-
-    String english = "Europe";
-    assertTrue(continentManager.isValidKey(english));
-
-    String greek = "Ευρώπη";
-    assertTrue(continentManager.isValidKey(greek));
-  }
-
-  @Test
   public void testSerializable() throws Exception {
     ContinentManager continentManager = new ContinentManager(null, localizationProperty);
     // populate distance calculator map

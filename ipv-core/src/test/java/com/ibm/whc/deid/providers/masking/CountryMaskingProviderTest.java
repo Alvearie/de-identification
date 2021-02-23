@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,10 +18,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
@@ -38,6 +41,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests all three of the CountryMaskingProvider options (country.mask.closest,
    * country.mask.closestK, and country.mask.pseudorandom). When the country.mask.closest flag is
@@ -49,7 +53,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testRandomCountryGenerator() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalCountry = "United Kingdom";
 
@@ -71,7 +75,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setMaskPseudorandom(true);
 
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalCity = "Italy";
     String maskedCity = maskingProvider.mask(originalCity);
@@ -91,7 +95,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String greekOriginalValue = "Ελλάδα";
 
@@ -120,7 +124,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testEmptyValue() {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalCountry = "";
     String randomCountry = countryMaskingProvider.mask(originalCountry);
@@ -132,8 +136,8 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testPreservesFormat() {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
-    CountryManager countryManager = new CountryManager(null);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    CountryManager countryManager = new CountryManager(null, localizationProperty);
 
     String originalCountry = "GB";
     String randomCountry = countryMaskingProvider.mask(originalCountry);
@@ -157,7 +161,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     maskingConfiguration.setMaskClosest(true);
 
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     int randomizationOK = 0;
 
@@ -176,7 +180,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testCompoundMask() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId);
+        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalCountry = "Italy";
 
@@ -195,7 +199,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskNullCountryInputReturnNull() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidCountry = null;
     String maskedCountry = maskingProvider.mask(invalidCountry);
@@ -208,7 +212,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidCountryInputValidHandlingReturnNull() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidCountry = "Invalid Country";
     String maskedCountry = maskingProvider.mask(invalidCountry);
@@ -221,7 +225,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidCountryInputValidHandlingReturnRandom() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new CountryIdentifier();
 
     String invalidCountry = "Invalid Country";
@@ -236,7 +240,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidCountryInputValidHandlingReturnDefaultCustomValue() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidCountry = "Invalid Country";
     String maskedCountry = maskingProvider.mask(invalidCountry);
@@ -251,7 +255,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
     maskingConfiguration.setUnspecifiedValueReturnMessage("Test Country");
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidCountry = "Invalid Country";
     String maskedCountry = maskingProvider.mask(invalidCountry);
@@ -264,7 +268,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidCountryInputInvalidHandlingReturnNull() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidCountry = "Invalid Country";
     String maskedCountry = maskingProvider.mask(invalidCountry);
@@ -287,7 +291,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     String[] originalValues = new String[] {"GB"};
 
     for (CountryMaskingProviderConfig config : configurations) {
-      CountryMaskingProvider maskingProvider = new CountryMaskingProvider(config, tenantId);
+      CountryMaskingProvider maskingProvider = new CountryMaskingProvider(config, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();

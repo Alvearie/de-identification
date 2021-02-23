@@ -53,7 +53,9 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   protected volatile boolean initialized = false;
 
   public AddressMaskingProvider(AddressMaskingProviderConfig configuration, String tenantId,
-      MaskingProviderFactory maskingProviderFactory) {
+      MaskingProviderFactory maskingProviderFactory, String localizationProperty) {
+
+		super(tenantId, localizationProperty);
 
     this.maskingProviderFactory = maskingProviderFactory;
 

@@ -41,7 +41,8 @@ public class ManagerFactory {
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
 
-
+		// FIXME: We will need a manager that is tenant specific instead of just base on
+		// resourceType
     Manager manager = managers.get(resourceType);
 
     if (manager != null) {
@@ -73,7 +74,7 @@ public class ManagerFactory {
           manager = new ContinentManager(tenantId, localizationProperty);
           break;
         case COUNTRY:
-          manager = new CountryManager(tenantId);
+          manager = new CountryManager(tenantId, localizationProperty);
           break;
         case COUNTY:
           manager = new CountyManager(tenantId, localizationProperty);

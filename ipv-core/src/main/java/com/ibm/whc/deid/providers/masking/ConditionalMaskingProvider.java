@@ -35,7 +35,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   private static final MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
   List<ConditionalMaskRuleSet> maskRuleSet;
-  private String tenantId;
+
   private DeidMaskingConfig deidMaskingConfig;
 
   private JsonNode root;
@@ -43,8 +43,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig) {
-    this.tenantId = tenantId;
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.deidMaskingConfig = deidMaskingConfig;
     maskRuleSet = configuration.getMaskRuleSet();
   }

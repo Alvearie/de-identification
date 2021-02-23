@@ -41,11 +41,12 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
   protected volatile boolean initialized = false;
 
   public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.getClosestK = configuration.getMaskClosestK();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-		this.localizationProperty = localizationProperty;
+
   }
 
   protected void initialize() {

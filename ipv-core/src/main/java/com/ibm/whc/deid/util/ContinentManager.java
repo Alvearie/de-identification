@@ -14,8 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -45,7 +47,7 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.CONTINENT);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
   }
 
   @Override

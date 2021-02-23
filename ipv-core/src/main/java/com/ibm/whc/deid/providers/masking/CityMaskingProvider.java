@@ -30,6 +30,7 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
   protected volatile boolean initialized = false;
 
   public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();

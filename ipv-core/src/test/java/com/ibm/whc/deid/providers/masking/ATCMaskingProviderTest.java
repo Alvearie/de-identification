@@ -9,8 +9,11 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.shared.pojo.config.masking.ATCMaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   // @formatter:off
@@ -19,33 +22,35 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
    * It also tests for an invalid value.
    */
 
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testMask() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setMaskLevelsToKeep(1);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "A04AA02";
     String maskedValue = maskingProvider.mask(atc);
     assertTrue(maskedValue.equals("A"));
 
     configuration.setMaskLevelsToKeep(2);
-    maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
     maskedValue = maskingProvider.mask(atc);
     assertTrue(maskedValue.equals("A04"));
 
     configuration.setMaskLevelsToKeep(3);
-    maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
     maskedValue = maskingProvider.mask(atc);
     assertTrue(maskedValue.equals("A04A"));
 
     configuration.setMaskLevelsToKeep(4);
-    maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
     maskedValue = maskingProvider.mask(atc);
     assertTrue(maskedValue.equals("A04AA"));
 
     configuration.setMaskLevelsToKeep(5);
-    maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
     maskedValue = maskingProvider.mask(atc);
     assertEquals(null, maskedValue);
   }
@@ -53,7 +58,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskNullValueReturnNull() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = null;
     String maskedValue = maskingProvider.mask(atc);
@@ -68,7 +73,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidValueValidHandlingReturnNull() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
@@ -83,7 +88,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidValueValidHandlingReturnRandom() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
@@ -98,7 +103,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidValueValidHandlingReturnDefaultCustomValue() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
@@ -114,7 +119,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test ATC");
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
@@ -129,7 +134,7 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidValueInvalidHandlingReturnNull() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);

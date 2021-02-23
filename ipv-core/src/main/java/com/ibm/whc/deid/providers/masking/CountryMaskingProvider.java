@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.util.Map;
+
 import com.ibm.whc.deid.models.City;
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
@@ -34,7 +35,8 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId) {
+  public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();

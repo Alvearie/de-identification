@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
+
 import scala.Tuple2;
 
 public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingProvider {
@@ -39,7 +41,9 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
 
   protected String identifier;
 
-  public AbstractComplexMaskingProvider() {}
+	public AbstractComplexMaskingProvider() {
+		super(null, null);
+	}
 
   public AbstractComplexMaskingProvider(DeidMaskingConfig maskingConfiguration) {
     this.keyForType = maskingConfiguration.getJson().getMessageTypeKey();

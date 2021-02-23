@@ -21,7 +21,9 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
-  public ATCMaskingProvider(ATCMaskingProviderConfig configuration, String tenantId) {
+  public ATCMaskingProvider(ATCMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+		
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.levelsToKeep = configuration.getMaskLevelsToKeep();

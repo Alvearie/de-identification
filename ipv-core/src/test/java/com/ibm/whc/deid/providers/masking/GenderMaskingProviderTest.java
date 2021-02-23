@@ -10,12 +10,17 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.GenderIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.GenderMaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Note: Tries origin value of "male, Female, or Both" 100 times, and gets back a random
    * distribution of masked MALE and FEMALE values. GenderMaskingProvider does not check the origin
@@ -26,7 +31,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMask() {
     Identifier identifier = new GenderIdentifier();
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalValue = "male";
     int randomizationOK = 0;
@@ -80,7 +85,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testMaskNullGenderInputReturnNull() throws Exception {
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidGender = null;
     String maskedGender = maskingProvider.mask(invalidGender);
@@ -93,7 +98,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidGenderInputValidHandlingReturnNull() throws Exception {
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidGender = "Invalid Gender";
     String maskedGender = maskingProvider.mask(invalidGender);
@@ -106,7 +111,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidGenderInputValidHandlingReturnRandom() throws Exception {
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new GenderIdentifier();
 
     String invalidGender = "Invalid Gender";
@@ -121,7 +126,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidGenderInputValidHandlingReturnDefaultCustomValue() throws Exception {
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidGender = "Invalid Gender";
     String maskedGender = maskingProvider.mask(invalidGender);
@@ -136,7 +141,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
     maskingConfiguration.setUnspecifiedValueReturnMessage("Test Gender");
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidGender = "Invalid Gender";
     String maskedGender = maskingProvider.mask(invalidGender);
@@ -149,7 +154,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidGenderInputInvalidHandlingReturnNull() throws Exception {
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidGender = "Invalid Gender";
     String maskedGender = maskingProvider.mask(invalidGender);

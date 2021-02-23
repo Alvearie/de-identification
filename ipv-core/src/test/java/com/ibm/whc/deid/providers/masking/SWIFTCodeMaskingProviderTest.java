@@ -6,17 +6,22 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.SWIFTCodeIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SWIFTMaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testDefault() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new SWIFTCodeIdentifier();
 
     String key = "EMCRGRA1";
@@ -28,7 +33,7 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testPreserveCountry() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(Boolean.TRUE);
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new SWIFTCodeIdentifier();
 
     String key = "EMCRGRA1";
@@ -45,7 +50,7 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMask() {
     Identifier swiftIdentifier = new SWIFTCodeIdentifier();
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId);
+    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String value = "EMCRGRA1";
     int randomizationOK = 0;
