@@ -204,7 +204,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new ICDv10MaskingProvider((ICDv10MaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case IMEI:
-        provider = new IMEIMaskingProvider((IMEIMaskingProviderConfig) config);
+        provider = new IMEIMaskingProvider((IMEIMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case IP_ADDRESS:
         provider = new IPAddressMaskingProvider((IPAddressMaskingProviderConfig) config);

@@ -9,16 +9,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.ibm.whc.deid.providers.identifiers.IMEIIdentifier;
-import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
 import org.junit.Test;
 
-public class IMEIMaskingProviderTest extends TestLogSetUp {
+import com.ibm.whc.deid.providers.identifiers.IMEIIdentifier;
+import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
+
+public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testMask() {
     IMEIIdentifier identifier = new IMEIIdentifier();
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config);
+    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
     String imei = "001013001234568";
     String maskedValue = maskingProvider.mask(imei);
@@ -33,7 +37,7 @@ public class IMEIMaskingProviderTest extends TestLogSetUp {
   public void testMaskNoTACPreservation() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
     config.setPreserveTAC(Boolean.FALSE);
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config);
+    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
     IMEIIdentifier identifier = new IMEIIdentifier();
 
@@ -48,7 +52,7 @@ public class IMEIMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidValue() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config);
+    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
     String imei = "foobar";
     String maskedValue = maskingProvider.mask(imei);

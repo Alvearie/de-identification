@@ -9,22 +9,25 @@ import com.ibm.whc.deid.providers.identifiers.IMEIIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
 import com.ibm.whc.deid.util.IMEIManager;
 import com.ibm.whc.deid.util.RandomGenerators;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class IMEIMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = -5189348513611132622L;
 
   private static final IMEIIdentifier identifier = new IMEIIdentifier();
-	private static final IMEIManager imeiManager = new IMEIManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+	private final IMEIManager imeiManager;
   private final boolean preserveTAC;
 
   /**
    * Instantiates a new Imei masking provider.
    *
    * @param config an IMEIMaskingProviderConfig instance
+ * @param tenantId TODO
+ * @param localizationProperty TODO
    */
-  public IMEIMaskingProvider(IMEIMaskingProviderConfig config) {
+  public IMEIMaskingProvider(IMEIMaskingProviderConfig config, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+		imeiManager = new IMEIManager(localizationProperty);
     this.preserveTAC = config.getPreserveTAC();
   }
 

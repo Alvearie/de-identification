@@ -31,7 +31,6 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-  private final String tenantId;
   private final DeidMaskingConfig deidMaskingConfig;
 
 
@@ -46,7 +45,6 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     this.maskQuery = configuration.isMaskMaskQuery();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-    this.tenantId = tenantId;
     this.deidMaskingConfig = deidMaskingConfig;
   }
 

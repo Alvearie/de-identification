@@ -32,6 +32,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
