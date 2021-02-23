@@ -198,10 +198,10 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new IBANMaskingProvider((IBANMaskingProviderConfig) config);
         break;
       case ICDV9:
-        provider = new ICDv9MaskingProvider((ICDv9MaskingProviderConfig) config, tenantId);
+        provider = new ICDv9MaskingProvider((ICDv9MaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case ICDV10:
-        provider = new ICDv10MaskingProvider((ICDv10MaskingProviderConfig) config, tenantId);
+        provider = new ICDv10MaskingProvider((ICDv10MaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case IMEI:
         provider = new IMEIMaskingProvider((IMEIMaskingProviderConfig) config);
@@ -221,7 +221,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         break;
       case MARITAL:
         provider =
-            new MaritalStatusMaskingProvider((MaritalStatusMaskingProviderConfig) config, tenantId);
+            new MaritalStatusMaskingProvider((MaritalStatusMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case NAME:
         provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId, localizationProperty);
@@ -234,17 +234,17 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         break;
       case OCCUPATION:
         provider =
-            new OccupationMaskingProvider((OccupationMaskingProviderConfig) config, tenantId);
+            new OccupationMaskingProvider((OccupationMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case PHONE:
-        provider = new PhoneMaskingProvider((PhoneMaskingProviderConfig) config, tenantId);
+        provider = new PhoneMaskingProvider((PhoneMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case PSEUDONYM:
         provider = new PseudonymMaskingProvider((PseudonymMaskingProviderConfig) config);
         break;
       case RACE:
         provider =
-            new RaceEthnicityMaskingProvider((RaceEthnicityMaskingProviderConfig) config, tenantId);
+            new RaceEthnicityMaskingProvider((RaceEthnicityMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case RANDOM:
         provider = new RandomMaskingProvider();

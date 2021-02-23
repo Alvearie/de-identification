@@ -10,14 +10,17 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.OccupationIdentifier;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -27,6 +30,8 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class OccupationMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests mask generalize to occupation category and its boolean values (true and false). It also
    * tests for an invalid value and the localization of the occupation.
@@ -34,7 +39,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   @Test
   public void testMaskRandomOccupation() {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new OccupationIdentifier();
 
     String occupation = "actor";
@@ -47,7 +52,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     // this test assumes that GR is loaded by default
 
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String greekOriginalValue = "Χτίστης";
 
@@ -76,7 +81,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     configuration = new OccupationMaskingProviderConfig();
     configuration.setMaskGeneralize(true);
 
-    maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(greekOriginalValue);
@@ -87,7 +92,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   @Test
   public void testMaskNullOccupationInputReturnNull() throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidOccupation = null;
     String maskedOccupation = maskingProvider.mask(invalidOccupation);
@@ -100,7 +105,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskInvalidOccupationInputValidHandlingReturnNull() throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidOccupation = "Invalid Occupation";
     String maskedOccupation = maskingProvider.mask(invalidOccupation);
@@ -113,7 +118,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskInvalidOccupationInputValidHandlingReturnRandom() throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new OccupationIdentifier();
 
     String invalidOccupation = "Invalid Occupation";
@@ -129,7 +134,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
       throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidOccupation = "Invalid Occupation";
     String maskedOccupation = maskingProvider.mask(invalidOccupation);
@@ -144,7 +149,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Occupation");
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidOccupation = "Invalid Occupation";
     String maskedOccupation = maskingProvider.mask(invalidOccupation);
@@ -157,7 +162,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskInvalidOccupationInputInvalidHandlingReturnNull() throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidOccupation = "Invalid Occupation";
     String maskedOccupation = maskingProvider.mask(invalidOccupation);
@@ -170,7 +175,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskGeneralizeToCategory() {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setMaskGeneralize(true);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String occupation = "actor";
     String maskedValue = maskingProvider.mask(occupation);
@@ -181,7 +186,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskGeneralizeToRandomCategoryIfNotFound() {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setMaskGeneralize(true);
-    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
     String occupation = "adadad";
     String maskedValue = maskingProvider.mask(occupation);

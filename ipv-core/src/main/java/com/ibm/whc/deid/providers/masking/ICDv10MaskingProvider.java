@@ -29,7 +29,8 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId) {
+  public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.randomizeToCategory = configuration.isRandomizeCategory();
     this.randomizeToRange = configuration.isRandomizeChapter();
 

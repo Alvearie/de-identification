@@ -33,10 +33,12 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new Ic dv 9 masking provider.
    *
    * @param configuration the configuration
-   * @param tenantId tenant id
-   * @param random the random
+ * @param tenantId tenant id
+ * @param localizationProperty TODO
+ * @param random the random
    */
-  public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId) {
+  public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.randomizeToCategory = configuration.isRandomizeCategory();
     this.randomizeToRange = configuration.isRandomizeChapter();
 

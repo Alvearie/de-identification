@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 import com.ibm.whc.deid.models.Occupation;
 import com.ibm.whc.deid.shared.pojo.config.masking.OccupationMaskingProviderConfig;
 import com.ibm.whc.deid.util.OccupationManager;
@@ -24,8 +25,9 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public OccupationMaskingProvider(OccupationMaskingProviderConfig configuration, String tenantId) {
-    this.generalizeToCategory = configuration.isMaskGeneralize();
+  public OccupationMaskingProvider(OccupationMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+		this.generalizeToCategory = configuration.isMaskGeneralize();
     this.random = new SecureRandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();

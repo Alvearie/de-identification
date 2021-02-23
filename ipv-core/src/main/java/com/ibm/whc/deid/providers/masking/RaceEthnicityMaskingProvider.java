@@ -25,10 +25,12 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
 
   /**
    * @param configuration
-   * @param tenantId
+ * @param tenantId
+ * @param localizationProperty TODO
    */
   public RaceEthnicityMaskingProvider(RaceEthnicityMaskingProviderConfig configuration,
-      String tenantId) {
+      String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }

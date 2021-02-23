@@ -32,6 +32,7 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
   protected volatile boolean initialized = false;
 
 	public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.random = new SecureRandom();
 		this.names = new NamesManager.NameManager(tenantId, localizationProperty);
     this.allowUnisex = configuration.isMaskingAllowUnisex();

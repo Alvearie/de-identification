@@ -17,15 +17,17 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.MaritalStatusIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaritalStatusMaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
     MaritalStatusMaskingProviderConfig maskingConfiguration =
         new MaritalStatusMaskingProviderConfig();
     MaritalStatusMaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     MaritalStatusIdentifier identifier = new MaritalStatusIdentifier();
 
     String originalStatus = "Married";
@@ -49,7 +51,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
     MaritalStatusMaskingProviderConfig maskingConfiguration =
         new MaritalStatusMaskingProviderConfig();
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidMaritalStatus = null;
     String maskedMaritalStatus = maskingProvider.mask(invalidMaritalStatus);
@@ -64,7 +66,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
         new MaritalStatusMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(1);
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidMaritalStatus = "Invalid Marital Status";
     String maskedMaritalStatus = maskingProvider.mask(invalidMaritalStatus);
@@ -79,7 +81,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
         new MaritalStatusMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new MaritalStatusIdentifier();
 
     String invalidMaritalStatus = "Invalid Marital Status";
@@ -97,7 +99,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
         new MaritalStatusMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidMaritalStatus = "Invalid Marital Status";
     String maskedMaritalStatus = maskingProvider.mask(invalidMaritalStatus);
@@ -114,7 +116,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
     maskingConfiguration.setUnspecifiedValueHandling(3);
     maskingConfiguration.setUnspecifiedValueReturnMessage("Test Marital Status");
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidMaritalStatus = "Invalid Marital Status";
     String maskedMaritalStatus = maskingProvider.mask(invalidMaritalStatus);
@@ -129,7 +131,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
         new MaritalStatusMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(4);
     MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String invalidMaritalStatus = "Invalid Marital Status";
     String maskedMaritalStatus = maskingProvider.mask(invalidMaritalStatus);
@@ -152,7 +154,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
 
     for (MaritalStatusMaskingProviderConfig maskingConfiguration : configurations) {
       MaritalStatusMaskingProvider maskingProvider =
-          new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
+          new MaritalStatusMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();

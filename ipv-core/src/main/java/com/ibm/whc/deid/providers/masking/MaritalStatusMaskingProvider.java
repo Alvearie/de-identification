@@ -26,12 +26,12 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
 
   /**
    * Instantiates a new Marital status masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
+ * @param configuration the configuration
+ * @param localizationProperty TODO
+ * @param random the random
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
-      String tenantId) {
+      String tenantId, String localizationProperty) {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }

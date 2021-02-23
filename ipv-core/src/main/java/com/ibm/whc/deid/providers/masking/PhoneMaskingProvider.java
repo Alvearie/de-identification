@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.providers.identifiers.PhoneIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
@@ -33,7 +34,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId) {
+  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.preserveCountryCode = configuration.isCountryCodePreserve();
     this.preserveAreaCode = configuration.isAreaCodePreserve();
