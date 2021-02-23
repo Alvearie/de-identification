@@ -25,6 +25,10 @@ public class HospitalIdentifier extends AbstractManagerBasedIdentifier {
 
 	private HospitalManager hospitalManager;
 
+	public HospitalIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {

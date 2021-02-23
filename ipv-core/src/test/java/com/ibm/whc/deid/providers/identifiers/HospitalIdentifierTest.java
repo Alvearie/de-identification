@@ -9,10 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class HospitalIdentifierTest {
+public class HospitalIdentifierTest implements IdentifierTest {
   @Test
   public void testIdentifier() {
-    Identifier identifier = new HospitalIdentifier();
+		Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
 
     String hospitalName = "York Hospital";
     assertTrue(identifier.isOfThisType(hospitalName));

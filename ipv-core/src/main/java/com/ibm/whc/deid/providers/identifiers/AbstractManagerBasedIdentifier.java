@@ -14,6 +14,17 @@ public abstract class AbstractManagerBasedIdentifier extends AbstractIdentifier 
 
 	protected String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
+	protected String tenantId;
+
+	public AbstractManagerBasedIdentifier(String tenantId, String localizationProperty) {
+		this.localizationProperty = localizationProperty;
+		this.tenantId = tenantId;
+	}
+
+	public AbstractManagerBasedIdentifier() {
+
+	}
+
   /**
    * Gets manager.
    *

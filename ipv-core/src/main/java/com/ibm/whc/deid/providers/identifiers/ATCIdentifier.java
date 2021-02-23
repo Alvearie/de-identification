@@ -25,10 +25,15 @@ public class ATCIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public ATCIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			atcManager = (ATCManager) ManagerFactory.getInstance().getManager(null, Resource.ATC_CODES, null, localizationProperty);
+			atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ATC_CODES, null,
+					localizationProperty);
 
 			initialized = true;
 		}

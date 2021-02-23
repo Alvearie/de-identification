@@ -27,7 +27,7 @@ public class BuiltInIdentifierFactory {
 		case ADDRESS:
 			return new AddressIdentifier();
 		case ATC:
-			return new ATCIdentifier();
+			return new ATCIdentifier(tenantId, localizationProperty);
 		case CITY:
 			return new CityIdentifier();
 		case CONTINENT:
@@ -47,7 +47,7 @@ public class BuiltInIdentifierFactory {
 		case GENDER:
 			return new GenderIdentifier();
 		case HOSPITAL:
-			return new HospitalIdentifier();
+			return new HospitalIdentifier(tenantId, localizationProperty);
 		case IBAN:
 			return new IBANIdentifier();
 		case ICDV9:

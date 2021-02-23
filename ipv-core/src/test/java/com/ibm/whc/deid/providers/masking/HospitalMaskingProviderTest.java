@@ -102,7 +102,7 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new HospitalIdentifier();
+		Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
