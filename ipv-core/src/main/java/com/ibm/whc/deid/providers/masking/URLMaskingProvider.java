@@ -36,7 +36,8 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
 
 
   public URLMaskingProvider(URLMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig) {
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.maskUsernamePassword = configuration.isMaskUsernamePassword();
     this.randomizePort = configuration.isMaskPort();

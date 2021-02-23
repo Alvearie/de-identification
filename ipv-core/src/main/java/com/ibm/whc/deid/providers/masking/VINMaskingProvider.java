@@ -25,7 +25,7 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public VINMaskingProvider(VINMaskingProviderConfig configuration, String tenantId) {
+  public VINMaskingProvider(VINMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
     this.preserveWMI = configuration.isWmiPreserve();
     this.preserveVDS = configuration.isVdsPreserve();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();

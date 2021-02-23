@@ -265,20 +265,20 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new SSNUSMaskingProvider((SSNUSMaskingProviderConfig) config);
         break;
       case STATE_US:
-        provider = new StatesUSMaskingProvider((StatesUSMaskingProviderConfig) config, tenantId);
+        provider = new StatesUSMaskingProvider((StatesUSMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case SWIFT:
         provider = new SWIFTCodeMaskingProvider((SWIFTMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case URL:
         provider =
-            new URLMaskingProvider((URLMaskingProviderConfig) config, tenantId, deidMaskingConfig);
+            new URLMaskingProvider((URLMaskingProviderConfig) config, tenantId, deidMaskingConfig, localizationProperty);
         break;
       case VIN:
-        provider = new VINMaskingProvider((VINMaskingProviderConfig) config, tenantId);
+        provider = new VINMaskingProvider((VINMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case ZIPCODE:
-        provider = new ZIPCodeMaskingProvider((ZIPCodeMaskingProviderConfig) config, tenantId);
+        provider = new ZIPCodeMaskingProvider((ZIPCodeMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       default:
         throw new IllegalArgumentException("Unsupported provider type" + providerType);

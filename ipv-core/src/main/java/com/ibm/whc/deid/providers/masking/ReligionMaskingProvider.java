@@ -22,6 +22,7 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
 	private String tenantId;
 
   public ReligionMaskingProvider(ReligionMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
 		this.localizationProperty = localizationProperty;
