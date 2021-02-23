@@ -39,6 +39,7 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+		this.localizationProperty = localizationProperty;
   }
 
   @Override

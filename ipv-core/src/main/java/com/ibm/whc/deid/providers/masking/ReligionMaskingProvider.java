@@ -19,10 +19,13 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
   private final String unspecifiedValueReturnMessage;
 
   protected volatile boolean initialized = false;
+	private String tenantId;
 
-  public ReligionMaskingProvider(ReligionMaskingProviderConfig configuration, String tenantId) {
+  public ReligionMaskingProvider(ReligionMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+		this.localizationProperty = localizationProperty;
+		this.tenantId = tenantId;
   }
 
   @Override
@@ -51,7 +54,7 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      religionManager = new ReligionManager(null, localizationProperty);
+			religionManager = new ReligionManager(tenantId, localizationProperty);
       initialized = true;
     }
   }

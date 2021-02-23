@@ -11,25 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.NameIdentifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
 import com.ibm.whc.deid.util.NamesManager;
-import com.ibm.whc.deid.util.Readers;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
@@ -67,77 +56,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     assertTrue(names.isLastName(res));
   }
 
-  @Test
-  public void testLocalizationFirstName() throws Exception {
-    // this test assumes that GR is loaded by default
 
-    NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
-    NameMaskingProvider maskingProvider = new NameMaskingProvider(defaultConfiguration, tenantId, localizationProperty);
-
-    String greekOriginalValue = "Γιώργος";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.FIRST_NAME_MALE, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.FIRST_NAME_FEMALE,
-        Collections.singletonList("gr"));
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
-
-  @Test
-  public void testLocalizationLastName() throws Exception {
-    // this test assumes that GR is loaded by default
-    NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
-    NameMaskingProvider maskingProvider = new NameMaskingProvider(defaultConfiguration, tenantId, localizationProperty);
-    String greekOriginalValue = "Παπαδόπουλος";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.LAST_NAME, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
 
   @Test
   public void testMaskNameAndSurname() throws Exception {

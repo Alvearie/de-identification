@@ -10,22 +10,13 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.RaceEthnicityIdentifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.RaceEthnicityMaskingProviderConfig;
-import com.ibm.whc.deid.util.Readers;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   /*
@@ -53,35 +44,6 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
     assertTrue(randomizationOK > 0);
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-    // this test assumes that GR is loaded by default
-
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId);
-
-    String greekRace = "Ασιάτης";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.RACE_ETHNICITY, Collections.singletonList("gr"));
-    Set<String> greekRaces = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekRaces.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedRace = maskingProvider.mask(greekRace);
-      assertTrue(greekRaces.contains(maskedRace.toUpperCase()));
-    }
-  }
 
   @Test
   public void testMaskNullRaceEthnicityInputReturnNull() throws Exception {

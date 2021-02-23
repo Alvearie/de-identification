@@ -253,7 +253,7 @@ public class BasicMaskingProviderFactory implements Serializable, MaskingProvide
         provider = new RedactMaskingProvider((RedactMaskingProviderConfig) config);
         break;
       case RELIGION:
-        provider = new ReligionMaskingProvider((ReligionMaskingProviderConfig) config, tenantId);
+        provider = new ReligionMaskingProvider((ReligionMaskingProviderConfig) config, tenantId, localizationProperty);
         break;
       case REPLACE:
         provider = new ReplaceMaskingProvider((ReplaceMaskingProviderConfig) config);

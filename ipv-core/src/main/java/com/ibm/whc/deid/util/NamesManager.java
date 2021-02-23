@@ -87,7 +87,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.LAST_NAME);
+			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.LAST_NAME);
     }
 
     /**
@@ -141,7 +141,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.FIRST_NAME_MALE);
+			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.FIRST_NAME_MALE);
     }
 
     /**
@@ -197,7 +197,7 @@ public class NamesManager implements Serializable {
 
     @Override
     public Collection<ResourceEntry> getResources() {
-      return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.FIRST_NAME_FEMALE);
+			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.FIRST_NAME_FEMALE);
     }
 
     /**

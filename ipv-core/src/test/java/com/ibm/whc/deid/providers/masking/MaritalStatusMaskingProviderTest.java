@@ -10,22 +10,13 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.MaritalStatusIdentifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaritalStatusMaskingProviderConfig;
-import com.ibm.whc.deid.util.Readers;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
@@ -51,37 +42,7 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
     assertTrue(randomizationOK > 0);
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-    // this test assumes that GR is loaded by default
 
-    MaritalStatusMaskingProviderConfig maskingConfiguration =
-        new MaritalStatusMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new MaritalStatusMaskingProvider(maskingConfiguration, tenantId);
-
-    String greekOriginalValue = "Χήρα";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.MARITAL_STATUS, Arrays.asList(new String[] {"gr"}));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
 
   @Test
   public void testMaskNullMaritalStatusInputReturnNull() throws Exception {
