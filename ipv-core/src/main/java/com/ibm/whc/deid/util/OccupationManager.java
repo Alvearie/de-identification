@@ -12,8 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Occupation;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -30,7 +32,7 @@ public class OccupationManager extends ResourceBasedManager<Occupation> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.OCCUPATION);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.OCCUPATION);
   }
 
   @Override

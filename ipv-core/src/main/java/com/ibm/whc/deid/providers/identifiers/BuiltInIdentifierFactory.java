@@ -19,9 +19,10 @@ public class BuiltInIdentifierFactory {
 	 * Get an Identifier based on the input type
 	 *
 	 * @param type
+	 * @param localizationProperty TODO
 	 * @return
 	 */
-	public Identifier getIdentifier(EntityTypes type, String tenantId) {
+	public Identifier getIdentifier(EntityTypes type, String tenantId, String localizationProperty) {
 		switch ((EntityType) type) {
 		case ADDRESS:
 			return new AddressIdentifier();
@@ -84,11 +85,11 @@ public class BuiltInIdentifierFactory {
 		}
 	}
 
-	public Collection<Identifier> getAvailableIdentifiers(String tenantId) {
+	public Collection<Identifier> getAvailableIdentifiers(String tenantId, String localizationProperty) {
 		Set<Identifier> identifiers = new HashSet<Identifier>();
 
 		Arrays.stream(EntityType.values()).forEach(e -> {
-			identifiers.add(getIdentifier(e, tenantId));
+			identifiers.add(getIdentifier(e, tenantId, localizationProperty));
 		});
 
 		return identifiers;

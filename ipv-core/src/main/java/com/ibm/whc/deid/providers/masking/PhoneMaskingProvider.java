@@ -43,7 +43,7 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.phoneRegexPatterns = configuration.getPhoneRegexPatterns();
-    this.phoneIdentifier = new PhoneIdentifier(this.phoneRegexPatterns);
+    this.phoneIdentifier = new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
   }
 
   private String generateRandomPhoneNumber(String countryCode) {
@@ -199,7 +199,7 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      msisdnManager = new MSISDNManager(null);
+      msisdnManager = new MSISDNManager(null, localizationProperty);
       initialized = true;
     }
   }

@@ -65,7 +65,7 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      occupationManager = new OccupationManager(null, localizationProperty);
+			occupationManager = new OccupationManager(tenantId, localizationProperty);
       initialized = true;
     }
   }

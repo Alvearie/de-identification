@@ -63,7 +63,7 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.SWIFT);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
   }
 
   @Override

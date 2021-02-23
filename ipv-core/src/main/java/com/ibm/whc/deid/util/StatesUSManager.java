@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.State;
 import com.ibm.whc.deid.models.StateNameFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -30,7 +32,7 @@ public class StatesUSManager extends ResourceBasedManager<State> {
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.STATES_US);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.STATES_US);
   }
 
   @Override

@@ -35,6 +35,7 @@ public class PseudonymMaskingProvider extends AbstractMaskingProvider {
   private final String hashAlgorithm;
   private final HashMaskingProvider hashMaskingProvider;
 
+
   /** Instantiates a new pseudonym masking provider. */
   public PseudonymMaskingProvider() {
     this(new PseudonymMaskingProviderConfig());

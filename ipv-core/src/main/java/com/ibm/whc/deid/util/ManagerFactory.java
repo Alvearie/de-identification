@@ -68,7 +68,7 @@ public class ManagerFactory {
 				manager = new CityManager(tenantId, localizationProperty);
           break;
         case POSTAL_CODES:
-          manager = new PostalCodeManager(tenantId);
+          manager = new PostalCodeManager(tenantId, localizationProperty);
           break;
         case CONTINENT:
           manager = new ContinentManager(tenantId, localizationProperty);
@@ -86,10 +86,10 @@ public class ManagerFactory {
           manager = new HospitalManager(tenantId, localizationProperty);
           break;
         case ICDV10:
-          manager = new ICDv10Manager(tenantId);
+          manager = new ICDv10Manager(tenantId, localizationProperty);
           break;
         case ICDV9:
-          manager = new ICDv9Manager(tenantId);
+          manager = new ICDv9Manager(tenantId, localizationProperty);
           break;
         case MARITAL_STATUS:
           manager = new MaritalStatusManager(tenantId, localizationProperty);
@@ -113,7 +113,7 @@ public class ManagerFactory {
           manager = new SWIFTCodeManager(tenantId, localizationProperty);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
-          manager = new VINManager(tenantId);
+				manager = new VINManager(tenantId, localizationProperty);
           break;
         case ZIPCODE:
           int prefixLength = (int) options;

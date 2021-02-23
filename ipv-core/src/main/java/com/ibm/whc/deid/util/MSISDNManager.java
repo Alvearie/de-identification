@@ -16,8 +16,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -28,12 +30,9 @@ import com.ibm.whc.deid.utils.log.LogManager;
 public class MSISDNManager implements Serializable {
   /** */
   private static final long serialVersionUID = -7892640285929594432L;
-  protected static final Collection<ResourceEntry> callingCodesList =
-      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_CALLING_CODES);
-  protected static final Collection<ResourceEntry> areaCodeResourceList =
-      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_AREA_CODES);
-  protected static final Collection<ResourceEntry> phoneNumberDigitsList =
-      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PHONE_NUM_DIGITS);
+	protected final Collection<ResourceEntry> callingCodesList;
+	protected final Collection<ResourceEntry> areaCodeResourceList;
+	protected final Collection<ResourceEntry> phoneNumberDigitsList;
 
   protected MapWithRandomPick<String, String> countryCodeMap;
   protected Map<String, Set<String>> areaCodeMapByCountry;
@@ -49,9 +48,17 @@ public class MSISDNManager implements Serializable {
    * Instantiates a new Msisdn manager.
    *
    * @param tenantId
+ * @param localizationProperty TODO
    */
-  public MSISDNManager(String tenantId) {
+  public MSISDNManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		callingCodesList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_CALLING_CODES);
+		areaCodeResourceList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_AREA_CODES);
+		phoneNumberDigitsList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_NUM_DIGITS);
+
     this.countryCodeMap = new MapWithRandomPick<>(new HashMap<String, String>());
     this.areaCodeMapByCountry = new HashMap<>();
     this.phoneNumberDigitsMap = new HashMap<>();

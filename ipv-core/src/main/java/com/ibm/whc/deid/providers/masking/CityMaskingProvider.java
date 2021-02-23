@@ -36,13 +36,13 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-		this.localizationProperty = localizationProperty;
   }
 
   protected void initialize() {
     if (!initialized) {
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null, localizationProperty);
+					(CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY, null,
+							localizationProperty);
 
       initialized = true;
     }

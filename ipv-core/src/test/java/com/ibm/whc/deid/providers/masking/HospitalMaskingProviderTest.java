@@ -11,14 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.junit.Test;
 
 import com.ibm.whc.deid.models.Hospital;
@@ -28,9 +20,7 @@ import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.HospitalMaskingProviderConfig;
 import com.ibm.whc.deid.util.HospitalManager;
 import com.ibm.whc.deid.util.ManagerFactory;
-import com.ibm.whc.deid.util.Readers;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class HospitalMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
@@ -80,47 +70,7 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     assertTrue(randomizationOK > 0);
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-    String greekHospital = "ΠΕΠΑΓΝΗ";
 
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.HOSPITAL_NAMES, Collections.singletonList("gr"));
-    Set<String> greekHospitals = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekHospitals.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-
-    int randomizationOK = 0;
-    for (int i = 0; i < 100; i++) {
-      String maskedHospital = maskingProvider.mask(greekHospital);
-      if (!maskedHospital.toUpperCase().equals(greekHospital.toUpperCase())) {
-        randomizationOK++;
-      }
-
-      boolean isMatch = greekHospitals.contains(maskedHospital.toUpperCase());
-
-      if (!isMatch) {
-        System.out.println(maskedHospital);
-      }
-
-      assertTrue(isMatch);
-    }
-
-    assertTrue(randomizationOK > 0);
-  }
 
   @Test
   public void testMaskNullHospitalInputReturnNull() throws Exception {

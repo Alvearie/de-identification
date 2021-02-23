@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.MaritalStatus;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -44,7 +46,7 @@ public class MaritalStatusManager extends ResourceBasedManager<MaritalStatus>
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.MARITAL_STATUS);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.MARITAL_STATUS);
   }
 
   @Override

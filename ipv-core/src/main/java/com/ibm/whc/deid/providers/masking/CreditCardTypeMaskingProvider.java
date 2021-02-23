@@ -12,14 +12,12 @@ import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.util.CreditCardManager;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = 3375383479009603851L;
 
-	private static final CreditCardTypeManager ccTypeManager = new CreditCardTypeManager(
-			LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+	private final CreditCardTypeManager ccTypeManager;
 	private final CreditCardManager creditCardManager;
 
   /** Instantiates a new Credit card type masking provider. 
@@ -27,8 +25,9 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
  * @param localizationProperty TODO*/
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
-		this.localizationProperty = localizationProperty;
+
 		creditCardManager = new CreditCardManager(localizationProperty);
+		ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
   }
 
   @Override

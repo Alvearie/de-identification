@@ -21,11 +21,5 @@ public class HospitalIdentifierTest {
     assertTrue(identifier.isOfThisType(hospitalName));
   }
 
-  @Test
-  public void testIdentifierGreek() {
-    Identifier identifier = new HospitalIdentifier();
 
-    String hospitalName = "ΠΕΠΑΓΝΗ";
-    assertTrue(identifier.isOfThisType(hospitalName));
-  }
 }

@@ -11,16 +11,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,13 +25,10 @@ import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.schema.RelationshipOperand;
 import com.ibm.whc.deid.schema.RelationshipType;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountryMaskingProviderConfig;
 import com.ibm.whc.deid.util.CountryManager;
 import com.ibm.whc.deid.util.CountryNameSpecification;
-import com.ibm.whc.deid.util.Readers;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
@@ -89,36 +79,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     }
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-    // this test assumes that GR is loaded by default
 
-    CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
-    MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-
-    String greekOriginalValue = "Ελλάδα";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.COUNTRY, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 10000; i++) {
-      String maskedValue = countryMaskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
 
   @Test
   public void testEmptyValue() {

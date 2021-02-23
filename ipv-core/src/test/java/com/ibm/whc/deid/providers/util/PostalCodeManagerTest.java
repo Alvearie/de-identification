@@ -6,19 +6,26 @@
 package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertTrue;
+
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.util.PostalCodeManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
-@Ignore
+
 public class PostalCodeManagerTest {
+	private String tenantId = "TEST_TENANT";
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookupSuccessful() throws Exception {
-    PostalCodeManager postalCodeManager = new PostalCodeManager(null);
+    PostalCodeManager postalCodeManager = new PostalCodeManager(null, localizationProperty);
     String code = "99503";
 
     assertTrue(postalCodeManager.isValidKey(code));
@@ -26,14 +33,14 @@ public class PostalCodeManagerTest {
 
   @Test
   public void testRandomCodeGenerator() throws Exception {
-    PostalCodeManager postalCodeManager = new PostalCodeManager(null);
+    PostalCodeManager postalCodeManager = new PostalCodeManager(null, localizationProperty);
     assertTrue(postalCodeManager.isValidKey(postalCodeManager.getRandomKey()));
   }
 
   @Test
   @Ignore
   public void testPerformance() {
-    PostalCodeManager postalCodeManager = new PostalCodeManager(null);
+    PostalCodeManager postalCodeManager = new PostalCodeManager(null, localizationProperty);
     int N = 1000000;
     long startMillis = System.currentTimeMillis();
     String code = "99503";
@@ -51,9 +58,9 @@ public class PostalCodeManagerTest {
 
   @Test
   public void testClosestCode() throws Exception {
-    PostalCodeManager postalCodeManager = new PostalCodeManager(null);
+		PostalCodeManager postalCodeManager = new PostalCodeManager(tenantId, localizationProperty);
     String originalCode = "99529";
-    String[] neighbors = {"99501", "99502", "99503", "99507", "99510", "99515", "99517", "99518",
+		String[] neighbors = { "99501", "99502", "99503", "99507", "99510", "99513", "99515", "99517", "99518",
         "99529", "99530", "99599"};
 
     List<String> neighborsList = Arrays.asList(neighbors);
@@ -67,6 +74,7 @@ public class PostalCodeManagerTest {
       } else {
         returnedCode = "NO_CODE_FOUND";
       }
+
       assertTrue(neighborsList.contains(returnedCode.toUpperCase()));
     }
   }

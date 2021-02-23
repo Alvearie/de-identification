@@ -49,7 +49,7 @@ public class VINManagerTest {
 
   @Test
   public void testRandomWMIGenerator() throws Exception {
-    VINManager vinManager = new VINManager(null);
+		VINManager vinManager = new VINManager(null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     // test random WMI
 
     for (int i = 0; i < 1000; i++) {

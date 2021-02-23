@@ -25,7 +25,7 @@ public class RandomGenerators {
   private static final IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
   private static final IPAddressMaskingProvider ipAddressMaskingProvider =
       new IPAddressMaskingProvider();
-  private static final TLDManager tldManager = TLDManager.instance();
+	private static final TLDManager tldManager = TLDManager.instance();
 	private final CreditCardManager creditCardManager;
 
   private static final char[] alphaDigitSubset =

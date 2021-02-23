@@ -20,7 +20,7 @@ public class CreditCardTypeIdentifier extends AbstractManagerBasedIdentifier {
 
   private static final String[] appropriateNames = {"Credit Card Type"};
 	private static final CreditCardTypeManager creditCardTypeManager = new CreditCardTypeManager(
-			LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+			null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
   @Override
   protected Manager getManager() {

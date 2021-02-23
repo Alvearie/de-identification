@@ -37,7 +37,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMask() {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     PhoneMaskingProvider phoneMaskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-    PhoneIdentifier phoneIdentifier = new PhoneIdentifier(null);
+    PhoneIdentifier phoneIdentifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String originalPhone = "+353-0876653255";
     PhoneNumber originalPhoneNumber = phoneIdentifier.getPhoneNumber(originalPhone);
@@ -159,7 +159,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new PhoneIdentifier(null);
+    Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -178,12 +178,12 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     // country
     // code
     MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new PhoneIdentifier(null);
+    Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "+53-08766532550864345656";
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId);
+    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
 
     assertFalse(maskedPhone.equals(invalidPhone));
     assertTrue(identifier.isOfThisType(maskedPhone));
@@ -199,12 +199,12 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     // country
     // code
     MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new PhoneIdentifier(null);
+    Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId);
+    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
 
     assertFalse(maskedPhone.equals(invalidPhone));
     assertTrue(identifier.isOfThisType(maskedPhone));
@@ -221,12 +221,12 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     // country
     // code
     MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new PhoneIdentifier(null);
+    Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId);
+    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
 
     assertFalse(maskedPhone.equals(invalidPhone));
     assertTrue(identifier.isOfThisType(maskedPhone));

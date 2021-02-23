@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,7 +20,6 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
@@ -31,39 +29,12 @@ import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.schema.RelationshipOperand;
 import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
-import com.ibm.whc.deid.util.ContinentManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ContinentMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
-	protected String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
-  @Test
-  public void testLocalization() throws Exception {
-    // this test assumes that GR is loaded by default
-    // By default, the continent mask closest flag is false and closestK is
-    // 5.
-    ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
-
-    ContinentManager manager = new ContinentManager(tenantId, localizationProperty);
-    Collection<Continent> greekContinents = manager.getValues("gr");
-    assertNotNull(greekContinents);
-    assertTrue(greekContinents.size() > 2);
-    HashSet<String> greekContinentNames = new HashSet<>(greekContinents.size() * 2);
-    for (Continent c : greekContinents) {
-      greekContinentNames.add(c.getName());
-    }
-
-    String greekContinent = "Ευρώπη";
-    for (int i = 0; i < 100; i++) {
-      String masked = maskingProvider.mask(greekContinent);
-      assertNotNull(masked);
-      assertTrue(
-          "unexpected name " + masked + " - should be one of " + greekContinentNames.toString(),
-          greekContinentNames.contains(masked));
-    }
-  }
 
   @Test
   public void testMaskClosest() throws Exception {

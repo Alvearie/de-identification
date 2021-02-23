@@ -8,13 +8,18 @@ package com.ibm.whc.deid.providers.identifiers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.ibm.whc.deid.models.PhoneNumber;
 import org.junit.Test;
 
+import com.ibm.whc.deid.models.PhoneNumber;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
+
 public class PhoneIdentifierTest {
+	private String tenantId = "TEST_TENANT";
+	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testIsOfThisType() throws Exception {
-    PhoneIdentifier identifier = new PhoneIdentifier(null);
+    PhoneIdentifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String[] validNumbers = {"+353-0876653255", "00353-0876653255", "+353-(087)6653255",
         "0044-(087)6653255", "0044 (087)6653255", "0044 0876653255",};
@@ -47,7 +52,7 @@ public class PhoneIdentifierTest {
 
   @Test
   public void testGetPhone() throws Exception {
-    PhoneIdentifier identifier = new PhoneIdentifier(null);
+    PhoneIdentifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
     String phoneNumber = "+353-0876653255";
 
     PhoneNumber number = identifier.getPhoneNumber(phoneNumber);

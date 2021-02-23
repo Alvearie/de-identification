@@ -7,12 +7,16 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.identifiers.EntityType;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class BuiltInIdentifierFactoryTest {
 
@@ -21,7 +25,8 @@ public class BuiltInIdentifierFactoryTest {
     BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
     String tenantId = "TEST_TENANT";
     for (EntityType type : EntityType.values()) {
-      assertNotNull(identifierFactory.getIdentifier(type, tenantId));
+			assertNotNull(identifierFactory.getIdentifier(type, tenantId,
+					LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES));
     }
   }
 
@@ -62,7 +67,8 @@ public class BuiltInIdentifierFactoryTest {
     Set<String> clazzNamesSet = new HashSet<>(Arrays.asList(clazzNames));
     BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
     String tenantId = "TEST_TENANT";
-    Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId);
+		Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId,
+				LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     assertTrue(clazzNamesSet.size() == identifiers.size());
     for (Identifier identifier : identifiers) {
       String className = identifier.getClass().getSimpleName();

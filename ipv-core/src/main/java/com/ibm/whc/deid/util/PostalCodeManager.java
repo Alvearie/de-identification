@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -28,8 +30,7 @@ public class PostalCodeManager implements Manager, Serializable {
 
   private static final long serialVersionUID = -5126260477789733871L;
 
-  protected static final Collection<ResourceEntry> resourceList =
-      LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.POSTAL_CODES);
+	protected final Collection<ResourceEntry> resourceList;
   protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
   protected List<PostalCode> postalCodeList;
   private LatLonDistance<PostalCode> latLonTree = null;
@@ -39,8 +40,10 @@ public class PostalCodeManager implements Manager, Serializable {
 
   protected final String tenantId;
 
-  public PostalCodeManager(String tenantId) {
+  public PostalCodeManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		resourceList = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+				.getResources(Resource.POSTAL_CODES);
     this.postalCodeList = new ArrayList<>();
 
     this.postalCodeMap = new MapWithRandomPick<>(new HashMap<String, PostalCode>());

@@ -101,7 +101,8 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
   /** Get the collection of all pattern resource locations, for all countries and languages */
   @Override
   protected Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getResources(Resource.PATTERN);
+		return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+				.getResources(Resource.PATTERN);
   }
 
   /**
