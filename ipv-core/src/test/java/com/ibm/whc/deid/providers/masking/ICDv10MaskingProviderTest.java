@@ -10,8 +10,10 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.ICDv10Identifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv10MaskingProviderConfig;
@@ -164,7 +166,7 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ICDv10Identifier();
+		Identifier identifier = new ICDv10Identifier(tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);

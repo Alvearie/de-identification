@@ -166,7 +166,7 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ICDv9Identifier();
+		Identifier identifier = new ICDv9Identifier(tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);

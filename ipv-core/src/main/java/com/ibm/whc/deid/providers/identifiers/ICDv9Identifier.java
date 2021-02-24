@@ -28,6 +28,10 @@ public class ICDv9Identifier extends AbstractManagerBasedIdentifier {
 
 	private ICDv9Manager icdv9Manager;
 
+	public ICDv9Identifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public ProviderType getType() {
 		return ProviderType.ICDv9;

@@ -29,7 +29,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
    */
   @Test
   public void testMask() {
-    Identifier identifier = new GenderIdentifier();
+		Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -112,7 +112,7 @@ public class GenderMaskingProviderTest extends TestLogSetUp implements MaskingPr
     GenderMaskingProviderConfig maskingConfiguration = new GenderMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new GenderMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-    Identifier identifier = new GenderIdentifier();
+		Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
 
     String invalidGender = "Invalid Gender";
     String maskedGender = maskingProvider.mask(invalidGender);

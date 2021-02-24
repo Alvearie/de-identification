@@ -45,15 +45,15 @@ public class BuiltInIdentifierFactory {
 		case EMAIL:
 			return new EmailIdentifier();
 		case GENDER:
-			return new GenderIdentifier();
+			return new GenderIdentifier(tenantId, localizationProperty);
 		case HOSPITAL:
 			return new HospitalIdentifier(tenantId, localizationProperty);
 		case IBAN:
 			return new IBANIdentifier();
 		case ICDV9:
-			return new ICDv9Identifier();
+			return new ICDv9Identifier(tenantId, localizationProperty);
 		case ICDV10:
-			return new ICDv10Identifier();
+			return new ICDv10Identifier(tenantId, localizationProperty);
 		case IMEI:
 			return new IMEIIdentifier();
 		case IP_ADDRESS:

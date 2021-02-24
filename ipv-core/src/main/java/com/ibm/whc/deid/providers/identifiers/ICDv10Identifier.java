@@ -28,6 +28,10 @@ public class ICDv10Identifier extends AbstractManagerBasedIdentifier {
 	protected volatile boolean initialized = false;
 	private ICDv10Manager icdv10Manager;
 
+	public ICDv10Identifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public ProviderType getType() {
 		return ProviderType.ICDv10;

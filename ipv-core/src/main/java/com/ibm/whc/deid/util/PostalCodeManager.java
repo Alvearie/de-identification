@@ -42,7 +42,7 @@ public class PostalCodeManager implements Manager, Serializable {
 
   public PostalCodeManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
-		resourceList = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+		resourceList = LocalizationManager.getInstance(localizationProperty)
 				.getResources(Resource.POSTAL_CODES);
     this.postalCodeList = new ArrayList<>();
 
