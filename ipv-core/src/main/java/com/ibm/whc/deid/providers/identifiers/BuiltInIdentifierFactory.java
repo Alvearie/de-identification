@@ -39,7 +39,7 @@ public class BuiltInIdentifierFactory {
 		case CREDIT_CARD:
 			return new CreditCardIdentifier();
 		case CREDIT_CARD_TYPE:
-			return new CreditCardTypeIdentifier();
+			return new CreditCardTypeIdentifier(tenantId, localizationProperty);
 		case DATETIME:
 			return new DateTimeIdentifier();
 		case EMAIL:

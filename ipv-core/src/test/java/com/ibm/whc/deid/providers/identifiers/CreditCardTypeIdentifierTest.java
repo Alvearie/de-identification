@@ -9,10 +9,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class CreditCardTypeIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class CreditCardTypeIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
-    CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier();
+		CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier(tenantId, localizationProperty);
 
     String originalValue = "VISA";
     assertTrue(identifier.isOfThisType(originalValue));

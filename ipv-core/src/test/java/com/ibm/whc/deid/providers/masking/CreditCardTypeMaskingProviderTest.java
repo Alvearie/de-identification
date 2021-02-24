@@ -27,7 +27,7 @@ public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements M
   public void testMask() {
 		CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(
 				tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-    CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier();
+		CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier(tenantId, localizationProperty);
 
     String originalValue = "VISA";
 

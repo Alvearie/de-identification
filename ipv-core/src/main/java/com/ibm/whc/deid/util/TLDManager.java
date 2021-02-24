@@ -47,6 +47,7 @@ public class TLDManager {
 	}
 
   private void buildList() {
+		// Assume TLD is english only and loads the default localization.properties
 		ResourceEntry filename = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.PUBLIC_SUFFIX_LIST).iterator().next();
 

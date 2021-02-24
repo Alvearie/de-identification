@@ -19,7 +19,6 @@ import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.PostalCodeManager;
 import com.ibm.whc.deid.util.StreetNameManager;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * The type Address masking provider.
@@ -195,12 +194,13 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
 					.getManager(tenantId, Resource.STREET_NAMES, null, localizationProperty);
 
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
-          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+					MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null,
+					localizationProperty);
       countryMaskingProvider.initialize();
 
       cityMaskingProvider =
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
-              null, configuration.getCityMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+							null, configuration.getCityMaskingConfig(), null, localizationProperty);
 
 			postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
