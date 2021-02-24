@@ -355,11 +355,19 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     configuration.setAreaCodePreserve(false);
     maskingProvider = new PhoneMaskingProvider(configuration, tenantId);
-    maskedLandLine = maskingProvider.mask(landLine);
-    log.info("Landline original: {}     masked: {}", landLine, maskedLandLine);
-    assertNotEquals(landLine, maskedLandLine);
-    // Make sure area code is changed
-    assertFalse(maskedLandLine.startsWith("(011) "));
+    boolean foundChanged = false;
+    // try a few times since could happen randomly
+    for (int i=0; i < 10; i++) {
+      maskedLandLine = maskingProvider.mask(landLine);
+      log.info("Landline original: {}     masked: {}", landLine, maskedLandLine);
+      assertNotEquals(landLine, maskedLandLine);
+      // Make sure area code is changed
+      foundChanged = !maskedLandLine.startsWith("(011) ");
+      if (foundChanged) {
+        break;
+      }
+    }
+    assertTrue(foundChanged);
   }
 
   @Test
