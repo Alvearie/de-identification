@@ -110,7 +110,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     maskingConfiguration.setUnspecifiedValueHandling(2);
     CityMaskingProvider maskingProvider = (CityMaskingProvider) maskingProviderFactory
         .getProviderFromType(MaskingProviderType.CITY, null, maskingConfiguration, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-    Identifier identifier = new CityIdentifier();
+		Identifier identifier = new CityIdentifier(tenantId, localizationProperty);
 
     String invalidCity = "Invalid City";
     String maskedCity = maskingProvider.mask(invalidCity);

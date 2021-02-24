@@ -125,7 +125,7 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ContinentIdentifier();
+		Identifier identifier = new ContinentIdentifier(tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
     String maskedContinent = maskingProvider.mask(invalidContinent);

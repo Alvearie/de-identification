@@ -9,7 +9,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ATCIdentifierTest implements IdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class ATCIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
 		Identifier identifier = new ATCIdentifier(tenantId, localizationProperty);

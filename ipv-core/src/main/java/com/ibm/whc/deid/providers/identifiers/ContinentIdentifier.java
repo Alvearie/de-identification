@@ -27,6 +27,10 @@ public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
 	protected volatile boolean initialized = false;
 	private ContinentManager continentManager;
 
+	public ContinentIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
   @Override
   public ProviderType getType() {
     return ProviderType.CONTINENT;

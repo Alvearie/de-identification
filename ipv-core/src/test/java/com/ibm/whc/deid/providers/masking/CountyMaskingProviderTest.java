@@ -17,10 +17,8 @@ import com.ibm.whc.deid.providers.identifiers.CountyIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Test for pseudorandom boolean option (true and false).
    */
@@ -47,7 +45,7 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testMask() {
     // county.mask.pseudorandom by default is off
-    Identifier identifier = new CountyIdentifier();
+		Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     assertEquals(MaskingProviderType.COUNTY, configuration.getType());
 
@@ -101,7 +99,7 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new CountyIdentifier();
+		Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);

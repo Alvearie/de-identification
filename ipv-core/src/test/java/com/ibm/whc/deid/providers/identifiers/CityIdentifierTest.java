@@ -10,10 +10,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class CityIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class CityIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    CityIdentifier identifier = new CityIdentifier();
+		CityIdentifier identifier = new CityIdentifier(tenantId, localizationProperty);
 
     String[] validCities = {"Athens", "athens", "Dublin", "New York City"};
 

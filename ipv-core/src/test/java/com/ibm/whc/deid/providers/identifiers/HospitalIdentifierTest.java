@@ -9,7 +9,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class HospitalIdentifierTest implements IdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class HospitalIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIdentifier() {
 		Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);

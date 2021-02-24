@@ -26,6 +26,10 @@ public class CityIdentifier extends AbstractManagerBasedIdentifier {
 	private static final String[] appropriateNames = { "City" };
 	private CityManager cityManager;
 
+	public CityIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	protected volatile boolean initialized = false;
 
 	@Override

@@ -187,7 +187,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-    Identifier identifier = new CountryIdentifier();
+		Identifier identifier = new CountryIdentifier(tenantId, localizationProperty);
 
     String invalidCountry = "Invalid Country";
     String maskedCountry = maskingProvider.mask(invalidCountry);

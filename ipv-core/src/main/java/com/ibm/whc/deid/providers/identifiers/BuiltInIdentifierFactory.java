@@ -29,13 +29,13 @@ public class BuiltInIdentifierFactory {
 		case ATC:
 			return new ATCIdentifier(tenantId, localizationProperty);
 		case CITY:
-			return new CityIdentifier();
+			return new CityIdentifier(tenantId, localizationProperty);
 		case CONTINENT:
-			return new ContinentIdentifier();
+			return new ContinentIdentifier(tenantId, localizationProperty);
 		case COUNTRY:
-			return new CountryIdentifier();
+			return new CountryIdentifier(tenantId, localizationProperty);
 		case COUNTY:
-			return new CountyIdentifier();
+			return new CountyIdentifier(tenantId, localizationProperty);
 		case CREDIT_CARD:
 			return new CreditCardIdentifier();
 		case CREDIT_CARD_TYPE:

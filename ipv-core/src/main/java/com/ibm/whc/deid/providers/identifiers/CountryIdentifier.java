@@ -39,6 +39,10 @@ public class CountryIdentifier extends AbstractManagerBasedIdentifier {
 				+ ", their 2-letter ISO code (like US) or their 3-letter ISO code (like USA)";
 	}
 
+	public CountryIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public Collection<ProviderType> getLinkedTypes() {
 		return Arrays.asList(new ProviderType[] { ProviderType.CITY });

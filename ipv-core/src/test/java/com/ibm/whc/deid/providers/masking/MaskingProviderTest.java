@@ -5,8 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.util.localization.LocalizationManager;
+
 public interface MaskingProviderTest {
 
   String tenantId = "TEST_TENANT";
+
+	String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
 }

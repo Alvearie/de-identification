@@ -10,10 +10,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ContinentIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class ContinentIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    ContinentIdentifier identifier = new ContinentIdentifier();
+		ContinentIdentifier identifier = new ContinentIdentifier(tenantId, localizationProperty);
 
     String[] validContinents = {"Asia", "Europe", "Africa", "europe"};
 
