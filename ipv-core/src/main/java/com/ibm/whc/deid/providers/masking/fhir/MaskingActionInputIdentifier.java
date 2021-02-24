@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,22 +11,16 @@ import com.ibm.whc.deid.providers.masking.MaskingProvider;
 public class MaskingActionInputIdentifier {
 
   private MaskingProvider provider;
-
   private JsonNode node;
-
   private JsonNode parent;
-
   private String path;
-
   private String resourceId;
-
   private String resourceType;
-
   private JsonNode root;
-
+  private JsonNode currentNode;
+  
   public MaskingActionInputIdentifier(MaskingProvider provider, JsonNode node, JsonNode parent,
       String path, String resourceType, String resourceId, JsonNode root) {
-    super();
     this.provider = provider;
     this.node = node;
     this.parent = parent;
@@ -90,5 +84,22 @@ public class MaskingActionInputIdentifier {
 
   public void setRoot(JsonNode root) {
     this.root = root;
+  }
+
+  /**
+   * Retrieves the updated node or the original node if no update
+   * has been recorded
+   * 
+   * @return the current node value 
+   */
+  public JsonNode getCurrentNode() {
+    return currentNode == null ? node : currentNode;
+  }
+
+  /**
+   * @param currentNode the currentNode to set
+   */
+  public void setCurrentNode(JsonNode currentNode) {
+    this.currentNode = currentNode;
   }
 }

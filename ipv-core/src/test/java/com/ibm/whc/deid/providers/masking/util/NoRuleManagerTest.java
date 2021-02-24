@@ -6,16 +6,16 @@
 package com.ibm.whc.deid.providers.masking.util;
 
 import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.providers.masking.NullMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
-import com.ibm.whc.deid.providers.masking.fhir.NullMaskingProvider;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Test;
 
 public class NoRuleManagerTest {
 
