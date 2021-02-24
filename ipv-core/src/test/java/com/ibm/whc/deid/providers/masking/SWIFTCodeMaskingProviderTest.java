@@ -12,17 +12,15 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.SWIFTCodeIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SWIFTMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testDefault() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-    Identifier identifier = new SWIFTCodeIdentifier();
+		Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
 
     String key = "EMCRGRA1";
     String maskedValue = maskingProvider.mask(key);
@@ -34,7 +32,7 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(Boolean.TRUE);
     MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-    Identifier identifier = new SWIFTCodeIdentifier();
+		Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
 
     String key = "EMCRGRA1";
     String countryCodeOriginal = key.substring(4, 6);
@@ -48,7 +46,7 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
 
   @Test
   public void testMask() {
-    Identifier swiftIdentifier = new SWIFTCodeIdentifier();
+		Identifier swiftIdentifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 

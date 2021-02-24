@@ -23,8 +23,8 @@ public class IMEIManager extends ResourceBasedManager<String> {
   /** */
   private static final long serialVersionUID = -5860856726235946681L;
 
-  public IMEIManager(String localizationProperty) {
-    super(null, Resource.TACDB, localizationProperty);
+  public IMEIManager(String tenantId, String localizationProperty) {
+		super(tenantId, Resource.TACDB, localizationProperty);
   }
 
   @Override

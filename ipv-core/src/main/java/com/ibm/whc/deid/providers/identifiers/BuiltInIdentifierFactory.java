@@ -55,7 +55,7 @@ public class BuiltInIdentifierFactory {
 		case ICDV10:
 			return new ICDv10Identifier(tenantId, localizationProperty);
 		case IMEI:
-			return new IMEIIdentifier();
+			return new IMEIIdentifier(tenantId, localizationProperty);
 		case IP_ADDRESS:
 			return new IPAddressIdentifier();
 		case LATITUDE_LONGITUDE:
@@ -63,23 +63,23 @@ public class BuiltInIdentifierFactory {
 		case MAC_ADDRESS:
 			return new MACAddressIdentifier();
 		case MARITAL_STATUS:
-			return new MaritalStatusIdentifier();
+			return new MaritalStatusIdentifier(tenantId, localizationProperty);
 		case NAME:
-			return new NameIdentifier();
+			return new NameIdentifier(tenantId, localizationProperty);
 		case OCCUPATION:
-			return new OccupationIdentifier();
+			return new OccupationIdentifier(tenantId, localizationProperty);
 		case RACE:
-			return new RaceEthnicityIdentifier();
+			return new RaceEthnicityIdentifier(tenantId, localizationProperty);
 		case RELIGION:
-			return new ReligionIdentifier();
+			return new ReligionIdentifier(tenantId, localizationProperty);
 		case STATES_US:
-			return new StatesUSIdentifier();
+			return new StatesUSIdentifier(tenantId, localizationProperty);
 		case SWIFT:
-			return new SWIFTCodeIdentifier();
+			return new SWIFTCodeIdentifier(tenantId, localizationProperty);
 		case VIN:
-			return new VINIdentifier();
+			return new VINIdentifier(tenantId, localizationProperty);
 		case ZIPCODE:
-			return new ZIPCodeIdentifier();
+			return new ZIPCodeIdentifier(tenantId, localizationProperty);
 		default:
 			throw new IllegalArgumentException("Unknown type " + type);
 		}

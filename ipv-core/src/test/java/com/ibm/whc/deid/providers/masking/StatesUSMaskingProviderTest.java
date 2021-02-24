@@ -12,14 +12,12 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.StatesUSIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.StatesUSMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class StatesUSMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
-    Identifier statesUSIdentifier = new StatesUSIdentifier();
+		Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
     StatesUSMaskingProviderConfig maskingConfiguration = new StatesUSMaskingProviderConfig();
     MaskingProvider maskingProvider = new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -40,7 +38,7 @@ public class StatesUSMaskingProviderTest extends TestLogSetUp implements Masking
 
   @Test
   public void testMaskEmptyValue() {
-    Identifier statesUSIdentifier = new StatesUSIdentifier();
+		Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
     StatesUSMaskingProviderConfig maskingConfiguration = new StatesUSMaskingProviderConfig();
     MaskingProvider maskingProvider = new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 

@@ -28,6 +28,10 @@ public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public RaceEthnicityIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public ProviderType getType() {
 		return ProviderType.RACE;

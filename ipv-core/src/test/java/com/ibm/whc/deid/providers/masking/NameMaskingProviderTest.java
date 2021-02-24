@@ -151,7 +151,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new NameIdentifier();
+		Identifier identifier = new NameIdentifier(tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);

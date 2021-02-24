@@ -24,6 +24,10 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
 	protected volatile boolean initialized = false;
 	private SWIFTCodeManager swiftCodeManager;
 
+	public SWIFTCodeIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
   @Override
   protected Manager getManager() {
 		if (!initialized) {

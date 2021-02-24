@@ -13,7 +13,6 @@ import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.util.NamesManager.NameManager;
 import com.ibm.whc.deid.util.NumberUtils;
 import com.ibm.whc.deid.util.Tuple;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /** The type Name identifier. */
 public class NameIdentifier extends AbstractIdentifier implements IdentifierWithOffset {
@@ -24,6 +23,14 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
   private static final String[] appropriateNames = {"Name", "Surname"};
 
 	protected volatile boolean initialized = false;
+	
+	protected String tenantId;
+	protected String localizationProperty;
+
+	public NameIdentifier(String tenantId, String localizationProperty) {
+		this.tenantId = tenantId;
+		this.localizationProperty = localizationProperty;
+	}
 
   @Override
   public ProviderType getType() {
@@ -32,7 +39,7 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
 	protected NameManager getManager() {
 		if (!initialized) {
-			nameNanager = new NameManager(null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+			nameNanager = new NameManager(tenantId, localizationProperty);
 			initialized = true;
 		}
 		return nameNanager;

@@ -10,9 +10,12 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.ZIPCodeIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
@@ -263,7 +266,7 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ZIPCodeIdentifier();
+		Identifier identifier = new ZIPCodeIdentifier(tenantId, localizationProperty);
 
     String invalidZIPCode = "8512";
     String maskedZIPCode = maskingProvider.mask(invalidZIPCode);

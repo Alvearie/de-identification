@@ -10,10 +10,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class VINIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class VINIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
-    VINIdentifier vinIdentifier = new VINIdentifier();
+		VINIdentifier vinIdentifier = new VINIdentifier(tenantId, localizationProperty);
 
     /* VIN value too short */
     String vin = "ABV3231333";

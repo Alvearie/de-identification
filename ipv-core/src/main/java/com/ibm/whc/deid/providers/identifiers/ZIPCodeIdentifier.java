@@ -25,6 +25,10 @@ public class ZIPCodeIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public ZIPCodeIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public ProviderType getType() {
 		return ProviderType.ZIPCODE;

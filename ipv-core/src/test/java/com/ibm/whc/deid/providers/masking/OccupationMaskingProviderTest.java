@@ -29,7 +29,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskRandomOccupation() {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new OccupationIdentifier();
+		Identifier identifier = new OccupationIdentifier(tenantId, localizationProperty);
 
     String occupation = "actor";
     String maskedValue = maskingProvider.mask(occupation);
@@ -68,7 +68,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new OccupationIdentifier();
+		Identifier identifier = new OccupationIdentifier(tenantId, localizationProperty);
 
     String invalidOccupation = "Invalid Occupation";
     String maskedOccupation = maskingProvider.mask(invalidOccupation);

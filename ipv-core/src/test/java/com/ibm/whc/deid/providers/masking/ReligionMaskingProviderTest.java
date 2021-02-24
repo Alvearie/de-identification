@@ -17,7 +17,6 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.ReligionIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ReligionMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ReligionMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   // @formatter:off
@@ -26,13 +25,11 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
    * religion value. It also tests for localization masking of religion value.
    */
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
-
   @Test
   public void testMask() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
 		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
-    ReligionIdentifier identifier = new ReligionIdentifier();
+		ReligionIdentifier identifier = new ReligionIdentifier(tenantId, localizationProperty);
 
     String originalReligion = "Buddhist";
 
@@ -79,7 +76,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
 		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ReligionIdentifier();
+		Identifier identifier = new ReligionIdentifier(tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);

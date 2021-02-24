@@ -13,14 +13,12 @@ import org.junit.Test;
 
 import com.ibm.whc.deid.providers.identifiers.IMEIIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IMEIMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
-    IMEIIdentifier identifier = new IMEIIdentifier();
+		IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
     MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
@@ -39,7 +37,7 @@ public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProv
     config.setPreserveTAC(Boolean.FALSE);
     MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
-    IMEIIdentifier identifier = new IMEIIdentifier();
+		IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
 
     String imei = "001013001234568";
     String maskedValue = maskingProvider.mask(imei);

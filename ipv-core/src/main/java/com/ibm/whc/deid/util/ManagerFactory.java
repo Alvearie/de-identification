@@ -91,6 +91,9 @@ public class ManagerFactory {
         case ICDV9:
           manager = new ICDv9Manager(tenantId, localizationProperty);
           break;
+			case TACDB:
+				manager = new IMEIManager(tenantId, localizationProperty);
+				break;
         case MARITAL_STATUS:
           manager = new MaritalStatusManager(tenantId, localizationProperty);
           break;

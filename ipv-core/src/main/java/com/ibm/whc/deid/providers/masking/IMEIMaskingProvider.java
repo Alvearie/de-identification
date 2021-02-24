@@ -14,7 +14,7 @@ public class IMEIMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = -5189348513611132622L;
 
-  private static final IMEIIdentifier identifier = new IMEIIdentifier();
+	private final IMEIIdentifier imeiIdentifier;
 	private final IMEIManager imeiManager;
   private final boolean preserveTAC;
 
@@ -27,14 +27,15 @@ public class IMEIMaskingProvider extends AbstractMaskingProvider {
    */
   public IMEIMaskingProvider(IMEIMaskingProviderConfig config, String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
-		imeiManager = new IMEIManager(localizationProperty);
+		imeiIdentifier = new IMEIIdentifier(tenantId, localizationProperty);
+		imeiManager = new IMEIManager(tenantId, localizationProperty);
     this.preserveTAC = config.getPreserveTAC();
   }
 
   @Override
   public String mask(String identifier) {
     String tac;
-    if (!IMEIMaskingProvider.identifier.isOfThisType(identifier)) {
+		if (!imeiIdentifier.isOfThisType(identifier)) {
       return null;
     } else {
       if (!this.preserveTAC) {

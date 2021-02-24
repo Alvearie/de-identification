@@ -17,10 +17,8 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.RaceEthnicityIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.RaceEthnicityMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Race masking provider has no options. It tests for random masking of race value. It also tests
    * for localization masking of race value.
@@ -30,7 +28,7 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   public void testMask() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-    RaceEthnicityIdentifier identifier = new RaceEthnicityIdentifier();
+		RaceEthnicityIdentifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String originalRace = "white";
 
@@ -77,7 +75,7 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new RaceEthnicityIdentifier();
+		Identifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);

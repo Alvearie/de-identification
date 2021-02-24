@@ -23,9 +23,8 @@ import com.ibm.whc.deid.util.VINManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  private final VINIdentifier vinIdentifier = new VINIdentifier();
+	private final VINIdentifier vinIdentifier = new VINIdentifier(tenantId, localizationProperty);
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   /*
    * Tests for both VIN options and their boolean values (true and false). Also tests for an invalid
@@ -148,7 +147,7 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new VINIdentifier();
+		Identifier identifier = new VINIdentifier(tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);

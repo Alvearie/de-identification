@@ -66,6 +66,7 @@ public class LocalizationManagerTest {
   public void getResourcesWithCountry() throws Exception {
     for (Resources resource : Resource.values()) {
       if (resource != Resource.PATTERN) {
+
         Collection<ResourceEntry> resources =
             manager.getResources(resource, Collections.singleton("us"));
 

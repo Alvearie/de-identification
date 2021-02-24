@@ -33,6 +33,10 @@ public class VINIdentifier extends AbstractManagerBasedIdentifier {
 
 	private VINManager vinManager;
 
+	public VINIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	private static final String[] appropriateNames = { "Vehicle Identification Number", "VIN" };
 
 	@Override
