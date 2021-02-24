@@ -46,7 +46,8 @@ public class ICDv10Identifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(null, Resource.ICDV10, null, localizationProperty);
+			icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV10, null,
+					localizationProperty);
 
 			initialized = true;
 		}

@@ -61,7 +61,7 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(null,
+			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.HOSPITAL_NAMES, null, localizationProperty);
       initialized = true;
     }

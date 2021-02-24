@@ -51,7 +51,7 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
 							localizationProperty);
 
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null,
+					(CityManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.CITY, null, localizationProperty);
 
       initialized = true;

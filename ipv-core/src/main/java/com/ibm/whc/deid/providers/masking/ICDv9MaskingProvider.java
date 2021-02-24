@@ -89,7 +89,8 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       icdV9Manager =
-          (ICDv9Manager) ManagerFactory.getInstance().getManager(null, Resource.ICDV9, null, localizationProperty);
+					(ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV9, null,
+							localizationProperty);
       initialized = true;
     }
   }

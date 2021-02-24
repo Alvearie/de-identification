@@ -27,7 +27,7 @@ public class MaritalStatusIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			maritalStatusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(null,
+			maritalStatusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
 					Resource.MARITAL_STATUS, null, localizationProperty);
 
 			initialized = true;

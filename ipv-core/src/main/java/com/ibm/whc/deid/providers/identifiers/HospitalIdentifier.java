@@ -32,7 +32,8 @@ public class HospitalIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(null, Resource.HOSPITAL_NAMES,
+			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
+					Resource.HOSPITAL_NAMES,
 					null, localizationProperty);
 
 			initialized = true;

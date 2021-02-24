@@ -45,7 +45,8 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       swiftCodeManager =
-          (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null, localizationProperty);
+					(SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.SWIFT, null,
+							localizationProperty);
 
       initialized = true;
     }

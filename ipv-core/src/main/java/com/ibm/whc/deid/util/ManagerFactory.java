@@ -19,7 +19,7 @@ public class ManagerFactory {
 
   private static final ManagerFactory instance = new ManagerFactory();
 
-  ConcurrentHashMap<Resources, Manager> managers = new ConcurrentHashMap<>();
+	ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
 
 	private ManagerFactory() {
 	}
@@ -41,9 +41,9 @@ public class ManagerFactory {
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
 
-		// FIXME: We will need a manager that is tenant specific instead of just base on
-		// resourceType
-    Manager manager = managers.get(resourceType);
+		// The manager needs to be tenant specific based on type
+		String key = tenantId + "_" + resourceType;
+		Manager manager = managers.get(key);
 
     if (manager != null) {
       // check prefix length for ZIPCodeManager. Only return the cached
@@ -126,7 +126,7 @@ public class ManagerFactory {
       throw new IllegalArgumentException("Unsupported resource type:" + resourceType);
     }
 
-    managers.put(resourceType, manager);
+		managers.put(key, manager);
 
     return manager;
   }

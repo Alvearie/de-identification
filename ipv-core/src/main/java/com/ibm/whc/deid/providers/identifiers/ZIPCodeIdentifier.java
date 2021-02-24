@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
+
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -42,7 +43,7 @@ public class ZIPCodeIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(null, Resource.ZIPCODE,
+			zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ZIPCODE,
                 ZIPCodeMaskingProviderConfig.MASK_PREFIX_LENGTH_DEFAULT, localizationProperty);
 
 			initialized = true;

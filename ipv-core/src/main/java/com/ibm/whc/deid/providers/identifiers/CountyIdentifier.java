@@ -24,7 +24,8 @@ public class CountyIdentifier extends AbstractManagerBasedIdentifier {
 	protected Manager getManager() {
 
 		if (!initialized) {
-			countyManager = (CountyManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTY, null, localizationProperty);
+			countyManager = (CountyManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTY, null,
+					localizationProperty);
 
 			initialized = true;
 		}

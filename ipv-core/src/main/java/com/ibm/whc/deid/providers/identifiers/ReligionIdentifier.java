@@ -26,7 +26,8 @@ public class ReligionIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(null, Resource.RELIGION, null, localizationProperty);
+			religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(tenantId, Resource.RELIGION,
+					null, localizationProperty);
 
 			initialized = true;
 		}

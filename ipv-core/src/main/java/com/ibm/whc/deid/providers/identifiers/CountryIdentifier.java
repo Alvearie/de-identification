@@ -52,7 +52,8 @@ public class CountryIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			countryManager = (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null, localizationProperty);
+			countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTRY, null,
+					localizationProperty);
 
 			initialized = true;
 		}

@@ -51,14 +51,16 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(null,
+			continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.CONTINENT, null, localizationProperty);
 
       countryManager =
-          (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null, localizationProperty);
+					(CountryManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTRY, null,
+							localizationProperty);
 
       cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null, localizationProperty);
+					(CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY, null,
+							localizationProperty);
 
       initialized = true;
     }

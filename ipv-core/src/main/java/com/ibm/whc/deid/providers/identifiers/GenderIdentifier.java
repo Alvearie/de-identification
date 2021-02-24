@@ -23,7 +23,8 @@ public class GenderIdentifier extends AbstractManagerBasedIdentifier {
   @Override
   protected Manager getManager() {
 		if (!initialized) {
-			genderManager = (GenderManager) ManagerFactory.getInstance().getManager(null, Resource.GENDER, null, localizationProperty);
+			genderManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId, Resource.GENDER, null,
+					localizationProperty);
 
 			initialized = true;
 		}

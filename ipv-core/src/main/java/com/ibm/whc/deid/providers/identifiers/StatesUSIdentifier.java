@@ -23,7 +23,8 @@ public class StatesUSIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(null, Resource.STATES_US, null, localizationProperty);
+			statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(tenantId, Resource.STATES_US,
+					null, localizationProperty);
 
 			initialized = true;
 		}

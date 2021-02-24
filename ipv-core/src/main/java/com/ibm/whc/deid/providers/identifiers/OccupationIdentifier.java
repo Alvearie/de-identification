@@ -26,7 +26,8 @@ public class OccupationIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(null, Resource.OCCUPATION,
+			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(tenantId,
+					Resource.OCCUPATION,
 					null, localizationProperty);
 
 			initialized = true;

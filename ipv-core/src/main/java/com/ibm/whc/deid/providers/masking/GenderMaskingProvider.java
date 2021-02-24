@@ -54,7 +54,7 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       genderManager =
-          (GenderManager) ManagerFactory.getInstance().getManager(null,
+					(GenderManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.GENDER, null, localizationProperty);
 
       initialized = true;

@@ -192,7 +192,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
     if (!initialized) {
       // Initialize all the masking providers/managers needed.
       streetNameManager = (StreetNameManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.STREET_NAMES, null, localizationProperty);
+					.getManager(tenantId, Resource.STREET_NAMES, null, localizationProperty);
 
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
           MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
@@ -202,7 +202,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
               null, configuration.getCityMaskingConfig(), null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
-      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(null,
+			postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
       initialized = true;
     }
