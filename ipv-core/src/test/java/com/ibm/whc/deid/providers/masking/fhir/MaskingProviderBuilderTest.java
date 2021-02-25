@@ -31,32 +31,41 @@ import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-import com.ibm.whc.deid.shared.util.MaskingConfigUtils;
 
 /**
- * Unit tests for generic masking provider
+ * Unit tests for MaskingProviderBuilder.
  *
  */
 public class MaskingProviderBuilderTest {
 
   private MaskingProviderFactory maskingProviderFactory = new BasicMaskingProviderFactory();
 
-  private String schemaType = "fhir";
-
   private final boolean defNoRuleRes = true;
   private final String tenantId = "TEST_TENANT";
-
   private final String hashRuleName = "hashRule";
-
   private final String maintainRuleName = "maintainRule";
-
   private final String deleteRuleName = "deleteRule";
-
   private final String randomRuleName = "randomRule";
-
   private final String datetimeRuleName = "datetimeRule";
-
   private final String cityRuleName = "cityRule";
+
+  private class TestMaskingProviderBuilder extends MaskingProviderBuilder {
+
+    private static final long serialVersionUID = -4779753869249393576L;
+
+    public TestMaskingProviderBuilder(FHIRResourceMaskingConfiguration resourceConfiguration,
+        DeidMaskingConfig maskingConfiguration, boolean defNoRuleRes,
+        MaskingProviderFactory maskingProviderFactory, String tenantId) {
+      super(resourceConfiguration, maskingConfiguration, defNoRuleRes, maskingProviderFactory,
+          tenantId);
+    }
+
+    public JsonNode mask(JsonNode node) {
+      List<MaskingResource> inputList = new ArrayList<>();
+      inputList.add(new MaskingResource("1", node, node.get("resourceType").asText()));
+      return orchestrateMasking(inputList).get(0).getJsonNode();
+    }
+  }
 
   @Test
   public void testBasicMaskDeleteSimple() throws Exception {
@@ -77,7 +86,7 @@ public class MaskingProviderBuilderTest {
     assertTrue(device.get("expiry").isTextual());
 
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedDevice = genericMaskingProvider.mask(device);
@@ -164,7 +173,7 @@ public class MaskingProviderBuilderTest {
     String originalReference = "ID1";
     assertEquals(originalReference, group.get("identifier").get(1).get("value").asText());
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
@@ -202,7 +211,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully deleted and the rest weren't
@@ -246,10 +255,8 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
-        resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
-
-    genericMaskingProvider.setDefNoRuleRes(false);
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
+        resourceConfiguration, testMaskingConfig, false, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully deleted and the rest
     // weren't
@@ -296,7 +303,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -342,7 +349,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -369,7 +376,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -398,7 +405,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedDevice = genericMaskingProvider.mask(device);
@@ -424,7 +431,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedDevice = genericMaskingProvider.mask(device);
@@ -461,7 +468,7 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedPatient = genericMaskingProvider.mask(patient);
@@ -483,7 +490,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -512,7 +519,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -545,7 +552,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully deleted and the rest weren't
@@ -575,7 +582,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -614,7 +621,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully deleted and the rest weren't
@@ -641,7 +648,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -669,7 +676,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -697,7 +704,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -726,7 +733,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -755,7 +762,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -780,7 +787,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -805,7 +812,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -830,7 +837,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the specified item was successfully masked
@@ -860,7 +867,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -894,7 +901,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -931,7 +938,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     String maskedExpect11 = "88CAFB31A719642B7DA0ADB63E72C015B4DCC66C4247D4EAC8CED064A8360C06";
@@ -973,7 +980,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValue = genericMaskingProvider.mask(group);
     assertEquals("07/2017",
@@ -1000,7 +1007,7 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -1041,7 +1048,7 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -1093,7 +1100,7 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
@@ -1152,7 +1159,7 @@ public class MaskingProviderBuilderTest {
     JsonConfig jsonConfig = testMaskingConfig.getJson();
     jsonConfig.addMaskingRule("/identifier/value", hashRuleName);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -1207,7 +1214,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -1243,7 +1250,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfiguration2 =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf2);
 
-    MaskingProviderBuilder genericMaskingProvider2 = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider2 = new TestMaskingProviderBuilder(
         resourceConfiguration2, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValue2 = genericMaskingProvider2.mask(group);
@@ -1293,7 +1300,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderD = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderD = new TestMaskingProviderBuilder(
         resourceConfigurationD, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueD = maskingProviderD.mask(groupD);
@@ -1310,7 +1317,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationE =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfE);
 
-    MaskingProviderBuilder maskingProviderE = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderE = new TestMaskingProviderBuilder(
         resourceConfigurationE, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueE = maskingProviderE.mask(groupE);
     assertEquals("ID0", maskedValueE.get("identifier").get(0).get("value").asText());
@@ -1327,7 +1334,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationF =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfF);
 
-    MaskingProviderBuilder maskingProviderF = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderF = new TestMaskingProviderBuilder(
         resourceConfigurationF, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueF = maskingProviderF.mask(groupF);
@@ -1344,7 +1351,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationG =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfG);
 
-    MaskingProviderBuilder maskingProviderG = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderG = new TestMaskingProviderBuilder(
         resourceConfigurationG, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueG = maskingProviderG.mask(groupG);
@@ -1376,7 +1383,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderA = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderA = new TestMaskingProviderBuilder(
         resourceConfigurationA, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueA = maskingProviderA.mask(groupA);
@@ -1393,7 +1400,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationB =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfB);
 
-    MaskingProviderBuilder maskingProviderB = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderB = new TestMaskingProviderBuilder(
         resourceConfigurationB, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     maskingProviderB.mask(groupB);
@@ -1409,7 +1416,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfC.put("/fhir/Group/identifier[,,,,n]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationC =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfC);
-    MaskingProviderBuilder maskingProviderC = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderC = new TestMaskingProviderBuilder(
         resourceConfigurationC, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     maskingProviderC.mask(groupC);
     assertEquals("ID0", maskedValueA.get("identifier").get(0).get("value").asText());
@@ -1425,7 +1432,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfD.put("/fhir/Group/identifier[0,5]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationD =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfD);
-    MaskingProviderBuilder maskingProviderD = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderD = new TestMaskingProviderBuilder(
         resourceConfigurationD, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueD = maskingProviderD.mask(groupD);
     assertEquals(maskedExpect0, maskedValueD.get("identifier").get(0).get("value").asText());
@@ -1441,7 +1448,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationE =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfE);
 
-    MaskingProviderBuilder maskingProviderE = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderE = new TestMaskingProviderBuilder(
         resourceConfigurationE, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueE = maskingProviderE.mask(groupE);
     assertEquals("ID0", maskedValueE.get("identifier").get(0).get("value").asText());
@@ -1457,7 +1464,7 @@ public class MaskingProviderBuilderTest {
     FHIRResourceMaskingConfiguration resourceConfigurationF =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfF);
 
-    MaskingProviderBuilder maskingProviderF = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderF = new TestMaskingProviderBuilder(
         resourceConfigurationF, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueF = maskingProviderF.mask(groupF);
     assertEquals("ID0", maskedValueF.get("identifier").get(0).get("value").asText());
@@ -1479,7 +1486,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderA = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderA = new TestMaskingProviderBuilder(
         resourceConfigurationA, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueA = maskingProviderA.mask(groupA);
@@ -1495,7 +1502,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfB.put("/fhir/Group", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationB =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfB);
-    MaskingProviderBuilder maskingProviderB = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderB = new TestMaskingProviderBuilder(
         resourceConfigurationB, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     maskingProviderB.mask(groupB);
@@ -1511,7 +1518,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfC.put("/fhir/Group/identifier[n]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationC =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfC);
-    MaskingProviderBuilder maskingProviderC = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderC = new TestMaskingProviderBuilder(
         resourceConfigurationC, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     maskingProviderC.mask(groupC);
@@ -1528,7 +1535,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfD.put("/fhir/Group", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationD =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfD);
-    MaskingProviderBuilder maskingProviderD = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderD = new TestMaskingProviderBuilder(
         resourceConfigurationD, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     maskingProviderD.mask(groupD);
     assertEquals("ID0", maskedValueA.get("identifier").get(0).get("value").asText());
@@ -1552,7 +1559,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderC = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderC = new TestMaskingProviderBuilder(
         resourceConfigurationC, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueC = maskingProviderC.mask(groupC);
@@ -1580,7 +1587,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderA = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderA = new TestMaskingProviderBuilder(
         resourceConfigurationA, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     JsonNode maskedValueA = maskingProviderA.mask(groupA);
@@ -1596,7 +1603,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfB.put("/fhir/Group/identifier[{0}]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationB =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfB);
-    MaskingProviderBuilder maskingProviderB = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderB = new TestMaskingProviderBuilder(
         resourceConfigurationB, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueB = maskingProviderB.mask(groupB);
     assertEquals(maskedExpect0, maskedValueB.get("identifier").get(0).get("value").asText());
@@ -1611,7 +1618,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfC.put("/fhir/Group/identifier[{0,}]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationC =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfC);
-    MaskingProviderBuilder maskingProviderC = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderC = new TestMaskingProviderBuilder(
         resourceConfigurationC, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueC = maskingProviderC.mask(groupC);
     assertEquals(maskedExpect0, maskedValueC.get("identifier").get(0).get("value").asText());
@@ -1627,7 +1634,7 @@ public class MaskingProviderBuilderTest {
     groupMaskConfD.put("/fhir/Group/identifier[0,2]/value", hashRuleName);
     FHIRResourceMaskingConfiguration resourceConfigurationD =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConfD);
-    MaskingProviderBuilder maskingProviderD = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderD = new TestMaskingProviderBuilder(
         resourceConfigurationD, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueD = maskingProviderD.mask(groupD);
     assertEquals(maskedExpect0, maskedValueD.get("identifier").get(0).get("value").asText());
@@ -1654,7 +1661,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder maskingProviderA = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder maskingProviderA = new TestMaskingProviderBuilder(
         resourceConfigurationA, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     JsonNode maskedValueA = maskingProviderA.mask(groupA);
     assertEquals(maskedExpect0, maskedValueA.get("identifier").get(0).get("value").asText());
@@ -1676,7 +1683,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
     // Check that the items were not masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
@@ -1702,7 +1709,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the items were not masked
@@ -1726,7 +1733,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the items were not masked
@@ -1750,7 +1757,7 @@ public class MaskingProviderBuilderTest {
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
 
-    MaskingProviderBuilder genericMaskingProvider = new MaskingProviderBuilder(schemaType,
+    TestMaskingProviderBuilder genericMaskingProvider = new TestMaskingProviderBuilder(
         resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
 
     // Check that the items was masked
@@ -1777,18 +1784,16 @@ public class MaskingProviderBuilderTest {
       DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
       testMaskingConfig = addRules(testMaskingConfig);
 
-      MaskingProviderBuilder maskingProvider = new MaskingProviderBuilder(schemaType,
+      TestMaskingProviderBuilder maskingProvider = new TestMaskingProviderBuilder(
           resourceConfiguration, testMaskingConfig, defNoRuleRes, maskingProviderFactory, tenantId);
       maskingProvider.mask(group);
       isSuccessful = true;
     } catch (IllegalArgumentException e) {
       String expectedText =
-          "Cannot intermix fhir arrays by index and arrays by query in the same masking rule";
+          "Cannot intermix arrays by index and arrays by query in the same masking rule";
       assertEquals(expectedText, e.getMessage());
     }
     // Make sure it didn't actually succeed
     assertEquals(false, isSuccessful);
   }
-
-
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -30,7 +30,10 @@ public class FHIRResourceMaskingAction implements Serializable {
   }
 
   public String[] getPaths() {
-    return paths;
+    // thread-safety - ensure changes to the returned array are not reflected in this object
+    String[] pathsReturned = new String[paths.length];
+    System.arraycopy(paths, 0, pathsReturned, 0, paths.length);
+    return pathsReturned;
   }
 
   public MaskingProvider getMaskingProvider() {
