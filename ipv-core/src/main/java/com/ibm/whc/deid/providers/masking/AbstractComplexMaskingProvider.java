@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,7 +23,7 @@ import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
-public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingProvider {
+public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -7270189743655406461L;
 
@@ -48,10 +48,6 @@ public abstract class AbstractComplexMaskingProvider<K> extends AbstractMaskingP
     if (this.keyForType == null || this.keyForType.trim().isEmpty()) {
       this.keyForType = DISABLE_TYPES_VALUE;
     }
-  }
-
-  public K mask(K obj) {
-    return obj;
   }
 
   @Override
