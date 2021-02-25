@@ -1,15 +1,16 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
+import java.io.Serializable;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
 
-public interface MaskingProviderFactory {
+public interface MaskingProviderFactory extends Serializable {
 
   /**
    * Get a masking provider based on type.

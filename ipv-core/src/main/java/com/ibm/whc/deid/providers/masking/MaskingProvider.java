@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,33 +15,18 @@ import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 /**
- * The interface Masking provider.
- *
+ * Interface supported by classes that provide privacy protection functions.
  */
 public interface MaskingProvider extends Serializable {
-  /**
-   * Mask string [ ].
-   *
-   * @param data the data
-   * @return the string [ ]
-   */
-  String[] mask(final String[] data);
 
   /**
-   * Mask string.
+   * Applies a privacy protection operation to a string.
    *
-   * @param identifier the identifier
-   * @return the string
+   * @param identifier the input data to be protected
+   * 
+   * @return the protected value to use
    */
-  String mask(String identifier);
-
-  /**
-   * Mask byte [ ].
-   *
-   * @param data the data
-   * @return the byte [ ]
-   */
-  byte[] mask(byte[] data);
+  public String mask(String identifier);
 
   /**
    * Mask string.
@@ -64,14 +49,11 @@ public interface MaskingProvider extends Serializable {
   String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,
       Map<String, OriginalMaskedValuePair> values);
 
-  void setTestingOnlyLogManager(LogManager logManager);
-
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers);
 
-  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
-      String jobId);
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId);
 
-  void setName(String ruleName);
+  public void setName(String ruleName);
 
-  String getName();
+  public String getName();
 }

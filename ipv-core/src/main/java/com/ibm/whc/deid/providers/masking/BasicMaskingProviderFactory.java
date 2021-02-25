@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +64,7 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
  * The type Masking provider factory.
  *
  */
-public class BasicMaskingProviderFactory implements Serializable, MaskingProviderFactory {
+public class BasicMaskingProviderFactory implements MaskingProviderFactory {
 
   private static final long serialVersionUID = -7454645556196383954L;
 

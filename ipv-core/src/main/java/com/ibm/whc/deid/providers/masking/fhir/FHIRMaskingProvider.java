@@ -1,11 +1,10 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking.fhir;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +21,9 @@ import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
-public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> {
+public class FHIRMaskingProvider extends AbstractComplexMaskingProvider {
 
   private static final long serialVersionUID = 5945527984023679481L;
-
-  private List<String> copyFieldList = new ArrayList<String>();
 
   public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
@@ -60,8 +57,8 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
       FHIRResourceMaskingConfiguration resourceConfiguration =
           new FHIRResourceMaskingConfiguration(basePath, ruleAssignments);
       this.maskingProviderMap.put(type.toLowerCase(),
-          new MaskingProviderBuilder("fhir", resourceConfiguration, maskingConfiguration,
-              defNoRuleRes, maskingProviderFactory, tenantId));
+          new MaskingProviderBuilder(resourceConfiguration, maskingConfiguration, defNoRuleRes,
+              maskingProviderFactory, tenantId));
     });
   }
 
@@ -99,14 +96,6 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
         "FHIRMaskingProvider: Masking on a per-string basis is not enabled.");
   }
 
-  public List<String> getCopyFieldList() {
-    return copyFieldList;
-  }
-
-  public void setCopyFieldList(List<String> copyFieldList) {
-    this.copyFieldList = copyFieldList;
-  }
-
   @Override
   public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId) {
     List<Tuple2<String, JsonNode>> toMask = payloadData.stream().map(input -> {
@@ -114,8 +103,6 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider<String> 
       try {
         node = ObjectMapperFactory.getObjectMapper().readTree(input.getData());
       } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1013E, e);
-      } catch (IOException e) {
         log.logError(LogCodes.WPH1013E, e);
       }
       return new Tuple2<String, JsonNode>(input.getIdentifier(), node);

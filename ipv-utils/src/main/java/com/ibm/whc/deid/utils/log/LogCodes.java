@@ -64,4 +64,5 @@ public interface LogCodes {
   public static final String WPH8012E = "WPH8012E";
   public static final String WPH8013E = "WPH8013E";
   public static final String WPH8014E = "WPH8014E";
+  public static final String WPH8015E = "WPH8015E";
 }
