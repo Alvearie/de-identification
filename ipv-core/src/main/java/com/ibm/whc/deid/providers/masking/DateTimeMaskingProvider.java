@@ -199,7 +199,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.dateYearDeleteComparedValue = compareDateValue;
 
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    
+
     String fixedDateFormatString = configuration.getFormatFixed();
     this.fixedDateFormat =
         (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())

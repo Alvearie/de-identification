@@ -71,8 +71,8 @@ public class LocalizationManagerTest {
             manager.getResources(resource, Collections.singleton("us"));
 
         assertNotNull(resources);
-				assertThat("Resource  " + resource + " size should not be zero", resources.size(),
-						is(not(0)));
+        assertThat("Resource  " + resource + " size should not be zero", resources.size(),
+            is(not(0)));
       }
     }
   }

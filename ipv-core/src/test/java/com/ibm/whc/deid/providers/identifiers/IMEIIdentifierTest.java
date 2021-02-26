@@ -15,7 +15,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class IMEIIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
-		IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
+    IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
 
     String imei = "001013001234568"; // OK
     assertTrue(identifier.isOfThisType(imei));

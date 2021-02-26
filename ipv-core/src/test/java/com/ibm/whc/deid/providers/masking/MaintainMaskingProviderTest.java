@@ -15,7 +15,7 @@ public class MaintainMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaintain_NonEmptyInput() throws Exception {
 
-		MaintainMaskingProvider maskingProvider = new MaintainMaskingProvider();
+    MaintainMaskingProvider maskingProvider = new MaintainMaskingProvider();
 
     String originalValue = "*A-Acc,DDD123455;>";
     String maskedValue = maskingProvider.mask(originalValue);
@@ -25,7 +25,7 @@ public class MaintainMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaintain_NullInput() throws Exception {
 
-		MaintainMaskingProvider maskingProvider = new MaintainMaskingProvider();
+    MaintainMaskingProvider maskingProvider = new MaintainMaskingProvider();
 
     String originalValue = null;
     String maskedValue = maskingProvider.mask(originalValue);

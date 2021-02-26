@@ -24,7 +24,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ContinentManagerTest {
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testSerializable() throws Exception {

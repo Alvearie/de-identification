@@ -30,8 +30,8 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
   private static final long serialVersionUID = -7270189743655406461L;
 
   public static final String DISABLE_TYPES_VALUE = "default";
-  
-  protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();  
+
+  protected final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();
 
   protected String keyForType;
 
@@ -41,9 +41,9 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
 
   protected String identifier;
 
-	public AbstractComplexMaskingProvider() {
-		super(null, null);
-	}
+  public AbstractComplexMaskingProvider() {
+    super(null, null);
+  }
 
   public AbstractComplexMaskingProvider(DeidMaskingConfig maskingConfiguration) {
     this.keyForType = maskingConfiguration.getJson().getMessageTypeKey();

@@ -21,8 +21,9 @@ import com.ibm.whc.deid.util.NamesManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
-  private final NamesManager.NameManager names = new NamesManager.NameManager(null, localizationProperty);
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private final NamesManager.NameManager names =
+      new NamesManager.NameManager(null, localizationProperty);
 
   @Test
   public void testMask() throws Exception {
@@ -84,7 +85,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String[] originalValues = new String[] {"John"};
 
     for (NameMaskingProviderConfig maskingConfiguration : configurations) {
-      NameMaskingProvider maskingProvider = new NameMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+      NameMaskingProvider maskingProvider =
+          new NameMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();
@@ -107,7 +109,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskingAllowUnisex(true);
 
-    MaskingProvider nameMaskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider nameMaskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String name = "Mary";
 
@@ -123,7 +126,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskNullNameInputReturnNull() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskingAllowUnisex(true);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = null;
     String maskedName = maskingProvider.mask(invalidName);
@@ -137,7 +141,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
 
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -150,8 +155,9 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputValidHandlingReturnRandom() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
-		Identifier identifier = new NameIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new NameIdentifier(tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -165,7 +171,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputValidHandlingReturnDefaultCustomValue() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -179,7 +186,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Name");
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -192,7 +200,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputInvalidHandlingReturnNull() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);

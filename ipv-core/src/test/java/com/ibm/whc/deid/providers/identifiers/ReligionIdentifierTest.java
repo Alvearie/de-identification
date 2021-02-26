@@ -14,7 +14,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class ReligionIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-		ReligionIdentifier religionIdentifier = new ReligionIdentifier(tenantId, localizationProperty);
+    ReligionIdentifier religionIdentifier = new ReligionIdentifier(tenantId, localizationProperty);
     String religion = "Buddhist";
     assertTrue(religionIdentifier.isOfThisType(religion));
   }

@@ -13,23 +13,24 @@ import com.ibm.whc.deid.util.RandomGenerators;
  *
  */
 public class CreditCardMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = -5924474542829037368L;
 
   private final boolean preserveIssuer;
   private final int preservedDigits;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-	private final RandomGenerators randomGenerators;
+  private final RandomGenerators randomGenerators;
 
 
-  public CreditCardMaskingProvider(CreditCardMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public CreditCardMaskingProvider(CreditCardMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.preserveIssuer = configuration.isIssuerPreserve();
     this.preservedDigits = this.preserveIssuer ? 6 : 0;
-		randomGenerators = new RandomGenerators(localizationProperty);
+    randomGenerators = new RandomGenerators(localizationProperty);
   }
 
   @Override
@@ -40,7 +41,7 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     }
 
     if (!preserveIssuer) {
-			return randomGenerators.generateRandomCreditCard();
+      return randomGenerators.generateRandomCreditCard();
     }
 
     final StringBuilder buffer = new StringBuilder();
@@ -57,7 +58,7 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     if (digitsEncountered != 16) {
       debugFaultyInput("digitsEncountered");
       if (unspecifiedValueHandling == 2) {
-				return randomGenerators.generateRandomCreditCard();
+        return randomGenerators.generateRandomCreditCard();
       } else if (unspecifiedValueHandling == 3) {
         return unspecifiedValueReturnMessage;
       } else {

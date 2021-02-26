@@ -23,8 +23,9 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.preserveCountry = configuration.isMaskPreserveCountry();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
@@ -61,7 +62,7 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
+      hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.HOSPITAL_NAMES, null, localizationProperty);
       initialized = true;
     }

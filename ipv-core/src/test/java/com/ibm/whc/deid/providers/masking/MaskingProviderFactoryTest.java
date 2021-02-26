@@ -44,12 +44,13 @@ public class MaskingProviderFactoryTest {
      * Instantiate a MaskingProviderFactory with a ConfigurationManager and the map of identified
      * types
      */
-    MaskingProviderFactory maskingProviderFactory = new BasicMaskingProviderFactory(
-        new DeidMaskingConfig(), identifiedTypes);
+    MaskingProviderFactory maskingProviderFactory =
+        new BasicMaskingProviderFactory(new DeidMaskingConfig(), identifiedTypes);
 
     /* Get the masking provider and mask a value */
     MaskingProvider maskingProvider = maskingProviderFactory.getProviderFromType(
-        MaskingProviderType.HASH, deidMaskingConfig, new HashMaskingProviderConfig(), tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+        MaskingProviderType.HASH, deidMaskingConfig, new HashMaskingProviderConfig(), tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalValue = "John Smith";
     String maskedValue = maskingProvider.mask(originalValue);
@@ -63,7 +64,8 @@ public class MaskingProviderFactoryTest {
     MaskingProviderFactory maskingProviderFactory =
         new BasicMaskingProviderFactory(deidMaskingConfig, null);
     MaskingProvider maskingProvider = maskingProviderFactory.getProviderFromType(
-        MaskingProviderType.HASH, deidMaskingConfig, new HashMaskingProviderConfig(), tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+        MaskingProviderType.HASH, deidMaskingConfig, new HashMaskingProviderConfig(), tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalValue = "John Smith";
     String maskedValue = maskingProvider.mask(originalValue);
@@ -76,7 +78,8 @@ public class MaskingProviderFactoryTest {
     DeidMaskingConfig deidMaskingConfig = new DeidMaskingConfig();
 
     MaskingProvider maskingProvider = maskingProviderFactory.getProviderFromType(
-        MaskingProviderType.NAME, deidMaskingConfig, new NameMaskingProviderConfig(), tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+        MaskingProviderType.NAME, deidMaskingConfig, new NameMaskingProviderConfig(), tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     assertTrue(maskingProvider instanceof NameMaskingProvider);
   }
@@ -93,8 +96,7 @@ public class MaskingProviderFactoryTest {
 
     // The main masking provider FHIR/GEN do not have
     // MaskingProviderConfig of their own
-    MaskingProviderType typesToIgnore[] =
-        {MaskingProviderType.FHIR, MaskingProviderType.GEN};
+    MaskingProviderType typesToIgnore[] = {MaskingProviderType.FHIR, MaskingProviderType.GEN};
     List<MaskingProviderType> list = Arrays.asList(typesToIgnore);
 
     Stream.of(MaskingProviderType.values()).filter(type -> !list.contains(type))
@@ -104,7 +106,8 @@ public class MaskingProviderFactoryTest {
             MaskingProviderConfig config =
                 MaskingProviderConfig.getDefaultMaskingProviderConfig(providerType);
             MaskingProvider maskingProvider =
-                mpf.getProviderFromType(providerType, deidMaskingConfig, config, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+                mpf.getProviderFromType(providerType, deidMaskingConfig, config, tenantId,
+                    LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
             assertNotNull(maskingProvider);
             assertTrue(maskingProvider instanceof Serializable);

@@ -14,7 +14,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class GenderIdentifierTest implements MaskingProviderTest {
   @Test
   public void testMatch() {
-		Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
 
     String value = "Male";
     assertTrue(identifier.isOfThisType(value));
@@ -22,7 +22,7 @@ public class GenderIdentifierTest implements MaskingProviderTest {
 
   @Test
   public void testMatchIgnoresCase() {
-		Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new GenderIdentifier(tenantId, localizationProperty);
 
     String value = "MaLE";
     assertTrue(identifier.isOfThisType(value));

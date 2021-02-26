@@ -14,7 +14,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class HospitalIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIdentifier() {
-		Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
 
     String hospitalName = "York Hospital";
     assertTrue(identifier.isOfThisType(hospitalName));

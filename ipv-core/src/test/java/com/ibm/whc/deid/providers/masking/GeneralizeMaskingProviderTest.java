@@ -178,7 +178,8 @@ public class GeneralizeMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testEmptyConfig() {
-    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(new GeneralizeMaskingProviderConfig());
+    GeneralizeMaskingProvider maskingProvider =
+        new GeneralizeMaskingProvider(new GeneralizeMaskingProviderConfig());
     assertNull(maskingProvider.mask("value1"));
   }
 

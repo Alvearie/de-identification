@@ -31,12 +31,13 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   private static final Logger log = LoggerFactory.getLogger(PhoneMaskingProviderTest.class);
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    PhoneMaskingProvider phoneMaskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    PhoneMaskingProvider phoneMaskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     PhoneIdentifier phoneIdentifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String originalPhone = "+353-0876653255";
@@ -80,7 +81,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskUSNumberNoAreaCode() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setAreaCodePreserve(false);
-    PhoneMaskingProvider phoneMaskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    PhoneMaskingProvider phoneMaskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalPhone = "+1-3471234567";
 
@@ -132,7 +134,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskNullPhoneInputReturnNull() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidPhone = null;
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -145,7 +148,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandlingReturnNull() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -158,7 +162,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandlingReturnRandom() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
@@ -177,7 +182,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     configuration.setInvNdigitsReplaceWith("53"); // Cuba
     // country
     // code
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "+53-08766532550864345656";
@@ -198,7 +204,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     configuration.setInvNdigitsReplaceWith("34"); // Spain
     // country
     // code
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
@@ -220,7 +227,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     configuration.setInvNdigitsReplaceWith("538"); // Invalid
     // country
     // code
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
@@ -238,7 +246,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandlingReturnDefaultCustomValue() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -252,7 +261,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Phone");
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -265,7 +275,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputInvalidHandlingReturnNull() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
@@ -283,7 +294,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     configuration.setPhoneRegexPatterns(phoneRegexPatterns);
 
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String phoneNumber = "02 43 87 23 05";
     String maskedPhoneNumber = maskingProvider.mask(phoneNumber);
@@ -312,7 +324,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     configuration.setAreaCodePreserve(false);
 
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String internationalFormat = "+380 44 123 45 67";
     String maskedInternalFormat = maskingProvider.mask(internationalFormat);
@@ -346,7 +359,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     configuration.setPhoneRegexPatterns(phoneRegexPatterns);
 
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String mobileNumber = "7881342113";
     String maskedMobileNumber = maskingProvider.mask(mobileNumber);
@@ -361,10 +375,10 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     configuration.setAreaCodePreserve(false);
 
-		maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     boolean foundChanged = false;
     // try a few times since could happen randomly
-    for (int i=0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
       maskedLandLine = maskingProvider.mask(landLine);
       log.info("Landline original: {}     masked: {}", landLine, maskedLandLine);
       assertNotEquals(landLine, maskedLandLine);
@@ -395,7 +409,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     phoneRegexPatterns.add("^400(?<number>\\d{7}-\\d{4})");
     configuration.setPhoneRegexPatterns(phoneRegexPatterns);
 
-    MaskingProvider maskingProvider = new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
     String mobileNumber = "139 1099 8888";
     String maskedMobileNumber = maskingProvider.mask(mobileNumber);

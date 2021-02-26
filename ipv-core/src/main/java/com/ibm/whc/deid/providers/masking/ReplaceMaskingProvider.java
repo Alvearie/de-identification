@@ -13,7 +13,7 @@ import com.ibm.whc.deid.util.RandomGenerators;
  *
  */
 public class ReplaceMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 8734109695774758607L;
 
   private final int preservedCharacters;
@@ -29,9 +29,10 @@ public class ReplaceMaskingProvider extends AbstractMaskingProvider {
    */
   public ReplaceMaskingProvider(ReplaceMaskingProviderConfig configuration) {
     this.offset = configuration.getMaskOffset();
-    this.preservedCharacters = configuration.getMaskPreserve();    
+    this.preservedCharacters = configuration.getMaskPreserve();
     this.replaceWithRandom = configuration.isMaskReplaceWithRandom();
-    this.replaceWithAsterisks = this.replaceWithRandom ? false : configuration.isMaskReplaceWithAsterisks();
+    this.replaceWithAsterisks =
+        this.replaceWithRandom ? false : configuration.isMaskReplaceWithAsterisks();
   }
 
   @Override

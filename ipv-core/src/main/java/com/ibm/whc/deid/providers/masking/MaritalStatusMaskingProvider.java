@@ -17,7 +17,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = -1898529887780962978L;
 
-	protected MaritalStatusManager statusManager;
+  protected MaritalStatusManager statusManager;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
@@ -25,16 +25,17 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
 
   /**
    * Instantiates a new Marital status masking provider.
- * @param configuration the configuration
- * @param localizationProperty TODO
- * @param random the random
+   * 
+   * @param configuration the configuration
+   * @param localizationProperty TODO
+   * @param random the random
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty);
 
-		statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
-				Resource.MARITAL_STATUS, null, localizationProperty);
+    statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
+        Resource.MARITAL_STATUS, null, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
@@ -65,7 +66,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-			statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
+      statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.MARITAL_STATUS, null, localizationProperty);
 
       initialized = true;

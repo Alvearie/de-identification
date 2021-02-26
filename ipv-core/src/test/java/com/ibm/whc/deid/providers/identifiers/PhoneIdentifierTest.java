@@ -14,8 +14,8 @@ import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class PhoneIdentifierTest {
-	private String tenantId = "TEST_TENANT";
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String tenantId = "TEST_TENANT";
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testIsOfThisType() throws Exception {

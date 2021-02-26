@@ -25,9 +25,10 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   @Test
   public void testMask() {
-		CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(
-				tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-		CreditCardTypeIdentifier identifier = new CreditCardTypeIdentifier(tenantId, localizationProperty);
+    CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    CreditCardTypeIdentifier identifier =
+        new CreditCardTypeIdentifier(tenantId, localizationProperty);
 
     String originalValue = "VISA";
 
@@ -45,8 +46,8 @@ public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements M
 
   @Test
   public void testCompoundMask() throws Exception {
-		CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(
-				tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    CreditCardTypeMaskingProvider maskingProvider = new CreditCardTypeMaskingProvider(tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String originalCCType = "VISA";
 

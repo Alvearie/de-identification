@@ -33,7 +33,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ConditionalMaskingProviderTest {
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   String tenantId = "TEST_TENANT";
   DeidMaskingConfig deidMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();

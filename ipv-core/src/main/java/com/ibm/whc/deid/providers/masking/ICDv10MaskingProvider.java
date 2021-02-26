@@ -29,8 +29,9 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.randomizeToCategory = configuration.isRandomizeCategory();
     this.randomizeToRange = configuration.isRandomizeChapter();
 
@@ -81,9 +82,8 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      icdv10Manager =
-					(ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV10, null,
-							localizationProperty);
+      icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ICDV10, null, localizationProperty);
       initialized = true;
     }
   }

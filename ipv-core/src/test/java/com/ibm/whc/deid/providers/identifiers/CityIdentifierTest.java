@@ -15,7 +15,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class CityIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-		CityIdentifier identifier = new CityIdentifier(tenantId, localizationProperty);
+    CityIdentifier identifier = new CityIdentifier(tenantId, localizationProperty);
 
     String[] validCities = {"Athens", "athens", "Dublin", "New York City"};
 

@@ -18,7 +18,7 @@ public class CountryIdentifierTest implements MaskingProviderTest {
    */
   @Test
   public void testIsOfThisType() {
-		Identifier identifier = new CountryIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new CountryIdentifier(tenantId, localizationProperty);
     String country = "United States of America";
     assertTrue(identifier.isOfThisType(country));
   }

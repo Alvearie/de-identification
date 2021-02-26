@@ -23,8 +23,8 @@ public class ReplaceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMask() {
-        ReplaceMaskingProviderConfig configuration = new ReplaceMaskingProviderConfig();
-        MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
+    ReplaceMaskingProviderConfig configuration = new ReplaceMaskingProviderConfig();
+    MaskingProvider maskingProvider = new ReplaceMaskingProvider(configuration);
     String originalValue = "asdasdad";
     String maskedValue = maskingProvider.mask(originalValue);
     assertTrue(maskedValue.equals("asd"));

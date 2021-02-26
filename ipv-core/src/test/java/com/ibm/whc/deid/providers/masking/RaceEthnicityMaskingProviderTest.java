@@ -27,8 +27,10 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   @Test
   public void testMask() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-		RaceEthnicityIdentifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    RaceEthnicityIdentifier identifier =
+        new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String originalRace = "white";
 
@@ -48,7 +50,8 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   @Test
   public void testMaskNullRaceEthnicityInputReturnNull() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidRaceEthnicity = null;
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
@@ -61,7 +64,8 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   public void testMaskInvalidRaceEthnicityInputValidHandlingReturnNull() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
@@ -74,8 +78,9 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   public void testMaskInvalidRaceEthnicityInputValidHandlingReturnRandom() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-		Identifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
@@ -90,7 +95,8 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
       throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
@@ -104,7 +110,8 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test RaceEthnicity");
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
@@ -117,7 +124,8 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
   public void testMaskInvalidRaceEthnicityInputInvalidHandlingReturnNull() throws Exception {
     RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidRaceEthnicity = "Invalid RaceEthnicity";
     String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);

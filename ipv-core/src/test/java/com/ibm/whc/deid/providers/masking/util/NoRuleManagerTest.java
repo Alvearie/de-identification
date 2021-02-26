@@ -70,18 +70,18 @@ public class NoRuleManagerTest {
     list.add(new MaskingActionInputIdentifier(null, childNode, lineNode, "line[2]", "Organization",
         "r2", root));
     // original node
-    list.add(new MaskingActionInputIdentifier(null, cNode, cParentNode, "c", "Organization",
-        "r2", root));
+    list.add(new MaskingActionInputIdentifier(null, cNode, cParentNode, "c", "Organization", "r2",
+        root));
     // already null node
-    list.add(new MaskingActionInputIdentifier(null, eNode, cParentNode, "e", "Organization",
-        "r2", root));    
+    list.add(new MaskingActionInputIdentifier(null, eNode, cParentNode, "e", "Organization", "r2",
+        root));
     mgr.removeNodesAlreadyMasked(list);
     mgr.applyToRemainingNodes();
     assertEquals(
         "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,\"v101\",null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":3,\"d\":null,\"e\":null}]]}]}",
         om.writeValueAsString(root));
-    
-    //root is value node - not supported by system
+
+    // root is value node - not supported by system
     JsonNode valueRoot = new TextNode("lion");
     mgr = new NoRuleManager(new MaskingProviderBuilder.MaskingResource("id", valueRoot, null), "r3",
         provider);

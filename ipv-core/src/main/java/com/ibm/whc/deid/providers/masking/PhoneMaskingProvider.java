@@ -34,8 +34,9 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.preserveCountryCode = configuration.isCountryCodePreserve();
     this.preserveAreaCode = configuration.isAreaCodePreserve();
@@ -43,7 +44,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.phoneRegexPatterns = configuration.getPhoneRegexPatterns();
-    this.phoneIdentifier = new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
+    this.phoneIdentifier =
+        new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
   }
 
   private String generateRandomPhoneNumber(String countryCode) {

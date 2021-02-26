@@ -22,7 +22,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.URLMaskingProviderConfig;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class URLMaskingProviderTest extends TestLogSetUp {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   URLIdentifier identifier = new URLIdentifier();
 
   String tenantId = "TEST_TENANT";
@@ -74,8 +74,9 @@ public class URLMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testDefaultMask() throws Exception {
-		URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-		MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
+    MaskingProvider urlMaskingProvider =
+        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
 
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
@@ -86,8 +87,9 @@ public class URLMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testURLWithIPv4Address() throws Exception {
-		URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-		MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
+    MaskingProvider urlMaskingProvider =
+        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
     IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
 
     String url = "http://10.22.33.44";
@@ -101,8 +103,9 @@ public class URLMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testURLWithIPv6Address() throws Exception {
-		URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-		MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
+    MaskingProvider urlMaskingProvider =
+        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
     IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
 
     String url = "http://[1::4:5:6:7:8]:100/";
@@ -208,8 +211,9 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testUsernamePasswordMask() throws Exception {
 
-		URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-		MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
+    MaskingProvider urlMaskingProvider =
+        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
 
     /* we test that both username and passwords get randomized */
     String url = "http://user1:pass1@www.nba.com";
@@ -408,8 +412,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
         new String[] {"http://www.nba.com", "http://user1:pass1@www.nba.com", "http://10.22.33.44"};
 
     for (URLMaskingProviderConfig maskingConfiguration : configurations) {
-      URLMaskingProvider maskingProvider =
-          new URLMaskingProvider(maskingConfiguration, tenantId, deidMaskingConfig, localizationProperty);
+      URLMaskingProvider maskingProvider = new URLMaskingProvider(maskingConfiguration, tenantId,
+          deidMaskingConfig, localizationProperty);
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();
 

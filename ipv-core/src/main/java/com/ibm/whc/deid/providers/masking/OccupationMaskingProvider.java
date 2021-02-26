@@ -25,9 +25,10 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public OccupationMaskingProvider(OccupationMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-		this.generalizeToCategory = configuration.isMaskGeneralize();
+  public OccupationMaskingProvider(OccupationMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
+    this.generalizeToCategory = configuration.isMaskGeneralize();
     this.random = new SecureRandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
@@ -65,7 +66,7 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-			occupationManager = new OccupationManager(tenantId, localizationProperty);
+      occupationManager = new OccupationManager(tenantId, localizationProperty);
       initialized = true;
     }
   }

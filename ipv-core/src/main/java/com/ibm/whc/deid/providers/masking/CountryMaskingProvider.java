@@ -35,8 +35,9 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
@@ -46,13 +47,11 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      countryManager =
-					(CountryManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTRY, null,
-							localizationProperty);
+      countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.COUNTRY, null, localizationProperty);
 
-      cityManager =
-					(CityManager) ManagerFactory.getInstance().getManager(tenantId,
-          Resource.CITY, null, localizationProperty);
+      cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY,
+          null, localizationProperty);
 
       initialized = true;
     }

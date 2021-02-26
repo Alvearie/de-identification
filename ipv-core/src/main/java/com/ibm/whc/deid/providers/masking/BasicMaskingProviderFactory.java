@@ -71,7 +71,7 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
   /**
    * Per-tenant map of masking provider configurations to masking provider objects
    */
-  private final Map<String,ConcurrentHashMap<MaskingProviderConfig,MaskingProvider>> maskingProvidersCache;
+  private final Map<String, ConcurrentHashMap<MaskingProviderConfig, MaskingProvider>> maskingProvidersCache;
 
   public BasicMaskingProviderFactory() {
     this(null, null);
@@ -112,55 +112,65 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
 
   @Override
   public MaskingProvider getProviderFromType(MaskingProviderTypes providerType,
-      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId, String localizationProperty) {
+      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId,
+      String localizationProperty) {
 
     // Note - as per documentation of the MaskingProviderFactory interface, allow
     // NullPointerException to be thrown if providerType or config are null
-    
+
     // Check the cache first
 
-    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviderCache = getPerTenantCache(tenantId);
+    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviderCache =
+        getPerTenantCache(tenantId);
     MaskingProvider provider = maskingProviderCache.get(config);
     if (provider != null) {
       return provider;
     }
-		provider = getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId, localizationProperty);
+    provider = getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId,
+        localizationProperty);
     maskingProviderCache.put(config, provider);
     return provider;
   }
 
   protected MaskingProvider getNewProviderFromType(MaskingProviderTypes providerType,
-      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId, String localizationProperty) {
+      DeidMaskingConfig deidMaskingConfig, MaskingProviderConfig config, String tenantId,
+      String localizationProperty) {
     MaskingProvider provider = null;
     switch ((MaskingProviderType) providerType) {
       case ADDRESS:
-        provider =
-            new AddressMaskingProvider((AddressMaskingProviderConfig) config, tenantId, this, localizationProperty);
+        provider = new AddressMaskingProvider((AddressMaskingProviderConfig) config, tenantId, this,
+            localizationProperty);
         break;
       case ATC:
-        provider = new ATCMaskingProvider((ATCMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ATCMaskingProvider((ATCMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case BINNING:
         provider = new BinningMaskingProvider((BinningMaskingProviderConfig) config);
         break;
       case CITY:
-        provider = new CityMaskingProvider((CityMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new CityMaskingProvider((CityMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case CONDITIONAL:
         provider = new ConditionalMaskingProvider((ConditionalMaskingProviderConfig) config,
             tenantId, deidMaskingConfig, localizationProperty);
         break;
       case CONTINENT:
-        provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case COUNTY:
-        provider = new CountyMaskingProvider((CountyMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new CountyMaskingProvider((CountyMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case COUNTRY:
-        provider = new CountryMaskingProvider((CountryMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new CountryMaskingProvider((CountryMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case CREDIT_CARD:
-        provider = new CreditCardMaskingProvider((CreditCardMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new CreditCardMaskingProvider((CreditCardMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case DATEDEPENDENCY:
         provider = new DateDependencyMaskingProvider((DateDependencyMaskingProviderConfig) config,
@@ -179,7 +189,8 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new GenericMaskingProvider(deidMaskingConfig, this, tenantId);
         break;
       case GENDER:
-        provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case GENERALIZE:
         provider = new GeneralizeMaskingProvider((GeneralizeMaskingProviderConfig) config);
@@ -191,19 +202,23 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new HashMaskingProvider((HashMaskingProviderConfig) config);
         break;
       case HOSPITAL:
-        provider = new HospitalMaskingProvider((HospitalMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new HospitalMaskingProvider((HospitalMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case IBAN:
         provider = new IBANMaskingProvider((IBANMaskingProviderConfig) config);
         break;
       case ICDV9:
-        provider = new ICDv9MaskingProvider((ICDv9MaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ICDv9MaskingProvider((ICDv9MaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case ICDV10:
-        provider = new ICDv10MaskingProvider((ICDv10MaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ICDv10MaskingProvider((ICDv10MaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case IMEI:
-        provider = new IMEIMaskingProvider((IMEIMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new IMEIMaskingProvider((IMEIMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case IP_ADDRESS:
         provider = new IPAddressMaskingProvider((IPAddressMaskingProviderConfig) config);
@@ -219,11 +234,12 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new MaintainMaskingProvider();
         break;
       case MARITAL:
-        provider =
-            new MaritalStatusMaskingProvider((MaritalStatusMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new MaritalStatusMaskingProvider((MaritalStatusMaskingProviderConfig) config,
+            tenantId, localizationProperty);
         break;
       case NAME:
-        provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new NameMaskingProvider((NameMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case NULL:
         provider = new NullMaskingProvider((NullMaskingProviderConfig) config);
@@ -232,18 +248,19 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new NumberVarianceMaskingProvider((NumberVarianceMaskingProviderConfig) config);
         break;
       case OCCUPATION:
-        provider =
-            new OccupationMaskingProvider((OccupationMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new OccupationMaskingProvider((OccupationMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case PHONE:
-        provider = new PhoneMaskingProvider((PhoneMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new PhoneMaskingProvider((PhoneMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case PSEUDONYM:
         provider = new PseudonymMaskingProvider((PseudonymMaskingProviderConfig) config);
         break;
       case RACE:
-        provider =
-            new RaceEthnicityMaskingProvider((RaceEthnicityMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new RaceEthnicityMaskingProvider((RaceEthnicityMaskingProviderConfig) config,
+            tenantId, localizationProperty);
         break;
       case RANDOM:
         provider = new RandomMaskingProvider();
@@ -252,7 +269,8 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new RedactMaskingProvider((RedactMaskingProviderConfig) config);
         break;
       case RELIGION:
-        provider = new ReligionMaskingProvider((ReligionMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ReligionMaskingProvider((ReligionMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case REPLACE:
         provider = new ReplaceMaskingProvider((ReplaceMaskingProviderConfig) config);
@@ -264,20 +282,24 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         provider = new SSNUSMaskingProvider((SSNUSMaskingProviderConfig) config);
         break;
       case STATE_US:
-        provider = new StatesUSMaskingProvider((StatesUSMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new StatesUSMaskingProvider((StatesUSMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case SWIFT:
-        provider = new SWIFTCodeMaskingProvider((SWIFTMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new SWIFTCodeMaskingProvider((SWIFTMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case URL:
-        provider =
-            new URLMaskingProvider((URLMaskingProviderConfig) config, tenantId, deidMaskingConfig, localizationProperty);
+        provider = new URLMaskingProvider((URLMaskingProviderConfig) config, tenantId,
+            deidMaskingConfig, localizationProperty);
         break;
       case VIN:
-        provider = new VINMaskingProvider((VINMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new VINMaskingProvider((VINMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       case ZIPCODE:
-        provider = new ZIPCodeMaskingProvider((ZIPCodeMaskingProviderConfig) config, tenantId, localizationProperty);
+        provider = new ZIPCodeMaskingProvider((ZIPCodeMaskingProviderConfig) config, tenantId,
+            localizationProperty);
         break;
       default:
         throw new IllegalArgumentException("Unsupported provider type" + providerType);

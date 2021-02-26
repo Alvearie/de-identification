@@ -20,8 +20,8 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 
 public class PostalCodeManagerTest {
-	private String tenantId = "TEST_TENANT";
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String tenantId = "TEST_TENANT";
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testLookupSuccessful() throws Exception {
@@ -58,10 +58,10 @@ public class PostalCodeManagerTest {
 
   @Test
   public void testClosestCode() throws Exception {
-		PostalCodeManager postalCodeManager = new PostalCodeManager(tenantId, localizationProperty);
+    PostalCodeManager postalCodeManager = new PostalCodeManager(tenantId, localizationProperty);
     String originalCode = "99529";
-		String[] neighbors = { "99501", "99502", "99503", "99507", "99510", "99513", "99515", "99517", "99518",
-        "99529", "99530", "99599"};
+    String[] neighbors = {"99501", "99502", "99503", "99507", "99510", "99513", "99515", "99517",
+        "99518", "99529", "99530", "99599"};
 
     List<String> neighborsList = Arrays.asList(neighbors);
 

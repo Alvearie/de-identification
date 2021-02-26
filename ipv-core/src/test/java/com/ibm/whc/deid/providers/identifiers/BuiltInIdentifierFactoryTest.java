@@ -25,8 +25,8 @@ public class BuiltInIdentifierFactoryTest {
     BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
     String tenantId = "TEST_TENANT";
     for (EntityType type : EntityType.values()) {
-			assertNotNull(identifierFactory.getIdentifier(type, tenantId,
-					LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES));
+      assertNotNull(identifierFactory.getIdentifier(type, tenantId,
+          LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES));
     }
   }
 
@@ -67,12 +67,12 @@ public class BuiltInIdentifierFactoryTest {
     Set<String> clazzNamesSet = new HashSet<>(Arrays.asList(clazzNames));
     BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
     String tenantId = "TEST_TENANT";
-		Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId,
-				LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     assertTrue(clazzNamesSet.size() == identifiers.size());
     for (Identifier identifier : identifiers) {
       String className = identifier.getClass().getSimpleName();
-      assertTrue("identifier "+ className + " not in class list",
+      assertTrue("identifier " + className + " not in class list",
           clazzNamesSet.contains(className));
     }
   }

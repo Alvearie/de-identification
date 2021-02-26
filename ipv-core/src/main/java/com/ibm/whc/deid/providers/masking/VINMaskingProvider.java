@@ -25,8 +25,9 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public VINMaskingProvider(VINMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public VINMaskingProvider(VINMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.preserveWMI = configuration.isWmiPreserve();
     this.preserveVDS = configuration.isVdsPreserve();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
@@ -78,7 +79,7 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-			vinManager = (VINManager) ManagerFactory.getInstance().getManager(tenantId,
+      vinManager = (VINManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
 
       initialized = true;

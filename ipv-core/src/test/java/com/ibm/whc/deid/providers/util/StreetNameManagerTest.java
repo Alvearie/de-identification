@@ -15,7 +15,8 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class StreetNameManagerTest {
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookupSuccessful() throws Exception {
     StreetNameManager streetNameManager = new StreetNameManager(null, localizationProperty);

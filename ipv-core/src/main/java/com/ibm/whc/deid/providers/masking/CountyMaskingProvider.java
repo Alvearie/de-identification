@@ -24,12 +24,13 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new Country masking provider.
    *
    * @param configuration the configuration
- * @param tenantId
- * @param localizationProperty TODO
- * @param random the random
+   * @param tenantId
+   * @param localizationProperty TODO
+   * @param random the random
    */
-  public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();

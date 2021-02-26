@@ -17,9 +17,10 @@ public class StatesUSMaskingProviderTest extends TestLogSetUp implements Masking
 
   @Test
   public void testMask() {
-		Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
+    Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
     StatesUSMaskingProviderConfig maskingConfiguration = new StatesUSMaskingProviderConfig();
-    MaskingProvider maskingProvider = new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String value = "Alabama";
     int randomizationOK = 0;
@@ -38,9 +39,10 @@ public class StatesUSMaskingProviderTest extends TestLogSetUp implements Masking
 
   @Test
   public void testMaskEmptyValue() {
-		Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
+    Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
     StatesUSMaskingProviderConfig maskingConfiguration = new StatesUSMaskingProviderConfig();
-    MaskingProvider maskingProvider = new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String value = "";
 

@@ -14,7 +14,8 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class RaceEthnicityIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-		RaceEthnicityIdentifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
+    RaceEthnicityIdentifier identifier =
+        new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String race = "White";
     assertTrue(identifier.isOfThisType(race));

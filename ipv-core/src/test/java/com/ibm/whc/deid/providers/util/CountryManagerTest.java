@@ -18,7 +18,8 @@ import com.ibm.whc.deid.util.CountryNameSpecification;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class CountryManagerTest {
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookupSuccessful() throws Exception {
     CountryManager countryManager = new CountryManager(null, localizationProperty);

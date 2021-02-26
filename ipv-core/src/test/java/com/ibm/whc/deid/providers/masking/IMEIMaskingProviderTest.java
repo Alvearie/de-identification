@@ -18,9 +18,10 @@ public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProv
 
   @Test
   public void testMask() {
-		IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
+    IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
     String imei = "001013001234568";
     String maskedValue = maskingProvider.mask(imei);
@@ -35,9 +36,10 @@ public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskNoTACPreservation() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
     config.setPreserveTAC(Boolean.FALSE);
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
-		IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
+    IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
 
     String imei = "001013001234568";
     String maskedValue = maskingProvider.mask(imei);
@@ -50,7 +52,8 @@ public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProv
   @Test
   public void testMaskInvalidValue() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    MaskingProvider maskingProvider = new IMEIMaskingProvider(config, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new IMEIMaskingProvider(config, tenantId, localizationProperty);
 
     String imei = "foobar";
     String maskedValue = maskingProvider.mask(imei);

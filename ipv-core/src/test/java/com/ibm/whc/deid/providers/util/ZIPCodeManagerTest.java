@@ -16,7 +16,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ZIPCodeManagerTest {
   String tenantId = "TEST_TENANT";
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void test() {
@@ -69,7 +69,8 @@ public class ZIPCodeManagerTest {
   @Test
   public void testZipCodeLength() {
     String zipLength =
-        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties("US").getProperty("zipcode.length");
+        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+            .getLocaleProperties("US").getProperty("zipcode.length");
     assertTrue(zipLength.equals("5"));
   }
 
@@ -77,21 +78,23 @@ public class ZIPCodeManagerTest {
   @Test
   public void testZipCodeLengthInvalidCountry() {
     String zipLength =
-        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties("$#!").getProperty("zipcode.length");
+        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+            .getLocaleProperties("$#!").getProperty("zipcode.length");
     assertTrue(zipLength == null);
   }
 
   @Test
   public void testZipCodeReplacement() {
-    System.out.println(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties("US")
-        .getProperty("zipcode.underPopulated"));
-    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties("US")
-        .getProperty("zipcode.underPopulated").equals("000"));
+    System.out.println(
+        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+            .getLocaleProperties("US").getProperty("zipcode.underPopulated"));
+    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+        .getLocaleProperties("US").getProperty("zipcode.underPopulated").equals("000"));
   }
 
   @Test
   public void testZipCodeReplacementInvalidCountry() {
-    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES).getLocaleProperties("$#!")
-        .getProperty("zipcode.underPopulated") == null);
+    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+        .getLocaleProperties("$#!").getProperty("zipcode.underPopulated") == null);
   }
 }

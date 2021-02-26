@@ -17,7 +17,7 @@ import com.ibm.whc.deid.util.ReversePatternManager;
  *
  */
 public class PseudonymMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = -185505347822379112L;
 
   private final boolean generateViaOptions;

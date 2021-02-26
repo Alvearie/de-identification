@@ -15,7 +15,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class ContinentIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-		ContinentIdentifier identifier = new ContinentIdentifier(tenantId, localizationProperty);
+    ContinentIdentifier identifier = new ContinentIdentifier(tenantId, localizationProperty);
 
     String[] validContinents = {"Asia", "Europe", "Africa", "europe"};
 

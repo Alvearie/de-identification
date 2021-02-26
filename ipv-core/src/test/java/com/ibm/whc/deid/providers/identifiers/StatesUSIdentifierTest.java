@@ -14,7 +14,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class StatesUSIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIdentification() {
-		StatesUSIdentifier identifier = new StatesUSIdentifier(tenantId, localizationProperty);
+    StatesUSIdentifier identifier = new StatesUSIdentifier(tenantId, localizationProperty);
     String value = "Alabama";
     assertTrue(identifier.isOfThisType(value));
 
@@ -24,7 +24,7 @@ public class StatesUSIdentifierTest implements MaskingProviderTest {
 
   @Test
   public void testIdentificationIgnoresCase() {
-		StatesUSIdentifier identifier = new StatesUSIdentifier(tenantId, localizationProperty);
+    StatesUSIdentifier identifier = new StatesUSIdentifier(tenantId, localizationProperty);
     String value = "aLABama";
     assertTrue(identifier.isOfThisType(value));
   }

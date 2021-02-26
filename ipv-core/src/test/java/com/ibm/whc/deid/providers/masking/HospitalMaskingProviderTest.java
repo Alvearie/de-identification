@@ -24,7 +24,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class HospitalMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests for hospital.mask.preserveCountry option and its boolean values (true and false). It also
    * tests for the localization of the hospital.
@@ -35,7 +35,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setMaskPreserveCountry(false);
 
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
     String hospitalName = "York Hospital";
     String maskedValue = maskingProvider.mask(hospitalName);
 
@@ -47,7 +48,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     // the preserve country option by default is true.
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
 
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
     String hospitalName = "York Hospital";
 
     int randomizationOK = 0;
@@ -58,9 +60,9 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
         randomizationOK++;
       }
 
-      HospitalManager hospitalManager = (HospitalManager) ManagerFactory.getInstance()
-					.getManager(tenantId, Resource.HOSPITAL_NAMES, null,
-							LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+      HospitalManager hospitalManager =
+          (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
+              Resource.HOSPITAL_NAMES, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
       Hospital original = hospitalManager.getKey(hospitalName);
       Hospital masked = hospitalManager.getKey(maskedValue);
 
@@ -75,7 +77,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
   @Test
   public void testMaskNullHospitalInputReturnNull() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = null;
     String maskedHospital = maskingProvider.mask(invalidHospital);
@@ -88,7 +91,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidHospitalInputValidHandlingReturnNull() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
@@ -101,8 +105,9 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidHospitalInputValidHandlingReturnRandom() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-		Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
@@ -116,7 +121,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidHospitalInputValidHandlingReturnDefaultCustomValue() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
@@ -131,7 +137,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Hospital");
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
@@ -144,7 +151,8 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidHospitalInputInvalidHandlingReturnNull() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);

@@ -17,17 +17,20 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = 3375383479009603851L;
 
-	private final CreditCardTypeManager ccTypeManager;
-	private final CreditCardManager creditCardManager;
+  private final CreditCardTypeManager ccTypeManager;
+  private final CreditCardManager creditCardManager;
 
-  /** Instantiates a new Credit card type masking provider. 
- * @param tenantId TODO
- * @param localizationProperty TODO*/
+  /**
+   * Instantiates a new Credit card type masking provider.
+   * 
+   * @param tenantId TODO
+   * @param localizationProperty TODO
+   */
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty);
 
-		creditCardManager = new CreditCardManager(localizationProperty);
-		ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
+    creditCardManager = new CreditCardManager(localizationProperty);
+    ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
   }
 
   @Override

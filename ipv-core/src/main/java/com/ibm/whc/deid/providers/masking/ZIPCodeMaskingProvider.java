@@ -40,8 +40,9 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.countryCode = configuration.getMaskCountryCode();
     this.replaceWithNeighbor = configuration.isMaskReplaceWithNeighbor();
     this.replaceWithNeighborNearestCount = configuration.getMaskReplaceWithNeighborNearestCount();
@@ -158,11 +159,11 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance()
-					.getManager(tenantId, Resource.POSTAL_CODES, null, localizationProperty);
+      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.POSTAL_CODES, null, localizationProperty);
 
-      zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance()
-					.getManager(tenantId, Resource.ZIPCODE, prefixLength, localizationProperty);
+      zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ZIPCODE, prefixLength, localizationProperty);
 
       initialized = true;
     }

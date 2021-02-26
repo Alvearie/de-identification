@@ -27,7 +27,7 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
  */
 public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
-	private static final long serialVersionUID = -13830496083023321L;
+  private static final long serialVersionUID = -13830496083023321L;
 
   private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
@@ -36,18 +36,18 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
       DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
-		super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty);
     this.deidMaskingConfig = deidMaskingConfig;
     this.maskRuleSet = configuration.getMaskRuleSet();
   }
 
-	@Override
-	public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
-		for (MaskingActionInputIdentifier i : identifiers) {
-			String value = mask(i);
-			putField(i, value);
-		}
-	}
+  @Override
+  public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
+    for (MaskingActionInputIdentifier i : identifiers) {
+      String value = mask(i);
+      putField(i, value);
+    }
+  }
 
   /**
    * Masks the specified identifier by the masking provider of the condition that is met.
@@ -80,9 +80,9 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
-    return MaskingProviderFactoryUtil.getMaskingProviderFactory()
-				.getProviderFromType(config.getType(), deidMaskingConfig, config, tenantId,
-						LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    return MaskingProviderFactoryUtil.getMaskingProviderFactory().getProviderFromType(
+        config.getType(), deidMaskingConfig, config, tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   /**

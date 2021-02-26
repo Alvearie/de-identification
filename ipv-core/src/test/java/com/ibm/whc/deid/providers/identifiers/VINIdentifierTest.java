@@ -15,7 +15,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class VINIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
-		VINIdentifier vinIdentifier = new VINIdentifier(tenantId, localizationProperty);
+    VINIdentifier vinIdentifier = new VINIdentifier(tenantId, localizationProperty);
 
     /* VIN value too short */
     String vin = "ABV3231333";

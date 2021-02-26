@@ -19,8 +19,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testDefault() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-		Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
 
     String key = "EMCRGRA1";
     String maskedValue = maskingProvider.mask(key);
@@ -31,8 +32,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testPreserveCountry() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(Boolean.TRUE);
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-		Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    Identifier identifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
 
     String key = "EMCRGRA1";
     String countryCodeOriginal = key.substring(4, 6);
@@ -46,9 +48,10 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
 
   @Test
   public void testMask() {
-		Identifier swiftIdentifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
+    Identifier swiftIdentifier = new SWIFTCodeIdentifier(tenantId, localizationProperty);
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
-    MaskingProvider maskingProvider = new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
+    MaskingProvider maskingProvider =
+        new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String value = "EMCRGRA1";
     int randomizationOK = 0;

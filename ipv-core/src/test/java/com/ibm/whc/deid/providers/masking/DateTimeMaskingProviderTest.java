@@ -45,8 +45,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
    */
   @Test
   public void testMask() throws Exception {
-		DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-		DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
+    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     // different values
     String originalDateTime = "08-12-1981 00:00:00";
@@ -103,7 +103,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testMaskShiftDateNegative() throws Exception {
 
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
-    config.setFormatFixed("  \t\n  ");  // whitespace, so ignored
+    config.setFormatFixed("  \t\n  "); // whitespace, so ignored
     config.setMaskShiftDate(true);
     config.setMaskShiftSeconds(-120);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
@@ -207,8 +207,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testCompoundMasking() throws Exception {
-		DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-		DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
+    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     // different values
     String originalDateTime = "04-03-2014 00:00:00";

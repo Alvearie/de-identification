@@ -14,7 +14,7 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 public class CountyIdentifierTest implements MaskingProviderTest {
   @Test
   public void testFullName() {
-		Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
 
     String originalValue = "Pendleton County";
     assertTrue(identifier.isOfThisType(originalValue));
@@ -22,7 +22,7 @@ public class CountyIdentifierTest implements MaskingProviderTest {
 
   @Test
   public void testShortName() {
-		Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
+    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
 
     String originalValue = "Pendleton";
     assertTrue(identifier.isOfThisType(originalValue));

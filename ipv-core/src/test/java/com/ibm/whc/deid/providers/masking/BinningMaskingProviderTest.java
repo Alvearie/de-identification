@@ -35,7 +35,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("-5-0", maskingProvider.mask("-0.01"));
     assertEquals("-5-0", maskingProvider.mask("-4.9"));
     assertEquals("-5-0", maskingProvider.mask("-5.00000"));
-    assertEquals("-10--5", maskingProvider.mask("-5.01"));    
+    assertEquals("-10--5", maskingProvider.mask("-5.01"));
     assertEquals("-10--5", maskingProvider.mask("-8"));
     assertEquals("-10--5", maskingProvider.mask("-9.98"));
     assertEquals("-10--5", maskingProvider.mask("-10.00"));
@@ -52,7 +52,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     String originalValue = "abc";
     String maskedValue = maskingProvider.mask(originalValue);
     assertNull(maskedValue);
-    
+
     config = new BinningMaskingProviderConfig();
     config.setUnspecifiedValueHandling(2);
     maskingProvider = new BinningMaskingProvider(config);
@@ -108,13 +108,13 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("12:22", maskingProvider.mask("12.0"));
     assertEquals("12:22", maskingProvider.mask("12.01"));
     assertEquals("12:22", maskingProvider.mask("15"));
-    assertEquals("7999999992:8000000002", maskingProvider.mask("8000000000"));    
+    assertEquals("7999999992:8000000002", maskingProvider.mask("8000000000"));
   }
-  
+
   @Test
   public void testStartValueGreaterThanBinSize() {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    config.setStartValue(1002);    
+    config.setStartValue(1002);
     config.setUseStartValue(true);
     config.setFormat("%s:%s");
     config.setBinSize(10);
@@ -136,13 +136,13 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("12:22", maskingProvider.mask("12.0"));
     assertEquals("12:22", maskingProvider.mask("12.01"));
     assertEquals("12:22", maskingProvider.mask("15"));
-    assertEquals("7999999992:8000000002", maskingProvider.mask("8000000000"));    
+    assertEquals("7999999992:8000000002", maskingProvider.mask("8000000000"));
   }
-  
+
   @Test
   public void testStartValueNegative() {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    config.setStartValue(-17);    
+    config.setStartValue(-17);
     config.setUseStartValue(true);
     config.setFormat("%s:%s");
     config.setBinSize(6);
@@ -163,7 +163,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("7:13", maskingProvider.mask("7"));
     assertEquals("7:13", maskingProvider.mask("7.0001"));
   }
-    
+
   @Test
   public void testValidationBypassed() {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();

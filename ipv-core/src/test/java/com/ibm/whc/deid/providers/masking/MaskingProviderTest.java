@@ -11,6 +11,6 @@ public interface MaskingProviderTest {
 
   String tenantId = "TEST_TENANT";
 
-	String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
 }

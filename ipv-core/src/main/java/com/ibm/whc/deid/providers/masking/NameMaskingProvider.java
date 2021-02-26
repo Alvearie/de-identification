@@ -31,16 +31,17 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-	public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
+  public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.random = new SecureRandom();
-		this.names = new NamesManager.NameManager(tenantId, localizationProperty);
+    this.names = new NamesManager.NameManager(tenantId, localizationProperty);
     this.allowUnisex = configuration.isMaskingAllowUnisex();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-		this.localizationProperty = localizationProperty;
+    this.localizationProperty = localizationProperty;
   }
 
   @Override
