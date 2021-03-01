@@ -201,6 +201,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
               null, configuration.getCityMaskingConfig(), tenantId, localizationProperty);
 
+
       postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
       initialized = true;
