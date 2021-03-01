@@ -38,6 +38,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
 
   protected final String localizationProperty;
 
+
   /**
    * Gets all countries name.
    *
