@@ -16,19 +16,22 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  protected SWIFTCodeManager swiftCodeManager =
-      (SWIFTCodeManager) ManagerFactory
-      .getInstance().getManager(null, Resource.SWIFT, null);
+  protected SWIFTCodeManager swiftCodeManager;
   protected final boolean preserveCountry;
 
   /**
    * Instantiates a new SWIFT masking provider.
-   *
-   * @param random the random
+   * 
    * @param configuration the configuration
+   * @param localizationProperty TODO
+   * @param random the random
    */
-  public SWIFTCodeMaskingProvider(SWIFTMaskingProviderConfig configuration, String tenantId) {
+  public SWIFTCodeMaskingProvider(SWIFTMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.preserveCountry = configuration.isPreserveCountry();
+    swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+        Resource.SWIFT, null, localizationProperty);
   }
 
   @Override
@@ -43,8 +46,8 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      swiftCodeManager =
-          (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null);
+      swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.SWIFT, null, localizationProperty);
 
       initialized = true;
     }

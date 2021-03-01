@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -30,8 +32,7 @@ public class CountryManager extends AbstractManager<Country>
   /** */
   private static final long serialVersionUID = -1974159797966269524L;
   protected final Resources resourceType = Resource.COUNTRY;
-  protected final Collection<ResourceEntry> resourceCountryList =
-      LocalizationManager.getInstance().getResources(resourceType);
+	protected final Collection<ResourceEntry> resourceCountryList;
   protected final SecureRandom random;
 
   protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
@@ -53,13 +54,17 @@ public class CountryManager extends AbstractManager<Country>
     return CountryManager.allCountriesName;
   }
 
-  /** Instantiates a new Country manager. */
-  public CountryManager(String tenantId) {
+  /** Instantiates a new Country manager. 
+ * @param localizationProperty TODO*/
+  public CountryManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
     this.random = new SecureRandom();
 
     this.countryMap = new HashMap<>();
     this.countryListMap = new HashMap<>();
+
+		resourceCountryList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(resourceType);
 
     readResources(resourceType, tenantId);
 

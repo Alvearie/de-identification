@@ -10,11 +10,14 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.ICDv10Identifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv10MaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   /*
@@ -23,10 +26,13 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
    * for format, case , and invalid value.
    */
 
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testMaskConvertToCategory() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     // default configuration is to convert to category
     String originalICD = "A01.0";
@@ -56,7 +62,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
 
     for (ICDv10MaskingProviderConfig configuration : configurations) {
 
-      MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+      MaskingProvider maskingProvider =
+          new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
       int N = 1000000;
       String[] originalICDs = {"A01.0", "Typhoid Fever"};
@@ -84,7 +91,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
 
     configuration.setRandomizeCategory(false);
     configuration.setRandomizeChapter(true);
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     // default configuration is to convert to category
     String originalICD = "A01.0";
@@ -112,7 +120,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
     configuration.setRandomizeCategory(false);
     configuration.setRandomizeChapter(false);
 
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     // Test convert to chapter
     String originalICD = "002.0";
@@ -134,7 +143,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskNullICDv10InputReturnNull() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
 
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = null;
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
@@ -147,7 +157,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidICDv10InputValidHandlingReturnNull() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
@@ -160,8 +171,9 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidICDv10InputValidHandlingReturnRandom() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
-    Identifier identifier = new ICDv10Identifier();
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new ICDv10Identifier(tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
@@ -175,7 +187,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidICDv10InputValidHandlingReturnDefaultCustomValue() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
@@ -190,7 +203,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test ICDv10");
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
@@ -203,7 +217,8 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidICDv10InputInvalidHandlingReturnNull() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ICDv10MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);

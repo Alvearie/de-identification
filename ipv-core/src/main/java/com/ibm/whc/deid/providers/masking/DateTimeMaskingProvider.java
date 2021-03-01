@@ -18,7 +18,9 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
+
 import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.schema.FieldRelationship;
@@ -197,7 +199,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.dateYearDeleteComparedValue = compareDateValue;
 
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    
+
     String fixedDateFormatString = configuration.getFormatFixed();
     this.fixedDateFormat =
         (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())

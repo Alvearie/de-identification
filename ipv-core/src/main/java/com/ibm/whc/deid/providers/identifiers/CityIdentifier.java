@@ -26,6 +26,10 @@ public class CityIdentifier extends AbstractManagerBasedIdentifier {
 	private static final String[] appropriateNames = { "City" };
 	private CityManager cityManager;
 
+	public CityIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	protected volatile boolean initialized = false;
 
 	@Override
@@ -46,7 +50,8 @@ public class CityIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			cityManager = (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+			cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY, null,
+					localizationProperty);
 
 			initialized = true;
 		}

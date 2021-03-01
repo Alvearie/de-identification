@@ -5,19 +5,29 @@
  */
 package com.ibm.whc.deid.providers.identifiers;
 
-import com.ibm.whc.deid.models.ValueClass;
-import com.ibm.whc.deid.providers.ProviderType;
-import com.ibm.whc.deid.util.IMEIManager;
-import com.ibm.whc.deid.util.IdentifierUtils;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class IMEIIdentifier extends AbstractIdentifier {
+import com.ibm.whc.deid.models.ValueClass;
+import com.ibm.whc.deid.providers.ProviderType;
+import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.util.IMEIManager;
+import com.ibm.whc.deid.util.IdentifierUtils;
+import com.ibm.whc.deid.util.Manager;
+import com.ibm.whc.deid.util.ManagerFactory;
+
+public class IMEIIdentifier extends AbstractManagerBasedIdentifier {
   /** */
   private static final long serialVersionUID = -8398288614698641845L;
 
   private static final String[] appropriateNames = new String[] {"IMEI"};
-  private static final IMEIManager imeiManager = new IMEIManager();
+	private IMEIManager imeiManager;
+
+	protected volatile boolean initialized = false;
+
+	public IMEIIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
 
   @Override
   protected Collection<String> getAppropriateNames() {
@@ -44,7 +54,7 @@ public class IMEIIdentifier extends AbstractIdentifier {
     }
 
     String tac = data.substring(0, 8);
-    if (!imeiManager.isValidKey(tac)) {
+		if (!getManager().isValidKey(tac)) {
       return false;
     }
 
@@ -60,4 +70,14 @@ public class IMEIIdentifier extends AbstractIdentifier {
   public ValueClass getValueClass() {
     return ValueClass.TEXT;
   }
+
+	@Override
+	protected Manager getManager() {
+		if (!initialized) {
+			imeiManager = (IMEIManager) ManagerFactory.getInstance().getManager(tenantId, Resource.TACDB, null,
+					localizationProperty);
+			initialized = true;
+		}
+		return imeiManager;
+	}
 }

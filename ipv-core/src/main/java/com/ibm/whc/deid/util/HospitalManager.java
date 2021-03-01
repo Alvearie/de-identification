@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Hospital;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -22,13 +24,13 @@ public class HospitalManager extends ResourceBasedManager<Hospital> {
   /** */
   private static final long serialVersionUID = 7945071777848441928L;
 
-  public HospitalManager(String tenantId) {
-    super(tenantId, Resource.HOSPITAL_NAMES);
+  public HospitalManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.HOSPITAL_NAMES, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.HOSPITAL_NAMES);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.HOSPITAL_NAMES);
   }
 
   @Override

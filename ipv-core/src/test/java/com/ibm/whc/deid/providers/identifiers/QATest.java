@@ -6,20 +6,25 @@
 package com.ibm.whc.deid.providers.identifiers;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.Collection;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.ProviderType;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class QATest {
   private static final String charset =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+=-{}[]:;\"'\\?/<>,.~`";
 
-	String tenantId = "TEST_TENANT";
+  String tenantId = "TEST_TENANT";
+
   @Test
   public void testOneLetters() {
 
-    Collection<Identifier> identifiers =
-				IdentifierFactoryUtil.getIdentifierFactory().getAvailableIdentifiers(tenantId);
+    Collection<Identifier> identifiers = IdentifierFactoryUtil.getIdentifierFactory()
+        .getAvailableIdentifiers(tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     for (int i = 0; i < charset.length(); i++) {
       String value = "" + charset.charAt(i);
@@ -44,8 +49,8 @@ public class QATest {
   @Test
   public void testTwoLetters() {
 
-		Collection<Identifier> identifiers = IdentifierFactoryUtil.getIdentifierFactory()
-				.getAvailableIdentifiers(tenantId);
+    Collection<Identifier> identifiers = IdentifierFactoryUtil.getIdentifierFactory()
+        .getAvailableIdentifiers(tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     for (int i = 0; i < charset.length(); i++) {
       for (int j = 0; j < charset.length(); j++) {

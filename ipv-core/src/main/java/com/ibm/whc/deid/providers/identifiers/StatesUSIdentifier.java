@@ -16,14 +16,19 @@ public class StatesUSIdentifier extends AbstractManagerBasedIdentifier {
 	/** */
 	private static final long serialVersionUID = 710170960599545348L;
 
-	private StatesUSManager statesUSManager = new StatesUSManager(null);
+	private StatesUSManager statesUSManager = new StatesUSManager(null, localizationProperty);
 
 	protected volatile boolean initialized = false;
+
+	public StatesUSIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
 
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(null, Resource.STATES_US, null);
+			statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(tenantId, Resource.STATES_US,
+					null, localizationProperty);
 
 			initialized = true;
 		}

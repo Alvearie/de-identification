@@ -9,7 +9,9 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
+
 import com.ibm.whc.deid.models.CreditCard;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.LatitudeLongitudeFormat;
@@ -23,11 +25,15 @@ public class RandomGenerators {
   private static final IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
   private static final IPAddressMaskingProvider ipAddressMaskingProvider =
       new IPAddressMaskingProvider();
-  private static final TLDManager tldManager = TLDManager.instance();
-  private static final CreditCardManager creditCardManager = new CreditCardManager();
+	private static final TLDManager tldManager = TLDManager.instance();
+	private final CreditCardManager creditCardManager;
 
   private static final char[] alphaDigitSubset =
       "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+
+	public RandomGenerators(String localizationProperty) {
+		creditCardManager = new CreditCardManager(localizationProperty);
+	}
 
   /**
    * Luhn check digit int.
@@ -60,7 +66,7 @@ public class RandomGenerators {
    *
    * @return the string
    */
-  public static String generateRandomCreditCard() {
+	public String generateRandomCreditCard() {
     CreditCard creditCard = creditCardManager.randomCreditCardInformation();
 
     String[] prefixes = creditCard.getPrefixes();

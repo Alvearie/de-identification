@@ -24,10 +24,15 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
 	protected volatile boolean initialized = false;
 	private SWIFTCodeManager swiftCodeManager;
 
+	public SWIFTCodeIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
   @Override
   protected Manager getManager() {
 		if (!initialized) {
-			swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(null, Resource.SWIFT, null);
+			swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.SWIFT,
+					null, localizationProperty);
 
 			initialized = true;
 		}

@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.State;
 import com.ibm.whc.deid.models.StateNameFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -23,14 +25,14 @@ public class StatesUSManager extends ResourceBasedManager<State> {
   /** */
   private static final long serialVersionUID = -5599163280173053663L;
 
-  public StatesUSManager(String tenantId) {
-    super(tenantId, Resource.STATES_US);
+  public StatesUSManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.STATES_US, localizationProperty);
   }
 
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.STATES_US);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.STATES_US);
   }
 
   @Override

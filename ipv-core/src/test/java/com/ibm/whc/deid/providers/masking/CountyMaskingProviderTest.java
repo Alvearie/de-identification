@@ -10,7 +10,9 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.CountyIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountyMaskingProviderConfig;
@@ -26,7 +28,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     assertEquals(MaskingProviderType.COUNTY, configuration.getType());
     configuration.setMaskPseudorandom(true);
 
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalCity = "Italy";
     String maskedCity = maskingProvider.mask(originalCity);
@@ -43,11 +46,12 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testMask() {
     // county.mask.pseudorandom by default is off
-    Identifier identifier = new CountyIdentifier();
+    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     assertEquals(MaskingProviderType.COUNTY, configuration.getType());
 
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalValue = "Pendleton County";
     assertTrue(identifier.isOfThisType(originalValue));
@@ -70,7 +74,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskNullCountyInputReturnNull() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
 
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidCounty = null;
     String maskedCounty = maskingProvider.mask(invalidCounty);
@@ -83,7 +88,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidCountyInputValidHandlingReturnNull() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);
@@ -96,8 +102,9 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidCountyInputValidHandlingReturnRandom() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
-    Identifier identifier = new CountyIdentifier();
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);
@@ -111,7 +118,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidCountyInputValidHandlingReturnDefaultCustomValue() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);
@@ -126,7 +134,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test County");
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);
@@ -139,7 +148,8 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
   public void testMaskInvalidCountyInputInvalidHandlingReturnNull() throws Exception {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new CountyMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidCounty = "Invalid County";
     String maskedCounty = maskingProvider.mask(invalidCounty);

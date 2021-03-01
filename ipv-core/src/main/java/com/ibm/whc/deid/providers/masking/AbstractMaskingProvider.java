@@ -5,6 +5,10 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -14,9 +18,6 @@ import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Common base class for all classes providing privacy protection functions.
@@ -28,9 +29,21 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   protected SecureRandom random;
   protected boolean debug_enabled;
 
+  protected String localizationProperty;
+  protected String tenantId;
+
   protected LogManager log = LogManager.getInstance();
 
   private String name = "";
+
+  public AbstractMaskingProvider() {
+
+  }
+
+  public AbstractMaskingProvider(String tenantId, String localizationProperty) {
+    this.tenantId = tenantId;
+    this.localizationProperty = localizationProperty;
+  }
 
   @Override
   public String mask(String identifier, String fieldName) {
@@ -76,8 +89,7 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   }
 
   @Override
-  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData,
-      String jobId) {
+  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId) {
     return null;
   }
 
@@ -96,7 +108,7 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
       i.setParent(((ObjectNode) i.getParent()).set(i.getPath(), newNode));
       i.setCurrentNode(newNode);
     } else if (i.getParent().isArray()) {
-      ArrayNode aNode = (ArrayNode)i.getParent();
+      ArrayNode aNode = (ArrayNode) i.getParent();
       int indexOfResult = -1;
       int size = aNode.size();
       for (int currentIndex = 0; currentIndex < size; currentIndex++) {

@@ -10,10 +10,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class IMEIIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class IMEIIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() {
-    IMEIIdentifier identifier = new IMEIIdentifier();
+    IMEIIdentifier identifier = new IMEIIdentifier(tenantId, localizationProperty);
 
     String imei = "001013001234568"; // OK
     assertTrue(identifier.isOfThisType(imei));

@@ -9,10 +9,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ICDv9IdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class ICDv9IdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    ICDv9Identifier identifier = new ICDv9Identifier();
+    ICDv9Identifier identifier = new ICDv9Identifier(tenantId, localizationProperty);
 
     String icdCode = "004.8";
     assertTrue(identifier.isOfThisType(icdCode));

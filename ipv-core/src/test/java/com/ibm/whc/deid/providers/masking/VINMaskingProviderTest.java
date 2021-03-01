@@ -10,17 +10,21 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.VINIdentifier;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.VINMaskingProviderConfig;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.VINManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  private final VINIdentifier vinIdentifier = new VINIdentifier();
+  private final VINIdentifier vinIdentifier = new VINIdentifier(tenantId, localizationProperty);
+
 
   /*
    * Tests for both VIN options and their boolean values (true and false). Also tests for an invalid
@@ -30,7 +34,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testDefaultMask() {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    MaskingProvider vinMaskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider vinMaskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String vin = "1B312345678901234";
     assertTrue(vinIdentifier.isOfThisType(vin));
@@ -47,9 +52,11 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setWmiPreserve(false);
     configuration.setVdsPreserve(true);
-    MaskingProvider vinMaskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider vinMaskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
     VINManager vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+        Resource.WORLD_MANUFACTURERS_IDENTIFIER, null,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String vin = "1B312345678901234";
     String maskedResult = vinMaskingProvider.mask(vin);
@@ -67,7 +74,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setWmiPreserve(true);
     configuration.setVdsPreserve(false);
-    MaskingProvider vinMaskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider vinMaskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String vin = "1B312345678901234";
     String maskedResult = vinMaskingProvider.mask(vin);
@@ -95,7 +103,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     String[] originalValues = new String[] {"1B312345678901234"};
 
     for (VINMaskingProviderConfig maskingConfiguration : configurations) {
-      VINMaskingProvider maskingProvider = new VINMaskingProvider(maskingConfiguration, tenantId);
+      VINMaskingProvider maskingProvider =
+          new VINMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();
@@ -116,7 +125,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskNullVINInputReturnNull() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidVIN = null;
     String maskedVIN = maskingProvider.mask(invalidVIN);
@@ -129,7 +139,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidVINInputValidHandlingReturnNull() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);
@@ -142,8 +153,9 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidVINInputValidHandlingReturnRandom() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
-    Identifier identifier = new VINIdentifier();
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new VINIdentifier(tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);
@@ -157,7 +169,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidVINInputValidHandlingReturnDefaultCustomValue() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);
@@ -171,7 +184,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test VIN");
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);
@@ -184,7 +198,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   public void testMaskInvalidVINInputInvalidHandlingReturnNull() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new VINMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidVIN = "Invalid VIN";
     String maskedVIN = maskingProvider.mask(invalidVIN);

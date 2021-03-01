@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Race;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -22,13 +24,13 @@ public class RaceManager extends ResourceBasedManager<Race> {
   /** */
   private static final long serialVersionUID = 3518587195772769899L;
 
-  public RaceManager(String tenantId) {
-    super(tenantId, Resource.RACE_ETHNICITY);
+  public RaceManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.RACE_ETHNICITY, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.RACE_ETHNICITY);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.RACE_ETHNICITY);
   }
 
   @Override

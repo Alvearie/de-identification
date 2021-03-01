@@ -33,6 +33,10 @@ public class VINIdentifier extends AbstractManagerBasedIdentifier {
 
 	private VINManager vinManager;
 
+	public VINIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	private static final String[] appropriateNames = { "Vehicle Identification Number", "VIN" };
 
 	@Override
@@ -53,8 +57,8 @@ public class VINIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			vinManager = (VINManager) ManagerFactory.getInstance().getManager(null,
-					Resource.WORLD_MANUFACTURERS_IDENTIFIER, null);
+			vinManager = (VINManager) ManagerFactory.getInstance().getManager(tenantId,
+					Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
 
 			initialized = true;
 		}

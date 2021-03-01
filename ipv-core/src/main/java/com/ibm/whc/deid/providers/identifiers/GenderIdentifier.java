@@ -20,10 +20,15 @@ public class GenderIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public GenderIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
   @Override
   protected Manager getManager() {
 		if (!initialized) {
-			genderManager = (GenderManager) ManagerFactory.getInstance().getManager(null, Resource.GENDER, null);
+			genderManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId, Resource.GENDER, null,
+					localizationProperty);
 
 			initialized = true;
 		}

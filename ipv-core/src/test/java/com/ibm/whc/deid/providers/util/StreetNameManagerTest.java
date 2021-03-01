@@ -8,13 +8,18 @@ package com.ibm.whc.deid.providers.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.ibm.whc.deid.util.StreetNameManager;
 import org.junit.Test;
 
+import com.ibm.whc.deid.util.StreetNameManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
+
 public class StreetNameManagerTest {
+
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookupSuccessful() throws Exception {
-    StreetNameManager streetNameManager = new StreetNameManager(null);
+    StreetNameManager streetNameManager = new StreetNameManager(null, localizationProperty);
 
     String streetName = "Woodland";
     assertTrue(streetNameManager.isValidKey(streetName));
@@ -26,7 +31,7 @@ public class StreetNameManagerTest {
 
   @Test
   public void testRandomKeySuccessful() throws Exception {
-    StreetNameManager streetNameManager = new StreetNameManager(null);
+    StreetNameManager streetNameManager = new StreetNameManager(null, localizationProperty);
 
     String streetName = "Woodland";
     String randomStreetName = streetNameManager.getRandomKey();

@@ -9,7 +9,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.NumberVarianceMaskingProvider
 import com.ibm.whc.deid.util.RandomGenerators;
 
 public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = -7031813954318819006L;
 
   private final double limitDown;
@@ -23,9 +23,9 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
 
-	public NumberVarianceMaskingProvider() {
-		this(new NumberVarianceMaskingProviderConfig());
-	}
+  public NumberVarianceMaskingProvider() {
+    this(new NumberVarianceMaskingProviderConfig());
+  }
 
   public NumberVarianceMaskingProvider(NumberVarianceMaskingProviderConfig configuration) {
     this.limitDown = configuration.getMaskLimitDown();

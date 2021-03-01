@@ -33,7 +33,7 @@ public class DataMaskingCoreAdditionalTest {
     List<ReferableData> maskedDataList =
         dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
 
-    String result = readStringResource("/result/ruleOrderMaintained.result.json");    
+    String result = readStringResource("/result/ruleOrderMaintained.result.json");
     assertEquals(1, maskedDataList.size());
     assertEquals(result, maskedDataList.get(0).getData());
   }
@@ -43,7 +43,8 @@ public class DataMaskingCoreAdditionalTest {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String config = readStringResource("/config/ruleOrderMaintained.config.json");
-    config = config.replace("\"defaultNoRuleResolution\": true,", "\"defaultNoRuleResolution\": false,");
+    config =
+        config.replace("\"defaultNoRuleResolution\": true,", "\"defaultNoRuleResolution\": false,");
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
@@ -51,7 +52,7 @@ public class DataMaskingCoreAdditionalTest {
     List<ReferableData> maskedDataList =
         dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
 
-    String result = readStringResource("/result/ruleOrderMaintained.norule.result.json");    
+    String result = readStringResource("/result/ruleOrderMaintained.norule.result.json");
     assertEquals(1, maskedDataList.size());
     assertEquals(result, maskedDataList.get(0).getData());
   }
@@ -116,9 +117,11 @@ public class DataMaskingCoreAdditionalTest {
 
     String resultLeaf = readStringResource("/result/pathNotLeaf.result.norule.leaf.json");
     String resultArray = readStringResource("/result/pathNotLeaf.result.norule.array.json");
-    String resultNestedArray = readStringResource("/result/pathNotLeaf.result.norule.nested-array.json");
+    String resultNestedArray =
+        readStringResource("/result/pathNotLeaf.result.norule.nested-array.json");
     String resultObject = readStringResource("/result/pathNotLeaf.result.norule.object.json");
-    String resultMixedArray = readStringResource("/result/pathNotLeaf.result.norule.mixed-array.json");
+    String resultMixedArray =
+        readStringResource("/result/pathNotLeaf.result.norule.mixed-array.json");
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
@@ -141,13 +144,16 @@ public class DataMaskingCoreAdditionalTest {
     inputList.add(readStringResource("/data/defNoRuleRes.type-not-listed.json"));
     inputList.add(readStringResource("/data/defNoRuleRes.type-not-present.json"));
     List<ReferableData> convertedList = convertList(inputList);
-    
-    String resultListed = readStringResource("/result/defNoRuleRes.result.type-listed-no-rules.json");
+
+    String resultListed =
+        readStringResource("/result/defNoRuleRes.result.type-listed-no-rules.json");
     String resultNotListed = readStringResource("/result/defNoRuleRes.result.type-not-listed.json");
-    String resultNotPresent = readStringResource("/result/defNoRuleRes.result.type-not-present.json");
+    String resultNotPresent =
+        readStringResource("/result/defNoRuleRes.result.type-not-present.json");
 
     DataMaskingCore dataMask = new DataMaskingCore();
-    List<ReferableData> maskedDataList = dataMask.maskData(config, convertedList, ConfigSchemaType.FHIR);
+    List<ReferableData> maskedDataList =
+        dataMask.maskData(config, convertedList, ConfigSchemaType.FHIR);
 
     assertEquals(3, maskedDataList.size());
     boolean foundListed = false;
@@ -178,11 +184,12 @@ public class DataMaskingCoreAdditionalTest {
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/messageTypesIgnored.json"));
     List<ReferableData> convertedList = convertList(inputList);
-    
+
     String resultList = readStringResource("/result/messageTypesIgnored.json");
 
     DataMaskingCore dataMask = new DataMaskingCore();
-    List<ReferableData> maskedDataList = dataMask.maskData(config, convertedList, ConfigSchemaType.GEN);
+    List<ReferableData> maskedDataList =
+        dataMask.maskData(config, convertedList, ConfigSchemaType.GEN);
 
     assertEquals(1, maskedDataList.size());
     assertEquals(resultList, maskedDataList.get(0).getData());
