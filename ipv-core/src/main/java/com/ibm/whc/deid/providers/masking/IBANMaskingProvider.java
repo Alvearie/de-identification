@@ -12,11 +12,11 @@ import com.ibm.whc.deid.providers.identifiers.IBANIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IBANMaskingProviderConfig;
 
 public class IBANMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 107169194604514108L;
 
   private static final IBANIdentifier ibanIdentifier = new IBANIdentifier();
-  
+
   private final boolean preserveCountry;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;

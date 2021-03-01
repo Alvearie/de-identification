@@ -12,8 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.CreditCard;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -29,9 +31,13 @@ public class CreditCardManager {
 
   private static final LogManager logger = LogManager.getInstance();
 
-  /** Instantiates a new Credit card manager. */
-  public CreditCardManager() {
+	private final String localizationProperty;
+
+  /** Instantiates a new Credit card manager. 
+ * @param localizationProperty TODO*/
+  public CreditCardManager(String localizationProperty) {
     this.random = new SecureRandom();
+		this.localizationProperty = localizationProperty;
 
     this.creditCardMapByPrefix = new HashMap<>();
     this.creditCardMap = readResourceList();
@@ -48,7 +54,7 @@ public class CreditCardManager {
    */
   public Map<String, CreditCard> readResourceList() {
     Collection<ResourceEntry> resources =
-        LocalizationManager.getInstance().getResources(Resource.CREDIT_CARD_TYPE);
+				LocalizationManager.getInstance(localizationProperty).getResources(Resource.CREDIT_CARD_TYPE);
     Map<String, CreditCard> ccMap = new HashMap<>();
 
     for (ResourceEntry resourceEntry : resources) {

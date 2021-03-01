@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.util.Map;
+
 import com.ibm.whc.deid.models.City;
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.Country;
@@ -39,23 +40,26 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId) {
+  public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.getClosestK = configuration.getMaskClosestK();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+
   }
 
   protected void initialize() {
     if (!initialized) {
-      continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(null,
-          Resource.CONTINENT, null);
+      continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CONTINENT, null, localizationProperty);
 
-      countryManager =
-          (CountryManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTRY, null);
+      countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.COUNTRY, null, localizationProperty);
 
-      cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+      cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY,
+          null, localizationProperty);
 
       initialized = true;
     }

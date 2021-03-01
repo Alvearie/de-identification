@@ -12,7 +12,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
 
 /** The type Hash masking provider. */
 public class HashMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 7924730647129367168L;
 
   private final char[] hexArray = "0123456789ABCDEF".toCharArray();

@@ -10,11 +10,14 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -25,7 +28,7 @@ public class LocalizationManagerTest {
 
   @Before
   public void setUp() {
-    manager = LocalizationManager.getInstance();
+    manager = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   @Test
@@ -57,28 +60,19 @@ public class LocalizationManagerTest {
       assertThat(resourceEntry.getCountryCode(), is("en"));
   }
 
-  @Test
-  public void getResourcesUkIsEn() throws Exception {
-    Collection<ResourceEntry> resources =
-        manager.getResources(Resource.COUNTRY, Collections.singleton("uk"));
 
-    assertNotNull(resources);
-    assertThat(resources.size(), is(1));
-
-    for (ResourceEntry resourceEntry : resources)
-      assertThat(resourceEntry.getCountryCode(), is("en"));
-  }
 
   @Test
   public void getResourcesWithCountry() throws Exception {
     for (Resources resource : Resource.values()) {
       if (resource != Resource.PATTERN) {
+
         Collection<ResourceEntry> resources =
             manager.getResources(resource, Collections.singleton("us"));
 
         assertNotNull(resources);
-				assertThat("Resource  " + resource + " size should not be zero", resources.size(),
-						is(not(0)));
+        assertThat("Resource  " + resource + " size should not be zero", resources.size(),
+            is(not(0)));
       }
     }
   }

@@ -9,10 +9,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class HospitalIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class HospitalIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIdentifier() {
-    Identifier identifier = new HospitalIdentifier();
+    Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
 
     String hospitalName = "York Hospital";
     assertTrue(identifier.isOfThisType(hospitalName));
@@ -21,11 +23,5 @@ public class HospitalIdentifierTest {
     assertTrue(identifier.isOfThisType(hospitalName));
   }
 
-  @Test
-  public void testIdentifierGreek() {
-    Identifier identifier = new HospitalIdentifier();
 
-    String hospitalName = "ΠΕΠΑΓΝΗ";
-    assertTrue(identifier.isOfThisType(hospitalName));
-  }
 }

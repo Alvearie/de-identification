@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.providers.identifiers.PhoneIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
@@ -33,7 +34,9 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId) {
+  public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.preserveCountryCode = configuration.isCountryCodePreserve();
     this.preserveAreaCode = configuration.isAreaCodePreserve();
@@ -41,7 +44,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.phoneRegexPatterns = configuration.getPhoneRegexPatterns();
-    this.phoneIdentifier = new PhoneIdentifier(this.phoneRegexPatterns);
+    this.phoneIdentifier =
+        new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
   }
 
   private String generateRandomPhoneNumber(String countryCode) {
@@ -197,7 +201,7 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      msisdnManager = new MSISDNManager(null);
+      msisdnManager = new MSISDNManager(null, localizationProperty);
       initialized = true;
     }
   }

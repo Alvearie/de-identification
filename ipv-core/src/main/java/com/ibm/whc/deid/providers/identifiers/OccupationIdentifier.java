@@ -23,11 +23,16 @@ public class OccupationIdentifier extends AbstractManagerBasedIdentifier {
 	private OccupationManager occupationManager;
 	protected volatile boolean initialized = false;
 
+	public OccupationIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(null, Resource.OCCUPATION,
-					null);
+			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(tenantId,
+					Resource.OCCUPATION,
+					null, localizationProperty);
 
 			initialized = true;
 		}

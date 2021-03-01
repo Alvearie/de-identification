@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
+
 import com.ibm.whc.deid.seceng.SecEngBufferedReader;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -17,7 +18,7 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 public class TLDManager {
-  private static TLDManager instance = new TLDManager();
+	private static TLDManager instance = new TLDManager();
   /** The Random. */
   SecureRandom random;
 
@@ -26,7 +27,7 @@ public class TLDManager {
 
   private static LogManager logger = LogManager.getInstance();
 
-  private TLDManager() {
+	private TLDManager() {
     this.random = new SecureRandom();
 
     for (int i = 0; i < 256; i++) {
@@ -36,17 +37,18 @@ public class TLDManager {
     buildList();
   }
 
-  /**
-   * Instance tld manager.
-   *
-   * @return the tld manager
-   */
-  public static TLDManager instance() {
-    return instance;
-  }
+	/**
+	 * Instance tld manager.
+	 *
+	 * @return the tld manager
+	 */
+	public static TLDManager instance() {
+		return instance;
+	}
 
   private void buildList() {
-    ResourceEntry filename = LocalizationManager.getInstance()
+		// Assume TLD is english only and loads the default localization.properties
+		ResourceEntry filename = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
         .getResources(Resource.PUBLIC_SUFFIX_LIST).iterator().next();
 
     String line = null;

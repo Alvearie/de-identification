@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.security.SecureRandom;
 import java.util.Map;
 
 import com.ibm.whc.deid.models.CreditCard;
@@ -18,22 +17,21 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
   /** */
   private static final long serialVersionUID = 3375383479009603851L;
 
-  private static final CreditCardTypeManager ccTypeManager = new CreditCardTypeManager();
-  private static final CreditCardManager creditCardManager = new CreditCardManager();
-
-  /** Instantiates a new Credit card type masking provider. */
-  public CreditCardTypeMaskingProvider() {
-		this(new SecureRandom());
-  }
+  private final CreditCardTypeManager ccTypeManager;
+  private final CreditCardManager creditCardManager;
 
   /**
    * Instantiates a new Credit card type masking provider.
-   *
-   * @param random the random
-   * @param configuration the configuration
+   * 
+   * @param tenantId TODO
+   * @param localizationProperty TODO
    */
-	public CreditCardTypeMaskingProvider(SecureRandom random) {
-	}
+  public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+
+    creditCardManager = new CreditCardManager(localizationProperty);
+    ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
+  }
 
   @Override
   public String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,

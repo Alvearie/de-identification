@@ -9,10 +9,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class RaceEthnicityIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class RaceEthnicityIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    RaceEthnicityIdentifier identifier = new RaceEthnicityIdentifier();
+    RaceEthnicityIdentifier identifier =
+        new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
     String race = "White";
     assertTrue(identifier.isOfThisType(race));

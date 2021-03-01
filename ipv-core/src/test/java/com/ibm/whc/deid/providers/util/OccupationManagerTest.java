@@ -7,13 +7,17 @@ package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import com.ibm.whc.deid.util.OccupationManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class OccupationManagerTest {
   @Test
   public void testLookup() {
-    OccupationManager occupationManager = new OccupationManager(null);
+    OccupationManager occupationManager =
+        new OccupationManager(null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     String occupation = "actor";
     assertTrue(occupationManager.isValidKey(occupation));
@@ -27,7 +31,8 @@ public class OccupationManagerTest {
   public void testFalsePositives() {
     String[] values = {"C", "Z", "S", "P", "N", "G", "O", "-"};
 
-    OccupationManager occupationManager = new OccupationManager(null);
+    OccupationManager occupationManager =
+        new OccupationManager(null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     for (String value : values) {
       assertEquals(Boolean.FALSE, Boolean.valueOf(occupationManager.isValidKey(value)));
     }

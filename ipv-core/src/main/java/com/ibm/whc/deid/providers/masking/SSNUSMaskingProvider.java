@@ -11,7 +11,7 @@ import com.ibm.whc.deid.providers.identifiers.SSNUSIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SSNUSMaskingProviderConfig;
 
 public class SSNUSMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 1913380865876971674L;
 
   private static final SSNUSIdentifier ssnUSIdentifier = new SSNUSIdentifier();

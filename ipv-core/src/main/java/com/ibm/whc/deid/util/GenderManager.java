@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Sex;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -22,13 +24,13 @@ public class GenderManager extends ResourceBasedManager<Sex> {
   /** */
   private static final long serialVersionUID = -7343046175769273053L;
 
-  public GenderManager(String tenantId) {
-    super(tenantId, Resource.GENDER);
+  public GenderManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.GENDER, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.GENDER);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.GENDER);
   }
 
   @Override

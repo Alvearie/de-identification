@@ -12,7 +12,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
  *
  */
 public class NullMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = -663861245004131575L;
 
   private final boolean maskReturnNull;

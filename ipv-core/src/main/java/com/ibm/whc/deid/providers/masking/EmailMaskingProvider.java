@@ -28,8 +28,8 @@ public class EmailMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    */
-	public EmailMaskingProvider() {
-		this(new EmailMaskingProviderConfig());
+  public EmailMaskingProvider() {
+    this(new EmailMaskingProviderConfig());
   }
 
 

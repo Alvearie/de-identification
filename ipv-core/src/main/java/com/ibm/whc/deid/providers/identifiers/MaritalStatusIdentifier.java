@@ -23,12 +23,16 @@ public class MaritalStatusIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 	private MaritalStatusManager maritalStatusManager;
+	
+	public MaritalStatusIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
 
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			maritalStatusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(null,
-					Resource.MARITAL_STATUS, null);
+			maritalStatusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
+					Resource.MARITAL_STATUS, null, localizationProperty);
 
 			initialized = true;
 		}

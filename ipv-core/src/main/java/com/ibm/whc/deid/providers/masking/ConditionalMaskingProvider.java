@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -18,6 +19,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * The type Conditional masking provider.
@@ -30,12 +32,11 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
   private final List<ConditionalMaskRuleSet> maskRuleSet;
-  private final String tenantId;
   private final DeidMaskingConfig deidMaskingConfig;
 
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig) {
-    this.tenantId = tenantId;
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.deidMaskingConfig = deidMaskingConfig;
     this.maskRuleSet = configuration.getMaskRuleSet();
   }
@@ -79,8 +80,9 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
-    return MaskingProviderFactoryUtil.getMaskingProviderFactory()
-        .getProviderFromType(config.getType(), deidMaskingConfig, config, tenantId);
+    return MaskingProviderFactoryUtil.getMaskingProviderFactory().getProviderFromType(
+        config.getType(), deidMaskingConfig, config, tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   /**

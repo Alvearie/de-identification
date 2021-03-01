@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
@@ -32,7 +33,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
       {"Phone Number", "Mobile", "Mobile Number", "Telephone", "Tel."};
 
   /** The constant msisdnManager. */
-  public static final MSISDNManager msisdnManager = new MSISDNManager(null);
+	public final MSISDNManager msisdnManager;
 
   private final static LogManager log = LogManager.getInstance();
 
@@ -55,7 +56,9 @@ public class PhoneIdentifier extends AbstractIdentifier {
   // allow users to provide custom patterns.
   private final Pattern[] customPatterns;
 
-  public PhoneIdentifier(List<String> customRegexPatterns) {
+  public PhoneIdentifier(List<String> customRegexPatterns, String tenantId, String localizationProperty) {
+
+		msisdnManager = new MSISDNManager(tenantId, localizationProperty);
     if (customRegexPatterns == null) {
       customPatterns = null;
     } else {

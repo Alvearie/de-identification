@@ -13,12 +13,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
 
-public class NameIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class NameIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    NameIdentifier identifier = new NameIdentifier();
+    NameIdentifier identifier = new NameIdentifier(tenantId, localizationProperty);
 
     assertFalse(identifier.isOfThisType("12308u499234802"));
     assertFalse(identifier.isOfThisType("84032-43092-3242"));
@@ -51,7 +54,7 @@ public class NameIdentifierTest {
 
   @Test
   public void testSurnamesTop1000US() throws Exception {
-    NameIdentifier identifier = new NameIdentifier();
+    NameIdentifier identifier = new NameIdentifier(tenantId, localizationProperty);
     String filename = "/top1KsurnamesUS.csv";
     List<String> surnames = fileContentsAsList(this.getClass().getResourceAsStream(filename));
 
@@ -69,7 +72,7 @@ public class NameIdentifierTest {
 
   @Test
   public void testNamesTop1000US() throws Exception {
-    NameIdentifier identifier = new NameIdentifier();
+    NameIdentifier identifier = new NameIdentifier(tenantId, localizationProperty);
     String[] filenames = {"/top1200maleNamesUS.csv", "/top1000femaleNamesUS.csv"};
 
     for (String filename : filenames) {

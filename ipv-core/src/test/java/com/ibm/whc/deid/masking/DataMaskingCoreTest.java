@@ -111,7 +111,8 @@ public class DataMaskingCoreTest {
       dataMask.maskData(invalidConfig, Arrays.asList(new ReferableData(patientData)),
           ConfigSchemaType.FHIR);
     } catch (DeidException e) {
-      assertTrue(e.getMessage().contains("the rule assignment with `rule` value `NO_SUCH_RULE` does not refer to a valid rule"));
+      assertTrue(e.getMessage().contains(
+          "the rule assignment with `rule` value `NO_SUCH_RULE` does not refer to a valid rule"));
       throw e;
     }
   }

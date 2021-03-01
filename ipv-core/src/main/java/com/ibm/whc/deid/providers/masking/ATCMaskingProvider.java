@@ -21,7 +21,10 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
-  public ATCMaskingProvider(ATCMaskingProviderConfig configuration, String tenantId) {
+  public ATCMaskingProvider(ATCMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
+
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.levelsToKeep = configuration.getMaskLevelsToKeep();
@@ -40,11 +43,11 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected volatile boolean initialized = false;
+
   protected void initialize() {
     if (!initialized) {
-      atcManager =
-          (ATCManager) ManagerFactory.getInstance().getManager(null,
-          Resource.ATC_CODES, null);
+      atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ATC_CODES, null, localizationProperty);
 
       initialized = true;
     }

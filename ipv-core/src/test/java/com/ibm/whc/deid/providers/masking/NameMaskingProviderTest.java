@@ -10,32 +10,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.NameIdentifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
 import com.ibm.whc.deid.util.NamesManager;
-import com.ibm.whc.deid.util.Readers;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  private final NamesManager.NameManager names = new NamesManager.NameManager(null);
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+  private final NamesManager.NameManager names =
+      new NamesManager.NameManager(null, localizationProperty);
 
   @Test
   public void testMask() throws Exception {
     NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
     NameMaskingProvider nameMaskingProvider =
-        new NameMaskingProvider(defaultConfiguration, tenantId);
+        new NameMaskingProvider(defaultConfiguration, tenantId, localizationProperty);
 
     String name = "John";
     String res = nameMaskingProvider.mask(name);
@@ -63,83 +57,13 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     assertTrue(names.isLastName(res));
   }
 
-  @Test
-  public void testLocalizationFirstName() throws Exception {
-    // this test assumes that GR is loaded by default
 
-    NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
-    NameMaskingProvider maskingProvider = new NameMaskingProvider(defaultConfiguration, tenantId);
-
-    String greekOriginalValue = "Γιώργος";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
-        .getResources(Resource.FIRST_NAME_MALE, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    entryCollection = LocalizationManager.getInstance().getResources(Resource.FIRST_NAME_FEMALE,
-        Collections.singletonList("gr"));
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
-
-  @Test
-  public void testLocalizationLastName() throws Exception {
-    // this test assumes that GR is loaded by default
-    NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
-    NameMaskingProvider maskingProvider = new NameMaskingProvider(defaultConfiguration, tenantId);
-    String greekOriginalValue = "Παπαδόπουλος";
-
-    Collection<ResourceEntry> entryCollection = LocalizationManager.getInstance()
-        .getResources(Resource.LAST_NAME, Collections.singletonList("gr"));
-    Set<String> greekValues = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekValues.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(greekOriginalValue);
-      assertTrue(greekValues.contains(maskedValue.toUpperCase()));
-    }
-  }
 
   @Test
   public void testMaskNameAndSurname() throws Exception {
     NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
     NameMaskingProvider nameMaskingProvider =
-        new NameMaskingProvider(defaultConfiguration, tenantId);
+        new NameMaskingProvider(defaultConfiguration, tenantId, localizationProperty);
 
     String name = "John Smith";
     String res = nameMaskingProvider.mask(name);
@@ -161,7 +85,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String[] originalValues = new String[] {"John"};
 
     for (NameMaskingProviderConfig maskingConfiguration : configurations) {
-      NameMaskingProvider maskingProvider = new NameMaskingProvider(maskingConfiguration, tenantId);
+      NameMaskingProvider maskingProvider =
+          new NameMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();
@@ -184,7 +109,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskingAllowUnisex(true);
 
-    MaskingProvider nameMaskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider nameMaskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String name = "Mary";
 
@@ -200,7 +126,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskNullNameInputReturnNull() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskingAllowUnisex(true);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = null;
     String maskedName = maskingProvider.mask(invalidName);
@@ -214,7 +141,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
 
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -227,8 +155,9 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputValidHandlingReturnRandom() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
-    Identifier identifier = new NameIdentifier();
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new NameIdentifier(tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -242,7 +171,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputValidHandlingReturnDefaultCustomValue() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -256,7 +186,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Name");
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -269,7 +200,8 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   public void testMaskInvalidNameInputInvalidHandlingReturnNull() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidName = "Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
@@ -286,7 +218,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskPseudorandom(true);
 
-    MaskingProvider mp = new NameMaskingProvider(configuration, tenantId);
+    MaskingProvider mp = new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
     String maskedName1 = mp.mask(original1);
     String maskedName2 = mp.mask(original2);

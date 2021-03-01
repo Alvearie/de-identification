@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -32,24 +33,37 @@ public class LocalizationManager {
   private final Map<String, String> countryCommonMap;
   private final Map<String, Properties> countryLocalizationOptions;
 
-  private static final LocalizationManager instance = new LocalizationManager();
+	public static final String DEFAULT_LOCALIZATION_PROPERTIES = "/localization.properties";
 
-  /**
-   * Gets instance.
-   *
-   * @return the instance
-   */
-  public static LocalizationManager getInstance() {
-    return instance;
+	private static final HashMap<String, LocalizationManager> localizationManagers = new HashMap<String, LocalizationManager>();
+
+  	/**
+	 * Gets instance.
+	 * 
+	 * @param propertyFile Location of the property file.
+	 *
+	 * @return the instance
+	 */
+  public static LocalizationManager getInstance(String propertyFile) {
+		LocalizationManager manager = localizationManagers.get(propertyFile);
+		if (manager == null) {
+			synchronized (LocalizationManager.class) {
+				if (localizationManagers.get(propertyFile) == null) {
+					manager = new LocalizationManager(propertyFile);
+					localizationManagers.put(propertyFile, manager);
+				}
+			}
+		}
+		return manager;
   }
 
   /** Instantiates a new Localization manager. */
-  private LocalizationManager() {
+	private LocalizationManager(String propertyFile) {
     this.registeredResources = new HashMap<>();
     this.countryCommonMap = new HashMap<>();
     this.countryLocalizationOptions = new HashMap<>();
 
-    try (InputStream is = getClass().getResourceAsStream("/localization.properties")) {
+		try (InputStream is = getClass().getResourceAsStream(propertyFile)) {
       if (null != is) {
         Properties properties = new Properties();
         properties.load(is);

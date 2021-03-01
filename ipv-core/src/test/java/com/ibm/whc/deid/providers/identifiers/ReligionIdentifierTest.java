@@ -9,10 +9,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class ReligionIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class ReligionIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    ReligionIdentifier religionIdentifier = new ReligionIdentifier();
+    ReligionIdentifier religionIdentifier = new ReligionIdentifier(tenantId, localizationProperty);
     String religion = "Buddhist";
     assertTrue(religionIdentifier.isOfThisType(religion));
   }

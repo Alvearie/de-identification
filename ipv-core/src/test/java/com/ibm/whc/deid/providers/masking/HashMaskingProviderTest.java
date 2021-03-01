@@ -119,10 +119,10 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithBeginOffset_startOfValue() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetBegin(0);
-		HashMaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetBegin(0);
+    HashMaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with begin offset as the start of the value and default end
     // offset to the end of value.
@@ -136,11 +136,11 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithBeginOffset_endOfValue_invalidOffsetOption1() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetBegin(25);
-		config.setOffsetInvalidOffsetValue(1);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetBegin(25);
+    config.setOffsetInvalidOffsetValue(1);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with begin offset as the end of the value and default end offset
     // to the end of value.
@@ -154,10 +154,10 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithEndOffset_inMiddle() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetEnd(7);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetEnd(7);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with end offset in the middle of the value and default begin
     // offset at the start of value.
@@ -172,11 +172,11 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithEndOffset_startOfValue_invalidOffsetOption2() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetEnd(0);
-		config.setOffsetInvalidOffsetValue(2);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetEnd(0);
+    config.setOffsetInvalidOffsetValue(2);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with end offset as start of the value and default begin offset
     // at the start of value.
@@ -190,10 +190,10 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithEndOffset_endOfValue() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetEnd(25);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetEnd(25);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with end offset as the end of the value and default begin offset
     // at the start of value.
@@ -207,11 +207,11 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithBeginAndEndOffset_inMiddle() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetBegin(8);
-		config.setOffsetEnd(15);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetBegin(8);
+    config.setOffsetEnd(15);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with a begin and end offset in the middle of the value.
     // This should result in a partially masked value:
@@ -225,11 +225,11 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithBeginAndEndOffset_startAndEndOfValue() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetBegin(0);
-		config.setOffsetEnd(25);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetBegin(0);
+    config.setOffsetEnd(25);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with a begin and end offset set to the start and end of the
     // value
@@ -244,12 +244,12 @@ public class HashMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskWithBeginAndEndOffset_sameOffsetValue_invalidOffsetOption3()
       throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetBegin(7);
-		config.setOffsetEnd(7);
-		config.setOffsetInvalidOffsetValue(3);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetBegin(7);
+    config.setOffsetEnd(7);
+    config.setOffsetInvalidOffsetValue(3);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with a begin and end offset set to the same offset in the middle
     // of the value
@@ -264,13 +264,13 @@ public class HashMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskWithHashingOffsetOffsetMaskDeelte_setToTrue() throws Exception {
-		HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-		config.setOffsetOffsetMask(true);
-		config.setOffsetOffsetMaskDelete(true);
-		config.setOffsetBegin(8);
-		config.setOffsetEnd(15);
-		config.setOffsetInvalidOffsetValue(3);
-		MaskingProvider maskingProvider = new HashMaskingProvider(config);
+    HashMaskingProviderConfig config = new HashMaskingProviderConfig();
+    config.setOffsetOffsetMask(true);
+    config.setOffsetOffsetMaskDelete(true);
+    config.setOffsetBegin(8);
+    config.setOffsetEnd(15);
+    config.setOffsetInvalidOffsetValue(3);
+    MaskingProvider maskingProvider = new HashMaskingProvider(config);
 
     // Test with a begin and end offset in the middle of the value.
     // This should result in a partially masked value: "<masked value>"

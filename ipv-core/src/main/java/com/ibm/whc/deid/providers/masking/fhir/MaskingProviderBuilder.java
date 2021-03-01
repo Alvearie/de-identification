@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
@@ -23,6 +24,7 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
 import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -95,19 +97,18 @@ public class MaskingProviderBuilder implements Serializable {
   private final MaskingProviderFactory maskingProviderFactory;
 
   public MaskingProviderBuilder(FHIRResourceMaskingConfiguration resourceConfiguration,
-      DeidMaskingConfig maskingConfiguration, boolean defNoRuleRes,
-      MaskingProviderFactory maskingProviderFactory, String tenantId) {
+			DeidMaskingConfig maskingConfiguration, boolean defNoRuleRes, MaskingProviderFactory maskingProviderFactory,
+			String tenantId) {
 
-    this.maskingProviderFactory = maskingProviderFactory;
+		this.maskingProviderFactory = maskingProviderFactory;
 
-    this.defNoRuleRes = defNoRuleRes;
-    this.noRuleResProvider = this.defNoRuleRes ? null
-        : this.maskingProviderFactory.getProviderFromType(MaskingProviderType.NULL,
-            maskingConfiguration, new NullMaskingProviderConfig(), tenantId);
+		this.defNoRuleRes = defNoRuleRes;
+		this.noRuleResProvider = this.defNoRuleRes ? null
+				: this.maskingProviderFactory.getProviderFromType(MaskingProviderType.NULL, maskingConfiguration,
+						new NullMaskingProviderConfig(), tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
-    this.maskingActionList =
-        buildMaskingActions(resourceConfiguration, maskingConfiguration, tenantId);
-  }
+		this.maskingActionList = buildMaskingActions(resourceConfiguration, maskingConfiguration, tenantId);
+	}
 
   /**
    * Given the masking configuration, retrieves and sets the masking providers
@@ -142,7 +143,7 @@ public class MaskingProviderBuilder implements Serializable {
 
       rule.getMaskingProviders().stream().forEach(p -> {
         MaskingProvider maskingProvider =
-            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId);
+            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
         maskingProvider.setName(ruleName);
         maskingActions.add(
             new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier, maskingProvider, null));

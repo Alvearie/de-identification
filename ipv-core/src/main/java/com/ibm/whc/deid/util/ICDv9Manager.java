@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -26,8 +28,7 @@ public class ICDv9Manager implements Manager, Serializable {
   /** */
   private static final long serialVersionUID = -5865782878844917863L;
 
-  protected static final Collection<ResourceEntry> resourceICDList =
-      LocalizationManager.getInstance().getResources(Resource.ICDV9);
+	protected final Collection<ResourceEntry> resourceICDList;
 
   protected final MapWithRandomPick<String, ICD> icdByCodeMap;
   protected final MapWithRandomPick<String, ICD> icdByNameMap;
@@ -37,13 +38,16 @@ public class ICDv9Manager implements Manager, Serializable {
 
   protected final String tenantId;
 
-  /**
-   * Instantiates a new Ic dv 9 manager.
-   *
-   * @param tenantId
-   */
-  public ICDv9Manager(String tenantId) {
+  	/**
+	 * Instantiates a new Ic dv 9 manager.
+	 *
+	 * @param tenantId
+	 * @param localizationProperty TODO
+	 */
+	public ICDv9Manager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		resourceICDList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.ICDV9);
     this.icdByCodeMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
     this.icdByNameMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
 

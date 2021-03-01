@@ -10,13 +10,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.ICDv9Identifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv9MaskingProviderConfig;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests for both randomize chapter and category options and their boolean values (true and
    * false). That is, tests converting the ICDv9 code or name to category or chapter. It also tests
@@ -26,7 +31,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskConvertToCategory() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
     // default configuration is to convert to category
     String originalICD = "002.0";
     String maskedICD = maskingProvider.mask(originalICD);
@@ -55,7 +61,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
 
     for (ICDv9MaskingProviderConfig configuration : configurations) {
 
-      ICDv9MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+      ICDv9MaskingProvider maskingProvider =
+          new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
       int N = 1000000;
       String[] originalICDs = {"002.0", "Typhoid Fever"};
@@ -84,7 +91,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
     configuration.setRandomizeCategory(false);
     configuration.setRandomizeChapter(true);
 
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     // Test convert to chapter
     String originalICD = "002.0";
@@ -112,7 +120,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
     configuration.setRandomizeCategory(false);
     configuration.setRandomizeChapter(false);
 
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     // Test convert to chapter
     String originalICD = "002.0";
@@ -134,7 +143,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskNullICDv9InputReturnNull() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
 
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv9 = null;
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);
@@ -147,7 +157,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidICDv9InputValidHandlingReturnNull() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);
@@ -160,8 +171,9 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidICDv9InputValidHandlingReturnRandom() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
-    Identifier identifier = new ICDv9Identifier();
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
+    Identifier identifier = new ICDv9Identifier(tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);
@@ -175,7 +187,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidICDv9InputValidHandlingReturnDefaultCustomValue() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);
@@ -189,7 +202,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test ICDv9");
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);
@@ -202,7 +216,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidICDv9InputInvalidHandlingReturnNull() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ICDv9MaskingProvider(configuration, tenantId);
+    MaskingProvider maskingProvider =
+        new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv9 = "Invalid ICDv9";
     String maskedICDv9 = maskingProvider.mask(invalidICDv9);

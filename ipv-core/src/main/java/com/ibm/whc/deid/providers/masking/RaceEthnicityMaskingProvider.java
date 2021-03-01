@@ -26,9 +26,11 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
   /**
    * @param configuration
    * @param tenantId
+   * @param localizationProperty TODO
    */
   public RaceEthnicityMaskingProvider(RaceEthnicityMaskingProviderConfig configuration,
-      String tenantId) {
+      String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
@@ -59,7 +61,7 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      raceManager = new RaceManager(null);
+      raceManager = new RaceManager(null, localizationProperty);
       initialized = true;
     }
   }

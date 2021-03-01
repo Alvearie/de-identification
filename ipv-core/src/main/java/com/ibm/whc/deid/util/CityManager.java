@@ -13,8 +13,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.City;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -33,15 +35,15 @@ public class CityManager extends ResourceBasedManager<City> {
 
   private LatLonDistance<City> distanceCalc;
 
-  public CityManager(String tenantId) {
-    super(tenantId, Resource.CITY);
+	public CityManager(String tenantId, String localizationProperty) {
+		super(tenantId, Resource.CITY, localizationProperty);
 
     distanceCalc = new LatLonDistance<City>(getItemList());
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.CITY);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CITY);
   }
 
   protected void addToCityList(City city, String countryCode) {
@@ -87,11 +89,13 @@ public class CityManager extends ResourceBasedManager<City> {
     return cities;
   }
 
-  public void init() {
+  @Override
+public void init() {
     this.cityListMap = new HashMap<>();
   }
 
-  public void postInit() {
+  @Override
+public void postInit() {
     this.latLonTree = new HashMap<>();
 
     for (String key : cityListMap.keySet()) {

@@ -10,22 +10,13 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.ReligionIdentifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.ReligionMaskingProviderConfig;
-import com.ibm.whc.deid.util.Readers;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
 
 public class ReligionMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
   // @formatter:off
@@ -37,8 +28,8 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
   @Test
   public void testMask() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
-    ReligionIdentifier identifier = new ReligionIdentifier();
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
+		ReligionIdentifier identifier = new ReligionIdentifier(tenantId, localizationProperty);
 
     String originalReligion = "Buddhist";
 
@@ -54,39 +45,11 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
     assertTrue(randomizationOK > 0);
   }
 
-  @Test
-  public void testLocalization() throws Exception {
-    ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
-
-    String greekReligion = "Βουδιστής";
-
-    Collection<ResourceEntry> entryCollection =
-        LocalizationManager.getInstance()
-            .getResources(Resource.RELIGION, Arrays.asList(new String[] {"gr"}));
-    Set<String> greekReligions = new HashSet<>();
-
-    for (ResourceEntry entry : entryCollection) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          greekReligions.add(name.toUpperCase());
-        }
-        inputStream.close();
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      String greekMasked = maskingProvider.mask(greekReligion);
-      assertTrue(greekReligions.contains(greekMasked.toUpperCase()));
-    }
-  }
 
   @Test
   public void testMaskNullReligionInputReturnNull() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidReligion = null;
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -99,7 +62,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidReligionInputValidHandlingReturnNull() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -112,8 +75,8 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidReligionInputValidHandlingReturnRandom() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
-    Identifier identifier = new ReligionIdentifier();
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
+		Identifier identifier = new ReligionIdentifier(tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -127,7 +90,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidReligionInputValidHandlingReturnDefaultCustomValue() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -142,7 +105,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test Religion");
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -155,7 +118,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
   public void testMaskInvalidReligionInputInvalidHandlingReturnNull() throws Exception {
     ReligionMaskingProviderConfig configuration = new ReligionMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId);
+		MaskingProvider maskingProvider = new ReligionMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidReligion = "Invalid Religion";
     String maskedReligion = maskingProvider.mask(invalidReligion);
@@ -177,7 +140,7 @@ public class ReligionMaskingProviderTest extends TestLogSetUp implements Masking
 
     for (ReligionMaskingProviderConfig maskingConfiguration : configurations) {
       ReligionMaskingProvider maskingProvider =
-          new ReligionMaskingProvider(maskingConfiguration, tenantId);
+					new ReligionMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();

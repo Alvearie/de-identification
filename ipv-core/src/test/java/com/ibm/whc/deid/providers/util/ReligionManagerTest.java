@@ -7,13 +7,17 @@ package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertTrue;
 
-import com.ibm.whc.deid.util.ReligionManager;
 import org.junit.Test;
 
+import com.ibm.whc.deid.util.ReligionManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
+
 public class ReligionManagerTest {
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+
   @Test
   public void testLookupSuccessful() throws Exception {
-    ReligionManager religionManager = new ReligionManager(null);
+    ReligionManager religionManager = new ReligionManager(null, localizationProperty);
     String religion = "Catholic";
     assertTrue(religionManager.isValidKey(religion));
 
@@ -23,7 +27,7 @@ public class ReligionManagerTest {
 
   @Test
   public void testRandomCodeGenerator() throws Exception {
-    ReligionManager religionManager = new ReligionManager(null);
+    ReligionManager religionManager = new ReligionManager(null, localizationProperty);
     assertTrue(religionManager.isValidKey(religionManager.getRandomKey()));
   }
 }
