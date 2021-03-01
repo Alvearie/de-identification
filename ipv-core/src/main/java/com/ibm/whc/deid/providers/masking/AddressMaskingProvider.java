@@ -199,7 +199,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
 
       cityMaskingProvider =
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
-              null, configuration.getCityMaskingConfig(), null, localizationProperty);
+              tenantId, configuration.getCityMaskingConfig(), null, localizationProperty);
 
       postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
