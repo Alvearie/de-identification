@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.ibm.whc.deid.models.LocalizedEntity;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
@@ -37,7 +36,8 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
 
   protected int resourceInDbCount = 0;
 
-	protected String localizationProperty;
+  protected final String localizationProperty;
+
 
   /**
    * Gets all countries name.

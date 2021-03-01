@@ -8,7 +8,6 @@ package com.ibm.whc.deid.providers.masking;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
-
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -29,15 +28,15 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   protected SecureRandom random;
   protected boolean debug_enabled;
 
-  protected String localizationProperty;
-  protected String tenantId;
+  protected final String localizationProperty;
+  protected final String tenantId;
 
   protected LogManager log = LogManager.getInstance();
 
   private String name = "";
 
   public AbstractMaskingProvider() {
-
+    this(null, null);
   }
 
   public AbstractMaskingProvider(String tenantId, String localizationProperty) {
