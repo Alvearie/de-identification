@@ -7,7 +7,6 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
-
 import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.models.RoadTypes;
@@ -194,7 +193,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
           Resource.STREET_NAMES, null, localizationProperty);
 
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
-          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null,
+          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), tenantId,
           localizationProperty);
       countryMaskingProvider.initialize();
 

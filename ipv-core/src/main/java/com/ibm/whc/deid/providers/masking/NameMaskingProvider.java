@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-
 import com.ibm.whc.deid.models.FirstName;
 import com.ibm.whc.deid.models.LastName;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
@@ -35,13 +34,11 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
       String localizationProperty) {
     super(tenantId, localizationProperty);
     this.random = new SecureRandom();
-    this.names = new NamesManager.NameManager(tenantId, localizationProperty);
     this.allowUnisex = configuration.isMaskingAllowUnisex();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-    this.localizationProperty = localizationProperty;
   }
 
   @Override
@@ -122,7 +119,7 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      names = new NamesManager.NameManager(null, localizationProperty);
+      names = new NamesManager.NameManager(tenantId, localizationProperty);
       initialized = true;
     }
   }

@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -19,7 +18,6 @@ import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * The type Conditional masking provider.
@@ -82,7 +80,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
     return MaskingProviderFactoryUtil.getMaskingProviderFactory().getProviderFromType(
         config.getType(), deidMaskingConfig, config, tenantId,
-        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+        localizationProperty);
   }
 
   /**

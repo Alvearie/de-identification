@@ -30,8 +30,6 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
       String localizationProperty) {
     super(tenantId, localizationProperty);
     this.preserveCountry = configuration.isPreserveCountry();
-    swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId,
-        Resource.SWIFT, null, localizationProperty);
   }
 
   @Override
