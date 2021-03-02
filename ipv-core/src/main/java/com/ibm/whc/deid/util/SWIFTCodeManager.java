@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,45 +25,47 @@ import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
-  /** */
+
   private static final long serialVersionUID = 8621077436877031606L;
+
+  protected CountryManager countryManager;
+  protected Map<String, List<SWIFTCode>> codeByCountryMap;
+
+  protected final SecureRandom random = new SecureRandom();
 
   public SWIFTCodeManager(String tenantId, String localizationProperty) {
     super(tenantId, Resource.SWIFT, localizationProperty);
   }
 
-	protected CountryManager countryManager;
-  protected Map<String, List<SWIFTCode>> codeByCountryMap;
-  protected final SecureRandom random = new SecureRandom();
-
   @Override
   public void init() {
     this.codeByCountryMap = new HashMap<>();
-		countryManager = new CountryManager(tenantId, localizationProperty);
+    this.countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
+        Resource.COUNTRY, null, localizationProperty);
   }
 
   /**
-   * Gets code from country.
+   * Retrieves a random SWIFT code from the known SWIFT codes from the given country.
    *
-   * @param code the code
-   * @return the code from country
+   * @param code the SWIFT country code
+   * 
+   * @return a random code from the indicated country or <i>null</i> if no such codes are available
    */
-  public String getCodeFromCountry(String code) {
-    SWIFTCode swiftCode = getKey(code);
-    if (swiftCode == null) {
-      return getRandomKey();
+  public String getRandomCodeFromCountry(String countryCode) {
+    String code = null;
+    if (countryCode != null) {
+      List<SWIFTCode> list = codeByCountryMap.get(countryCode.toUpperCase());
+      if (list != null && !list.isEmpty()) {
+        SWIFTCode randomCode = list.get(random.nextInt(list.size()));
+        code = randomCode.getCode();
+      }
     }
-
-    String countryCode = code.substring(4, 6);
-    List<SWIFTCode> list = codeByCountryMap.get(countryCode.toUpperCase());
-
-    SWIFTCode randomCode = list.get(random.nextInt(list.size()));
-    return randomCode.getCode();
+    return code;
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
+    return LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
   }
 
   @Override
@@ -72,33 +74,37 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
     Map<String, Map<String, SWIFTCode>> swiftCodeMap = new HashMap<>();
 
     for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String code = line.get(0);
-          String countryCode = code.substring(4, 6);
+      try (InputStream inputStream = entry.createStream()) {
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+            String code = line.get(0);
+            String countryCode = code.substring(4, 6);
 
-          Country country =
-              countryManager.lookupCountry(countryCode, "en");
-          if (country == null) {
-            continue;
+            Country country = countryManager.lookupCountry(countryCode, "en");
+            if (country == null) {
+              continue;
+            }
+
+            SWIFTCode swiftCode = new SWIFTCode(code, country);
+
+            addToMapByLocale(swiftCodeMap, getAllCountriesName(), code.toUpperCase(), swiftCode);
+
+            String ccKey = countryCode.toUpperCase();
+            if (!codeByCountryMap.containsKey(ccKey)) {
+              codeByCountryMap.put(ccKey, new ArrayList<SWIFTCode>());
+            }
+
+            codeByCountryMap.get(ccKey).add(swiftCode);
           }
-
-          SWIFTCode swiftCode = new SWIFTCode(code, country);
-
-          addToMapByLocale(swiftCodeMap, getAllCountriesName(), code.toUpperCase(), swiftCode);
-
-          String ccKey = countryCode.toUpperCase();
-          if (!codeByCountryMap.containsKey(ccKey)) {
-            codeByCountryMap.put(ccKey, new ArrayList<SWIFTCode>());
-          }
-
-          codeByCountryMap.get(ccKey).add(swiftCode);
         }
-        inputStream.close();
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
+    }
+
+    // ensure the all-countries map is always created even if there are no resources
+    if (swiftCodeMap.get(getAllCountriesName()) == null) {
+      swiftCodeMap.put(getAllCountriesName(), new HashMap<>());
     }
 
     return swiftCodeMap;
@@ -108,5 +114,4 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
   public Collection<SWIFTCode> getItemList() {
     return getValues();
   }
-
 }

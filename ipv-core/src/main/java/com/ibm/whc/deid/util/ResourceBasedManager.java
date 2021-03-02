@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,9 +19,8 @@ import com.ibm.whc.deid.utils.log.LogManager;
 /**
  * @param <K> the type parameter
  */
-public abstract class ResourceBasedManager<K> extends AbstractManager<K>
-    implements Serializable {
-  /** */
+public abstract class ResourceBasedManager<K> extends AbstractManager<K> implements Serializable {
+
   private static final long serialVersionUID = -2677416081691708110L;
 
   private static final String allCountriesName = "__all__";
@@ -61,9 +60,9 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
     Map<String, K> localMap = perLocaleMap.get(countryCode);
 
     if (localMap == null) {
-      perLocaleMap.put(countryCode, new HashMap<String, K>());
+      localMap = new HashMap<String, K>();
+      perLocaleMap.put(countryCode, localMap);
       listMap.put(countryCode, new ArrayList<String>());
-      localMap = perLocaleMap.get(countryCode);
     }
 
     localMap.put(key, value);
@@ -114,11 +113,12 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
    * Instantiates a new Resource based manager.
    *
    * @param tenantId tenant id
- * @param localizationProperty TODO
+   * @param localizationProperty TODO
    */
-  public ResourceBasedManager(String tenantId, Resources resourceType, String localizationProperty) {
+  public ResourceBasedManager(String tenantId, Resources resourceType,
+      String localizationProperty) {
     this.tenantId = tenantId;
-		this.localizationProperty = localizationProperty;
+    this.localizationProperty = localizationProperty;
     this.resourceType = resourceType;
     init();
 
@@ -206,16 +206,21 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
   }
 
   @Override
-public String getRandomKey() {
+  public String getRandomKey() {
     return getRandomKey(allCountriesName);
   }
 
   public K getRandomValue() {
-    return resourceMap.get(allCountriesName).getRandomValue();
+    return getRandomValue(allCountriesName);
   }
 
   public K getRandomValue(String countryCode) {
-    return resourceMap.get(countryCode).getRandomValue();
+    K value = null;
+    MapWithRandomPick<String, K> map = resourceMap.get(countryCode);
+    if (map != null && map.size() > 0) {
+      value = map.getRandomValue();
+    }
+    return value;
   }
 
   /**
@@ -229,12 +234,11 @@ public String getRandomKey() {
     if (map != null) {
       return map.getRandomKey();
     }
-
     return null;
   }
 
   @Override
-public boolean isValidKey(String key) {
+  public boolean isValidKey(String key) {
     MapWithRandomPick<String, K> map = resourceMap.get(allCountriesName);
     return map != null && map.getMap().containsKey(key.toUpperCase());
   }

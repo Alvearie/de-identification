@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -14,15 +14,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @param <K> the type parameter
- * @param <V> the type parameter
+ * @param <K> the key type parameter
+ * @param <V> the value type parameter
  */
 public class MapWithRandomPick<K, V> implements Serializable {
-  /** */
+
   private static final long serialVersionUID = -1788413492014517734L;
 
-  private Map<K, V> map;
-  private List<K> keylist = new ArrayList<K>();
+  private final Map<K, V> map;
+  private final List<K> keylist = new ArrayList<>();
   private final SecureRandom random;
 
   /**
@@ -75,5 +75,9 @@ public class MapWithRandomPick<K, V> implements Serializable {
   public V getRandomValue() {
     K key = getRandomKey();
     return map.get(key);
+  }
+
+  public int size() {
+    return keylist.size();
   }
 }
