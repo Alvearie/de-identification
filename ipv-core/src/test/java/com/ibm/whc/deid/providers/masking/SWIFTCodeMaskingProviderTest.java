@@ -30,6 +30,8 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     checkRandomGenerated("EMCRGRA1X", maskingProvider);
+    checkRandomGenerated("EMCRGRA1XX", maskingProvider);
+    checkRandomGenerated("EMCRGRA1XXX", maskingProvider);
     checkRandomGenerated("EMCR", maskingProvider);
     checkRandomGenerated("", maskingProvider);
     checkRandomGenerated(null, maskingProvider);
@@ -47,7 +49,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
-    String masked = checkRandomGenerated("EMCRGRA1X", maskingProvider);
+    assertNull(maskingProvider.mask("EMCRGRA1X"));
+    assertNull(maskingProvider.mask("EMCRGRA1XX"));
+    String masked = checkRandomGenerated("EMCRGRA1XXX", maskingProvider);
     assertEquals("GR", masked.substring(4, 6));
     assertNull(maskingProvider.mask("EMCR"));
     assertNull(maskingProvider.mask(""));
@@ -67,7 +71,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
-    String masked = checkRandomGenerated("EMCRGRA1X", maskingProvider);
+    checkRandomGenerated("EMCRGRA1x", maskingProvider);
+    checkRandomGenerated("EMCRGRA1xx", maskingProvider);
+    String masked = checkRandomGenerated("EMCRGRA1XXX", maskingProvider);
     assertEquals("GR", masked.substring(4, 6));
     checkRandomGenerated("EMCR", maskingProvider);
     checkRandomGenerated("", maskingProvider);
@@ -88,7 +94,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
-    String masked = checkRandomGenerated("EMCRGRA1X", maskingProvider);
+    assertEquals("slow", maskingProvider.mask("EMCRGRA12"));
+    assertEquals("slow", maskingProvider.mask("EMCRGRA122"));
+    String masked = checkRandomGenerated("EMCRGRA1222", maskingProvider);
     assertEquals("GR", masked.substring(4, 6));
     assertEquals("slow", maskingProvider.mask("EMCR"));
     assertEquals("slow", maskingProvider.mask(""));
@@ -107,8 +115,6 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         value + " fails to match pattern " + SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.pattern(),
         SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(value).matches());
     assertNotEquals(original, value);
-    // TODO: remove
-    System.out.println(value);
     return value;
   }
 
@@ -120,6 +126,8 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
     checkOneOf("EMCRGRA1X", maskingProvider, REPLACEMENTS);
+    checkOneOf("EMCRGRA1XX", maskingProvider, REPLACEMENTS);
+    checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     checkOneOf("EMCR", maskingProvider, REPLACEMENTS);
     checkOneOf("", maskingProvider, REPLACEMENTS);
     checkOneOf(null, maskingProvider, REPLACEMENTS);
@@ -140,7 +148,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
     // valid format, but country not loaded
-    checkOneOf("EMCRGRA1X", maskingProvider, REPLACEMENTS);
+    assertNull(maskingProvider.mask("EMCRGRA1X"));
+    assertNull(maskingProvider.mask("EMCRGRA1XX"));
+    checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     assertNull(maskingProvider.mask("EMCR"));
     assertNull(maskingProvider.mask(""));
     assertNull(maskingProvider.mask(null));
@@ -161,6 +171,8 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
     checkOneOf("EMCRGRA1X", maskingProvider, REPLACEMENTS);
+    checkOneOf("EMCRGRA1XX", maskingProvider, REPLACEMENTS);
+    checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     checkOneOf("EMCR", maskingProvider, REPLACEMENTS);
     checkOneOf("", maskingProvider, REPLACEMENTS);
     checkOneOf(null, maskingProvider, REPLACEMENTS);
@@ -182,7 +194,9 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
     // valid format, but country not loaded
-    checkOneOf("EMCRGRA1X", maskingProvider, REPLACEMENTS);
+    assertEquals("OTHER", maskingProvider.mask("EMCRGRA1X"));
+    assertEquals("OTHER", maskingProvider.mask("EMCRGRA1XX"));
+    checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     assertEquals("OTHER", maskingProvider.mask("EMCR"));
     assertEquals("OTHER", maskingProvider.mask(""));
     assertEquals("OTHER", maskingProvider.mask(null));
@@ -199,8 +213,6 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     String value = provider.mask(original);
     assertTrue("unexpected value " + value, Arrays.asList(possibles).contains(value));
     assertNotEquals(original, value);
-    // TODO: remove
-    System.out.println(value);
     return value;
   }
 }

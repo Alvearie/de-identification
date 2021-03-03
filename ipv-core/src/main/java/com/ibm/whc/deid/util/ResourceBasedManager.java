@@ -137,7 +137,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
     postInit();
   }
 
-  public Map<String, Map<String, K>> readResources(Resources resourceType, String tenantId) {
+  protected Map<String, Map<String, K>> readResources(Resources resourceType, String tenantId) {
     return readResourcesFromFile(getResources());
   }
 
@@ -161,7 +161,9 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
     if (map != null) {
       return map.getMap().values();
     }
-
+    if (allCountriesName.equals(countryCode)) {
+      return null;
+    }    
     return getValues(allCountriesName);
   }
 
@@ -239,32 +241,33 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
 
   @Override
   public boolean isValidKey(String key) {
-    MapWithRandomPick<String, K> map = resourceMap.get(allCountriesName);
-    return map != null && map.getMap().containsKey(key.toUpperCase());
+    return isValidKey(allCountriesName, key);
   }
 
   public boolean isValidKey(String countryCode, String key) {
     MapWithRandomPick<String, K> map = resourceMap.get(countryCode.toLowerCase());
-
     return map != null && map.getMap().containsKey(key.toUpperCase());
   }
 
   /**
-   * Gets key.
+   * Returns the value for the given key regardless of country code.
    *
    * @param key the key
-   * @return the key
+   * 
+   * @return the value or <i>null</i> if no value for the given key is found 
    */
   public K getKey(String key) {
-    MapWithRandomPick<String, K> map = resourceMap.get(allCountriesName);
-
-    if (map != null) {
-      return map.getMap().get(key.toUpperCase());
-    }
-
-    return null;
+    return getKey(allCountriesName, key);
   }
 
+  /**
+   * Returns the value for the given key for the given country code.
+   *
+   * @param countryCode a country or language code
+   * @param key the key
+   * 
+   * @return the value or <i>null</i> if no value for the given key is found 
+   */
   public K getKey(String countryCode, String key) {
     MapWithRandomPick<String, K> map = resourceMap.get(countryCode.toLowerCase());
 

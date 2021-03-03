@@ -38,38 +38,19 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
   }
 
   @Override
-  public void init() {
+  protected void init() {
     this.codeByCountryMap = new HashMap<>();
     this.countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
         Resource.COUNTRY, null, localizationProperty);
   }
 
-  /**
-   * Retrieves a random SWIFT code from the known SWIFT codes from the given country.
-   *
-   * @param code the SWIFT country code
-   * 
-   * @return a random code from the indicated country or <i>null</i> if no such codes are available
-   */
-  public String getRandomCodeFromCountry(String countryCode) {
-    String code = null;
-    if (countryCode != null) {
-      List<SWIFTCode> list = codeByCountryMap.get(countryCode.toUpperCase());
-      if (list != null && !list.isEmpty()) {
-        SWIFTCode randomCode = list.get(random.nextInt(list.size()));
-        code = randomCode.getCode();
-      }
-    }
-    return code;
-  }
-
   @Override
-  public Collection<ResourceEntry> getResources() {
+  protected Collection<ResourceEntry> getResources() {
     return LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
   }
 
   @Override
-  public Map<String, Map<String, SWIFTCode>> readResourcesFromFile(
+  protected Map<String, Map<String, SWIFTCode>> readResourcesFromFile(
       Collection<ResourceEntry> entries) {
     Map<String, Map<String, SWIFTCode>> swiftCodeMap = new HashMap<>();
 
@@ -102,16 +83,31 @@ public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
       }
     }
 
-    // ensure the all-countries map is always created even if there are no resources
-    if (swiftCodeMap.get(getAllCountriesName()) == null) {
-      swiftCodeMap.put(getAllCountriesName(), new HashMap<>());
-    }
-
     return swiftCodeMap;
   }
 
   @Override
   public Collection<SWIFTCode> getItemList() {
     return getValues();
+  }
+
+  /**
+   * Retrieves a random SWIFT code value from the known SWIFT codes from the given country.
+   *
+   * @param code the SWIFT country code
+   * 
+   * @return a random code value from the indicated country or <i>null</i> if no such codes are
+   *         available
+   */
+  public String getRandomValueFromCountry(String countryCode) {
+    String code = null;
+    if (countryCode != null) {
+      List<SWIFTCode> list = codeByCountryMap.get(countryCode.toUpperCase());
+      if (list != null && !list.isEmpty()) {
+        SWIFTCode randomCode = list.get(random.nextInt(list.size()));
+        code = randomCode.getCode();
+      }
+    }
+    return code;
   }
 }
