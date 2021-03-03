@@ -6,22 +6,13 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import java.util.Arrays;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.SWIFTMaskingProviderConfig;
 
-public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSetup {
 
-  private static final String TEST_LOCALIZATION_PROPERTIES =
-      "/localization/test.swift.localization.properties";
-
-  // values from the TEST_LOCALIZATION_PROPERTIES file
-  private static final String[] REPLACEMENTS = {"AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD",
-      "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
+  // "AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD", "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"
 
   @Test
   public void testNoPreserve() {
@@ -108,16 +99,6 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     assertEquals("AA", masked.substring(4, 6));
   }
 
-  private String checkRandomGenerated(String original, SWIFTCodeMaskingProvider provider) {
-    String value = provider.mask(original);
-    assertNotNull(value);
-    assertTrue(
-        value + " fails to match pattern " + SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.pattern(),
-        SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(value).matches());
-    assertNotEquals(original, value);
-    return value;
-  }
-
   @Test
   public void testValuesLoaded_NoPreserve() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
@@ -158,8 +139,8 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     assertNull(maskingProvider.mask("&&&"));
     assertNull(maskingProvider.mask("&&&&&&&&"));
     checkOneOf("aaaaaaaa", maskingProvider, REPLACEMENTS);
-    checkOneOf("nnnnUSxx", maskingProvider, "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH");
-    checkOneOf("nnnnCAxx", maskingProvider, "AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD");
+    checkOneOf("nnnnUSxx", maskingProvider, US_REPLACEMENTS);
+    checkOneOf("nnnnCAxx", maskingProvider, CA_REPLACEMENTS);
   }
 
   @Test
@@ -180,8 +161,8 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     checkOneOf("&&&", maskingProvider, REPLACEMENTS);
     checkOneOf("&&&&&&&&", maskingProvider, REPLACEMENTS);
     checkOneOf("aaaaaaaa", maskingProvider, REPLACEMENTS);
-    checkOneOf("nnnnUSxx", maskingProvider, "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH");
-    checkOneOf("nnnnCAxx", maskingProvider, "AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD");
+    checkOneOf("nnnnUSxx", maskingProvider, US_REPLACEMENTS);
+    checkOneOf("nnnnCAxx", maskingProvider, CA_REPLACEMENTS);
   }
 
   @Test
@@ -204,15 +185,7 @@ public class SWIFTCodeMaskingProviderTest extends TestLogSetUp implements Maskin
     assertEquals("OTHER", maskingProvider.mask("&&&"));
     assertEquals("OTHER", maskingProvider.mask("&&&&&&&&"));
     checkOneOf("aaaaaaaa", maskingProvider, REPLACEMENTS);
-    checkOneOf("nnnnUSxx", maskingProvider, "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH");
-    checkOneOf("nnnnCAxx", maskingProvider, "AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD");
-  }
-
-  private String checkOneOf(String original, SWIFTCodeMaskingProvider provider,
-      String... possibles) {
-    String value = provider.mask(original);
-    assertTrue("unexpected value " + value, Arrays.asList(possibles).contains(value));
-    assertNotEquals(original, value);
-    return value;
+    checkOneOf("nnnnUSxx", maskingProvider, US_REPLACEMENTS);
+    checkOneOf("nnnnCAxx", maskingProvider, CA_REPLACEMENTS);
   }
 }
