@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,17 +11,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 public abstract class AbstractIdentifier implements Identifier, Serializable {
-  /** */
+  
   private static final long serialVersionUID = 439172843528253186L;
-  private String maskingRule;
-
-  public String getMaskingRule() {
-    return maskingRule;
-  }
-
-  public void setMaskingRule(String maskingRule) {
-    this.maskingRule = maskingRule;
-  }
 
   /**
    * Gets appropriate names.
@@ -30,7 +21,7 @@ public abstract class AbstractIdentifier implements Identifier, Serializable {
    */
   protected Collection<String> getAppropriateNames() {
     return Collections.emptyList();
-  };
+  }
 
   @Override
   public int getPriority() {

@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
@@ -166,32 +165,5 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
     assertFalse(mgr.isValidKey("ABCDEFGH"));
     assertFalse(mgr.isValidKey("en", "ABCDEFGH"));
-  }
-
-  @Test
-  @Ignore
-  public void testLookup() {
-    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId, localizationProperty);
-
-    String key = "EMCRGRA1";
-    assertTrue(swiftCodeManager.isValidKey(key));
-
-    SWIFTCode code = swiftCodeManager.getKey(key);
-    assertTrue(code.getCode().equals(key));
-    assertTrue(code.getCountry().getName().toUpperCase().equals("GREECE"));
-  }
-
-  @Test
-  @Ignore
-  public void testCodeFromCountry() {
-    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager(tenantId, localizationProperty);
-
-    String validCode = "EMCRGRA1";
-    assertTrue(swiftCodeManager.isValidKey(validCode));
-    assertNotNull(swiftCodeManager.getRandomValueFromCountry(validCode));
-
-    String invalidCode = "INVALID_CODE";
-    assertFalse(swiftCodeManager.isValidKey(invalidCode));
-    assertNotNull(swiftCodeManager.getRandomValueFromCountry(invalidCode));
   }
 }
