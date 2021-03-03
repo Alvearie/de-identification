@@ -24,19 +24,45 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
   private static final long serialVersionUID = -2677416081691708110L;
 
   private static final String allCountriesName = "__all__";
+
+  protected static final LogManager logger = LogManager.getInstance();
+
   private final Map<String, MapWithRandomPick<String, K>> resourceMap;
   private final Map<String, List<String>> listMap;
 
   protected final String tenantId;
-
   protected final Resources resourceType;
-
-  static final LogManager logger = LogManager.getInstance();
-
+  protected final String localizationProperty;
+  
   protected int resourceInDbCount = 0;
 
-  protected final String localizationProperty;
+  /**
+   * Instantiates a new Resource based manager.
+   *
+   * @param tenantId tenant id
+   * @param localizationProperty TODO
+   */
+  public ResourceBasedManager(String tenantId, Resources resourceType,
+      String localizationProperty) {
+    this.tenantId = tenantId;
+    this.localizationProperty = localizationProperty;
+    this.resourceType = resourceType;
+    init();
 
+    this.resourceMap = new HashMap<>();
+    this.listMap = new HashMap<>();
+    Map<String, Map<String, K>> contents = readResources(resourceType, tenantId);
+
+    for (final Map.Entry<String, Map<String, K>> entry : contents.entrySet()) {
+      final String countryCode = entry.getKey();
+      final Map<String, K> perCountryData = entry.getValue();
+      MapWithRandomPick<String, K> mapWithRandomPick = new MapWithRandomPick<>(perCountryData);
+      this.resourceMap.put(countryCode, mapWithRandomPick);
+      this.resourceMap.get(countryCode).setKeyList();
+    }
+
+    postInit();
+  }
 
   /**
    * Gets all countries name.
@@ -107,34 +133,6 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
    */
   protected char getQuoteChar() {
     return '"';
-  }
-
-  /**
-   * Instantiates a new Resource based manager.
-   *
-   * @param tenantId tenant id
-   * @param localizationProperty TODO
-   */
-  public ResourceBasedManager(String tenantId, Resources resourceType,
-      String localizationProperty) {
-    this.tenantId = tenantId;
-    this.localizationProperty = localizationProperty;
-    this.resourceType = resourceType;
-    init();
-
-    this.resourceMap = new HashMap<>();
-    this.listMap = new HashMap<>();
-    Map<String, Map<String, K>> contents = readResources(resourceType, tenantId);
-
-    for (final Map.Entry<String, Map<String, K>> entry : contents.entrySet()) {
-      final String countryCode = entry.getKey();
-      final Map<String, K> perCountryData = entry.getValue();
-      MapWithRandomPick<String, K> mapWithRandomPick = new MapWithRandomPick<>(perCountryData);
-      this.resourceMap.put(countryCode, mapWithRandomPick);
-      this.resourceMap.get(countryCode).setKeyList();
-    }
-
-    postInit();
   }
 
   protected Map<String, Map<String, K>> readResources(Resources resourceType, String tenantId) {
@@ -277,5 +275,4 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
 
     return null;
   }
-
 }
