@@ -5,10 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
+import java.util.List;
 
 public class SWIFTCodeMaskingProviderTestSetup extends TestLogSetUp implements MaskingProviderTest {
 
@@ -16,28 +18,41 @@ public class SWIFTCodeMaskingProviderTestSetup extends TestLogSetUp implements M
       "/localization/test.swift.localization.properties";
 
   // values from the TEST_LOCALIZATION_PROPERTIES file
-  protected static final String[] REPLACEMENTS = {"AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD",
-      "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
+  protected static final String[] REPLACEMENTS = {"AAAACA11", "BBBBCABB", "CCCCCACC", "DDDDCADD004",
+      "EEEEUS55XX5", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
   protected static final String[] CA_REPLACEMENTS =
-      {"AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD"};
+      {"AAAACA11", "BBBBCABB", "CCCCCACC", "DDDDCADD004"};
   protected static final String[] US_REPLACEMENTS =
-      {"EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
+      {"EEEEUS55XX5", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
+  protected static final List<String> REPLACEMENTS_LIST = Arrays.asList(REPLACEMENTS);
+  protected static final List<String> CA_REPLACEMENTS_LIST = Arrays.asList(CA_REPLACEMENTS);
+  protected static final List<String> US_REPLACEMENTS_LIST = Arrays.asList(US_REPLACEMENTS);
 
-  protected String checkRandomGenerated(String original, SWIFTCodeMaskingProvider provider) {
-    String value = provider.mask(original);
-    assertNotNull(value);
-    assertTrue(
-        value + " fails to match pattern " + SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.pattern(),
-        SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(value).matches());
-    assertNotEquals(original, value);
-    return value;
+  protected void checkRandomGenerated(String original, SWIFTCodeMaskingProvider provider) {
+    checkRandomGenerated(original, provider, null);
   }
 
-  protected String checkOneOf(String original, SWIFTCodeMaskingProvider provider,
+  protected void checkRandomGenerated(String original, SWIFTCodeMaskingProvider provider,
+      String countryCode) {
+    for (int i = 0; i < 20; i++) {
+      String value = provider.mask(original);
+      assertNotNull(value);
+      assertTrue(
+          value + " fails to match pattern " + SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.pattern(),
+          SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(value).matches());
+      assertNotEquals(original, value);
+      if (countryCode != null) {
+        assertEquals(countryCode, value.substring(4, 6));
+      }
+    }
+  }
+
+  protected void checkOneOf(String original, SWIFTCodeMaskingProvider provider,
       String... possibles) {
-    String value = provider.mask(original);
-    assertTrue("unexpected value " + value, Arrays.asList(possibles).contains(value));
-    assertNotEquals(original, value);
-    return value;
+    for (int i = 0; i < 20; i++) {
+      String value = provider.mask(original);
+      assertTrue("unexpected value " + value, Arrays.asList(possibles).contains(value));
+      assertNotEquals(original, value);
+    }
   }
 }
