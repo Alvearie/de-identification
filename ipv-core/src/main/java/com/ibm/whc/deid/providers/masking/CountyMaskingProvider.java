@@ -25,7 +25,7 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    * @param tenantId
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
   public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId,

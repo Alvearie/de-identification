@@ -23,7 +23,7 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new SWIFT masking provider.
    * 
    * @param configuration the configuration
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
   public SWIFTCodeMaskingProvider(SWIFTMaskingProviderConfig configuration, String tenantId,

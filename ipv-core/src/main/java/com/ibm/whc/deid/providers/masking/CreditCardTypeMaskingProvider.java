@@ -24,7 +24,7 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new Credit card type masking provider.
    * 
    * @param tenantId TODO
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    */
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);

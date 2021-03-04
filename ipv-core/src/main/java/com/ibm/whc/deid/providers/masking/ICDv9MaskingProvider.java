@@ -34,7 +34,7 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    * @param tenantId tenant id
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
   public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId,

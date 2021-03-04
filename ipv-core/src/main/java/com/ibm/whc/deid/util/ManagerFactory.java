@@ -36,7 +36,7 @@ public class ManagerFactory {
 	 * @param resourceType
 	 * @param options      optional options a manager might have. eg zipcode
 	 *                     manager's prefixLength
-	 * @param localizationProperty TODO
+	 * @paramlocalizationProperty location of the localization property file
 	 * @return
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {

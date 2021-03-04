@@ -114,7 +114,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K>
    * Instantiates a new Resource based manager.
    *
    * @param tenantId tenant id
- * @param localizationProperty TODO
+ * @paramlocalizationProperty location of the localization property file
    */
   public ResourceBasedManager(String tenantId, Resources resourceType, String localizationProperty) {
     this.tenantId = tenantId;

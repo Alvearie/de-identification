@@ -55,7 +55,7 @@ public class CountryManager extends AbstractManager<Country>
   }
 
   /** Instantiates a new Country manager. 
- * @param localizationProperty TODO*/
+ * @paramlocalizationProperty location of the localization property file*/
   public CountryManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
     this.random = new SecureRandom();
