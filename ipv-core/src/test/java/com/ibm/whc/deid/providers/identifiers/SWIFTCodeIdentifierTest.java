@@ -21,7 +21,7 @@ public class SWIFTCodeIdentifierTest implements MaskingProviderTest {
     assertFalse(id.isOfThisType("ABC"));
     assertFalse(id.isOfThisType("ABCDEFGH"));
     assertTrue(id.isOfThisType("HHHHUSHH"));
-    assertTrue(id.isOfThisType("ddddCAdd"));
+    assertTrue(id.isOfThisType("ddddCADD004"));
     assertFalse(id.isOfThisType(null));
     assertFalse(id.isOfThisType(""));
   }
