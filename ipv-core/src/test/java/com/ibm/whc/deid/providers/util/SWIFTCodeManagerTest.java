@@ -10,28 +10,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
 import com.ibm.whc.deid.models.SWIFTCode;
-import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+import com.ibm.whc.deid.providers.masking.SWIFTCodeMaskingProviderTestSetup;
 import com.ibm.whc.deid.util.SWIFTCodeManager;
 
-public class SWIFTCodeManagerTest implements MaskingProviderTest {
-
-  private static final String TEST_LOCALIZATION_PROPERTIES =
-      "/localization/test.swift.localization.properties";
-
-  // values loaded from the TEST_LOCALIZATION_PROPERTIES file
-  // (some values not loaded because they reference non-loaded countries)
-  private static final List<String> REPLACEMENTS = Arrays.asList("AAAACAAA", "BBBBCABB", "CCCCCACC",
-      "DDDDCADD", "EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH");
-  private static final List<String> CA_REPLACEMENTS =
-      Arrays.asList("AAAACAAA", "BBBBCABB", "CCCCCACC", "DDDDCADD");
-  private static final List<String> US_REPLACEMENTS =
-      Arrays.asList("EEEEUSEE", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH");
+public class SWIFTCodeManagerTest extends SWIFTCodeMaskingProviderTestSetup {
 
   @Test
   public void testYesCodes() {
@@ -39,12 +26,12 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
     Collection<SWIFTCode> items = mgr.getItemList();
     assertNotNull(items);
-    assertEquals(REPLACEMENTS.size(), items.size());
+    assertEquals(REPLACEMENTS_LIST.size(), items.size());
     HashSet<String> codeset = new HashSet<>();
     for (SWIFTCode code : items) {
       assertTrue(codeset.add(code.getCode()));
     }
-    codeset.removeAll(REPLACEMENTS);
+    codeset.removeAll(REPLACEMENTS_LIST);
     assertEquals(0, codeset.size());
 
     assertNull(mgr.getKey("ABCDEFGH"));
@@ -62,8 +49,8 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
     List<String> keys = mgr.getKeys();
     assertNotNull(keys);
     codeset = new HashSet<>(keys);
-    assertEquals(REPLACEMENTS.size(), codeset.size());
-    codeset.removeAll(REPLACEMENTS);
+    assertEquals(REPLACEMENTS_LIST.size(), codeset.size());
+    codeset.removeAll(REPLACEMENTS_LIST);
     assertEquals(0, codeset.size());
 
     // manager returns all keys if no data for given locale/country
@@ -78,20 +65,20 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
     // swift is not localized, so not swift code country specific
     ps = mgr.getPseudorandom("CCCCCACC");
     assertNotNull(ps);
-    assertTrue(REPLACEMENTS.contains(ps));
+    assertTrue(REPLACEMENTS_LIST.contains(ps));
 
     assertNull(mgr.getRandomValueFromCountry("fr"));
     assertNull(mgr.getRandomValueFromCountry("en"));
     String value = mgr.getRandomValueFromCountry("ca");
     assertNotNull(value);
-    assertTrue(CA_REPLACEMENTS.contains(value));
+    assertTrue(CA_REPLACEMENTS_LIST.contains(value));
     value = mgr.getRandomValueFromCountry("us");
     assertNotNull(value);
-    assertTrue(US_REPLACEMENTS.contains(value));
+    assertTrue(US_REPLACEMENTS_LIST.contains(value));
 
     value = mgr.getRandomKey();
     assertNotNull(value);
-    assertTrue(REPLACEMENTS.contains(value));
+    assertTrue(REPLACEMENTS_LIST.contains(value));
 
     // not localized
     assertNull(mgr.getRandomKey("gb"));
@@ -101,7 +88,7 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
     code = mgr.getRandomValue();
     assertNotNull(code);
-    assertTrue(REPLACEMENTS.contains(code.getCode()));
+    assertTrue(REPLACEMENTS_LIST.contains(code.getCode()));
 
     // not localized
     assertNull(mgr.getRandomValue("fr"));
@@ -111,12 +98,12 @@ public class SWIFTCodeManagerTest implements MaskingProviderTest {
 
     items = mgr.getValues();
     assertNotNull(items);
-    assertEquals(REPLACEMENTS.size(), items.size());
+    assertEquals(REPLACEMENTS_LIST.size(), items.size());
     codeset = new HashSet<>();
     for (SWIFTCode codex : items) {
       assertTrue(codeset.add(codex.getCode()));
     }
-    codeset.removeAll(REPLACEMENTS);
+    codeset.removeAll(REPLACEMENTS_LIST);
     assertEquals(0, codeset.size());
 
     // not localized, manager returns all values if no data for given locale/country
