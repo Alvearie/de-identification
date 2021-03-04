@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,54 +16,75 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
+/**
+ * Class that handles loading resource instances of various types from CSV files. There is one
+ * instance of this class per resource type.
+ * 
+ * <p>
+ * This class must remain thread-safe.
+ */
 public class LocalizationManager {
   private static final String COMMON = "_common";
-  private static LogManager logger = LogManager.getInstance();
+  private static final LogManager logger = LogManager.getInstance();
 
-  /** The constant enabledCountries. */
-  private static Collection<String> enabledCountries = new ArrayList<>();
+  // A common set of enabled countries among all source properties files processed so far
+  private static final Set<String> enabledCountries = ConcurrentHashMap.newKeySet();
 
   private final Map<Resources, Map<String, ResourceEntry>> registeredResources;
   private final Map<String, String> countryCommonMap;
   private final Map<String, Properties> countryLocalizationOptions;
 
-	public static final String DEFAULT_LOCALIZATION_PROPERTIES = "/localization.properties";
+  public static final String DEFAULT_LOCALIZATION_PROPERTIES = "/localization.properties";
 
-	private static final HashMap<String, LocalizationManager> localizationManagers = new HashMap<String, LocalizationManager>();
+  /**
+   * A map from initialization properties files paths (keys) to the LocalizationManager instances
+   * built from each (values).
+   */
+  private static final Map<String, LocalizationManager> localizationManagers =
+      new ConcurrentHashMap<>();
 
-  	/**
-	 * Gets instance.
-	 * 
-	 * @param propertyFile Location of the property file.
-	 *
-	 * @return the instance
-	 */
+  /**
+   * Gets a LocalizationManager based on the given properties file.
+   * 
+   * @param propertyFile Location of the properties file from which a LocalizableManager instance is
+   *        to be built.
+   *
+   * @return the LocalizableManager, either just built or retrieved from the cache
+   */
   public static LocalizationManager getInstance(String propertyFile) {
-		LocalizationManager manager = localizationManagers.get(propertyFile);
-		if (manager == null) {
-			synchronized (LocalizationManager.class) {
-				if (localizationManagers.get(propertyFile) == null) {
-					manager = new LocalizationManager(propertyFile);
-					localizationManagers.put(propertyFile, manager);
-				}
-			}
-		}
-		return manager;
+    LocalizationManager manager = localizationManagers.get(propertyFile);
+    if (manager == null) {
+      synchronized (localizationManagers) {
+        manager = localizationManagers.get(propertyFile);
+        if (manager == null) {
+          manager = new LocalizationManager(propertyFile);
+          localizationManagers.put(propertyFile, manager);
+        }
+      }
+    }
+    return manager;
   }
 
-  /** Instantiates a new Localization manager. */
-	private LocalizationManager(String propertyFile) {
-    this.registeredResources = new HashMap<>();
+  /**
+   * Instantiates a new Localization manager based on the properties file at the given location.
+   * 
+   * @param propertyFile Location of the properties file from which a LocalizableManager instance is
+   *        to be built.
+   */
+  private LocalizationManager(String propertyFile) {
+    this.registeredResources = new ConcurrentHashMap<>();
+    // regular HashMap appropriate - all structural changes are here during construction
     this.countryCommonMap = new HashMap<>();
+    // regular HashMap appropriate - all structural changes are here during construction
     this.countryLocalizationOptions = new HashMap<>();
 
-		try (InputStream is = getClass().getResourceAsStream(propertyFile)) {
+    try (InputStream is = getClass().getResourceAsStream(propertyFile)) {
       if (null != is) {
         Properties properties = new Properties();
         properties.load(is);
@@ -71,8 +92,7 @@ public class LocalizationManager {
         // load enabledCountries
         for (final String country : properties.getProperty("country").split(",")) {
           // logger.debug("Enabling country {}", country);
-          if (!enabledCountries.contains(country.trim()))
-            enabledCountries.add(country.trim());
+          enabledCountries.add(country.trim());
 
           // Get any locale properties for this country
           try (InputStream countryOptionStream = getClass().getResourceAsStream(
@@ -113,7 +133,7 @@ public class LocalizationManager {
             }
           }
 
-          for (final String country : new HashSet<>(countryCommonMap.values())) {
+          for (final String country : countryCommonMap.values()) {
             final String path = properties.getProperty(country + '.' + resource.name());
             if (null != path) {
               // logger.debug("Creating resources for language
@@ -133,11 +153,6 @@ public class LocalizationManager {
         }
       }
 
-      //
-      try (InputStream external =
-          this.getClass().getResourceAsStream("/localization_external.properties")) {
-      }
-
       logger.logInfo(LogCodes.WPH1009I, enabledCountries.size(), countryCommonMap.size(),
           registeredResources.size());
     } catch (IOException e) {
@@ -151,7 +166,7 @@ public class LocalizationManager {
    * @param localizationProps The list of available resources per country
    * @param resource The resource type to load
    */
-  public synchronized void registerResourceForSupportedCountries(InputStream localizationProps,
+  public void registerResourceForSupportedCountries(InputStream localizationProps,
       Resources resource) {
 
     try {
@@ -167,7 +182,7 @@ public class LocalizationManager {
       }
 
       // Load resource if it has a definition for the given country
-      for (final String country : new HashSet<>(countryCommonMap.values())) {
+      for (final String country : countryCommonMap.values()) {
         final String path = properties.getProperty(country + '.' + resource.name());
         if (null != path) {
           registerResource(resource, country, path);
@@ -184,39 +199,33 @@ public class LocalizationManager {
     }
   }
 
-  private synchronized boolean registerResource(Resources resource, ResourceEntry entry) {
+  private void registerResource(Resources resource, ResourceEntry entry) {
     Map<String, ResourceEntry> entries = this.registeredResources.get(resource);
-
     if (entries == null) {
-      this.registeredResources.put(resource, new HashMap<String, ResourceEntry>());
-      entries = this.registeredResources.get(resource);
+      synchronized (this.registeredResources) {
+        entries = this.registeredResources.get(resource);
+        if (entries == null) {
+          entries = new ConcurrentHashMap<String, ResourceEntry>();
+          this.registeredResources.put(resource, entries);
+        }
+      }
     }
-
     entries.put(entry.getCountryCode(), entry);
-
-    return true;
   }
 
-  /**
-   * Register resource boolean.
-   *
-   * @param resource the resource
-   * @param countryCode the country code
-   * @param filename the filename
-   * @return the boolean
-   */
-  public synchronized boolean registerResource(Resources resource, String countryCode,
-      String filename) {
-    return registerResource(resource,
+  private void registerResource(Resources resource, String countryCode, String filename) {
+    registerResource(resource,
         new ResourceEntry(filename, countryCode, ResourceEntryType.EXTERNAL_FILENAME));
   }
 
   /**
-   * Gets resources.
+   * Gets records describing resources files for the given resource type for any of the countries in
+   * the given list of countries.
    *
-   * @param resource the resource
-   * @param countries the countries
-   * @return the resources
+   * @param resource the type of resource for which resources are to be obtained
+   * @param countries the countries for which resources are to be obtained
+   * 
+   * @return a possibly-empty collection of records describing the available resources
    */
   public Collection<ResourceEntry> getResources(Resources resource, Collection<String> countries) {
     // logger.debug("Requesting {} for {}", resource,
@@ -227,8 +236,9 @@ public class LocalizationManager {
 
     final Map<String, ResourceEntry> knownEntries = registeredResources.get(resource);
 
-    if (null == knownEntries)
+    if (null == knownEntries) {
       return entries;
+    }
 
     if (resource instanceof Resource) {
       switch ((Resource) resource) {
@@ -236,7 +246,6 @@ public class LocalizationManager {
         case TACDB:
         case PUBLIC_SUFFIX_LIST:
         case GENERALIZE:
-          return Collections.singletonList(knownEntries.get(COMMON));
         case PHONE_NUM_DIGITS:
           return Collections.singletonList(knownEntries.get(COMMON));
 
@@ -247,7 +256,7 @@ public class LocalizationManager {
     } // else go through code below as generic Resources
 
     for (String country : countries) {
-      // logger.debug("Retriving country {}", country);
+      // logger.debug("Retrieving country {}", country);
 
       if (!knownEntries.containsKey(country)) {
         // logger.debug("Country is not known");
@@ -304,13 +313,12 @@ public class LocalizationManager {
    *         country, or the country doesn't exist at all
    */
   public Properties getLocaleProperties(String country) {
-    if (country == null) {
-      return new Properties();
+    Properties p = null;
+    if (country != null) {
+      p = this.countryLocalizationOptions.get(country.toLowerCase().trim());
     }
-
-    Properties p = this.countryLocalizationOptions.get(country.toLowerCase().trim());
     if (p == null) {
-      return new Properties();
+      p = new Properties();
     }
     return p;
   }
