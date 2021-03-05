@@ -122,7 +122,6 @@ options and their default values.
 
    **Example 1: Conditional masking of a FHIR data element based on another FHIR data element with regular path**
 
-
 ```
     {
       "rules": [
@@ -187,8 +186,8 @@ options and their default values.
    provider along with its optional configuration parameters. The condition
    properties that must be satisfied in order for this provider to be applied
    (for example, the PSEUDONYM masking provider in Example 1, along with the options
-   **pseudonym.generateViaOptions.minLength = 12** and
-   **pseudonym.generateViaOptions.maxLength = 12**) are applied to mask the
+   **generateViaOptionsMinLength = 12** and
+   **generateViaOptionsMaxLength = 12**) are applied to mask the
    version data element only when the model data element has the value
    **example_model**. When the first condition is met, the corresponding
    data masking provider is applied. Optionally, a default data masking
@@ -205,8 +204,7 @@ options and their default values.
 
 >-  **field**: This contains the path of the condition field in the FHIR Resource
     type. The path may be either a regular path (that is, a non-array element path) or an
-    array query format path. For a description, see:
-    https://test.cloud.ibm.com/docs/services/data-de-identification?topic=data-de-identification-introduction-to-the-data-de-identification-service-configuration
+    array query format path. For a description, see [Introduction to the Data De-Identification service configuration](masking-config-overview.md).
 
 >-   **value**: This contains the expected value of the condition field.
 
@@ -1067,7 +1065,7 @@ To activate encryption-based pseudonym generation:
    is the default algorithm used. To generate pseudonyms using the SHA-256
    algorithm, the following configuration option must be set:
 
->   pseudonym.generateViaHash.useSHA256 = true
+>   generateViaHashUseSHA256 = true
 
 Here are the options and their default values for the PSEUDONYM  provider:
 
@@ -1174,7 +1172,13 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
 #### SWIFT
 
->    Masks SWIFT codes with the option to preserve their country.
+>   Masks SWIFT codes with the option to preserve their country.
+
+>   By default, no actual SWIFT codes are provided with the service.  When replacing SWIFT codes using this provider,
+>   the service generates a random value in a format similar to the format followed by actual SWIFT codes.  Actual
+>   SWIFT codes can be added to the service, if desired.  If codes are loaded, the service randomly selects 
+>   replacement values from the loaded codes, as appropriate.  For more information about loading custom codes, 
+>   see [Localization](localization.md).
 
 | **Option name** | **Type** | **Description**      | **Default value** |
 |-----------------|----------|----------------------|-------------------|
@@ -1228,9 +1232,9 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
 > 2.  Zero out the postal code's three-digit prefix if the total population in the
     geographical unit, formulated by combining all postal codes with the same
-        three-digit prefix as the original postal code, contains less than a specified
+    three-digit prefix as the original postal code, contains less than a specified
     minimum population. Additionally, the postal code may be truncated to a
-    specified length if the minumum population in the formulated geographical
+    specified length if the minimum population in the formulated geographical
     unit is not reached.
 
 > 3.  Replace the postal code digits suffix either with random digits, or with digits that
