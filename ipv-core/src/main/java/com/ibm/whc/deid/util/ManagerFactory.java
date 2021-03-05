@@ -1,28 +1,25 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
 import java.util.concurrent.ConcurrentHashMap;
-
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 
 /**
- * Resource manager takes time to instantiate. To save time, we cache resource
- * managers.
+ * Resource manager takes time to instantiate. To save time, we cache resource managers.
  *
  */
 public class ManagerFactory {
 
   private static final ManagerFactory instance = new ManagerFactory();
 
-	ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
 
-	private ManagerFactory() {
-	}
+  private ManagerFactory() {}
 
   public static ManagerFactory getInstance() {
     return instance;
@@ -40,10 +37,9 @@ public class ManagerFactory {
 	 * @return
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
-
-		// The manager needs to be tenant specific based on type
-		String key = tenantId + "_" + resourceType;
-		Manager manager = managers.get(key);
+    // The manager needs to be tenant specific based on type and localization
+    String key = tenantId + "_" + resourceType + "_" + localizationProperty;
+    Manager manager = managers.get(key);
 
     if (manager != null) {
       // check prefix length for ZIPCodeManager. Only return the cached
@@ -62,10 +58,10 @@ public class ManagerFactory {
     if (resourceType instanceof Resource) {
       switch ((Resource) resourceType) {
         case ATC_CODES:
-				manager = new ATCManager(tenantId, localizationProperty);
+          manager = new ATCManager(tenantId, localizationProperty);
           break;
         case CITY:
-				manager = new CityManager(tenantId, localizationProperty);
+          manager = new CityManager(tenantId, localizationProperty);
           break;
         case POSTAL_CODES:
           manager = new PostalCodeManager(tenantId, localizationProperty);
@@ -79,9 +75,9 @@ public class ManagerFactory {
         case COUNTY:
           manager = new CountyManager(tenantId, localizationProperty);
           break;
-			case CREDIT_CARD_TYPE:
-				manager = new CreditCardTypeManager(tenantId, localizationProperty);
-				break;
+        case CREDIT_CARD_TYPE:
+          manager = new CreditCardTypeManager(tenantId, localizationProperty);
+          break;
         case GENDER:
           manager = new GenderManager(tenantId, localizationProperty);
           break;
@@ -94,9 +90,9 @@ public class ManagerFactory {
         case ICDV9:
           manager = new ICDv9Manager(tenantId, localizationProperty);
           break;
-			case TACDB:
-				manager = new IMEIManager(tenantId, localizationProperty);
-				break;
+        case TACDB:
+          manager = new IMEIManager(tenantId, localizationProperty);
+          break;
         case MARITAL_STATUS:
           manager = new MaritalStatusManager(tenantId, localizationProperty);
           break;
@@ -119,7 +115,7 @@ public class ManagerFactory {
           manager = new SWIFTCodeManager(tenantId, localizationProperty);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
-				manager = new VINManager(tenantId, localizationProperty);
+          manager = new VINManager(tenantId, localizationProperty);
           break;
         case ZIPCODE:
           int prefixLength = (int) options;
@@ -132,7 +128,7 @@ public class ManagerFactory {
       throw new IllegalArgumentException("Unsupported resource type:" + resourceType);
     }
 
-		managers.put(key, manager);
+    managers.put(key, manager);
 
     return manager;
   }
