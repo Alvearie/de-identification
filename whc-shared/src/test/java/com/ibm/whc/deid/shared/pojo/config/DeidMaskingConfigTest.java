@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,12 +8,6 @@ package com.ibm.whc.deid.shared.pojo.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
-import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
-import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
-import com.ibm.whc.deid.shared.util.ConfigGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,11 +15,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
+import com.ibm.whc.deid.shared.util.ConfigGenerator;
 
 public class DeidMaskingConfigTest {
 
@@ -35,10 +32,14 @@ public class DeidMaskingConfigTest {
   public void testRules() {
     DeidMaskingConfig config = new DeidMaskingConfig();
     assertNull(config.getRules());
-    assertNull(config.getRulesMap());
-    
+    assertNotNull(config.getRulesMap());
+    assertEquals(0, config.getRulesMap().size());
+    config.setRules(new ArrayList<Rule>());
+    assertEquals(0, config.getRulesMap().size());
+
     List<Rule> rules = new ArrayList<>();
-    rules.add(new Rule("rule1", Arrays.asList(new HashMaskingProviderConfig(), new RedactMaskingProviderConfig())));
+    rules.add(new Rule("rule1",
+        Arrays.asList(new HashMaskingProviderConfig(), new RedactMaskingProviderConfig())));
     config.setRules(rules);
     assertNotNull(config.getRules());
     assertEquals(1, config.getRules().size());
@@ -65,7 +66,7 @@ public class DeidMaskingConfigTest {
 
     config.setRules(null);
     assertNull(config.getRules());
-    assertNotNull(config.getRulesMap());   
+    assertNotNull(config.getRulesMap());
     assertEquals(0, config.getRulesMap().size());
   }
 
@@ -78,7 +79,7 @@ public class DeidMaskingConfigTest {
   @Test
   public void testSerializeDedeserialize() throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();
-    
+
     DeidMaskingConfig maskingConfig = (new ConfigGenerator()).getTestDeidConfig();
 
     String maskingConfigStr = objectMapper.writeValueAsString(maskingConfig);
