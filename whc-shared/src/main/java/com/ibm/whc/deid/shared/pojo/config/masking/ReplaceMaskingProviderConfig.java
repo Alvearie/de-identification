@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -59,8 +60,9 @@ public class ReplaceMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (maskOffset < 0) {
       throw new InvalidMaskingConfigurationException(
           "`maskOffset` must be greater than or equal to 0");
