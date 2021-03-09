@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,6 +123,7 @@ public class MaskingProviderBuilder implements Serializable {
       FHIRResourceMaskingConfiguration resourceConfiguration, DeidMaskingConfig deidMaskingConfig,
       String tenantId) {
 
+    Map<String,Rule> rulesMap = deidMaskingConfig.getRulesMap();
     ArrayList<FHIRResourceMaskingAction> maskingActions = new ArrayList<>();
 
     List<FHIRResourceField> fields = resourceConfiguration.getFields();
@@ -135,7 +137,7 @@ public class MaskingProviderBuilder implements Serializable {
 
       checkIfValidPath(pathToIdentifier);
 
-      Rule rule = deidMaskingConfig.getRulesMap().get(ruleName);
+      Rule rule = rulesMap.get(ruleName);
       if (rule == null) {
         // safety check - the configuration should already have been validated
         throw new RuntimeException("invalid masking configuration: no rule for " + ruleName);

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,7 +22,7 @@ public class ConditionalMaskRuleSetTest {
   public void testValidate() throws Exception {
     ConditionalMaskRuleSet ruleset = new ConditionalMaskRuleSet();
     try {
-      ruleset.validate(null);
+      ruleset.validate(null, null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`null.maskingProvider` is missing", e.getMessage());
@@ -32,28 +32,28 @@ public class ConditionalMaskRuleSetTest {
     address.setPostalCodeNearestK(-2);    
     ruleset.setMaskingProvider(address);
     try {
-      ruleset.validate("maskRuleSet");
+      ruleset.validate("maskRuleSet", null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`maskRuleSet.maskingProvider` is invalid: `postalCodeNearestK` must be greater than 0", e.getMessage()); 
     }
     
     address.setPostalCodeNearestK(12);
-    ruleset.validate(null);
+    ruleset.validate(null, null);
     
     Condition condition = new Condition();
     condition.setOperator(ConditionOperator.CONTAINED_IN);
     condition.setValue("value2");
     ruleset.setCondition(condition);
     try {
-      ruleset.validate("maskRuleSet");
+      ruleset.validate("maskRuleSet", null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`maskRuleSet.condition.field` is missing", e.getMessage()); 
     }
     
     condition.setField("field2");
-    ruleset.validate("maskRuleSet");
+    ruleset.validate("maskRuleSet", null);
   }
   
   @SuppressWarnings("unlikely-arg-type")
@@ -102,5 +102,4 @@ public class ConditionalMaskRuleSetTest {
     assertTrue(set.equals(other));
     assertEquals(set.hashCode(), other.hashCode());    
   }
-
 }

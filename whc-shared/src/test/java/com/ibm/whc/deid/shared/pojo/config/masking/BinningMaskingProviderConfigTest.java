@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -18,35 +18,35 @@ public class BinningMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
 
     config.setUnspecifiedValueHandling(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(2);
-    config.validate();
+    config.validate(null);
 
     config.setBinSize(0);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`binSize` must be greater than 0", e.getMessage()); 
     }
 
     config.setBinSize(1);
-    config.validate();
+    config.validate(null);
 
     config.setBinSize(1000000);
-    config.validate();
+    config.validate(null);
 
     config.setBinSize(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`binSize` must be greater than 0", e.getMessage());
