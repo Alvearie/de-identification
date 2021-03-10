@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -64,8 +65,9 @@ public class PhoneMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (invNdigitsReplaceWith == null) {
       throw new InvalidMaskingConfigurationException("`invNdigitsReplaceWith` must be not null");
     }

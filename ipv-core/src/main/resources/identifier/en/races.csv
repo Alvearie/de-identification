@@ -1,8 +1,20 @@
+# Values described in the United States Federal Register / Vol. 62, No. 210 / Thursday, October 30, 1997 - https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf
+American Indian or Alaska Native
+Asian
+Black or African American
+Hispanic or Latino
+Native Hawaiian or Other Pacific Islander
+White
+# Values considered in Research to Improve Data on Race and Ethnicity, United States Census Bureau - https://www.census.gov/about/our-research/race-ethnicity.html
+Middle Eastern or North African  
+# Separating values above to recognize partial references
+American Indian
+Alaska Native
+Black
+African American
 Hispanic
 Latino
-Asian
-Black
-White
-Caucasian
-American Indian
-African American
+Native Hawaiian
+Pacific Islander
+Middle Eastern
+North African

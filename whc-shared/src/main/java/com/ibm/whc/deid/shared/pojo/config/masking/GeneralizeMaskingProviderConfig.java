@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -57,7 +58,7 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
           if (!ruleSetNode.isArray()) {
             throw new InvalidMaskingConfigurationException(
                 "`maskRuleSet` value must be a valid json array");
-          }            
+          }
           int index = 0;
           for (JsonNode ruleNode : ruleSetNode) {
             String targetValue = null;
@@ -101,8 +102,8 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
                   "`" + JSON_SOURCE_VALUE_IN_TAG + "` must be a json array in value set " + index);
             }
             if (sourceValueNotInNode != null && !sourceValueNotInNode.isArray()) {
-              throw new InvalidMaskingConfigurationException(
-                  "`" + JSON_SOURCE_VALUE_NOTIN_TAG + "` must be a json array in value set " + index);
+              throw new InvalidMaskingConfigurationException("`" + JSON_SOURCE_VALUE_NOTIN_TAG
+                  + "` must be a json array in value set " + index);
             }
 
             GeneralizeRule rule = new GeneralizeRule(targetValue);
@@ -148,8 +149,9 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     parseMaskRuleSet(getMaskRuleSet());
   }
 
