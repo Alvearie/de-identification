@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,42 +15,41 @@ public class RedactMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     RedactMaskingProviderConfig config = new RedactMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
 
     config.setUnspecifiedValueHandling(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(0);
-    config.validate();
+    config.validate(null);
 
     config.setReplaceCharacter("");
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`replaceCharacter` must be a single character", e.getMessage());
     }
 
     config.setReplaceCharacter(" ");
-    config.validate();
+    config.validate(null);
     config.setReplaceCharacter(".");
-    config.validate();
+    config.validate(null);
     
     config.setReplaceCharacter("ab");
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`replaceCharacter` must be a single character", e.getMessage());
     }
 
     config.setReplaceCharacter(null);  // uses default
-    config.validate();
+    config.validate(null);
     assertEquals("X", config.getReplaceCharacter());
-  }
-  
+  }  
 }

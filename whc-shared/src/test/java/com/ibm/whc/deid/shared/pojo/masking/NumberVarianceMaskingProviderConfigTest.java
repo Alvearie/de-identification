@@ -17,33 +17,33 @@ public class NumberVarianceMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     NumberVarianceMaskingProviderConfig config = new NumberVarianceMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
     config.setUnspecifiedValueHandling(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(3);
-    config.validate();    
+    config.validate(null);    
     config.setAugmentLowerBound(-1.0);
-    config.validate();
+    config.validate(null);
     config.setAugmentMask(true);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`augmentLowerBound` must be greater than 0"));
     }
     config.setAugmentLowerBound(2.0);
-    config.validate();
+    config.validate(null);
     config.setAugmentMask(false);
     config.setAugmentUpperBound(-1.0);
-    config.validate();
+    config.validate(null);
     config.setAugmentMask(true);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`augmentUpperBound` must be greater than 0"));
@@ -51,28 +51,28 @@ public class NumberVarianceMaskingProviderConfigTest {
     config.setResultWithPrecision(true);
     config.setAugmentUpperBound(1.0);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains(
           "`augmentLowerBound` must be less than or equal to `augmentUpperBound` when `resultWithPrecision` is true"));
     }
     config.setAugmentMask(false);
-    config.validate();
+    config.validate(null);
     config.setAugmentMask(true);
     config.setAugmentUpperBound(2.0);
-    config.validate();
+    config.validate(null);
     config.setResultWithPrecision(false);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");      
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains(
           "`augmentLowerBound` must be less than `augmentUpperBound` when `resultWithPrecision` is false"));
     }
     config.setAugmentMask(false);
-    config.validate();
+    config.validate(null);
     config.setAugmentUpperBound(3.0);
-    config.validate();
+    config.validate(null);
   }
 }

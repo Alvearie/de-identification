@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -35,7 +36,8 @@ public class ConditionalMaskRuleSet {
     this.maskingProvider = maskingProvider;
   }
 
-  public void validate(String parentName) throws InvalidMaskingConfigurationException {
+  public void validate(String parentName, DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
     if (condition != null) {
       condition.validate(String.valueOf(parentName) + ".condition");
     }
@@ -44,7 +46,7 @@ public class ConditionalMaskRuleSet {
           "`" + String.valueOf(parentName) + ".maskingProvider` is missing");
     }
     try {
-      maskingProvider.validate();
+      maskingProvider.validate(maskingConfig);
     } catch (InvalidMaskingConfigurationException e) {
       throw new InvalidMaskingConfigurationException(
           "`" + String.valueOf(parentName) + ".maskingProvider` is invalid: " + e.getMessage(), e);

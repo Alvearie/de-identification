@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,31 +15,31 @@ public class IPAddressMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     IPAddressMaskingProviderConfig config = new IPAddressMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
 
     config.setUnspecifiedValueHandling(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(0);
-    config.validate();
+    config.validate(null);
 
     config.setSubnetsPreserve(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`subnetsPreserve` must be greater than or equal to 0", e.getMessage());
     }
     config.setSubnetsPreserve(0);
-    config.validate();
+    config.validate(null);
     config.setSubnetsPreserve(1);
-    config.validate();
+    config.validate(null);
     config.setSubnetsPreserve(1);
-    config.validate();
+    config.validate(null);
   }
 
 }

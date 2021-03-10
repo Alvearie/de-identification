@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -34,8 +35,9 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (maskRuleSet == null || maskRuleSet.isEmpty()) {
       throw new InvalidMaskingConfigurationException(
           "`maskRuleSet` must be specified with at least one entry");
@@ -47,7 +49,7 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
             "entry at offset " + Integer.toString(offset) + " in `maskRuleSet` is null");
       }
       try {
-        ruleSet.validate("maskRuleSet");
+        ruleSet.validate("maskRuleSet", maskingConfig);
       } catch (InvalidMaskingConfigurationException e) {
         throw new InvalidMaskingConfigurationException("entry at offset " + Integer.toString(offset)
             + " in `maskRuleSet` is not valid: " + e.getMessage());

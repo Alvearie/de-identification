@@ -307,7 +307,7 @@ public class MaskingConfigUtils {
           // being valid
 
           try {
-            provider.validate();
+            provider.validate(deidMaskingConfig);
           } catch (InvalidMaskingConfigurationException e) {
             InvalidMaskingConfigurationException e2 = new InvalidMaskingConfigurationException(
                 Messages.getMessage(LogCodes.WPH8012E, providerOffset == 0 ? "first" : "second",
