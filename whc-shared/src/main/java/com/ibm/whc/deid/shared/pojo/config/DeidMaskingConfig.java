@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,11 +27,6 @@ public class DeidMaskingConfig implements Serializable {
   public static final String JSON_CONFIGURATION_PROPERTY_NAME = "json";
   public static final String RULES_CONFIGURATION_PROPERTY_NAME = "rules";
   
-  // The rules are configured in the json as an array. So we use List<Rule> in
-  // the POJO.
-  // But for quicker access, we also store the rule as a map.
-  @JsonIgnore
-  private Map<String, Rule> rulesMap;
   @JsonProperty(RULES_CONFIGURATION_PROPERTY_NAME)
   private List<Rule> rules;
 
@@ -50,6 +44,15 @@ public class DeidMaskingConfig implements Serializable {
 
   @JsonIgnore
   public Map<String, Rule> getRulesMap() {
+    int capacity = rules == null ? 2 : Math.round(rules.size() / 0.75f) + 1;
+    Map<String, Rule> rulesMap = new HashMap<>(capacity);
+    if (rules != null) {
+      for (Rule rule : rules) {        
+        if (rule != null) {
+          rulesMap.put(rule.getName(), rule);
+        }
+      }
+    }
     return rulesMap;
   }
 
@@ -59,16 +62,6 @@ public class DeidMaskingConfig implements Serializable {
 
   public void setRules(List<Rule> rules) {
     this.rules = rules;
-    
-    // Add all the rules to a hashmap for quicker access
-    rulesMap = new HashMap<>(rules == null ? 10 : rules.size() * 2);
-    if (rules != null) {
-      for (Rule rule : rules) {        
-        if (rule != null) {
-          rulesMap.put(rule.getName(), rule);
-        }
-      }
-    }
   }
 
   public JsonConfig getJson() {

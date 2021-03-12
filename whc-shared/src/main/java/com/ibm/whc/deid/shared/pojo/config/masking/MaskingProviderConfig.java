@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
@@ -143,10 +144,15 @@ public abstract class MaskingProviderConfig implements Serializable {
    * Subclasses requiring additional validation should override this method, but should still ensure
    * the validation done here is performed if applicable.
    * 
+   * @param maskingConfig the complete masking configuration - for reference only, the
+   *        implementation is only responsible for validating the configuration that has already
+   *        been set on itself
+   * 
    * @throws InvalidMaskingConfigurationException if this masking provider configuration is
    *         currently invalid
    */
-  public void validate() throws InvalidMaskingConfigurationException {
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
     if (unspecifiedValueHandling < 0 || unspecifiedValueHandling > 3) {
       throw new InvalidMaskingConfigurationException("`unspecifiedValueHandling` must be [0..3]");
     }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,33 +17,33 @@ public class LatitudeLongitudeMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     LatitudeLongitudeMaskingProviderConfig config = new LatitudeLongitudeMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
     config.setUnspecifiedValueHandling(4);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(2);
-    config.validate();
+    config.validate(null);
     config.setOffsetMaximumRadius(10);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`offsetMaximumRadius` must be greater than 10"));
     }
     config.setOffsetMaximumRadius(11);
-    config.validate();
+    config.validate(null);
     config.setOffsetMinimumRadius(10);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`offsetMinimumRadius` must be greater than 10"));
     }
     config.setOffsetMinimumRadius(11);
-    config.validate();
+    config.validate(null);
   }
 }

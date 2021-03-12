@@ -7,13 +7,9 @@ package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.BinningMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConfigConstant;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
-import org.junit.Test;
 
 public class BinningMaskingProviderTest extends TestLogSetUp {
   @Test
@@ -162,18 +158,5 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("1:7", maskingProvider.mask("2"));
     assertEquals("7:13", maskingProvider.mask("7"));
     assertEquals("7:13", maskingProvider.mask("7.0001"));
-  }
-
-  @Test
-  public void testValidationBypassed() {
-    BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    config.setBinSize(-6);
-    try {
-      @SuppressWarnings("unused")
-      BinningMaskingProvider provider = new BinningMaskingProvider(config);
-      fail("expected exception");
-    } catch (IllegalArgumentException e) {
-      assertTrue(e.getCause() instanceof InvalidMaskingConfigurationException);
-    }
   }
 }

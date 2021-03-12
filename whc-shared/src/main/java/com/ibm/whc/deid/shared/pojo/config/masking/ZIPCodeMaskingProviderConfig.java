@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -123,19 +124,18 @@ public class ZIPCodeMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (maskCountryCode == null) {
-      throw new InvalidMaskingConfigurationException(
-          "`maskCountryCode` must not be null");
+      throw new InvalidMaskingConfigurationException("`maskCountryCode` must not be null");
     }
     if (maskReplaceWithNeighborNearestCount < 1) {
       throw new InvalidMaskingConfigurationException(
           "`maskReplaceWithNeighborNearestCount` must be greater than 0");
     }
     if (maskPrefixLength < 1) {
-      throw new InvalidMaskingConfigurationException(
-          "`maskPrefixLength` must be greater than 0");
+      throw new InvalidMaskingConfigurationException("`maskPrefixLength` must be greater than 0");
     }
     if (maskPrefixMinPopulation < 1) {
       throw new InvalidMaskingConfigurationException(

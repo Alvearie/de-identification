@@ -19,33 +19,33 @@ public class PhoneMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     PhoneMaskingProviderConfig config = new PhoneMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
 
     config.setUnspecifiedValueHandling(-1);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(0);
-    config.validate();
+    config.validate(null);
 
     config.setInvNdigitsReplaceWith(null);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(e.getMessage().contains("`invNdigitsReplaceWith` must be not null"));
     }
     config.setInvNdigitsReplaceWith("1");
-    config.validate();
+    config.validate(null);
 
     List<String> patterns = new ArrayList<>();
     config.setPhoneRegexPatterns(patterns);
     patterns.add("[0-9");
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertTrue(
@@ -55,10 +55,10 @@ public class PhoneMaskingProviderConfigTest {
     patterns.add("^(?<prefix>\\+|00)(?<countryCode>\\d{1,3})(?<separator>-| )(?<number>\\d+)");
     patterns.add(
         "^(?<prefix>\\+|00)(?<countryCode>\\d{1,3})(?<separator>-| )(?<number>\\(\\d+\\))\\d+");
-    config.validate();
+    config.validate(null);
     patterns.add(null);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("pattern at offset 2 in `phoneRegexPatterns` is empty", e.getMessage());
@@ -66,13 +66,13 @@ public class PhoneMaskingProviderConfigTest {
     patterns.remove(2);
     patterns.add("  \t");
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("pattern at offset 2 in `phoneRegexPatterns` is empty", e.getMessage());
     }
     patterns.remove(2);
     patterns.add("[0-9]*");
-    config.validate();
+    config.validate(null);
   }
 }
