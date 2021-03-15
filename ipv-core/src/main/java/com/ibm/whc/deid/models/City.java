@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,13 +7,14 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import java.util.List;
+import com.ibm.whc.deid.resources.Resource;
 
-public class City implements Location, LocalizedEntity, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2457375277958856977L;
-	private String name;
+public class City implements Location, LocalizedEntity, Serializable, Resource {
+
+  private static final long serialVersionUID = 2457375277958856977L;
+
+  private final String name;
+  private final String key;
   private String nameCountryCode;
   private String countryCode;
   private LatitudeLongitude latitudeLongitude;
@@ -36,6 +37,8 @@ public class City implements Location, LocalizedEntity, Serializable {
 
     this.latitudeLongitude =
         new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
+
+    this.key = name.toUpperCase();
   }
 
   /**
@@ -44,7 +47,7 @@ public class City implements Location, LocalizedEntity, Serializable {
    * @return the name country code
    */
   @Override
-public String getNameCountryCode() {
+  public String getNameCountryCode() {
     return this.nameCountryCode;
   }
 
@@ -67,7 +70,7 @@ public String getNameCountryCode() {
   }
 
   @Override
-public LatitudeLongitude getLocation() {
+  public LatitudeLongitude getLocation() {
     return this.latitudeLongitude;
   }
 
@@ -87,5 +90,10 @@ public LatitudeLongitude getLocation() {
    */
   public String getCountryCode() {
     return this.countryCode;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
   }
 }
