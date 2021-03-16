@@ -11,11 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import com.ibm.whc.deid.util.HashUtils;
+import com.ibm.whc.deid.util.Manager;
 
 /**
  * @param <K> the type parameter
  */
-public abstract class ResourceManager<K extends Resource> {
+public abstract class ResourceManager<K extends Resource> implements Manager {
 
   protected final SecureRandom random = new SecureRandom();
 
@@ -27,8 +28,7 @@ public abstract class ResourceManager<K extends Resource> {
     resourceMap.put(key, resource);
   }
 
-  //public
-  protected Set<String> getKeys() {
+  public Set<String> getKeys() {
     return resourceMap.keySet();
   }
 
@@ -37,13 +37,11 @@ public abstract class ResourceManager<K extends Resource> {
    *
    * @return the values
    */
-  //public  
-  protected List<K> getValues() {
+  public List<K> getValues() {
     return resourceList;
   }
 
-  //public  
-  protected String getPseudorandom(String identifier) {
+  public String getPseudorandom(String identifier) {
     return getPseudorandomElement(resourceList, identifier.toUpperCase());
   }
 
@@ -60,13 +58,12 @@ public abstract class ResourceManager<K extends Resource> {
     return element;
   }
 
-  //public  
-  protected String getRandomKey() {
+  @Override
+  public String getRandomKey() {
     return getRandomResource(resourceList).getKey();
   }
 
-  //public  
-  protected K getRandomValue() {
+  public K getRandomValue() {
     return getRandomResource(resourceList);
   }
 
@@ -82,8 +79,8 @@ public abstract class ResourceManager<K extends Resource> {
     return resource;
   }
 
-  //public  
-  protected boolean isValidKey(String key) {
+  @Override
+  public boolean isValidKey(String key) {
     return resourceMap.containsKey(key.toUpperCase());
   }
 
@@ -94,8 +91,7 @@ public abstract class ResourceManager<K extends Resource> {
    * 
    * @return the value or <i>null</i> if no value for the given key is found 
    */
-  //public  
-  protected K getValue(String key) {
+  public K getValue(String key) {
     return resourceMap.get(key.toUpperCase());
   }
 }

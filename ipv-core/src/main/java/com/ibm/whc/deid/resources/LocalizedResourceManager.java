@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.resources;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +41,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * @param countryCode
    * @return
    */
-  //public
-  protected Set<String> getKeys(String countryCode) {
+  public Set<String> getKeys(String countryCode) {
     Set<String> keys = null;
     Map<String,K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
     if (map == null) {
@@ -58,10 +56,9 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * Gets values.
    *
    * @param countryCode the country code
-   * @return the values
+   * @return the non-null, possibly-empty list of values for the given country or language code
    */
-  //public
-  protected List<K> getValues(String countryCode) {
+  public List<K> getValues(String countryCode) {
     List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
     if (list == null) {
       list = Collections.emptyList();
@@ -70,8 +67,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
   }
 
   @Override
-  //public
-  protected String getPseudorandom(String identifier) {
+  public String getPseudorandom(String identifier) {
     String element = null;
     String key = identifier.toUpperCase();
     K value = getValue(key);
@@ -94,8 +90,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * @param countryCode the country code
    * @return the random key
    */
-  //public
-  protected String getRandomKey(String countryCode) {
+  public String getRandomKey(String countryCode) {
     String key = null;
     List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
     if (list != null) {
@@ -104,8 +99,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
     return key;
   }
 
-  //public
-  protected K getRandomValue(String countryCode) {
+  public K getRandomValue(String countryCode) {
     K value = null;
     List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
     if (list != null) {
@@ -114,8 +108,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
     return value;
   }
   
-  //public
-  protected boolean isValidKey(String countryCode, String key) {
+  public boolean isValidKey(String countryCode, String key) {
     boolean valid = false;
     Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
     if (map != null) {
@@ -133,8 +126,7 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * @return the value or <i>null</i> if no value for the given key is found 
    * for the given country or language code
    */
-  //public
-  protected K getValue(String countryCode, String key) {
+  public K getValue(String countryCode, String key) {
     K value = null;
     Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
     if (map != null) {

@@ -64,7 +64,7 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
       return cityManager.getClosestCity(identifier, this.closestK);
     }
 
-    City city = cityManager.getKey(identifier);
+    City city = cityManager.getValue(identifier);
 
     if (city == null) {
       debugFaultyInput("city");

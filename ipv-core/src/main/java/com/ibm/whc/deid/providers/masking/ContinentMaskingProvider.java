@@ -93,7 +93,7 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
       return country.getContinent();
 
     } else if (relationshipOperand.getType() == ProviderType.CITY) {
-      City city = cityManager.getKey(operandMaskedValue);
+      City city = cityManager.getValue(operandMaskedValue);
       if (city != null) {
         String countryCode = city.getCountryCode();
         Country country = countryManager.lookupCountry(countryCode, city.getNameCountryCode());

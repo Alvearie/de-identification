@@ -38,8 +38,8 @@ public class ManagerFactory {
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
     // The manager needs to be tenant specific based on type and localization
-    String key = tenantId + "_" + resourceType + "_" + localizationProperty;
-    Manager manager = managers.get(key);
+    String cacheKey = tenantId + "_" + resourceType + "_" + localizationProperty;
+    Manager manager = managers.get(cacheKey);
 
     if (manager != null) {
       // check prefix length for ZIPCodeManager. Only return the cached
@@ -61,7 +61,7 @@ public class ManagerFactory {
           manager = new ATCManager(tenantId, localizationProperty);
           break;
         case CITY:
-          manager = new CityManager(tenantId, localizationProperty);
+          manager = CityManager.getCityManager(localizationProperty);
           break;
         case POSTAL_CODES:
           manager = new PostalCodeManager(tenantId, localizationProperty);
@@ -128,7 +128,7 @@ public class ManagerFactory {
       throw new IllegalArgumentException("Unsupported resource type:" + resourceType);
     }
 
-    managers.put(key, manager);
+    managers.put(cacheKey, manager);
 
     return manager;
   }
