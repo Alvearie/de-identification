@@ -1,11 +1,14 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
-public interface Manager {
+/**
+ * Interface supported by classes that manage groups of items, such as cities, genders, names, religions, etc. 
+ */
+public interface Manager extends ManagerFactorySupported {
 
   /**
    * Is valid key boolean.
