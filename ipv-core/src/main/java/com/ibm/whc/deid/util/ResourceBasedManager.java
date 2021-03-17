@@ -179,7 +179,7 @@ public abstract class ResourceBasedManager<K> extends AbstractManager<K> impleme
   }
 
   private String getPseudorandomElement(List<String> keys, String key) {
-    Long hash = Math.abs(HashUtils.longFromHash(key, "SHA-256"));
+    Long hash = Math.abs(HashUtils.longFromHash(key));
 
     if (keys == null || keys.size() == 0) {
       return hash.toString();

@@ -13,10 +13,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -107,7 +105,7 @@ public class CountryManager extends AbstractManager<Country>
   }
 
   private String getPseudorandomElement(List<Location> keys, String key) {
-    Long hash = Math.abs(HashUtils.longFromHash(key, "SHA-256"));
+    Long hash = Math.abs(HashUtils.longFromHash(key));
 
     if (keys == null || keys.size() == 0) {
       return hash.toString();

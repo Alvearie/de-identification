@@ -8,6 +8,7 @@ package com.ibm.whc.deid.providers.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import java.util.HashSet;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.util.HashUtils;
@@ -18,12 +19,12 @@ public class HashUtilsTest {
     HashUtils util = new HashUtils();
     assertNotNull(util);
 
-    Long l = HashUtils.longFromHash("000000", "SHA-256");
+    Long l = HashUtils.longFromHash("000000");
     assertNotNull(l);
 
     Long originalValue = l;
     for (int i = 0; i < 1000; i++) {
-      l = HashUtils.longFromHash("000000", "SHA-256");
+      l = HashUtils.longFromHash("000000");
       assertEquals(originalValue.longValue(), l.longValue());
     }
   }
@@ -34,9 +35,23 @@ public class HashUtilsTest {
     assertNotNull(l);
   }
 
-  @Test(expected = Error.class)
-  public void testInvalidAlgoritm() {
-    HashUtils.longFromHash(null, "INVALID-ALGORITHM");
+  /**
+   * Test 10,000 values and get their hash values. Use a HashSet to make sure they are all
+   * different.
+   */
+  @Test
+  public void testDifferentOriginalValue() {
+
+    HashSet<Long> set = new HashSet<>();
+
+    for (int i = 0; i < 10000; i++) {
+      String str = String.format("%05d", i);
+      long hash = HashUtils.longFromHash(str);
+
+      set.add(hash);
+    }
+
+    assertEquals(10000, set.size());
   }
 
   @Test
@@ -47,7 +62,7 @@ public class HashUtilsTest {
     long start = System.currentTimeMillis();
 
     for (int i = 0; i < N; i++) {
-      HashUtils.longFromHash("000000", "SHA-256");
+      HashUtils.longFromHash("000000");
     }
 
     long diff = System.currentTimeMillis() - start;
