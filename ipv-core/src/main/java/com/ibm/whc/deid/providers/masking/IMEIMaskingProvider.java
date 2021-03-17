@@ -23,7 +23,7 @@ public class IMEIMaskingProvider extends AbstractMaskingProvider {
    *
    * @param config an IMEIMaskingProviderConfig instance
    * @param tenantId TODO
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    */
   public IMEIMaskingProvider(IMEIMaskingProviderConfig config, String tenantId,
       String localizationProperty) {

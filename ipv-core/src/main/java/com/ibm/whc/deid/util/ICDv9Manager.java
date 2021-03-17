@@ -42,7 +42,7 @@ public class ICDv9Manager implements Manager, Serializable {
 	 * Instantiates a new Ic dv 9 manager.
 	 *
 	 * @param tenantId
-	 * @param localizationProperty TODO
+	 * @paramlocalizationProperty location of the localization property file
 	 */
 	public ICDv9Manager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;

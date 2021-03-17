@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.util;
 
 import java.util.concurrent.ConcurrentHashMap;
-
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 
@@ -26,19 +25,18 @@ public class ManagerFactory {
     return instance;
   }
 
-  /**
-   * Get a resource based manager. First check to see if there is a cached version, otherwise create
-   * a new one
-   *
-   * @param tenantId
-   * @param resourceType
-   * @param options optional options a manager might have. eg zipcode manager's prefixLength
-   * @param localizationProperty TODO
-   * @return
-   */
-  public Manager getManager(String tenantId, Resources resourceType, Object options,
-      String localizationProperty) {
-
+	/**
+	 * Get a resource based manager. First check to see if there is a cached
+	 * version, otherwise create a new one
+	 *
+	 * @param tenantId
+	 * @param resourceType
+	 * @param options      optional options a manager might have. eg zipcode
+	 *                     manager's prefixLength
+	 * @paramlocalizationProperty location of the localization property file
+	 * @return
+	 */
+  public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
     // The manager needs to be tenant specific based on type and localization
     String key = tenantId + "_" + resourceType + "_" + localizationProperty;
     Manager manager = managers.get(key);

@@ -59,7 +59,7 @@ public class StreetNameManager extends ResourceBasedManager<String> {
    * Instantiates a new Street name manager.
    *
    * @param tenantId tenant id
- * @param localizationProperty TODO
+ * @paramlocalizationProperty location of the localization property file
    */
   public StreetNameManager(String tenantId, String localizationProperty) {
     super(tenantId, Resource.STREET_NAMES, localizationProperty);

@@ -34,7 +34,7 @@ public class CreditCardManager {
 	private final String localizationProperty;
 
   /** Instantiates a new Credit card manager. 
- * @param localizationProperty TODO*/
+ * @paramlocalizationProperty location of the localization property file*/
   public CreditCardManager(String localizationProperty) {
     this.random = new SecureRandom();
 		this.localizationProperty = localizationProperty;

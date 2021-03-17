@@ -27,7 +27,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new Marital status masking provider.
    * 
    * @param configuration the configuration
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,

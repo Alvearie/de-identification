@@ -45,7 +45,7 @@ public class ICDv10Manager implements Manager, Serializable {
    * Instantiates a new Ic dv 10 manager.
    *
    * @param tenantId
- * @param localizationProperty TODO
+ * @paramlocalizationProperty location of the localization property file
    */
   public ICDv10Manager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;

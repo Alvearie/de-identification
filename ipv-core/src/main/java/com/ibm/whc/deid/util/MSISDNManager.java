@@ -48,7 +48,7 @@ public class MSISDNManager implements Serializable {
    * Instantiates a new Msisdn manager.
    *
    * @param tenantId
- * @param localizationProperty TODO
+ * @paramlocalizationProperty location of the localization property file
    */
   public MSISDNManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;

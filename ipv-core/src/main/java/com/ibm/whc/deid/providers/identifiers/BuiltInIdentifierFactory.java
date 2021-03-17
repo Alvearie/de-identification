@@ -19,7 +19,7 @@ public class BuiltInIdentifierFactory {
 	 * Get an Identifier based on the input type
 	 *
 	 * @param type
-	 * @param localizationProperty TODO
+	 * @paramlocalizationProperty location of the localization property file
 	 * @return
 	 */
 	public Identifier getIdentifier(EntityTypes type, String tenantId, String localizationProperty) {
