@@ -27,7 +27,7 @@ public class ManagerFactory {
 
 	/**
 	 * Get a resource based manager. First check to see if there is a cached
-	 * version, otherwise create a new one
+	 * version, otherwise create a new one.
 	 *
 	 * @param tenantId
 	 * @param resourceType
