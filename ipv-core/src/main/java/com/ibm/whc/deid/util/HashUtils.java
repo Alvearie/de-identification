@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class HashUtils {
 
-  public static Long longFromHash(String value) {
+  public static long longFromHash(String value) {
     if (value == null) {
       value = "";
     }
