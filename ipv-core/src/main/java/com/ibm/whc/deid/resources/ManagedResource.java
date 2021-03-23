@@ -9,7 +9,7 @@ package com.ibm.whc.deid.resources;
  * An item of a particular category, such as a city, gender, religion, name, etc. that can be
  * uniquely identified within its category by a key.
  */
-public interface Resource {
+public interface ManagedResource {
 
   /**
    * 

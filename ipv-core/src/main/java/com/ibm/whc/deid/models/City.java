@@ -7,9 +7,9 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import java.util.List;
-import com.ibm.whc.deid.resources.Resource;
+import com.ibm.whc.deid.resources.ManagedResource;
 
-public class City implements Location, LocalizedEntity, Serializable, Resource {
+public class City implements Location, LocalizedEntity, Serializable, ManagedResource {
 
   private static final long serialVersionUID = 2457375277958856977L;
 

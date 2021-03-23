@@ -14,36 +14,57 @@ import java.util.Set;
 import com.ibm.whc.deid.models.LocalizedEntity;
 
 /**
- * @param <K> the type parameter
+ * Extension of the ResourceManager class that further manages resources by locale.
  */
-public abstract class LocalizedResourceManager<K extends Resource> extends ResourceManager<K> { 
+public abstract class LocalizedResourceManager<K extends ManagedResource> extends ResourceManager<K> {
 
+  /**
+   * A map of a locale identifier (key) to the list (value) of resources related to that locale
+   */
   private final HashMap<String, ArrayList<K>> localizedResourceListMap = new HashMap<>();
-  private final HashMap<String, HashMap<String,K>> localizedResourceMapMap = new HashMap<>();
-  
-  protected void add(String localeCode, String key, K resource) {
+
+  /**
+   * A map of a locale identifier (key) to a map (value) of resources related to that locale mapped
+   * by the resource key
+   */
+  private final HashMap<String, HashMap<String, K>> localizedResourceMapMap = new HashMap<>();
+
+  /**
+   * Adds a new resource associated with the given locale to the manager instance.
+   * 
+   * <p>
+   * This method should only be called during instance construction.
+   * 
+   * @param localeCode the locale
+   * @param resource the resource being added
+   */
+  protected void add(String localeCode, K resource) {
     ArrayList<K> list = localizedResourceListMap.get(localeCode);
     if (list == null) {
       list = new ArrayList<>();
       localizedResourceListMap.put(localeCode, list);
     }
     list.add(resource);
-    HashMap<String,K> map = localizedResourceMapMap.get(localeCode); 
+    HashMap<String, K> map = localizedResourceMapMap.get(localeCode);
     if (map == null) {
       map = new HashMap<>();
       localizedResourceMapMap.put(localeCode, map);
     }
-    map.put(key, resource);
+    map.put(resource.getKey(), resource);
   }
 
   /**
    * Retrieves all the keys for the given country or language code.
+   * 
    * @param countryCode
    * @return
    */
   public Set<String> getKeys(String countryCode) {
     Set<String> keys = null;
-    Map<String,K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
+    Map<String, K> map = null;
+    if (countryCode != null) {
+      map = localizedResourceMapMap.get(countryCode.toLowerCase());
+    }
     if (map == null) {
       keys = Collections.emptySet();
     } else {
@@ -59,7 +80,10 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * @return the non-null, possibly-empty list of values for the given country or language code
    */
   public List<K> getValues(String countryCode) {
-    List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
+    List<K> list = null;
+    if (countryCode != null) {
+      list = localizedResourceListMap.get(countryCode.toLowerCase());
+    }
     if (list == null) {
       list = Collections.emptyList();
     }
@@ -69,11 +93,14 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
   @Override
   public String getPseudorandom(String identifier) {
     String element = null;
-    String key = identifier.toUpperCase();
+    String key = identifier == null ? "" : identifier.toUpperCase();
     K value = getValue(key);
     if (value instanceof LocalizedEntity) {
       String countryCode = ((LocalizedEntity) value).getNameCountryCode();
-      List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
+      List<K> list = null;
+      if (countryCode != null) {
+        list = localizedResourceListMap.get(countryCode.toLowerCase());
+      }
       if (list != null) {
         element = getPseudorandomElement(list, key);
       }
@@ -92,27 +119,33 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    */
   public String getRandomKey(String countryCode) {
     String key = null;
-    List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
-    if (list != null) {
-      key = getRandomResource(list).getKey();
+    if (countryCode != null) {
+      List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
+      if (list != null) {
+        key = getRandomResource(list).getKey();
+      }
     }
     return key;
   }
 
   public K getRandomValue(String countryCode) {
     K value = null;
-    List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
-    if (list != null) {
-      value = getRandomResource(list);
+    if (countryCode != null) {
+      List<K> list = localizedResourceListMap.get(countryCode.toLowerCase());
+      if (list != null) {
+        value = getRandomResource(list);
+      }
     }
     return value;
   }
-  
+
   public boolean isValidKey(String countryCode, String key) {
     boolean valid = false;
-    Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
-    if (map != null) {
-     valid = map.containsKey(key.toUpperCase());
+    if (countryCode != null && key != null) {
+      Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
+      if (map != null) {
+        valid = map.containsKey(key.toUpperCase());
+      }
     }
     return valid;
   }
@@ -123,14 +156,16 @@ public abstract class LocalizedResourceManager<K extends Resource> extends Resou
    * @param countryCode a country or language code
    * @param key the key
    * 
-   * @return the value or <i>null</i> if no value for the given key is found 
-   * for the given country or language code
+   * @return the value or <i>null</i> if no value for the given key is found for the given country
+   *         or language code
    */
   public K getValue(String countryCode, String key) {
     K value = null;
-    Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
-    if (map != null) {
-      value = map.get(key.toUpperCase());
+    if (countryCode != null && key != null) {
+      Map<String, K> map = localizedResourceMapMap.get(countryCode.toLowerCase());
+      if (map != null) {
+        value = map.get(key.toUpperCase());
+      }
     }
     return value;
   }

@@ -8,6 +8,7 @@ package com.ibm.whc.deid.providers.identifiers;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.masking.SWIFTCodeMaskingProvider;
@@ -60,8 +61,8 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
       // commonly, no codes are loaded in the manager
       // if any codes are loaded, use the loaded codes to recognize input
       // if not, use the regular expression
-      List<String> keys = ((SWIFTCodeManager) getManager()).getKeys();
-      if (keys != null && !keys.isEmpty()) {
+      List<SWIFTCode> values = ((SWIFTCodeManager) getManager()).getValues();
+      if (values != null && !values.isEmpty()) {
         valid = super.isOfThisType(identifier);
       } else {
         valid =

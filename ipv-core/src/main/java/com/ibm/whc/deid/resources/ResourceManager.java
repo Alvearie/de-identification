@@ -14,18 +14,34 @@ import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.Manager;
 
 /**
- * @param <K> the type parameter
+ * A class that provides access to individual items of a particular type recognized by the
+ * De-Identification service, such as cities, names, genders, religions, etc.
  */
-public abstract class ResourceManager<K extends Resource> implements Manager {
+public abstract class ResourceManager<K extends ManagedResource> implements Manager {
 
   protected final SecureRandom random = new SecureRandom();
 
+  /**
+   * The known items stored in a list
+   */
   private final ArrayList<K> resourceList = new ArrayList<>();
-  private final HashMap<String,K> resourceMap = new HashMap<>();
-  
-  protected void add(String key, K resource) {
+
+  /**
+   * The known items/resources stored as a map from the resource key to the resource/item itself
+   */
+  private final HashMap<String, K> resourceMap = new HashMap<>();
+
+  /**
+   * Adds a new resource to the manager instance.
+   * 
+   * <p>
+   * This method should only be called during instance construction.
+   * 
+   * @param resource the resource being added
+   */
+  protected void add(K resource) {
     resourceList.add(resource);
-    resourceMap.put(key, resource);
+    resourceMap.put(resource.getKey(), resource);
   }
 
   public Set<String> getKeys() {
@@ -42,7 +58,7 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
   }
 
   public String getPseudorandom(String identifier) {
-    return getPseudorandomElement(resourceList, identifier.toUpperCase());
+    return getPseudorandomElement(resourceList, identifier == null ? "" : identifier.toUpperCase());
   }
 
   protected String getPseudorandomElement(List<K> resources, String key) {
@@ -52,7 +68,7 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
     if (count == 0) {
       element = Long.toString(hash);
     } else {
-      int position = (int) (hash % count); 
+      int position = (int) (hash % count);
       element = resources.get(position).getKey();
     }
     return element;
@@ -60,7 +76,12 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
 
   @Override
   public String getRandomKey() {
-    return getRandomResource(resourceList).getKey();
+    String key = null;
+    ManagedResource resource = getRandomResource(resourceList);
+    if (resource != null) {
+      key = resource.getKey();
+    }
+    return key;
   }
 
   public K getRandomValue() {
@@ -72,7 +93,7 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
     int count = resources.size();
     if (count == 1) {
       resource = resources.get(0);
-    } else if (count > 1) {     
+    } else if (count > 1) {
       int index = random.nextInt(count);
       resource = resources.get(index);
     }
@@ -81,7 +102,7 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
 
   @Override
   public boolean isValidKey(String key) {
-    return resourceMap.containsKey(key.toUpperCase());
+    return key == null ? false : resourceMap.containsKey(key.toUpperCase());
   }
 
   /**
@@ -89,9 +110,13 @@ public abstract class ResourceManager<K extends Resource> implements Manager {
    *
    * @param key the key
    * 
-   * @return the value or <i>null</i> if no value for the given key is found 
+   * @return the value or <i>null</i> if no value for the given key is found
    */
   public K getValue(String key) {
-    return resourceMap.get(key.toUpperCase());
+    K value = null;
+    if (key != null) {
+      value = resourceMap.get(key.toUpperCase());
+    }
+    return value;
   }
 }
