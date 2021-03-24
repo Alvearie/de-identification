@@ -10,13 +10,15 @@ import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 
 /**
- * Resource manager takes time to instantiate. To save time, we cache resource managers.
- *
+ * Class that provides instances of resource managers of all supported types.
  */
 public class ManagerFactory {
 
   private static final ManagerFactory instance = new ManagerFactory();
 
+  /** 
+   * Resource manager takes time to instantiate. To save time, we cache resource managers.
+   */
   private final ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
 
   private ManagerFactory() {}
@@ -27,7 +29,7 @@ public class ManagerFactory {
 
 	/**
 	 * Get a resource based manager. First check to see if there is a cached
-	 * version, otherwise create a new one
+	 * version, otherwise create a new one.
 	 *
 	 * @param tenantId
 	 * @param resourceType
@@ -38,8 +40,8 @@ public class ManagerFactory {
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
     // The manager needs to be tenant specific based on type and localization
-    String key = tenantId + "_" + resourceType + "_" + localizationProperty;
-    Manager manager = managers.get(key);
+    String cacheKey = tenantId + "_" + resourceType + "_" + localizationProperty;
+    Manager manager = managers.get(cacheKey);
 
     if (manager != null) {
       // check prefix length for ZIPCodeManager. Only return the cached
@@ -61,7 +63,7 @@ public class ManagerFactory {
           manager = new ATCManager(tenantId, localizationProperty);
           break;
         case CITY:
-          manager = new CityManager(tenantId, localizationProperty);
+          manager = CityManager.buildCityManager(localizationProperty);
           break;
         case POSTAL_CODES:
           manager = new PostalCodeManager(tenantId, localizationProperty);
@@ -112,7 +114,7 @@ public class ManagerFactory {
           manager = new StatesUSManager(tenantId, localizationProperty);
           break;
         case SWIFT:
-          manager = new SWIFTCodeManager(tenantId, localizationProperty);
+          manager = SWIFTCodeManager.buildSWIFTCodeManager(localizationProperty, tenantId);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
           manager = new VINManager(tenantId, localizationProperty);
@@ -128,9 +130,8 @@ public class ManagerFactory {
       throw new IllegalArgumentException("Unsupported resource type:" + resourceType);
     }
 
-    managers.put(key, manager);
+    managers.put(cacheKey, manager);
 
     return manager;
   }
-
 }

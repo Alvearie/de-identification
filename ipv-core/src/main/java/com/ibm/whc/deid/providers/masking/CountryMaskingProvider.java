@@ -70,7 +70,7 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
       String cityFieldName = fieldRelationship.getOperands()[0].getName();
       String maskedCity = values.get(cityFieldName).getMasked();
 
-      City city = cityManager.getKey(maskedCity);
+      City city = cityManager.getValue(maskedCity);
       if (city == null) {
         return mask(identifier);
       }
