@@ -212,7 +212,7 @@ public class LocalizedResourceManagerTest {
     assertFalse(ps.trim().isEmpty());
     ps = mgr.getPseudorandom("frthird");
     assertNotNull(ps);
-    assertTrue(FR_REPLACEMENTS_KEYS.contains(ps));
+    assertTrue(EN_REPLACEMENTS_KEYS.contains(ps) || FR_REPLACEMENTS_KEYS.contains(ps));
 
     String key = mgr.getRandomKey();
     assertNotNull(key);
