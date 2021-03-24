@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,19 +16,11 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
-import com.ibm.whc.deid.models.ValueClass;
-import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
-import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.schema.RelationshipOperand;
-import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 
 public class DateTimeMaskingProviderTest extends TestLogSetUp {
@@ -202,51 +194,6 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
           (double) diff / N));
       // Assert test always should finish in less than 30 seconds
       assertTrue(diff < 30000);
-    }
-  }
-
-  @Test
-  public void testCompoundMasking() throws Exception {
-    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
-
-    // different values
-    String originalDateTime = "04-03-2014 00:00:00";
-    Date originalDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(originalDateTime);
-
-    String originalOperandTime = "04-03-2015 00:00:00";
-    Date originalOperandDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(originalOperandTime);
-
-    long originalDiff = originalOperandDate.getTime() - originalDate.getTime();
-
-    String maskedOperandTime = "08-12-2015 00:00:00";
-    Date maskedOperandDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(maskedOperandTime);
-
-    FieldRelationship fieldRelationship =
-        new FieldRelationship(ValueClass.DATE, RelationshipType.LESS, "field0",
-            new RelationshipOperand[] {new RelationshipOperand("field1", ProviderType.DATETIME)});
-
-    Map<String, OriginalMaskedValuePair> maskedValues = new HashMap<>();
-    maskedValues.put("field1", new OriginalMaskedValuePair(originalOperandTime, maskedOperandTime));
-
-    for (int i = 0; i < 100; i++) {
-      String maskedDateTime =
-          maskingProvider.mask(originalDateTime, "field0", fieldRelationship, maskedValues);
-      Date maskedDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(maskedDateTime);
-      assertFalse(originalDateTime.equals(maskedDateTime));
-      assertTrue(maskedDate.before(maskedOperandDate));
-
-      long maskedDiff = maskedOperandDate.getTime() - maskedDate.getTime();
-      assertTrue(maskedDiff == originalDiff);
-    }
-
-    fieldRelationship = new FieldRelationship(ValueClass.DATE, RelationshipType.EQUALS, "field0",
-        new RelationshipOperand[] {new RelationshipOperand("field1", ProviderType.DATETIME)});
-
-    for (int i = 0; i < 100; i++) {
-      String maskedDateTime =
-          maskingProvider.mask(originalDateTime, "field0", fieldRelationship, maskedValues);
-      assertTrue(maskedOperandTime.equals(maskedDateTime));
     }
   }
 

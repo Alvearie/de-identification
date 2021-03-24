@@ -7,13 +7,10 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
-import com.ibm.whc.deid.schema.FieldRelationship;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
@@ -46,12 +43,6 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
 
   @Override
   public String mask(String identifier, String fieldName) {
-    return mask(identifier);
-  }
-
-  @Override
-  public String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,
-      Map<String, OriginalMaskedValuePair> maskedValues) {
     return mask(identifier);
   }
 
