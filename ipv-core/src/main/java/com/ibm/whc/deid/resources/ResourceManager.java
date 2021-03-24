@@ -63,7 +63,7 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
 
   protected String getPseudorandomElement(List<K> resources, String key) {
     String element;
-    long hash = Math.abs(HashUtils.longFromHash(key).longValue());
+    long hash = Math.abs(HashUtils.longFromHash(key));
     int count = resources.size();
     if (count == 0) {
       element = Long.toString(hash);
