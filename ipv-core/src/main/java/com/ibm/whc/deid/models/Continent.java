@@ -1,33 +1,20 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.ibm.whc.deid.resources.ManagedResource;
 
-public class Continent implements Location, LocalizedEntity, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1487382551058089794L;
-	private final String name;
+public class Continent implements Location, LocalizedEntity, Serializable, ManagedResource {
+
+  private static final long serialVersionUID = -1487382551058089794L;
+
+  private final String name;
   private final String nameCountryCode;
   private final LatitudeLongitude latitudeLongitude;
-  private ArrayList<Continent> neighbors;
-
-  /**
-   * Gets name country code.
-   *
-   * @return the name country code
-   */
-  @Override
-public String getNameCountryCode() {
-    return nameCountryCode;
-  }
 
   /**
    * Instantiates a new Continent.
@@ -45,12 +32,13 @@ public String getNameCountryCode() {
   }
 
   /**
-   * Gets neighbors.
+   * Gets name country code.
    *
-   * @return the neighbors
+   * @return the name country code
    */
-  public List<Continent> getNeighbors() {
-    return neighbors;
+  @Override
+  public String getNameCountryCode() {
+    return nameCountryCode;
   }
 
   /**
@@ -62,17 +50,13 @@ public String getNameCountryCode() {
     return name;
   }
 
-  /**
-   * Sets neighbors.
-   *
-   * @param neighbors the neighbors
-   */
-  public void setNeighbors(ArrayList<Continent> neighbors) {
-    this.neighbors = neighbors;
-  }
-
   @Override
   public LatitudeLongitude getLocation() {
     return this.latitudeLongitude;
+  }
+
+  @Override
+  public String getKey() {
+    return name.toUpperCase();
   }
 }

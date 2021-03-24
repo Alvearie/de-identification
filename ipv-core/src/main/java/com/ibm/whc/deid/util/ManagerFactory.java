@@ -69,7 +69,7 @@ public class ManagerFactory {
           manager = new PostalCodeManager(tenantId, localizationProperty);
           break;
         case CONTINENT:
-          manager = new ContinentManager(tenantId, localizationProperty);
+          manager = ContinentManager.buildContinentManager(localizationProperty);
           break;
         case COUNTRY:
           manager = new CountryManager(tenantId, localizationProperty);
