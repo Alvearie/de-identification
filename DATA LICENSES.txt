@@ -1,0 +1,60 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NON-IBM-LICENSE FOR De-id data files
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+TABLE OF CONTENTS
+
+THE REMAINDER OF THIS NON-IBM-LICENSE FILE CONSISTS OF THE FOLLOWING 
+SECTIONS:
+
+ODBL
+CDLA
+CC-BY-SA-3.0
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+OPEN DATA COMMONS OPEN DATABASE LICENSE (ODBL)
+
+The Program includes some or all of the following works licensed under 
+Open Data Commons Open Database License (ODbL).
+
+The url to the license is https://opendatacommons.org/licenses/odbl/
+
+ipv-core/src/main/resources/identifier/us/hospital_names.csv
+ipv-core/src/main/resources/identifier/us/street_names.csv
+(https://www.openstreetmap.org/ ")
+
+
+END OF OPEN DATA COMMONS OPEN DATABASE LICENSE (ODBL)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+COMMUNITY DATA LICENSE AGREEMENT
+
+The Program includes some or all of the following works licensed under 
+Community Data License Agreement.
+The url to the license is https://cdla.dev/
+
+ipv-core/src/main/resources/identifier/common/phone_number_digits.csv
+
+
+END OF COMMUNITY DATA LICENSE AGREEMENT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+CREATIVE COMMONS ATTRIBUTION SHARE ALIKE 3.0 GENERIC
+
+The Program includes some or all of the following works licensed under
+the Creative Commons.
+The url to the license is https://creativecommons.org/licenses/by-sa/3.0/legalcode
+
+ipv-core/src/main/resources/identifier/common/tacdb.txt
+(http://tacdb.osmocom.org/)
+
+
+END OF CREATIVE COMMONS ATTRIBUTION SHARE ALIKE 3.0 GENERIC NON-IBM-LICENSE
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+END OF NON-IBM-LICENSE FILE
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
