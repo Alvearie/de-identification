@@ -16,7 +16,8 @@ import com.ibm.whc.deid.models.LocalizedEntity;
 /**
  * Extension of the ResourceManager class that further manages resources by locale.
  */
-public abstract class LocalizedResourceManager<K extends ManagedResource> extends ResourceManager<K> {
+public abstract class LocalizedResourceManager<K extends ManagedResource>
+    extends ResourceManager<K> {
 
   /**
    * A map of a locale identifier (key) to the list (value) of resources related to that locale
@@ -50,14 +51,15 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
       map = new HashMap<>();
       localizedResourceMapMap.put(localeCode, map);
     }
-    map.put(resource.getKey(), resource);
+    map.put(resource.getKey().toUpperCase(), resource);
   }
 
   /**
-   * Retrieves all the keys for the given country or language code.
+   * Retrieves the keys for all the resources associated with the given country or language code.
    * 
-   * @param countryCode
-   * @return
+   * @param countryCode the localization code
+   * 
+   * @return a non-null, possibly empty set of the keys for each of the resources
    */
   public Set<String> getKeys(String countryCode) {
     Set<String> keys = null;
@@ -74,10 +76,11 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
   }
 
   /**
-   * Gets values.
+   * Retrieves the all resources associated with the given country or language code.
    *
-   * @param countryCode the country code
-   * @return the non-null, possibly-empty list of values for the given country or language code
+   * @param countryCode the localization code
+   * 
+   * @return the non-null, possibly-empty list of resources
    */
   public List<K> getValues(String countryCode) {
     List<K> list = null;
@@ -90,6 +93,23 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
     return list;
   }
 
+  /**
+   * Returns a value based on a mathematical computation using the given value. As long as the
+   * number of loaded resources remains constant, the same replacement value is returned each time
+   * the same input (ignoring case) is presented. If resources have been loaded, the returned value
+   * is the key of one of the loaded resources. if not, the returned value is generated from the
+   * computation performed on the input.
+   * 
+   * <p>
+   * If the input value matches, ignoring case, the key of a loaded resource and if that resource is
+   * associated with a country or locale, the returned value will be the key of one of the resources
+   * associated with that same country or locale. Otherwise, a value is returned as described for
+   * the superclass.
+   * 
+   * @param identifier input value for which a pseudorandom replacement is required
+   * 
+   * @return the replacement value, generated as described
+   */
   @Override
   public String getPseudorandom(String identifier) {
     String element = null;
@@ -112,10 +132,12 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
   }
 
   /**
-   * Gets random key.
-   *
-   * @param countryCode the country code
-   * @return the random key
+   * Retrieves the key from one of the loaded resources associated with the given localization code.
+   * 
+   * @param countryCode the localization code
+   * 
+   * @return the key from one of the loaded resources or <i>null</i> if no resources have been
+   *         loaded for the given localization code.
    */
   public String getRandomKey(String countryCode) {
     String key = null;
@@ -128,6 +150,14 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
     return key;
   }
 
+  /**
+   * Retrieves one of the loaded resources associated with the given localization code.
+   * 
+   * @param countryCode the localization code
+   * 
+   * @return one of the loaded resources or <i>null</i> if no resources have been loaded for the
+   *         given localization code.
+   */
   public K getRandomValue(String countryCode) {
     K value = null;
     if (countryCode != null) {
@@ -139,6 +169,16 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
     return value;
   }
 
+  /**
+   * Determines whether the given input is the key (ignoring case) of one of the loaded resources
+   * associated with the given localization code.
+   * 
+   * @param key the value to test
+   * @param countryCode the localization code
+   * 
+   * @return <i>True</i> if the input equals the key, ignoring case, of one of the loaded resources
+   *         associated with the given localization code and <i>False</i> if not
+   */
   public boolean isValidKey(String countryCode, String key) {
     boolean valid = false;
     if (countryCode != null && key != null) {
@@ -151,13 +191,13 @@ public abstract class LocalizedResourceManager<K extends ManagedResource> extend
   }
 
   /**
-   * Returns the value for the given key for the given country code.
+   * Returns the value for the given key for the given localization code.
    *
-   * @param countryCode a country or language code
+   * @param countryCode the localization code
    * @param key the key
    * 
-   * @return the value or <i>null</i> if no value for the given key is found for the given country
-   *         or language code
+   * @return the associated that has the given key or <i>null</i> if no value has been loaded that
+   *         is associated with the given localization code and has the given key
    */
   public K getValue(String countryCode, String key) {
     K value = null;

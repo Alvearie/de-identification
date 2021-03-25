@@ -41,22 +41,38 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
    */
   protected void add(K resource) {
     resourceList.add(resource);
-    resourceMap.put(resource.getKey(), resource);
+    resourceMap.put(resource.getKey().toUpperCase(), resource);
   }
 
+  /**
+   * Retrieve the keys for all the loaded resources.
+   * 
+   * @return a non-null, possibly empty set of the keys for each of the resources
+   */
   public Set<String> getKeys() {
     return resourceMap.keySet();
   }
 
   /**
-   * Gets values.
+   * Retrieve all the resources.
    *
-   * @return the values
+   * @return a non-null, possibly-empty list of all the loaded resources
    */
   public List<K> getValues() {
     return resourceList;
   }
 
+  /**
+   * Returns a value based on a mathematical computation using the given value. As long as the
+   * number of loaded resources remains constant, the same replacement value is returned each time
+   * the same input (ignoring case) is presented. If resources have been loaded, the returned value
+   * is the key of one of the loaded resources. if not, the returned value is generated from the
+   * computation performed on the input.
+   * 
+   * @param identifier input value for which a pseudorandom replacement is required
+   * 
+   * @return the replacement value, generated as described
+   */
   public String getPseudorandom(String identifier) {
     return getPseudorandomElement(resourceList, identifier == null ? "" : identifier.toUpperCase());
   }
@@ -74,6 +90,12 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
     return element;
   }
 
+  /**
+   * Retrieves the key from one of the loaded resources selected at random.
+   * 
+   * @return the key from one of the loaded resources or <i>null</i> if no resources have been
+   *         loaded
+   */
   @Override
   public String getRandomKey() {
     String key = null;
@@ -84,6 +106,11 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
     return key;
   }
 
+  /**
+   * Retrieves one of the loaded resources selected at random.
+   * 
+   * @return one of the loaded resources or <i>null</i> if no resources have been loaded
+   */
   public K getRandomValue() {
     return getRandomResource(resourceList);
   }
@@ -100,17 +127,25 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
     return resource;
   }
 
+  /**
+   * Determines whether the given input is the key (ignoring case) of one of the loaded resources.
+   * 
+   * @param key the value to test
+   * 
+   * @return <i>True</i> if the input equals the key, ignoring case, of one of the loaded resources
+   *         and <i>False</i> if not
+   */
   @Override
   public boolean isValidKey(String key) {
     return key == null ? false : resourceMap.containsKey(key.toUpperCase());
   }
 
   /**
-   * Returns the value for the given key regardless of country code.
+   * Returns the value for the given key (ignoring case).
    *
    * @param key the key
    * 
-   * @return the value or <i>null</i> if no value for the given key is found
+   * @return the value or <i>null</i> if no value with the given key has been loaded
    */
   public K getValue(String key) {
     K value = null;
