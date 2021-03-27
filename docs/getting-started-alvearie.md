@@ -15,7 +15,7 @@
  - To start the server, use the following command: 
 
 ```
-   java -jar target/de-identification-app-0.0.1.master-SNAPSHOT-exec.jar
+   java -jar de-identification-app/target/de-identification-app-0.0.1-SNAPSHOT-exec.jar
 ```
 
  - After you start the server, verify that it is running properly. Invoke the health API:
