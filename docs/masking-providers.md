@@ -356,7 +356,7 @@ This privacy provider supports these options:
 **Example 3 – Protecting the year of birth for patients who died at no more than 
 5 years old:**
 
-````
+```
     {
       "rules": [
         {
