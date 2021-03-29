@@ -28,6 +28,10 @@ public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public RaceEthnicityIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	public ProviderType getType() {
 		return ProviderType.RACE;
@@ -36,7 +40,8 @@ public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			raceManager = (RaceManager) ManagerFactory.getInstance().getManager(null, Resource.RACE_ETHNICITY, null);
+			raceManager = (RaceManager) ManagerFactory.getInstance().getManager(tenantId, Resource.RACE_ETHNICITY, null,
+					localizationProperty);
 
 			initialized = true;
 		}

@@ -29,7 +29,9 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId) {
+  public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
@@ -39,8 +41,8 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      cityManager =
-          (CityManager) ManagerFactory.getInstance().getManager(null, Resource.CITY, null);
+      cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY,
+          null, localizationProperty);
 
       initialized = true;
     }

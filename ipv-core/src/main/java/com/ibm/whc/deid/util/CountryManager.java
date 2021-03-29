@@ -18,6 +18,7 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -28,9 +29,8 @@ public class CountryManager extends AbstractManager<Country>
     implements Serializable {
   /** */
   private static final long serialVersionUID = -1974159797966269524L;
-  protected final Resource resourceType = Resource.COUNTRY;
-  protected final Collection<ResourceEntry> resourceCountryList =
-      LocalizationManager.getInstance().getResources(resourceType);
+  protected final Resources resourceType = Resource.COUNTRY;
+	protected final Collection<ResourceEntry> resourceCountryList;
   protected final SecureRandom random;
 
   protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
@@ -52,13 +52,17 @@ public class CountryManager extends AbstractManager<Country>
     return CountryManager.allCountriesName;
   }
 
-  /** Instantiates a new Country manager. */
-  public CountryManager(String tenantId) {
+  /** Instantiates a new Country manager. 
+ * @paramlocalizationProperty location of the localization property file*/
+  public CountryManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
     this.random = new SecureRandom();
 
     this.countryMap = new HashMap<>();
     this.countryListMap = new HashMap<>();
+
+		resourceCountryList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(resourceType);
 
     readResources(resourceType, tenantId);
 
@@ -72,7 +76,7 @@ public class CountryManager extends AbstractManager<Country>
     this.distanceCalc = new LatLonDistance(getItemList());
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     readCountryListFromFile(resourceCountryList);
   }
 
@@ -101,7 +105,7 @@ public class CountryManager extends AbstractManager<Country>
   }
 
   private String getPseudorandomElement(List<Location> keys, String key) {
-    Long hash = Math.abs(HashUtils.longFromHash(key, "SHA-256"));
+    Long hash = Math.abs(HashUtils.longFromHash(key));
 
     if (keys == null || keys.size() == 0) {
       return hash.toString();

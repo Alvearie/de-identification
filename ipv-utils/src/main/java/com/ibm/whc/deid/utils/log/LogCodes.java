@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -49,4 +49,20 @@ public interface LogCodes {
   public static final String WPH6000E = "WPH6000E";
   public static final String WPH6001E = "WPH6001E";
   public static final String WPH6002E = "WPH6002E";
+  public static final String WPH8000E = "WPH8000E";
+  public static final String WPH8001E = "WPH8001E";
+  public static final String WPH8002E = "WPH8002E";
+  public static final String WPH8003E = "WPH8003E";
+  public static final String WPH8004E = "WPH8004E";
+  public static final String WPH8005E = "WPH8005E";
+  public static final String WPH8006E = "WPH8006E";
+  public static final String WPH8007E = "WPH8007E";
+  public static final String WPH8008E = "WPH8008E";
+  public static final String WPH8009E = "WPH8009E";
+  public static final String WPH8010E = "WPH8010E";
+  public static final String WPH8011E = "WPH8011E";
+  public static final String WPH8012E = "WPH8012E";
+  public static final String WPH8013E = "WPH8013E";
+  public static final String WPH8014E = "WPH8014E";
+  public static final String WPH8015E = "WPH8015E";
 }

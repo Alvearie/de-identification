@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,9 +17,10 @@ import org.apache.commons.csv.CSVParser;
 public class Readers {
   private static final Readers instance = new Readers();
 
-  private static CSVParser createGenericReader(Reader reader, char separator, char quoteChar)
-      throws IOException {
-    return CSVFormat.DEFAULT.withDelimiter(separator).withQuote(quoteChar).parse(reader);
+  private static CSVParser createGenericReader(Reader reader, char separator, char quoteChar,
+      Character commentMarker) throws IOException {
+    return CSVFormat.DEFAULT.withDelimiter(separator).withQuote(quoteChar)
+        .withCommentMarker(commentMarker).parse(reader);
   }
 
   /**
@@ -44,7 +45,7 @@ public class Readers {
       return null;
 
     FileReader reader = new FileReader(filename);
-    return createGenericReader(reader, ',', '"');
+    return createGenericReader(reader, ',', '"', null);
   }
 
   /**
@@ -58,7 +59,7 @@ public class Readers {
   }
 
   /**
-   * Create csv reader from stream csv reader.
+   * Create csv reader from an input stream.
    *
    * @param stream the stream
    * @param separator the separator
@@ -67,6 +68,20 @@ public class Readers {
    */
   public static CSVParser createCSVReaderFromStream(InputStream stream, char separator,
       char quoteChar) throws IOException {
-    return createGenericReader(new InputStreamReader(stream, "UTF-8"), separator, quoteChar);
+    return createGenericReader(new InputStreamReader(stream, "UTF-8"), separator, quoteChar, null);
+  }
+
+  /**
+   * Create csv reader from an input stream.
+   *
+   * @param stream the stream
+   * @param separator the separator
+   * @param quoteChar the quote char
+   * @return the csv reader
+   */
+  public static CSVParser createCSVReaderFromStream(InputStream stream, char separator,
+      char quoteChar, char commentStart) throws IOException {
+    return createGenericReader(new InputStreamReader(stream, "UTF-8"), separator, quoteChar,
+        Character.valueOf(commentStart));
   }
 }

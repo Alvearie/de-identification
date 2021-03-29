@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,34 +13,37 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.LatitudeLongitude;
-import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 public class PostalCodeManager implements Manager, Serializable {
-  /** */
+
   private static final long serialVersionUID = -5126260477789733871L;
 
-  protected static final Collection<ResourceEntry> resourceList =
-      LocalizationManager.getInstance().getResources(Resource.POSTAL_CODES);
+	protected final Collection<ResourceEntry> resourceList;
   protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
-  protected List<Location> postalCodeList;
-  private LatLonDistance latLonTree = null;
+  protected List<PostalCode> postalCodeList;
+  private LatLonDistance<PostalCode> latLonTree = null;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.POSTAL_CODES;
+  protected final Resources resourceType = Resource.POSTAL_CODES;
 
   protected final String tenantId;
 
-  public PostalCodeManager(String tenantId) {
+  public PostalCodeManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		resourceList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.POSTAL_CODES);
     this.postalCodeList = new ArrayList<>();
 
     this.postalCodeMap = new MapWithRandomPick<>(new HashMap<String, PostalCode>());
@@ -49,14 +52,14 @@ public class PostalCodeManager implements Manager, Serializable {
     this.postalCodeMap.setKeyList();
 
     try {
-      this.latLonTree = new LatLonDistance(postalCodeList);
+      this.latLonTree = new LatLonDistance<>(postalCodeList);
     } catch (Exception e) {
       logger.logError(LogCodes.WPH1013E, e);
     }
 
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     this.postalCodeMap.getMap().putAll(readPostalCodeCodeListFromFile(resourceList));
   }
 
@@ -97,7 +100,7 @@ public class PostalCodeManager implements Manager, Serializable {
   public String getPseudorandom(String identifier) {
     int position =
         (int) (Math.abs(HashUtils.longFromHash(identifier)) % this.postalCodeList.size());
-    return ((PostalCode) this.postalCodeList.get(position)).getName();
+    return this.postalCodeList.get(position).getName();
   }
 
   /**
@@ -107,7 +110,6 @@ public class PostalCodeManager implements Manager, Serializable {
    * @param k the k
    * @return the closest postal codes
    */
-  @SuppressWarnings({"unchecked", "rawtypes"})
   public List<PostalCode> getClosestPostalCodes(String postalCode, int k) {
     String key = postalCode.toUpperCase();
     PostalCode lookup = this.postalCodeMap.getMap().get(key);
@@ -117,18 +119,17 @@ public class PostalCodeManager implements Manager, Serializable {
     }
 
     LatitudeLongitude latlon = lookup.getLocation();
-    double[] latlonKey = new double[] {latlon.getLatitude(), latlon.getLongitude(), 0};
 
-    return (ArrayList) this.latLonTree.findNearestK(latlonKey, k);
+    return this.latLonTree.findNearestK(latlon.getLatitude(), latlon.getLongitude(), k);
   }
 
   @Override
-public String getRandomKey() {
+  public String getRandomKey() {
     return this.postalCodeMap.getRandomKey();
   }
 
   @Override
-public boolean isValidKey(String postalCode) {
+  public boolean isValidKey(String postalCode) {
     return postalCodeMap.getMap().containsKey(postalCode.toUpperCase());
   }
 

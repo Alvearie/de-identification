@@ -21,21 +21,21 @@ public class ComplexMaskingProviderFactory {
       DeidMaskingConfig deidMaskingConfig, BasicMaskingProviderFactory maskingProviderFactory,
       String tenantId) {
 
-      switch ((ConfigSchemaType) configSchemaType) {
-        case FHIR:
-          if (deidMaskingConfig.getJson().getSchemaType() == null) {
-            // return null if the masking config did not specify json schema
-            return null;
-          }
-          return new FHIRMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
-        case GEN:
-          if (deidMaskingConfig.getJson().getSchemaType() == null) {
-            // return null if the masking config did not specify json schema
-            return null;
-          }
-          return new GenericMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
-        default:
-          throw new IllegalArgumentException("Unsupported type:" + configSchemaType);
-      }
+    switch ((ConfigSchemaType) configSchemaType) {
+      case FHIR:
+        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+          // return null if the masking config did not specify json schema
+          return null;
+        }
+        return new FHIRMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
+      case GEN:
+        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+          // return null if the masking config did not specify json schema
+          return null;
+        }
+        return new GenericMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
+      default:
+        throw new IllegalArgumentException("Unsupported type:" + configSchemaType);
+    }
   }
 }

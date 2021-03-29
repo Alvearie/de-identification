@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,7 +29,6 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-import com.ibm.whc.deid.shared.util.MaskingConfigUtils;
 import scala.Tuple2;
 
 public class FHIRMaskingProviderTest {
@@ -41,7 +39,7 @@ public class FHIRMaskingProviderTest {
 
   private MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
-  
+
   @Test
   public void testLoadRulesForResource() {
     DeidMaskingConfig config = new DeidMaskingConfig();
@@ -52,7 +50,7 @@ public class FHIRMaskingProviderTest {
 
     config.setJson(new JsonConfig());
     config.getJson().getMaskingRules().add(new JsonMaskingRule("/fhir/path/data", "rule1"));
-    assertEquals(1, config.getJson().getMaskingRules().size());    
+    assertEquals(1, config.getJson().getMaskingRules().size());
     list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
     assertNotNull(list);
     assertEquals(0, list.size());
@@ -61,7 +59,7 @@ public class FHIRMaskingProviderTest {
     assertEquals(1, list.size());
     assertEquals("/fhir/path/data", list.get(0).getKey());
     assertEquals("rule1", list.get(0).getShortRuleName());
-    
+
     config.setJson(null);
     assertNull(config.getJson());
     list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
@@ -75,10 +73,11 @@ public class FHIRMaskingProviderTest {
     list = FHIRMaskingProvider.loadRulesForResource("x", config, "/");
     assertNotNull(list);
     assertEquals(0, list.size());
-    
+
     config = new ConfigGenerator().getTestDeidConfig();
     String basePathPrefix = "/fhir/";
-    assertEquals(39, FHIRMaskingProvider.loadRulesForResource("Device", config, basePathPrefix).size());
+    assertEquals(39,
+        FHIRMaskingProvider.loadRulesForResource("Device", config, basePathPrefix).size());
   }
 
   @Ignore
@@ -200,11 +199,11 @@ public class FHIRMaskingProviderTest {
             this.getClass().getResourceAsStream("/config/fhir/patient_masking_rules.json");
         InputStream maskingProvidersStream =
             this.getClass().getResourceAsStream("/config/patient_masking_providers.json");) {
-      maskingRules = MaskingConfigUtils.readResourceFileAsString(maskingRulesStream);
-      maskingProviders = MaskingConfigUtils.readResourceFileAsString(maskingProvidersStream);
+      maskingRules = ConfigGenerator.readResourceFileAsString(maskingRulesStream);
+      maskingProviders = ConfigGenerator.readResourceFileAsString(maskingProvidersStream);
     }
 
-    DeidMaskingConfig fhirConfig = MaskingConfigUtils.getDeidConfig(maskingRules, maskingProviders);
+    DeidMaskingConfig fhirConfig = ConfigGenerator.getDeidConfig(maskingRules, maskingProviders);
     fhirConfig.setDefaultNoRuleResolution(true);
     FHIRMaskingProvider fhirMaskingProvider =
         new FHIRMaskingProvider(fhirConfig, maskingProviderFactory, tenantId);

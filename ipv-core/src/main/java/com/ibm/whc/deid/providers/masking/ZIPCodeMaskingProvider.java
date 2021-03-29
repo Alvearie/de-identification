@@ -7,7 +7,9 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
+
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
@@ -38,7 +40,9 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected volatile boolean initialized = false;
 
-  public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId) {
+  public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.countryCode = configuration.getMaskCountryCode();
     this.replaceWithNeighbor = configuration.isMaskReplaceWithNeighbor();
     this.replaceWithNeighborNearestCount = configuration.getMaskReplaceWithNeighborNearestCount();
@@ -155,11 +159,11 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.POSTAL_CODES, null);
+      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.POSTAL_CODES, null, localizationProperty);
 
-      zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.ZIPCODE, prefixLength);
+      zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ZIPCODE, prefixLength, localizationProperty);
 
       initialized = true;
     }

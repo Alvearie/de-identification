@@ -13,9 +13,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -25,25 +28,28 @@ public class VINManager implements Manager, Serializable {
   /** */
   private static final long serialVersionUID = 8854083379768714880L;
 
-  protected static final Collection<ResourceEntry> resourceWMIList =
-      LocalizationManager.getInstance().getResources(Resource.WORLD_MANUFACTURERS_IDENTIFIER);
+	protected final Collection<ResourceEntry> resourceWMIList;
   protected final Map<String, String> wmiMap;
   protected final String[] wmiList;
   protected final SecureRandom random;
   protected final char[] excludedCharacters = {'I', 'O', 'Q', 'i', 'o', 'q'};
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
+  protected final Resources resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
 
   protected final String tenantId;
 
-  /**
-   * Instantiates a new Vin manager.
-   *
-   * @param tenantId
-   */
-  public VINManager(String tenantId) {
+  	/**
+	 * Instantiates a new Vin manager.
+	 *
+	 * @param tenantId
+	 * @param localizationProperties TODO
+	 */
+	public VINManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+
+		resourceWMIList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.WORLD_MANUFACTURERS_IDENTIFIER);
     this.wmiMap = new HashMap<String, String>();
 
     readResources(resourceType, tenantId);
@@ -60,7 +66,7 @@ public class VINManager implements Manager, Serializable {
     }
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     this.wmiMap.putAll(readWMIListFromFile(resourceWMIList));
   }
 

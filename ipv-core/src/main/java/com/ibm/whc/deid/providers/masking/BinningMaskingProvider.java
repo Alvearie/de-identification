@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.shared.pojo.config.masking.BinningMaskingProviderConfig;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 /**
  * Privacy provider that replaces numeric values with a range that contains the original value.
@@ -29,12 +28,6 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
    * @param config a BinningMaskingProviderConfig instance
    */
   public BinningMaskingProvider(BinningMaskingProviderConfig config) {
-    try {
-      config.validate();
-    } catch (InvalidMaskingConfigurationException e) {
-      // not expected - config should always already have been validated
-      throw new IllegalArgumentException(e);
-    }
     this.binSize = config.getBinSize();
     this.format = config.getFormat();
     this.startValue = config.getStartValue();

@@ -82,8 +82,11 @@ options and their default values.
 
 #### BINNING
 
->   Replaces a numerical input value with an interval that contains the value. The interval's width is configurable, but is constant across the domain of values.  The range
->   is inclusive on the lower bound and exclusive on the upper bound. For examples of valid formats, see the javadoc for java.util.Formatter.
+>   Replaces a numerical input value with an interval that contains the value. For example, the value 5
+>   could be replaced with the string 0-9.  
+>   The interval's width is configurable, but is constant across the domain of values.  The range
+>   is inclusive on the lower bound and exclusive on the upper bound. The format in which the interval is presented is 
+>   configurable.  For examples of valid formats, see the java documentation for java.util.Formatter.
 
 | **Option name**       | **Type** | **Description**                         | **Default value** |
 |-----------------------|----------|-----------------------------------------|-------------------|
@@ -121,7 +124,6 @@ options and their default values.
    configuration options) that meets its condition.
 
    **Example 1: Conditional masking of a FHIR data element based on another FHIR data element with regular path**
-
 
 ```
     {
@@ -187,8 +189,8 @@ options and their default values.
    provider along with its optional configuration parameters. The condition
    properties that must be satisfied in order for this provider to be applied
    (for example, the PSEUDONYM masking provider in Example 1, along with the options
-   **pseudonym.generateViaOptions.minLength = 12** and
-   **pseudonym.generateViaOptions.maxLength = 12**) are applied to mask the
+   **generateViaOptionsMinLength = 12** and
+   **generateViaOptionsMaxLength = 12**) are applied to mask the
    version data element only when the model data element has the value
    **example_model**. When the first condition is met, the corresponding
    data masking provider is applied. Optionally, a default data masking
@@ -205,8 +207,7 @@ options and their default values.
 
 >-  **field**: This contains the path of the condition field in the FHIR Resource
     type. The path may be either a regular path (that is, a non-array element path) or an
-    array query format path. For a description, see:
-    https://test.cloud.ibm.com/docs/services/data-de-identification?topic=data-de-identification-introduction-to-the-data-de-identification-service-configuration
+    array query format path. For a description, see [Introduction to the Data De-Identification service configuration](masking-config-overview.md).
 
 >-   **value**: This contains the expected value of the condition field.
 
@@ -355,7 +356,7 @@ This privacy provider supports these options:
 **Example 3 – Protecting the year of birth for patients who died at no more than 
 5 years old:**
 
-````
+```
     {
       "rules": [
         {
@@ -1067,7 +1068,7 @@ To activate encryption-based pseudonym generation:
    is the default algorithm used. To generate pseudonyms using the SHA-256
    algorithm, the following configuration option must be set:
 
->   pseudonym.generateViaHash.useSHA256 = true
+>   generateViaHashUseSHA256 = true
 
 Here are the options and their default values for the PSEUDONYM  provider:
 
@@ -1174,7 +1175,13 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
 #### SWIFT
 
->    Masks SWIFT codes with the option to preserve their country.
+>   Masks SWIFT codes with the option to preserve their country.
+
+>   By default, no actual SWIFT codes are provided with the service.  When replacing SWIFT codes using this provider,
+>   the service generates a random value in a format similar to the format followed by actual SWIFT codes.  Actual
+>   SWIFT codes can be added to the service, if desired.  If codes are loaded, the service randomly selects 
+>   replacement values from the loaded codes, as appropriate.  For more information about loading custom codes, 
+>   see [Localization](localization.md).
 
 | **Option name** | **Type** | **Description**      | **Default value** |
 |-----------------|----------|----------------------|-------------------|
@@ -1228,9 +1235,9 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
 > 2.  Zero out the postal code's three-digit prefix if the total population in the
     geographical unit, formulated by combining all postal codes with the same
-        three-digit prefix as the original postal code, contains less than a specified
+    three-digit prefix as the original postal code, contains less than a specified
     minimum population. Additionally, the postal code may be truncated to a
-    specified length if the minumum population in the formulated geographical
+    specified length if the minimum population in the formulated geographical
     unit is not reached.
 
 > 3.  Replace the postal code digits suffix either with random digits, or with digits that
@@ -1261,15 +1268,16 @@ Here are the options and their default values for the PSEUDONYM  provider:
    for example: ls –al \| grep ‘\^d’
 
    When multiple data protection methods are specified for the same data element,
-   the first method is applied on the original value of the element, and its output
+   the first method is applied on the original value of the element and its output
    is provided as input to the next data protection method. The output of the
    last data protection method determines the new value of the data element.
 
    The Data De-Identification Service supports two approaches for applying
    multiple data protection methods to a data element. The first approach is
    to provide multiple values in the maskingProviders array. The second approach,
-   which only works for FHIR arrays with different keys, is to specify the
-   providers in separate rules in the data de-identification configuration
+   which only works for JSON arrays containing JSON objects with different keys,
+   is to specify the
+   providers in separate rule assignments in the data de-identification configuration
    file. To learn how each approach works, continue reading this topic.
 
 #### Provide multiple values in the maskingProviders array
@@ -1345,7 +1353,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
    by the EMAIL and subsequently by the HASH privacy providers.
 
    As another example, consider that we want to retrieve information about the
-   State where an individual resides (for individuals of certain US States),
+   state where an individual resides (for individuals of certain US States),
    based on the US postal (ZIP) code of their home address. The mapping of US postal codes
    to US States is provided in:
    <https://en.wikipedia.org/wiki/List_of_ZIP_code_prefixes>. Example 13
@@ -1397,46 +1405,47 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
    It is important to note that there are restrictions enforced by the
    Data De-Identification Service to both the number and the type of privacy
-   providers that can be applied to the same FHIR data element, when using the
-   comma-separated format.
+   providers that can be specified in a single masking rule.
 
-   Firstly, **only two privacy providers can be assigned to a single data element**.
+   Firstly, **only two privacy providers can be specified in a single rule**.
 
    The second restriction regards the type of the privacy providers that can be applied to the
    same data element, ensuring that the pair of providers that is used is
    valid. The service separates the privacy providers into two categories:
 
 1.  **Category I – PII-specific providers:** These providers mask a specific
-    type of PII / PHI / SPI. Examples are ADDRESS, PHONE, VIN, SSN, COUNTY, URL,
-    NAME, GENDER, RELIGION, IP ADDRESS, EMAIL, CREDIT CARD, DATETIME, IBAN,
-    CITY, ICD V9/V10, MAC ADDRESS, ATC, OCCUPATION, CONTINENT, HOSPITAL, ZIP
-    CODE, COUNTRY, LATITUDE / LONGITUDE, and DATEDEPENDENCY.
+    type of PII / PHI / SPI. The Category I providers are:
+    ADDRESS, ATC, CITY, CONTINENT, COUNTRY, COUNTY, CREDIT_CARD, DATEDEPENDENCY, 
+    DATETIME, EMAIL, GENDER, HOSPITAL, IBAN, ICDV10, ICDV9, IMEI, IP_ADDRESS,
+    LATITUDE_LONGITUDE, MAC_ADDRESS, MARITAL, NAME, OCCUPATION, PHONE, RACE, 
+    RELIGION, SSN_UK, SSN_US, STATE_US, SWIFT, URL, VIN, ZIPCODE.
 
 2.  **Category II – Generic providers:** These providers are not designed to
     mask a specific type of PII / PHI / SPI, but can be used to process several
-    types of identifiers. Examples are HASH, RANDOM, REPLACE, REDACT, NUMBERVARIANCE,
-    GENERALIZE, RARE_REPLACEMENT, and PSEUDONYM.
+    types of identifiers. The Category II providers are:
+    BINNING, CONDITIONAL, GENERALIZE, GUID, HASH, MAINTAIN, NULL, NUMBERVARIANCE,
+    PSEUDONYM, RANDOM, REDACT, REPLACE.
 
    Based on these categories, a pair of privacy providers is
    valid if the first provider belongs to Category I, and the second provider
    is from Category II.
 
 #### Using separate rules for privacy providers
-
+   
    The same data elements of an array can be processed by multiple privacy
    providers when more than one rule is defined for these data elements in
    the data de-identification configuration file. In this case, the rules are
    applied to the corresponding data elements of the array in the
-   sequence in which they have been defined.
+   sequence in which the rule assignments have been specified.
 
    - The first rule is applied to the original value of the data element.
    - Each subsequent rule is applied to the transformed value produced for this element by the previous
    rule. This is similar to the behavior of a UNIX pipe command.
 
-   The next example shows a valid rule set for processing data elements of a
-   FHIR array with multiple privacy providers.
+The next example shows a valid rule set for processing data elements of an
+array with multiple privacy providers.
 
-   **Example 14: Masking elements of an array with multiple masking providers**
+**Example 14: Masking elements of an array with multiple masking providers**
 
 ```
   {
@@ -1455,32 +1464,16 @@ Here are the options and their default values for the PSEUDONYM  provider:
   }
 ```
 
-   In this example, both the first and the second rule are applied to the
-   _use_ element in the second member of the _name_ array.  Offsets start at 0
-   so [1] refers to the second array member. The second rule is also applied to 
-   the _use_ element in all other members of the _name_ array.
-   The third entry applies the REPLACE rule to
-   the first member of the _given_ array in all members of the _name_ array.
+In this example, both the first and the second rule are applied to the
+_use_ element in the second member of the _name_ array.  Offsets start at 0
+so [1] refers to the second array member. The second rule is also applied to 
+the _use_ element in all other members of the _name_ array.
+The third entry applies the REPLACE rule to
+the first member of the _given_ array in all members of the _name_ array.
 
-   **Note:** In the case of regular, non-array FHIR data elements, if multiple de-identification
-   rules are specified, only the last rule is applied to the data. The previous rules are discarded.
+**Note:** This functionality is available only for indexed array data elements.  It is an 
+error for multiple rules to be assigned to data elements not identified by an array index.
 
-   **Example 15: Masking a regular data element using separate de-identification rules**
-
-```
-  {
-        "jsonPath": "/fhir/Patient/gender",
-        "rule": "RANDOM"
-  }
-
-  {
-        "jsonPath": "/fhir/Patient/gender",
-        "rule": "HASH"
-  }
-```
-
-  In this example, only the HASH (last) privacy provider is applied
-  to the gender data element of the Patient FHIR Resource.
 
 ## Handling unrecognized input values and exceptions raised by privacy providers
 
@@ -1534,7 +1527,9 @@ message is set to **OTHER**.
 **Exceptions**
 
 These privacy providers ignore the `unspecifiedValueHandling` option:
+* CONDITIONAL
 * GENERALIZE
+* GUID
 * HASH
 * MAINTAIN
 * NULL

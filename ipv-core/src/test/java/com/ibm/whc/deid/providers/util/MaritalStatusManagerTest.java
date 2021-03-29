@@ -7,16 +7,20 @@ package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertTrue;
 
-import com.ibm.whc.deid.util.MaritalStatusManager;
 import org.junit.Test;
+
+import com.ibm.whc.deid.util.MaritalStatusManager;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class MaritalStatusManagerTest {
 
   String tenantId = "TEST_TENANT";
+  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testLookupSuccessful() throws Exception {
-    MaritalStatusManager maritalStatusManager = new MaritalStatusManager(tenantId);
+    MaritalStatusManager maritalStatusManager =
+        new MaritalStatusManager(tenantId, localizationProperty);
     String status = "Single";
     assertTrue(maritalStatusManager.isValidKey(status));
 
@@ -26,7 +30,8 @@ public class MaritalStatusManagerTest {
 
   @Test
   public void testRandomCodeGenerator() throws Exception {
-    MaritalStatusManager maritalStatusManager = new MaritalStatusManager(tenantId);
+    MaritalStatusManager maritalStatusManager =
+        new MaritalStatusManager(tenantId, localizationProperty);
     assertTrue(maritalStatusManager.isValidKey(maritalStatusManager.getRandomKey()));
   }
 }

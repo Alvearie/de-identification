@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,8 +13,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Continent;
 import com.ibm.whc.deid.models.Location;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -23,40 +26,28 @@ import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class ContinentManager extends ResourceBasedManager<Continent> {
-  /** */
+
   private static final long serialVersionUID = -610638379564157663L;
 
-  public ContinentManager(String tenantId) {
-    super(tenantId, Resource.CONTINENT);
-
-    distanceCalc = new LatLonDistance<Continent>(getItemList());
-  }
-
   protected Map<String, List<Location>> continentListMap;
-  protected Map<String, LatLonDistance> latLonTree = null;
 
-  private LatLonDistance<Continent> distanceCalc;
+  private transient volatile ConcurrentHashMap<String, LatLonDistance<Continent>> distanceCalcMap =
+      null;
+
   protected final SecureRandom random = new SecureRandom();
 
-  public Collection<Continent> getItemList() {
-    return getValues();
+  public ContinentManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.CONTINENT, localizationProperty);
+  }
+
+  @Override
+  public void init() {
+    continentListMap = new HashMap<>();
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.CONTINENT);
-  }
-
-  protected void addToContinentList(Continent continent, String countryCode) {
-    List<Location> list = continentListMap.get(countryCode);
-
-    if (list == null) {
-      list = new ArrayList<>();
-      list.add(continent);
-      continentListMap.put(countryCode, list);
-    } else {
-      list.add(continent);
-    }
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
   }
 
   @Override
@@ -91,32 +82,49 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
   }
 
   @Override
-  public void init() {
-    continentListMap = new HashMap<>();
+  public Collection<Continent> getItemList() {
+    return getValues();
+  }
+
+  protected void addToContinentList(Continent continent, String countryCode) {
+    List<Location> list = continentListMap.get(countryCode);
+    if (list == null) {
+      list = new ArrayList<>();
+      continentListMap.put(countryCode, list);
+    }
+    list.add(continent);
   }
 
   /**
    * Gets closest continent.
    *
-   * @param identifier the identifier
-   * @param k the k
-   * @return the closest continent
+   * @param the non-null source continent
+   * 
+   * @param k the number of nearby continents from which to select
+   * 
+   * @return a randomly selected continent from the nearby list
    */
-  public String getClosestContinent(String identifier, int k) {
-    Continent continent = this.getKey(identifier);
-    if (continent == null) {
-      return getRandomKey();
-    }
-
+  public Continent getClosestContinent(Continent continent, int k) {
+    LatLonDistance<Continent> distanceCalc = getDistanceCalculator(continent.getNameCountryCode());
     List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
-    if (neighbors == null) {
-      return getRandomKey();
+    if (neighbors == null || neighbors.isEmpty()) {
+      return getRandomValue();
     }
+    return neighbors.get(random.nextInt(neighbors.size()));
+  }
 
-    if (k > neighbors.size()) {
-      k = neighbors.size();
+  private LatLonDistance<Continent> getDistanceCalculator(String countryCode) {
+    // OK if in a race condition multiple threads re-create this
+    ConcurrentHashMap<String, LatLonDistance<Continent>> map = distanceCalcMap;
+    if (map == null) {
+      map = new ConcurrentHashMap<>();
+      distanceCalcMap = map;
     }
-
-    return neighbors.get(random.nextInt(k - 1) + 1).getName();
+    LatLonDistance<Continent> dist = map.get(countryCode);
+    if (dist == null) {
+      dist = new LatLonDistance<>(getValues(countryCode));
+      map.put(countryCode, dist);
+    }
+    return dist;
   }
 }

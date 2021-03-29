@@ -1,13 +1,16 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -62,10 +65,27 @@ public class PhoneMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (invNdigitsReplaceWith == null) {
       throw new InvalidMaskingConfigurationException("`invNdigitsReplaceWith` must be not null");
+    }
+    if (phoneRegexPatterns != null) {
+      int offset = 0;
+      for (String regx : phoneRegexPatterns) {
+        if (regx == null || regx.trim().isEmpty()) {
+          throw new InvalidMaskingConfigurationException(
+              "pattern at offset " + offset + " in `phoneRegexPatterns` is empty");
+        }
+        try {
+          Pattern.compile(regx);
+        } catch (PatternSyntaxException e) {
+          throw new InvalidMaskingConfigurationException("pattern at offset " + offset
+              + " in `phoneRegexPatterns` is not valid: " + e.getMessage());
+        }
+        offset++;
+      }
     }
   }
 

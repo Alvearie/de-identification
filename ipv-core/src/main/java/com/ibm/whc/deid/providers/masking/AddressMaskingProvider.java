@@ -51,7 +51,9 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   protected volatile boolean initialized = false;
 
   public AddressMaskingProvider(AddressMaskingProviderConfig configuration, String tenantId,
-      MaskingProviderFactory maskingProviderFactory) {
+      MaskingProviderFactory maskingProviderFactory, String localizationProperty) {
+
+    super(tenantId, localizationProperty);
 
     this.maskingProviderFactory = maskingProviderFactory;
 
@@ -187,19 +189,21 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   protected void initialize() {
     if (!initialized) {
       // Initialize all the masking providers/managers needed.
-      streetNameManager = (StreetNameManager) ManagerFactory.getInstance()
-          .getManager(null, Resource.STREET_NAMES, null);
+      streetNameManager = (StreetNameManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.STREET_NAMES, null, localizationProperty);
 
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
-          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), null);
+          MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), tenantId,
+          localizationProperty);
       countryMaskingProvider.initialize();
 
       cityMaskingProvider =
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
-              null, configuration.getCityMaskingConfig(), null);
+              null, configuration.getCityMaskingConfig(), tenantId, localizationProperty);
 
-      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(null,
-          Resource.POSTAL_CODES, null);
+
+      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.POSTAL_CODES, null, localizationProperty);
       initialized = true;
     }
   }

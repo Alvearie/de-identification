@@ -23,6 +23,14 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
   private static final String[] appropriateNames = {"Name", "Surname"};
 
 	protected volatile boolean initialized = false;
+	
+	protected String tenantId;
+	protected String localizationProperty;
+
+	public NameIdentifier(String tenantId, String localizationProperty) {
+		this.tenantId = tenantId;
+		this.localizationProperty = localizationProperty;
+	}
 
   @Override
   public ProviderType getType() {
@@ -31,7 +39,7 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
 	protected NameManager getManager() {
 		if (!initialized) {
-			nameNanager = new NameManager(null);
+			nameNanager = new NameManager(tenantId, localizationProperty);
 			initialized = true;
 		}
 		return nameNanager;

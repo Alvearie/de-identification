@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.County;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -22,13 +24,13 @@ public class CountyManager extends ResourceBasedManager<County> {
   /** */
   private static final long serialVersionUID = -7331835176814737907L;
 
-  public CountyManager(String tenantId) {
-    super(tenantId, Resource.COUNTY);
+  public CountyManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.COUNTY, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.COUNTY);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.COUNTY);
   }
 
   @Override

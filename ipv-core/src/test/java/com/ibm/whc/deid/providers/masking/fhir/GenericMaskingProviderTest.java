@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,7 +22,6 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-import com.ibm.whc.deid.shared.util.MaskingConfigUtils;
 import scala.Tuple2;
 
 public class GenericMaskingProviderTest {
@@ -67,11 +66,11 @@ public class GenericMaskingProviderTest {
             this.getClass().getResourceAsStream("/config/generic/patient_masking_rules.json");
         InputStream maskingProvidersStream =
             this.getClass().getResourceAsStream("/config/patient_masking_providers.json");) {
-      maskingRules = MaskingConfigUtils.readResourceFileAsString(maskingRulesStream);
-      maskingProviders = MaskingConfigUtils.readResourceFileAsString(maskingProvidersStream);
+      maskingRules = ConfigGenerator.readResourceFileAsString(maskingRulesStream);
+      maskingProviders = ConfigGenerator.readResourceFileAsString(maskingProvidersStream);
     }
 
-    DeidMaskingConfig config = MaskingConfigUtils.getDeidConfig(maskingRules, maskingProviders);
+    DeidMaskingConfig config = ConfigGenerator.getDeidConfig(maskingRules, maskingProviders);
     config.setDefaultNoRuleResolution(true);
     config.getJson().setSchemaType(ConfigSchemaType.GEN);
     GenericMaskingProvider genericMaskingProvider =
@@ -85,9 +84,10 @@ public class GenericMaskingProviderTest {
     String filename = "/fhir/patientExample.json";
 
     System.out.println("Processing: " + filename);
-    InputStream is = this.getClass().getResourceAsStream(filename);
-
-    JsonNode node = mapper.readTree(is);
+    JsonNode node;
+    try (InputStream is = this.getClass().getResourceAsStream(filename)) {
+      node = mapper.readTree(is);
+    }
     JsonNode identifier = node.get("identifier").iterator().next();
     String originalPeriodStart = identifier.get("period").get("start").asText();
     assertEquals("2001-05-06", originalPeriodStart);

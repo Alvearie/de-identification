@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -111,7 +111,8 @@ public class DataMaskingCoreTest {
       dataMask.maskData(invalidConfig, Arrays.asList(new ReferableData(patientData)),
           ConfigSchemaType.FHIR);
     } catch (DeidException e) {
-      assertTrue(e.getMessage().contains("The JSON masking rule does not refer to a valid rule"));
+      assertTrue(e.getMessage().contains(
+          "the rule assignment with `rule` value `NO_SUCH_RULE` does not refer to a valid rule"));
       throw e;
     }
   }

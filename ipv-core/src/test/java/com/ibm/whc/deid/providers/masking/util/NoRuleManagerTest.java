@@ -6,16 +6,16 @@
 package com.ibm.whc.deid.providers.masking.util;
 
 import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.providers.masking.NullMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
-import com.ibm.whc.deid.providers.masking.fhir.NullMaskingProvider;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Test;
 
 public class NoRuleManagerTest {
 
@@ -70,18 +70,18 @@ public class NoRuleManagerTest {
     list.add(new MaskingActionInputIdentifier(null, childNode, lineNode, "line[2]", "Organization",
         "r2", root));
     // original node
-    list.add(new MaskingActionInputIdentifier(null, cNode, cParentNode, "c", "Organization",
-        "r2", root));
+    list.add(new MaskingActionInputIdentifier(null, cNode, cParentNode, "c", "Organization", "r2",
+        root));
     // already null node
-    list.add(new MaskingActionInputIdentifier(null, eNode, cParentNode, "e", "Organization",
-        "r2", root));    
+    list.add(new MaskingActionInputIdentifier(null, eNode, cParentNode, "e", "Organization", "r2",
+        root));
     mgr.removeNodesAlreadyMasked(list);
     mgr.applyToRemainingNodes();
     assertEquals(
         "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,\"v101\",null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":3,\"d\":null,\"e\":null}]]}]}",
         om.writeValueAsString(root));
-    
-    //root is value node - not supported by system
+
+    // root is value node - not supported by system
     JsonNode valueRoot = new TextNode("lion");
     mgr = new NoRuleManager(new MaskingProviderBuilder.MaskingResource("id", valueRoot, null), "r3",
         provider);

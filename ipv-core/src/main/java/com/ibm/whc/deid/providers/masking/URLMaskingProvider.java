@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,23 +8,18 @@ package com.ibm.whc.deid.providers.masking;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.ibm.whc.deid.providers.ProviderType;
-import com.ibm.whc.deid.providers.identifiers.Identifier;
-import com.ibm.whc.deid.providers.identifiers.IdentifierFactoryUtil;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.URLMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.RandomGenerators;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class URLMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 5992875957296289762L;
 
   private final boolean maskUsernamePassword;
@@ -32,19 +27,16 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
   private final boolean removeQuery;
   private final boolean maskQuery;
   private final int preserveDomains;
-  private final Map<ProviderType, MaskingProvider> providerMap =
-      new HashMap<>(ProviderType.values().length);
   private final MaskingProviderFactory maskingProviderFactory =
       MaskingProviderFactoryUtil.getMaskingProviderFactory();
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-
-  private String tenantId;
-  DeidMaskingConfig deidMaskingConfig;
+  private final DeidMaskingConfig deidMaskingConfig;
 
 
   public URLMaskingProvider(URLMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig) {
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.maskUsernamePassword = configuration.isMaskUsernamePassword();
     this.randomizePort = configuration.isMaskPort();
@@ -53,7 +45,6 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     this.maskQuery = configuration.isMaskMaskQuery();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-    this.tenantId = tenantId;
     this.deidMaskingConfig = deidMaskingConfig;
   }
 
@@ -93,23 +84,16 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
   }
 
   /**
-   * Gets masking provider.
+   * Gets the masking provider used to mask portions of the query string.
    *
    * @param type the type
    * @return the masking provider
    */
-  public synchronized MaskingProvider getMaskingProvider(ProviderType type) {
-    if (providerMap.containsKey(type)) {
-      return providerMap.get(type);
-    }
-
-    MaskingProviderType maskignProviderType = MaskingProviderType.valueOf(type.getName());
-    MaskingProvider maskingProvider =
-        maskingProviderFactory.getProviderFromType(maskignProviderType, deidMaskingConfig,
-            MaskingProviderConfig.getDefaultMaskingProviderConfig(maskignProviderType), tenantId);
-    providerMap.put(type, maskingProvider);
-
-    return maskingProvider;
+  protected MaskingProvider getQueryPartMaskingProvider() {
+    RedactMaskingProviderConfig providerConfig = new RedactMaskingProviderConfig();
+    providerConfig.setPreserveLength(false);
+    return maskingProviderFactory.getProviderFromType(MaskingProviderType.REDACT, deidMaskingConfig,
+        providerConfig, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
   }
 
   private String maskQuery(String query) {
@@ -117,11 +101,10 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
       return query;
     }
 
-    Collection<Identifier> identifiers =
-				IdentifierFactoryUtil.getIdentifierFactory().getAvailableIdentifiers(tenantId);
-
     String[] tokens = query.split("&");
     String[] maskedTokens = new String[tokens.length];
+
+    MaskingProvider maskingProvider = null;
 
     for (int i = 0; i < tokens.length; i++) {
       String token = tokens[i];
@@ -135,13 +118,11 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
         continue;
       }
 
-      for (Identifier identifier : identifiers) {
-        if (identifier.isOfThisType(parts[1])) {
-          MaskingProvider maskingProvider = getMaskingProvider(identifier.getType());
-          parts[1] = maskingProvider.mask(parts[1]);
-          break;
-        }
+      if (maskingProvider == null) {
+        maskingProvider = getQueryPartMaskingProvider();
       }
+
+      parts[1] = maskingProvider.mask(parts[1]);
 
       maskedTokens[i] = parts[0] + "=" + parts[1];
     }
@@ -211,11 +192,7 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     } catch (MalformedURLException e) {
       // For this provider, we do not return random URL
       debugFaultyInput("url");
-      if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return unspecifiedValueHandling == 3 ? unspecifiedValueReturnMessage : null;
     }
 
     return maskURL(url);

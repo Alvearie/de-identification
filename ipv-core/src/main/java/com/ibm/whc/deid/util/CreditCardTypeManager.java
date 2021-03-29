@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
@@ -20,13 +22,13 @@ public class CreditCardTypeManager extends ResourceBasedManager<String> {
   /** */
   private static final long serialVersionUID = -122866401583982944L;
 
-  public CreditCardTypeManager() {
-    super(null, Resource.CREDIT_CARD_TYPE);
+  public CreditCardTypeManager(String tenantId, String localizationProperty) {
+		super(tenantId, Resource.CREDIT_CARD_TYPE, localizationProperty);
   }
 
   @Override
   protected Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.CREDIT_CARD_TYPE);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CREDIT_CARD_TYPE);
   }
 
   @Override

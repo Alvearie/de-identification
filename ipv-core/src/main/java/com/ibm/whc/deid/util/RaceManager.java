@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Race;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -19,37 +21,36 @@ import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class RaceManager extends ResourceBasedManager<Race> {
-  /** */
+
   private static final long serialVersionUID = 3518587195772769899L;
 
-  public RaceManager(String tenantId) {
-    super(tenantId, Resource.RACE_ETHNICITY);
+  public RaceManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.RACE_ETHNICITY, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.RACE_ETHNICITY);
+    return LocalizationManager.getInstance(localizationProperty)
+        .getResources(Resource.RACE_ETHNICITY);
   }
 
   @Override
-  public Map<String, Map<String, Race>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
+  public Map<String, Map<String, Race>> readResourcesFromFile(Collection<ResourceEntry> entries) {
     Map<String, Map<String, Race>> races = new HashMap<>();
 
     for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          String key = name.toUpperCase();
-
-          Race race = new Race(name, countryCode);
-          addToMapByLocale(races, entry.getCountryCode(), key, race);
-          addToMapByLocale(races, getAllCountriesName(), key, race);
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream, ',', '"', '#')) {
+          for (CSVRecord line : reader) {
+            String name = line.get(0);
+            String key = name.toUpperCase();
+            Race race = new Race(name, countryCode);
+            addToMapByLocale(races, entry.getCountryCode(), key, race);
+            addToMapByLocale(races, getAllCountriesName(), key, race);
+          }
         }
-        inputStream.close();
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }

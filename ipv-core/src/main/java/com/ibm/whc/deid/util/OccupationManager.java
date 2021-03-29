@@ -12,8 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.Occupation;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -24,13 +26,13 @@ public class OccupationManager extends ResourceBasedManager<Occupation> {
   /** */
   private static final long serialVersionUID = 1820857985982718471L;
 
-  public OccupationManager(String tenantId) {
-    super(tenantId, Resource.OCCUPATION);
+  public OccupationManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.OCCUPATION, localizationProperty);
   }
 
   @Override
   public Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.OCCUPATION);
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.OCCUPATION);
   }
 
   @Override

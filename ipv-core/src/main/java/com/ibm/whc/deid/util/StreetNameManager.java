@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
@@ -21,12 +23,9 @@ public class StreetNameManager extends ResourceBasedManager<String> {
   /** */
   private static final long serialVersionUID = 140617576732256592L;
 
-  private static final Collection<ResourceEntry> resourceStreetNameList =
-      LocalizationManager.getInstance().getResources(Resource.STREET_NAMES);
-
   @Override
   public Collection<ResourceEntry> getResources() {
-    return resourceStreetNameList;
+		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.STREET_NAMES);
   }
 
   @Override
@@ -60,9 +59,10 @@ public class StreetNameManager extends ResourceBasedManager<String> {
    * Instantiates a new Street name manager.
    *
    * @param tenantId tenant id
+ * @paramlocalizationProperty location of the localization property file
    */
-  public StreetNameManager(String tenantId) {
-    super(tenantId, Resource.STREET_NAMES);
+  public StreetNameManager(String tenantId, String localizationProperty) {
+    super(tenantId, Resource.STREET_NAMES, localizationProperty);
   }
 
   @Override

@@ -11,11 +11,14 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -26,8 +29,7 @@ public class ICDv10Manager implements Manager, Serializable {
   /** */
   private static final long serialVersionUID = -7207643604541499595L;
 
-  protected static final Collection<ResourceEntry> resourceICDList =
-      LocalizationManager.getInstance().getResources(Resource.ICDV10);
+	protected final Collection<ResourceEntry> resourceICDList;
 
   protected final MapWithRandomPick<String, ICD> icdByCodeMap;
   protected final MapWithRandomPick<String, ICD> icdByNameMap;
@@ -35,7 +37,7 @@ public class ICDv10Manager implements Manager, Serializable {
   protected int resourceInDbCount = 0;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.ICDV10;
+  protected final Resources resourceType = Resource.ICDV10;
 
   protected final String tenantId;
 
@@ -43,9 +45,12 @@ public class ICDv10Manager implements Manager, Serializable {
    * Instantiates a new Ic dv 10 manager.
    *
    * @param tenantId
+ * @paramlocalizationProperty location of the localization property file
    */
-  public ICDv10Manager(String tenantId) {
+  public ICDv10Manager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		resourceICDList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.ICDV10);
     this.icdByCodeMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
     this.icdByNameMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
 
@@ -55,7 +60,7 @@ public class ICDv10Manager implements Manager, Serializable {
     this.icdByNameMap.setKeyList();
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     readICDList(resourceICDList);
   }
 

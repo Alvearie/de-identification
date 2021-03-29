@@ -27,8 +27,8 @@ public class IPAddressMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    */
-	public IPAddressMaskingProvider() {
-		this(new IPAddressMaskingProviderConfig());
+  public IPAddressMaskingProvider() {
+    this(new IPAddressMaskingProviderConfig());
   }
 
   public IPAddressMaskingProvider(IPAddressMaskingProviderConfig configuration) {

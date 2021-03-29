@@ -63,8 +63,9 @@ public class FHIRResourceMaskingConfiguration {
     if (fields == null || fields.isEmpty()) {
       this.fields = new ArrayList<>();
     } else {
-      // per documentation, if multiple rule assignments are made for same path, only the final one
-      // is used
+      // If multiple rule assignments are made for same path, validation will have already
+      // ensured all such rule assignments specified the same rule. Ensure the rule is only
+      // applied to the path once.
       ArrayList<FHIRResourceField> tempList = new ArrayList<>(fields.size());
       HashMap<String, Integer> previouslyAddedMap = new HashMap<>(fields.size() * 2);
       for (FHIRResourceField field : fields) {

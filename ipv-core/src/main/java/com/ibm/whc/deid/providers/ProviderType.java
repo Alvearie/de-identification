@@ -122,9 +122,6 @@ public final class ProviderType implements Serializable {
       new ProviderType("EMPTY", "Empty", "Empty", TypeClass.CATEGORICAL, true);
   /** The constant ATC. */
   public static final ProviderType ATC = new ProviderType("ATC", "ATC codes", "Masks ATC codes");
-  /** The constant MEDICINE. */
-  public static final ProviderType MEDICINE =
-      new ProviderType("MEDICINE", "Drug list", "Masks name of drugs");
   /** The constant REPLACE. */
   public static final ProviderType REPLACE = new ProviderType("REPLACE", "Replace",
       "Replaces and preserves parts of the value", TypeClass.CATEGORICAL, false);

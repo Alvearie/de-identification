@@ -16,9 +16,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -27,12 +30,9 @@ import com.ibm.whc.deid.utils.log.LogManager;
 public class MSISDNManager implements Serializable {
   /** */
   private static final long serialVersionUID = -7892640285929594432L;
-  protected static final Collection<ResourceEntry> callingCodesList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_CALLING_CODES);
-  protected static final Collection<ResourceEntry> areaCodeResourceList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_AREA_CODES);
-  protected static final Collection<ResourceEntry> phoneNumberDigitsList =
-      LocalizationManager.getInstance().getResources(Resource.PHONE_NUM_DIGITS);
+	protected final Collection<ResourceEntry> callingCodesList;
+	protected final Collection<ResourceEntry> areaCodeResourceList;
+	protected final Collection<ResourceEntry> phoneNumberDigitsList;
 
   protected MapWithRandomPick<String, String> countryCodeMap;
   protected Map<String, Set<String>> areaCodeMapByCountry;
@@ -48,9 +48,17 @@ public class MSISDNManager implements Serializable {
    * Instantiates a new Msisdn manager.
    *
    * @param tenantId
+ * @paramlocalizationProperty location of the localization property file
    */
-  public MSISDNManager(String tenantId) {
+  public MSISDNManager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		callingCodesList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_CALLING_CODES);
+		areaCodeResourceList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_AREA_CODES);
+		phoneNumberDigitsList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.PHONE_NUM_DIGITS);
+
     this.countryCodeMap = new MapWithRandomPick<>(new HashMap<String, String>());
     this.areaCodeMapByCountry = new HashMap<>();
     this.phoneNumberDigitsMap = new HashMap<>();
@@ -60,21 +68,23 @@ public class MSISDNManager implements Serializable {
     readResources(Resource.PHONE_NUM_DIGITS, tenantId);
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
-    switch (resourceType) {
-      case PHONE_CALLING_CODES:
-        this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
-        this.countryCodeMap.setKeyList();
-        break;
-      case PHONE_AREA_CODES:
-        this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
-        break;
-      case PHONE_NUM_DIGITS:
-        this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
-        break;
-      default:
-        // do nothing
-    }
+  protected void readResources(Resources resourceType, String tenantId) {
+    if (resourceType instanceof Resource) {
+      switch ((Resource) resourceType) {
+        case PHONE_CALLING_CODES:
+          this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
+          this.countryCodeMap.setKeyList();
+          break;
+        case PHONE_AREA_CODES:
+          this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
+          break;
+        case PHONE_NUM_DIGITS:
+          this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
+          break;
+        default:
+          // do nothing
+      }
+    } // else do nothing
   }
 
   protected Map<? extends String, ? extends Set<String>> readAreaCodeListFromFile(

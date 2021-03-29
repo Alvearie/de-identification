@@ -25,9 +25,12 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    * @param tenantId
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
-  public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId) {
+  public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.getPseudorandom = configuration.isMaskPseudorandom();
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
@@ -35,7 +38,7 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      countyManager = new CountyManager(null);
+      countyManager = new CountyManager(null, localizationProperty);
       initialized = true;
     }
   }

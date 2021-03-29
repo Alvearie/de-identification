@@ -23,10 +23,15 @@ public class ReligionIdentifier extends AbstractManagerBasedIdentifier {
 	private ReligionManager religionManager;
 	protected volatile boolean initialized = false;
 
+	public ReligionIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	protected Manager getManager() {
 		if (!initialized) {
-			religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(null, Resource.RELIGION, null);
+			religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(tenantId, Resource.RELIGION,
+					null, localizationProperty);
 
 			initialized = true;
 		}

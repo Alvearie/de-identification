@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,35 +25,34 @@ public class HashMaskingProviderConfigTest {
   @Test
   public void testValidate() throws Exception {
     HashMaskingProviderConfig config = new HashMaskingProviderConfig();
-    config.validate();
+    config.validate(null);
 
     config.setUnspecifiedValueHandling(5);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
     }
     config.setUnspecifiedValueHandling(3);
-    config.validate();
+    config.validate(null);
 
     config.setAlgorithmDefault(null);
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`algorithmDefault` is required", e.getMessage());
     }
     config.setAlgorithmDefault(" ");
     try {
-      config.validate();
+      config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`algorithmDefault` is required", e.getMessage());
     }
     // an algorithm not available on this system, might be available on the target system, so allow
     config.setAlgorithmDefault("myAlgorithm");
-    config.validate();
+    config.validate(null);
   }
-
 }

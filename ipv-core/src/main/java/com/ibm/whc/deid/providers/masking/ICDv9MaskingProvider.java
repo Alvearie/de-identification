@@ -34,9 +34,12 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
    *
    * @param configuration the configuration
    * @param tenantId tenant id
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
-  public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId) {
+  public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId,
+      String localizationProperty) {
+    super(tenantId, localizationProperty);
     this.randomizeToCategory = configuration.isRandomizeCategory();
     this.randomizeToRange = configuration.isRandomizeChapter();
 
@@ -86,8 +89,8 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
 
   protected void initialize() {
     if (!initialized) {
-      icdV9Manager =
-          (ICDv9Manager) ManagerFactory.getInstance().getManager(null, Resource.ICDV9, null);
+      icdV9Manager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ICDV9, null, localizationProperty);
       initialized = true;
     }
   }

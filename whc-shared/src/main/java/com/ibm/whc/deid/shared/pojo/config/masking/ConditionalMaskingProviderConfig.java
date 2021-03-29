@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,6 +8,7 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -34,17 +35,26 @@ public class ConditionalMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   @Override
-  public void validate() throws InvalidMaskingConfigurationException {
-    super.validate();
+  public void validate(DeidMaskingConfig maskingConfig)
+      throws InvalidMaskingConfigurationException {
+    super.validate(maskingConfig);
     if (maskRuleSet == null || maskRuleSet.isEmpty()) {
       throw new InvalidMaskingConfigurationException(
           "`maskRuleSet` must be specified with at least one entry");
     }
+    int offset = 0;
     for (ConditionalMaskRuleSet ruleSet : maskRuleSet) {
       if (ruleSet == null) {
-        throw new InvalidMaskingConfigurationException("entry in `maskRuleSet` is null");
+        throw new InvalidMaskingConfigurationException(
+            "entry at offset " + Integer.toString(offset) + " in `maskRuleSet` is null");
       }
-      ruleSet.validate("maskRuleSet");
+      try {
+        ruleSet.validate("maskRuleSet", maskingConfig);
+      } catch (InvalidMaskingConfigurationException e) {
+        throw new InvalidMaskingConfigurationException("entry at offset " + Integer.toString(offset)
+            + " in `maskRuleSet` is not valid: " + e.getMessage());
+      }
+      offset++;
     }
   }
 

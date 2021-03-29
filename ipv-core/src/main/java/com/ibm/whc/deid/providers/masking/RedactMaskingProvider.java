@@ -8,7 +8,7 @@ package com.ibm.whc.deid.providers.masking;
 import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
 
 public class RedactMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = 5183388096545702258L;
 
   private final boolean preserveLength;

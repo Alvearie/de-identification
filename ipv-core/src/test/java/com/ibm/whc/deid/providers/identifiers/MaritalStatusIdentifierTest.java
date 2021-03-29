@@ -9,10 +9,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class MaritalStatusIdentifierTest {
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+
+public class MaritalStatusIdentifierTest implements MaskingProviderTest {
   @Test
   public void testIsOfThisType() throws Exception {
-    MaritalStatusIdentifier maritalStatusIdentifier = new MaritalStatusIdentifier();
+    MaritalStatusIdentifier maritalStatusIdentifier =
+        new MaritalStatusIdentifier(tenantId, localizationProperty);
     String status = "Single";
     assertTrue(maritalStatusIdentifier.isOfThisType(status));
   }

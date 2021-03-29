@@ -10,11 +10,14 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -25,24 +28,26 @@ public class ICDv9Manager implements Manager, Serializable {
   /** */
   private static final long serialVersionUID = -5865782878844917863L;
 
-  protected static final Collection<ResourceEntry> resourceICDList =
-      LocalizationManager.getInstance().getResources(Resource.ICDV9);
+	protected final Collection<ResourceEntry> resourceICDList;
 
   protected final MapWithRandomPick<String, ICD> icdByCodeMap;
   protected final MapWithRandomPick<String, ICD> icdByNameMap;
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resource resourceType = Resource.ICDV9;
+  protected final Resources resourceType = Resource.ICDV9;
 
   protected final String tenantId;
 
-  /**
-   * Instantiates a new Ic dv 9 manager.
-   *
-   * @param tenantId
-   */
-  public ICDv9Manager(String tenantId) {
+  	/**
+	 * Instantiates a new Ic dv 9 manager.
+	 *
+	 * @param tenantId
+	 * @paramlocalizationProperty location of the localization property file
+	 */
+	public ICDv9Manager(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
+		resourceICDList = LocalizationManager.getInstance(localizationProperty)
+				.getResources(Resource.ICDV9);
     this.icdByCodeMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
     this.icdByNameMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
 
@@ -52,7 +57,7 @@ public class ICDv9Manager implements Manager, Serializable {
     this.icdByNameMap.setKeyList();
   }
 
-  protected void readResources(Resource resourceType, String tenantId) {
+  protected void readResources(Resources resourceType, String tenantId) {
     readICDList(resourceICDList);
   }
 

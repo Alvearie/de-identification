@@ -36,8 +36,8 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
 
   private static LogManager log = LogManager.getInstance();
 
-  public ReversePatternManager() {
-    super(null, Resource.PATTERN);
+  public ReversePatternManager(String localizationProperty) {
+    super(null, Resource.PATTERN, localizationProperty);
   }
 
   /**
@@ -47,7 +47,7 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
    */
   public static ReversePatternManager getInstance() {
     if (patternManager == null) {
-      patternManager = new ReversePatternManager();
+			patternManager = new ReversePatternManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
       patternManager.readResourcesFromFile(patternManager.getResources());
     }
     return patternManager;
@@ -101,7 +101,8 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
   /** Get the collection of all pattern resource locations, for all countries and languages */
   @Override
   protected Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance().getResources(Resource.PATTERN);
+		return LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+				.getResources(Resource.PATTERN);
   }
 
   /**

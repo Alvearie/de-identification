@@ -19,9 +19,9 @@ import com.ibm.whc.deid.utils.log.LogManager;
 
 public class MaskingProviderFactoryUtil {
 
-  private static DeidConfig deidConfig = null;
+  private static volatile DeidConfig deidConfig = null;
 
-  private static MaskingProviderFactory maskingProviderFactory = null;
+  private static volatile MaskingProviderFactory maskingProviderFactory = null;
 
   private static LogManager log = LogManager.getInstance();
 
@@ -63,9 +63,8 @@ public class MaskingProviderFactoryUtil {
       Constructor<? extends MaskingProviderFactory> constructor =
           (Constructor<? extends MaskingProviderFactory>) Class
               .forName(deidConfig.getMaskingProviderFactoryClass())
-							.getConstructor(DeidMaskingConfig.class, Map.class);
-      customMaskingProviderFactory =
-					constructor.newInstance(deidMaskingConfig, identifiedTypes);
+              .getConstructor(DeidMaskingConfig.class, Map.class);
+      customMaskingProviderFactory = constructor.newInstance(deidMaskingConfig, identifiedTypes);
     } catch (NoSuchMethodException | ClassNotFoundException | IllegalAccessException
         | InstantiationException | InvocationTargetException | DeidException e) {
       log.logError(LogCodes.WPH1013E, e);

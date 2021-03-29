@@ -20,11 +20,16 @@ public class CountyIdentifier extends AbstractManagerBasedIdentifier {
 
 	protected volatile boolean initialized = false;
 
+	public CountyIdentifier(String tenantId, String localizationProperty) {
+		super(tenantId, localizationProperty);
+	}
+
 	@Override
 	protected Manager getManager() {
 
 		if (!initialized) {
-			countyManager = (CountyManager) ManagerFactory.getInstance().getManager(null, Resource.COUNTY, null);
+			countyManager = (CountyManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTY, null,
+					localizationProperty);
 
 			initialized = true;
 		}

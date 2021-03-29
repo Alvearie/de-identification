@@ -10,12 +10,12 @@ import com.ibm.whc.deid.providers.identifiers.MACAddressIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MACAddressMaskingProviderConfig;
 
 public class MACAddressMaskingProvider extends AbstractMaskingProvider {
-  
+
   private static final long serialVersionUID = -5049095866017699568L;
 
   private static final char[] allowedCharacters = "abcdef0123456789".toCharArray();
   private static final MACAddressIdentifier macAddressIdentifier = new MACAddressIdentifier();
-  
+
   private final boolean preserveVendor;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
