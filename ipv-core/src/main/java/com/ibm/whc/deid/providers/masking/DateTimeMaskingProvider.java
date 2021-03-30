@@ -17,19 +17,12 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
-
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
-import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
 import com.ibm.whc.deid.util.Tuple;
-import com.ibm.whc.deid.utils.log.LogCodes;
 
 /**
  * The type Date time masking provider.
@@ -261,21 +254,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
-
-  private Date getDate(DateTimeFormatter f, String identifier) {
-    TemporalAccessor d = null;
-    try {
-      d = f.parse(identifier);
-    } catch (DateTimeParseException e) {
-      if (log.isWarnEnabled()) {
-        log.logWarn(LogCodes.WPH1012W, "DateTimeParseException was thrown when parsing the date");
-      }
-      return null;
-    }
-
-    return Date.from(Instant.from(d));
-  }
-
   /*
    * We can use LocalDate (org.joda.time.LocalDate) instead: LocalDate birthDate = new
    * LocalDate(birthYear, birthMonth, birthDay); LocalDate todayDate = new LocalDate(); Years ageYrs
@@ -295,74 +273,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     }
 
     return givenDate;
-  }
-
-  @Override
-  public String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,
-      Map<String, OriginalMaskedValuePair> maskedValues) {
-    try {
-      if (identifier == null) {
-        debugFaultyInput("identifier");
-        return null;
-      }
-
-      String operand = fieldRelationship.getOperands()[0].getName();
-      String baseMaskedValue = maskedValues.get(operand).getMasked();
-
-      RelationshipType relationshipType = fieldRelationship.getRelationshipType();
-      if (relationshipType == RelationshipType.EQUALS) {
-        return baseMaskedValue;
-      }
-
-      DateTimeFormatter f = dateTimeIdentifier.matchingFormat(baseMaskedValue);
-      if (f == null) {
-        return RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC));
-      }
-
-      Date d = getDate(f, baseMaskedValue);
-      if (d == null) {
-        return mask(identifier);
-      }
-
-      Date originalDate = getDate(f, identifier);
-      Date operandOriginalDate = getDate(f, maskedValues.get(operand).getOriginal());
-
-      if (operandOriginalDate == null) {
-        if (log.isDebugEnabled()) {
-          log.logDebug(LogCodes.WPH1000I, "operandOriginalDate is null");
-        }
-        return mask(identifier);
-      }
-
-      if (originalDate == null) {
-        if (log.isDebugEnabled()) {
-          log.logDebug(LogCodes.WPH1000I, "originalDate is null");
-        }
-        return mask(identifier);
-      }
-
-      long diff = (operandOriginalDate.getTime() - originalDate.getTime());
-
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(d);
-
-      switch (relationshipType) {
-        case LESS:
-          cal.setTimeInMillis(cal.getTimeInMillis() - diff);
-          break;
-        case GREATER:
-          cal.setTimeInMillis(cal.getTimeInMillis() + diff);
-          break;
-        default:
-          // XXX we should never reach this point!
-          return mask(identifier);
-      }
-
-      return f.format(cal.getTime().toInstant());
-    } catch (Exception e) {
-      logException(e);
-      return null;
-    }
   }
 
   @Override

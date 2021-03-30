@@ -7,92 +7,69 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.Continent;
-import com.ibm.whc.deid.models.Location;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class ContinentManager extends ResourceBasedManager<Continent> {
+/**
+ * Class that provides access to information about the continents known by the De-Identification
+ * service.
+ * 
+ * <p>
+ * Instances of this class are thread-safe.
+ */
+public class ContinentManager extends LocalizedResourceManager<Continent> {
 
-  private static final long serialVersionUID = -610638379564157663L;
-
-  protected Map<String, List<Location>> continentListMap;
-
-  private transient volatile ConcurrentHashMap<String, LatLonDistance<Continent>> distanceCalcMap =
-      null;
-
-  protected final SecureRandom random = new SecureRandom();
-
-  public ContinentManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.CONTINENT, localizationProperty);
+  private static final LogManager logger = LogManager.getInstance();
+  
+  protected ContinentManager() {
+    // nothing required here
   }
+  
+  /**
+   * Creates a new ContinentManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a ContinentManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static ContinentManager buildContinentManager(String localizationProperty) {
+    ContinentManager continentManager = new ContinentManager();
 
-  @Override
-  public void init() {
-    continentListMap = new HashMap<>();
-  }
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
+    for (ResourceEntry entry : resourceEntries) {
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
-  }
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-  @Override
-  public Map<String, Map<String, Continent>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, Continent>> continentsPerLocale = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String entryCountryCode = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          Double latitude = FileUtils.parseDouble(line.get(1));
-          Double longitude = FileUtils.parseDouble(line.get(2));
-          Continent continent = new Continent(name, entryCountryCode, latitude, longitude);
-
-          addToContinentList(continent, entryCountryCode);
-
-          addToMapByLocale(continentsPerLocale, entryCountryCode, name.toUpperCase(), continent);
-          addToMapByLocale(continentsPerLocale, getAllCountriesName(), name.toUpperCase(),
-              continent);
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+            String name = line.get(0);
+            Double latitude = FileUtils.parseDouble(line.get(1));
+            Double longitude = FileUtils.parseDouble(line.get(2));
+            Continent continent = new Continent(name, countryCode, latitude, longitude);
+            continentManager.add(continent);
+            continentManager.add(countryCode, continent);
+          }
         }
-        inputStream.close();
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return continentsPerLocale;
-  }
-
-  @Override
-  public Collection<Continent> getItemList() {
-    return getValues();
-  }
-
-  protected void addToContinentList(Continent continent, String countryCode) {
-    List<Location> list = continentListMap.get(countryCode);
-    if (list == null) {
-      list = new ArrayList<>();
-      continentListMap.put(countryCode, list);
-    }
-    list.add(continent);
+    return continentManager;
   }
 
   /**
@@ -105,26 +82,11 @@ public class ContinentManager extends ResourceBasedManager<Continent> {
    * @return a randomly selected continent from the nearby list
    */
   public Continent getClosestContinent(Continent continent, int k) {
-    LatLonDistance<Continent> distanceCalc = getDistanceCalculator(continent.getNameCountryCode());
+    LatLonDistance<Continent> distanceCalc = new LatLonDistance<>(getValues(continent.getNameCountryCode()));
     List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
     if (neighbors == null || neighbors.isEmpty()) {
       return getRandomValue();
     }
     return neighbors.get(random.nextInt(neighbors.size()));
-  }
-
-  private LatLonDistance<Continent> getDistanceCalculator(String countryCode) {
-    // OK if in a race condition multiple threads re-create this
-    ConcurrentHashMap<String, LatLonDistance<Continent>> map = distanceCalcMap;
-    if (map == null) {
-      map = new ConcurrentHashMap<>();
-      distanceCalcMap = map;
-    }
-    LatLonDistance<Continent> dist = map.get(countryCode);
-    if (dist == null) {
-      dist = new LatLonDistance<>(getValues(countryCode));
-      map.put(countryCode, dist);
-    }
-    return dist;
   }
 }
