@@ -10,21 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
-import com.ibm.whc.deid.models.ValueClass;
-import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.identifiers.CountryIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
-import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.schema.RelationshipOperand;
-import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountryMaskingProviderConfig;
 import com.ibm.whc.deid.util.CountryManager;
 import com.ibm.whc.deid.util.CountryNameSpecification;
@@ -136,26 +125,6 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     }
 
     assertTrue(randomizationOK > 0);
-  }
-
-  @Test
-  public void testCompoundMask() throws Exception {
-    CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
-    MaskingProvider countryMaskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-
-    String originalCountry = "Italy";
-
-    Map<String, OriginalMaskedValuePair> maskedValues = new HashMap<>();
-    maskedValues.put("city", new OriginalMaskedValuePair("Rome", "Athens"));
-
-    FieldRelationship fieldRelationship =
-        new FieldRelationship(ValueClass.LOCATION, RelationshipType.LINKED, "field0",
-            new RelationshipOperand[] {new RelationshipOperand("city", ProviderType.CITY)});
-
-    String maskedCountry =
-        countryMaskingProvider.mask(originalCountry, "field0", fieldRelationship, maskedValues);
-    assertEquals("Greece".toUpperCase(), maskedCountry.toUpperCase());
   }
 
   @Test

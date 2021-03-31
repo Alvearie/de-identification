@@ -23,7 +23,7 @@ public class StatesUSMaskingProvider extends AbstractMaskingProvider {
    * Instantiates a new StatusUS status masking provider.
    * 
    * @param configuration the configuration
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    * @param random the random
    */
   public StatesUSMaskingProvider(StatesUSMaskingProviderConfig configuration, String tenantId,

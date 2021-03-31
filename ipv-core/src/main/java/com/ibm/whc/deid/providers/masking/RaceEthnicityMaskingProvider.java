@@ -26,7 +26,7 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
   /**
    * @param configuration
    * @param tenantId
-   * @param localizationProperty TODO
+   * @paramlocalizationProperty location of the localization property file
    */
   public RaceEthnicityMaskingProvider(RaceEthnicityMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {

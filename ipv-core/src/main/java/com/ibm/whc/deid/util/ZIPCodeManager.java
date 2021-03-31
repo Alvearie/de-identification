@@ -36,7 +36,7 @@ public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Ser
    *
    * @param prefixLength the prefix length of ZIP codes
  * @param tenantId tenant id
- * @param localizationProperty TODO
+ * @paramlocalizationProperty location of the localization property file
    */
   public ZIPCodeManager(int prefixLength, String tenantId, String localizationProperty) {
     super(tenantId, Resource.ZIPCODE, localizationProperty);

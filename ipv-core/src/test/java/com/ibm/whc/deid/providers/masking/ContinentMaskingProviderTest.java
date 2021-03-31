@@ -11,23 +11,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
-import com.ibm.whc.deid.models.ValueClass;
-import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.identifiers.ContinentIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
-import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.schema.RelationshipOperand;
-import com.ibm.whc.deid.schema.RelationshipType;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -51,50 +40,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     for (int i = 0; i < 100; i++) {
       String maskedContinent = maskingProvider.mask(originalContinent);
       assertTrue(validNeighbors.contains(maskedContinent));
-    }
-  }
-
-  @Test
-  public void testCompoundMask() throws Exception {
-    ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String originalContinent = "Europe";
-
-    Map<String, OriginalMaskedValuePair> maskedValues = new HashMap<>();
-    maskedValues.put("country", new OriginalMaskedValuePair("Italy", "Australia"));
-
-    FieldRelationship fieldRelationship =
-        new FieldRelationship(ValueClass.LOCATION, RelationshipType.LINKED, "field0",
-            new RelationshipOperand[] {new RelationshipOperand("country", ProviderType.COUNTRY)});
-
-    for (int i = 0; i < 100; i++) {
-      String maskedContinent =
-          maskingProvider.mask(originalContinent, "field0", fieldRelationship, maskedValues);
-      assertEquals("Oceania".toUpperCase(), maskedContinent.toUpperCase());
-    }
-  }
-
-  @Test
-  public void testCompoundMaskLinkWithCity() throws Exception {
-    ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String originalContinent = "Europe";
-
-    Map<String, OriginalMaskedValuePair> maskedValues = new HashMap<>();
-    maskedValues.put("city", new OriginalMaskedValuePair("Rome", "Sydney"));
-
-    FieldRelationship fieldRelationship =
-        new FieldRelationship(ValueClass.LOCATION, RelationshipType.LINKED, "field0",
-            new RelationshipOperand[] {new RelationshipOperand("city", ProviderType.CITY)});
-
-    for (int i = 0; i < 100; i++) {
-      String maskedContinent =
-          maskingProvider.mask(originalContinent, "field0", fieldRelationship, maskedValues);
-      assertEquals("Oceania".toUpperCase(), maskedContinent.toUpperCase());
     }
   }
 
