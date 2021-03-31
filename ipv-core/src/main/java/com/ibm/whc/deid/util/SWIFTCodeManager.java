@@ -43,7 +43,7 @@ public class SWIFTCodeManager extends ResourceManager<SWIFTCode> {
    */
   protected final Map<String, List<SWIFTCode>> codeByCountryMap = new HashMap<>();
 
-  public SWIFTCodeManager() {
+  protected SWIFTCodeManager() {
     // nothing required here
   }
 

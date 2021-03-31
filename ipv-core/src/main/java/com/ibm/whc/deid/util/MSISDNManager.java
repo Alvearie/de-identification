@@ -1,128 +1,61 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
+import com.ibm.whc.deid.resources.KeyListResource;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.shared.localization.Resources;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
-import com.ibm.whc.deid.utils.log.LogCodes;
-import com.ibm.whc.deid.utils.log.LogManager;
 
-public class MSISDNManager implements Serializable {
-  /** */
-  private static final long serialVersionUID = -7892640285929594432L;
-	protected final Collection<ResourceEntry> callingCodesList;
-	protected final Collection<ResourceEntry> areaCodeResourceList;
-	protected final Collection<ResourceEntry> phoneNumberDigitsList;
+public class MSISDNManager {
 
-  protected MapWithRandomPick<String, String> countryCodeMap;
-  protected Map<String, Set<String>> areaCodeMapByCountry;
-  protected Map<String, List<Integer>> phoneNumberDigitsMap;
-  
-  private static final SecureRandom random = new SecureRandom();
+  protected final SecureRandom random = new SecureRandom();
 
-  private static LogManager logger = LogManager.getInstance();
+  protected final PhoneCountryCodesManager phoneCountryCodeManager;
+  protected final PhoneAreaCodesManager phoneAreaCodesManager;
+  protected final PhoneNumberLengthManager phoneNumberLengthManager;
 
-  protected final String tenantId;
+  protected MSISDNManager(PhoneCountryCodesManager phoneCountryCodeManager,
+      PhoneAreaCodesManager phoneAreaCodesManager,
+      PhoneNumberLengthManager phoneNumberLengthManager) {
+    this.phoneCountryCodeManager = phoneCountryCodeManager;
+    this.phoneAreaCodesManager = phoneAreaCodesManager;
+    this.phoneNumberLengthManager = phoneNumberLengthManager;
+  }
 
   /**
    * Instantiates a new Msisdn manager.
    *
-   * @param tenantId
- * @paramlocalizationProperty location of the localization property file
+   * @param localizationProperty location of the localization property file
    */
-  public MSISDNManager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-		callingCodesList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.PHONE_CALLING_CODES);
-		areaCodeResourceList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.PHONE_AREA_CODES);
-		phoneNumberDigitsList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.PHONE_NUM_DIGITS);
-
-    this.countryCodeMap = new MapWithRandomPick<>(new HashMap<String, String>());
-    this.areaCodeMapByCountry = new HashMap<>();
-    this.phoneNumberDigitsMap = new HashMap<>();
-
-    readResources(Resource.PHONE_CALLING_CODES, tenantId);
-    readResources(Resource.PHONE_AREA_CODES, tenantId);
-    readResources(Resource.PHONE_NUM_DIGITS, tenantId);
-  }
-
-  protected void readResources(Resources resourceType, String tenantId) {
-    if (resourceType instanceof Resource) {
-      switch ((Resource) resourceType) {
-        case PHONE_CALLING_CODES:
-          this.countryCodeMap.getMap().putAll(readCountryCodeListFromFile(callingCodesList));
-          this.countryCodeMap.setKeyList();
-          break;
-        case PHONE_AREA_CODES:
-          this.areaCodeMapByCountry.putAll(readAreaCodeListFromFile(areaCodeResourceList));
-          break;
-        case PHONE_NUM_DIGITS:
-          this.phoneNumberDigitsMap.putAll(readPhoneNumberDigitListFromFile(phoneNumberDigitsList));
-          break;
-        default:
-          // do nothing
-      }
-    } // else do nothing
-  }
-
-  protected Map<? extends String, ? extends Set<String>> readAreaCodeListFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Set<String>> codes = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String country = line.get(0);
-          String areaCode = line.get(1);
-
-          if (!codes.containsKey(country)) {
-            codes.put(country, new HashSet<String>());
-          }
-
-          codes.get(country).add(areaCode);
-        }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Failed to load area code list " + " for tenant " + tenantId, e);
-      }
-    }
-
-    return codes;
+  public static MSISDNManager buildMSISDNManager(String tenantId, String localizationProperty) {
+    MSISDNManager mgr = new MSISDNManager(
+        (PhoneCountryCodesManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.PHONE_CALLING_CODES, null, localizationProperty),
+        (PhoneAreaCodesManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.PHONE_AREA_CODES, null, localizationProperty),
+        (PhoneNumberLengthManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.PHONE_NUM_DIGITS, null, localizationProperty));
+    return mgr;
   }
 
   public boolean isValidCountryNumDigits(String countryCode, int inputNumDigits) {
-    List<Integer> numDigitsList = phoneNumberDigitsMap.get(countryCode);
+    List<Integer> numDigitsList = null;
+    KeyListResource<Integer> resource = phoneNumberLengthManager.getValue(countryCode);
+    if (resource != null) {
+      numDigitsList = resource.getValue();
+    }
+
     if (numDigitsList == null) {
       // since we do not know the number of phone digits for this country
       // code, assume the digits is valid.
       return true;
     }
     for (Integer numDigits : numDigitsList) {
-      if (numDigits.equals(inputNumDigits)) {
+      if (inputNumDigits == numDigits.intValue()) {
         return true;
       }
     }
@@ -136,12 +69,6 @@ public class MSISDNManager implements Serializable {
    * @return the boolean
    */
   public boolean isValidUSNumber(String data) {
-
-    Set<String> areaCodeMap = areaCodeMapByCountry.get("USA");
-    if (areaCodeMap == null) {
-      return false;
-    }
-
     if (data.length() == 10) {
       for (int i = 0; i < data.length(); i++) {
         char c = data.charAt(i);
@@ -149,83 +76,38 @@ public class MSISDNManager implements Serializable {
           return false;
         }
       }
-
       String areaCode = data.substring(0, 3);
-      if (areaCodeMap.contains(areaCode)) {
-        return true;
-      }
+      return phoneAreaCodesManager.isValidKey("USA", areaCode);
     }
-
     return false;
   }
 
-  protected Map<? extends String, ? extends String> readCountryCodeListFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, String> names = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      try (CSVParser reader = Readers.createCSVReaderFromStream(entry.createStream())) {
-        for (CSVRecord line : reader) {
-          names.put(line.get(0), line.get(1));
-        }
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Failed to load country code list " + " for tenant " + tenantId, e);
+  /**
+   * Return a valid phone number length for a phone number accessed via the given phone country
+   * code. If more than one length is valid for the given country code, one of the valid lengths is
+   * randomly selected.
+   * 
+   * @param countryCode a phone country calling code, such as "1" for USA
+   * 
+   * @return a valid length for a phone number associated with the given country code or <i>null</i>
+   *         if information is not known for the given country code
+   */
+  public Integer getRandomPhoneNumberDigitsByCountry(String countryCode) {
+    Integer selectedLength = null;
+    List<Integer> numDigitsList = null;
+    KeyListResource<Integer> resource = phoneNumberLengthManager.getValue(countryCode);
+    if (resource != null) {
+      numDigitsList = resource.getValue();
+    }
+    if (numDigitsList != null) {
+      int count = numDigitsList.size();
+      if (count == 1) {
+        selectedLength = numDigitsList.get(0);
+      } else if (count > 1) {
+        selectedLength = numDigitsList.get(random.nextInt(count));
       }
     }
-
-    return names;
-  }
-
-  protected Map<? extends String, ? extends List<Integer>> readPhoneNumberDigitListFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, List<Integer>> phoneNumberDigitMap = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      try (CSVParser reader = Readers.createCSVReaderFromStream(entry.createStream())) {
-        for (CSVRecord line : reader) {
-          String currArrayString = line.get(1);
-          List<Integer> currList = new ArrayList<>();
-          if (currArrayString.contains("-")) {
-            String[] currArray = currArrayString.split("-");
-            int startNum = Integer.parseInt(currArray[0]);
-            int endNum = Integer.parseInt(currArray[1]);
-            for (int idx = startNum; idx <= endNum; idx++) {
-              currList.add(idx);
-            }
-          } else if (currArrayString.contains("|")) {
-            String[] currArray = currArrayString.split("\\|");
-            for (int idx = 0; idx < currArray.length; idx++) {
-              currList.add(Integer.parseInt(currArray[idx]));
-            }
-          } else {
-            currList.add(Integer.parseInt(currArrayString));
-          }
-          phoneNumberDigitMap.put(line.get(0), currList);
-        }
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Failed to load phone number digit list " + " for tenant " + tenantId, e);
-      }
-    }
-
-    return phoneNumberDigitMap;
-  }
-
-  public int getRandomPhoneNumberDigitsByCountry(String countryCode) {
-    List<Integer> numberList = phoneNumberDigitsMap.get(countryCode);
-
-    int randNumber = random.nextInt(numberList.size());
-    return numberList.get(randNumber);
-  }
-
-  public boolean isCountryWithValidDigitMap(String countryCode) {
-    List<Integer> numberList = phoneNumberDigitsMap.get(countryCode);
-    if (numberList == null || numberList.isEmpty()) {
-      return false;
-    } else {
-      return true;
-    }
+    return selectedLength;
   }
 
   /**
@@ -234,7 +116,7 @@ public class MSISDNManager implements Serializable {
    * @return the random country code
    */
   public String getRandomCountryCode() {
-    return this.countryCodeMap.getRandomKey();
+    return phoneCountryCodeManager.getRandomKey();
   }
 
   /**
@@ -244,11 +126,6 @@ public class MSISDNManager implements Serializable {
    * @return the boolean
    */
   public boolean isValidCountryCode(String country) {
-    if (country == null || country.length() > 3) {
-      return false;
-    }
-
-    return countryCodeMap.getMap().containsKey(country.toUpperCase());
+    return phoneCountryCodeManager.isValidKey(country);
   }
-
 }

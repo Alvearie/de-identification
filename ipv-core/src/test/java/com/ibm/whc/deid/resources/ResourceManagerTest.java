@@ -180,4 +180,14 @@ public class ResourceManagerTest {
     assertTrue(mgr.isValidKey("ONE"));
     assertFalse(mgr.isValidKey(null));
   }
+  
+  @Test
+  public void testDuplicateResourceKey() {
+    TestResourceManager mgr = new TestResourceManager();
+    mgr.add(new TestResource("value"));
+    mgr.add(new TestResource("Value"));
+    
+    assertEquals(2, mgr.getValues().size());
+    assertEquals(1, mgr.getKeys().size());
+  }
 }

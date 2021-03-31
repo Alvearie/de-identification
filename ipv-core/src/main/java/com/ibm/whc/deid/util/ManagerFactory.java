@@ -8,6 +8,7 @@ package com.ibm.whc.deid.util;
 import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * Class that provides instances of resource managers of all supported types.
@@ -39,8 +40,7 @@ public class ManagerFactory {
 	 * @return
 	 */
   public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
-    // The manager needs to be tenant specific based on type and localization
-    String cacheKey = tenantId + "_" + resourceType + "_" + localizationProperty;
+    String cacheKey = resourceType + "_" + localizationProperty;
     Manager manager = managers.get(cacheKey);
 
     if (manager != null) {
@@ -60,7 +60,7 @@ public class ManagerFactory {
     if (resourceType instanceof Resource) {
       switch ((Resource) resourceType) {
         case ATC_CODES:
-          manager = new ATCManager(tenantId, localizationProperty);
+          manager = ATCManager.buildATCManager(localizationProperty);
           break;
         case CITY:
           manager = CityManager.buildCityManager(localizationProperty);
@@ -101,6 +101,15 @@ public class ManagerFactory {
         case OCCUPATION:
           manager = new OccupationManager(tenantId, localizationProperty);
           break;
+        case PHONE_AREA_CODES:
+          manager = PhoneAreaCodesManager.buildPhoneAreaCodesManager(localizationProperty);
+          break;
+        case PHONE_CALLING_CODES:
+          manager = PhoneCountryCodesManager.buildPhoneCountryCodesManager(localizationProperty);
+          break;
+        case PHONE_NUM_DIGITS:
+          manager = PhoneNumberLengthManager.buildPhoneNumberLengthManager(localizationProperty);
+          break;          
         case RACE_ETHNICITY:
           manager = new RaceManager(tenantId, localizationProperty);
           break;

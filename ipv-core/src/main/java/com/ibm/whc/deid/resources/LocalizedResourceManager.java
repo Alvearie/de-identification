@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.ibm.whc.deid.models.LocalizedEntity;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
 /**
  * Extension of the ResourceManager class that further manages resources by locale.
@@ -19,6 +21,8 @@ import com.ibm.whc.deid.models.LocalizedEntity;
 public abstract class LocalizedResourceManager<K extends ManagedResource>
     extends ResourceManager<K> {
 
+  private static final LogManager logger = LogManager.getInstance();
+  
   /**
    * A map of a locale identifier (key) to the list (value) of resources related to that locale
    */
@@ -51,7 +55,10 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
       map = new HashMap<>();
       localizedResourceMapMap.put(localeCode, map);
     }
-    map.put(resource.getKey().toUpperCase(), resource);
+    K oldValue = map.put(resource.getKey().toUpperCase(), resource);
+    if (oldValue != null) {
+      logger.logWarn(LogCodes.WPH1022W, localeCode, oldValue.getKey());
+    }
   }
 
   /**

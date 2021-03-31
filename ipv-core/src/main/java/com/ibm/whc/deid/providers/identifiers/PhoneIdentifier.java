@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,14 +26,10 @@ import com.ibm.whc.deid.utils.log.LogManager;
  */
 public class PhoneIdentifier extends AbstractIdentifier {
 
-  /** */
   private static final long serialVersionUID = -5245668163814340807L;
 
   private static final String[] appropriateNames =
       {"Phone Number", "Mobile", "Mobile Number", "Telephone", "Tel."};
-
-  /** The constant msisdnManager. */
-	public final MSISDNManager msisdnManager;
 
   private final static LogManager log = LogManager.getInstance();
 
@@ -56,9 +52,14 @@ public class PhoneIdentifier extends AbstractIdentifier {
   // allow users to provide custom patterns.
   private final Pattern[] customPatterns;
 
-  public PhoneIdentifier(List<String> customRegexPatterns, String tenantId, String localizationProperty) {
+  private final String tenantId;
+  private final String localizationProperty;
+  
+  protected transient volatile MSISDNManager msisdnManager = null;
 
-		msisdnManager = new MSISDNManager(tenantId, localizationProperty);
+  public PhoneIdentifier(List<String> customRegexPatterns, String tenantId, String localizationProperty) {
+    this.tenantId = tenantId;
+    this.localizationProperty = localizationProperty;
     if (customRegexPatterns == null) {
       customPatterns = null;
     } else {
@@ -188,5 +189,12 @@ public class PhoneIdentifier extends AbstractIdentifier {
   @Override
   protected Collection<String> getAppropriateNames() {
     return Arrays.asList(appropriateNames);
+  }
+  
+  protected MSISDNManager getMSISDNManager() {
+    if (msisdnManager == null) {
+      msisdnManager = MSISDNManager.buildMSISDNManager(tenantId, localizationProperty);
+    }
+    return msisdnManager;
   }
 }
