@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+# Note we do not use a -e flag here. The gitCommitPomFiles function relies on return code
+# to determine if a pom.xml file has been changed.  If we set -e, we 'll need to
+# modify that method
+set -x
+
+rc=0
+
+#########################################################
+# Update the maven version for each build               #
+#########################################################
+# Remember the current directory.  Subsequent functions may go into different directories
+export rootDir=`pwd`
+
+DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
+curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+
+source toolchain_util.sh
+
+
+#########################################################
+# Setup the artifactory repo settings                   #
+#########################################################
+if [ ! -f ${HOME}/.m2/settings.xml ]; then
+    mkdir ${HOME}/.m2
+fi
+
+curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
+
+# Update dependency version
+GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+GIT_REPO=de-identification
+export gitApiKey=${githubPubApiKey}
+RELEASE_VERSION=0.0.1
+MAVEN_VERSION="${RELEASE_VERSION}.${GIT_BRANCH}-SNAPSHOT"
+CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+#########################################################
+# Main build                                            #
+#########################################################
+mvn -B clean install 
+
+rc=$((rc || $? ))
+
+if [[ ! "$rc" == "0" ]]; then
+    echo "BUILD FAILURE; SEE ABOVE OUTPUT FOR DETAILS AND RESOLUTION";
+    exit $rc;
+fi
+
+#########################################################
+# Deploy the binaries to artifactory using maven        #
+#########################################################
+mvn -B deploy -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+
+rc=$((rc || $? ))
+
+if [[ ! "$rc" == "0" ]]; then
+    echo "FAILED to deploy artifacts; SEE ABOVE OUTPUT FOR DETAILS AND RESOLUTION";
+    exit $rc;
+fi
