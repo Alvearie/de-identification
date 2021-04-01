@@ -80,6 +80,12 @@ public class ManagerFactory {
         case CREDIT_CARD_TYPE:
           manager = new CreditCardTypeManager(tenantId, localizationProperty);
           break;
+        case FIRST_NAME_FEMALE:
+          manager = NameFirstFemaleManager.buildNameFirstFemaleManager(localizationProperty);
+          break;
+        case FIRST_NAME_MALE:
+          manager = NameFirstMaleManager.buildNameFirstMaleManager(localizationProperty);
+          break;
         case GENDER:
           manager = new GenderManager(tenantId, localizationProperty);
           break;
@@ -94,6 +100,9 @@ public class ManagerFactory {
           break;
         case TACDB:
           manager = new IMEIManager(tenantId, localizationProperty);
+          break;
+        case LAST_NAME:
+          manager = NameLastManager.buildNameLastManager(localizationProperty);
           break;
         case MARITAL_STATUS:
           manager = new MaritalStatusManager(tenantId, localizationProperty);

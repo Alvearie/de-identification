@@ -94,7 +94,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
     String prefix = getMatchedGroup(m, "prefix");
 
     String countryCode = getMatchedGroup(m, "countryCode");
-    if (countryCode != null && !msisdnManager.isValidCountryCode(countryCode)) {
+    if (countryCode != null && !getMSISDNManager().isValidCountryCode(countryCode)) {
       return null;
     }
 
@@ -169,7 +169,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
       return true;
     }
 
-    if (msisdnManager.isValidUSNumber(data)) {
+    if (getMSISDNManager().isValidUSNumber(data)) {
       return true;
     }
 

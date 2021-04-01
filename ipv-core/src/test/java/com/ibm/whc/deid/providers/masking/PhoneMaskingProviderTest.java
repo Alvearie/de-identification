@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,20 +12,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.PhoneIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
-import com.ibm.whc.deid.util.MSISDNManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
@@ -179,21 +175,19 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    configuration.setInvNdigitsReplaceWith("53"); // Cuba
-    // country
-    // code
-    MaskingProvider maskingProvider =
+    // Cuba country code
+    configuration.setInvNdigitsReplaceWith("53");
+    PhoneMaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "+53-08766532550864345656";
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
-
     assertFalse(maskedPhone.equals(invalidPhone));
     assertTrue(identifier.isOfThisType(maskedPhone));
-    assertFalse(msisdnManager.isValidCountryNumDigits("53", maskedPhone.split("-")[1].length()));
+    assertFalse(maskingProvider.getMSISDNManager().isValidCountryNumDigits("53",
+        maskedPhone.split("-")[1].length()));
   }
 
   @Test
@@ -201,21 +195,19 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    configuration.setInvNdigitsReplaceWith("34"); // Spain
-    // country
-    // code
-    MaskingProvider maskingProvider =
+    // Spain country code
+    configuration.setInvNdigitsReplaceWith("34");
+    PhoneMaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
-
     assertFalse(maskedPhone.equals(invalidPhone));
     assertTrue(identifier.isOfThisType(maskedPhone));
-    assertTrue(msisdnManager.isValidCountryNumDigits("34", maskedPhone.split("-")[1].length()));
+    assertTrue(maskingProvider.getMSISDNManager().isValidCountryNumDigits("34",
+        maskedPhone.split("-")[1].length()));
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
@@ -224,21 +216,21 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    configuration.setInvNdigitsReplaceWith("538"); // Invalid
-    // country
-    // code
-    MaskingProvider maskingProvider =
+    // Invalid country code
+    configuration.setInvNdigitsReplaceWith("538");
+    PhoneMaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
 
     String invalidPhone = "Invalid Phone";
     String maskedPhone = maskingProvider.mask(invalidPhone);
-
-    MSISDNManager msisdnManager = new MSISDNManager(tenantId, localizationProperty);
-
     assertFalse(maskedPhone.equals(invalidPhone));
+
     assertTrue(identifier.isOfThisType(maskedPhone));
-    assertTrue(msisdnManager.isValidCountryNumDigits("1", maskedPhone.split("-")[1].length()));
+
+    assertTrue(maskingProvider.getMSISDNManager().isValidCountryNumDigits("1",
+        maskedPhone.split("-")[1].length()));
+
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

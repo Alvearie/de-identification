@@ -18,8 +18,12 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 /**
- * Class that provides access to information about the telephone area codes 
- * known by the De-Identification service.
+ * Class that provides access to information about the telephone area codes known by the
+ * De-Identification service.
+ * 
+ * <p>
+ * Each area code is represented by a resource object. The key of the resource is the area code
+ * itself.
  * 
  * <p>
  * Instances of this class are thread-safe.
@@ -27,7 +31,7 @@ import com.ibm.whc.deid.utils.log.LogManager;
 public class PhoneAreaCodesManager extends LocalizedResourceManager<PhoneAreaCodeResource> {
 
   private static final LogManager logger = LogManager.getInstance();
-  
+
   protected PhoneAreaCodesManager() {
     // nothing required here
   }
@@ -45,9 +49,9 @@ public class PhoneAreaCodesManager extends LocalizedResourceManager<PhoneAreaCod
   public static PhoneAreaCodesManager buildPhoneAreaCodesManager(String localizationProperty) {
     PhoneAreaCodesManager mgr = new PhoneAreaCodesManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(Resource.PHONE_AREA_CODES);
-    
+    Collection<ResourceEntry> resourceEntries = LocalizationManager
+        .getInstance(localizationProperty).getResources(Resource.PHONE_AREA_CODES);
+
     for (ResourceEntry entry : resourceEntries) {
       try (InputStream inputStream = entry.createStream()) {
 
@@ -63,7 +67,7 @@ public class PhoneAreaCodesManager extends LocalizedResourceManager<PhoneAreaCod
             }
           }
         }
-        
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH2003E,
             "Failed to load telephone area code list " + " for tenant ", e);

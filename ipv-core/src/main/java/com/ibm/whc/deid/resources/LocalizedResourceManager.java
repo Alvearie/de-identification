@@ -44,16 +44,17 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
    * @param resource the resource being added
    */
   protected void add(String localeCode, K resource) {
-    ArrayList<K> list = localizedResourceListMap.get(localeCode);
+    String lcode = localeCode.toLowerCase();
+    ArrayList<K> list = localizedResourceListMap.get(lcode);
     if (list == null) {
       list = new ArrayList<>();
-      localizedResourceListMap.put(localeCode, list);
+      localizedResourceListMap.put(lcode, list);
     }
     list.add(resource);
-    HashMap<String, K> map = localizedResourceMapMap.get(localeCode);
+    HashMap<String, K> map = localizedResourceMapMap.get(lcode);
     if (map == null) {
       map = new HashMap<>();
-      localizedResourceMapMap.put(localeCode, map);
+      localizedResourceMapMap.put(lcode, map);
     }
     K oldValue = map.put(resource.getKey().toUpperCase(), resource);
     if (oldValue != null) {

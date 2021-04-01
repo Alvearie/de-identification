@@ -8,6 +8,7 @@ package com.ibm.whc.deid.util;
 import java.security.SecureRandom;
 import java.util.List;
 import com.ibm.whc.deid.resources.KeyListResource;
+import com.ibm.whc.deid.resources.KeyValueResource;
 import com.ibm.whc.deid.shared.localization.Resource;
 
 public class MSISDNManager {
@@ -69,16 +70,29 @@ public class MSISDNManager {
    * @return the boolean
    */
   public boolean isValidUSNumber(String data) {
-    if (data.length() == 10) {
-      for (int i = 0; i < data.length(); i++) {
+    String usCallingCode = "1";
+    String usAreaCodeLocalizationToken = "USA";
+    
+    // get the phone number length for the calling code, assume 10 if not found
+    int usNumberLength = 10;
+    KeyListResource<Integer> listResource = phoneNumberLengthManager.getValue(usCallingCode);
+    if (listResource != null && !listResource.getValue().isEmpty()) {
+      Integer lengthInt = listResource.getValue().get(0);
+      usNumberLength = lengthInt.intValue();
+    }
+    
+    if (data.length() == usNumberLength) {
+      for (int i = 0; i < usNumberLength; i++) {
         char c = data.charAt(i);
         if (c < '0' || c > '9') {
           return false;
         }
       }
-      String areaCode = data.substring(0, 3);
-      return phoneAreaCodesManager.isValidKey("USA", areaCode);
+      
+      String areaCode = data.substring(0, 3);      
+      return phoneAreaCodesManager.isValidKey(usAreaCodeLocalizationToken, areaCode);
     }
+    
     return false;
   }
 

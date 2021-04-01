@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,43 +7,40 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
-import com.ibm.whc.deid.util.NamesManager.NameManager;
+import com.ibm.whc.deid.util.NamesManager;
 import com.ibm.whc.deid.util.NumberUtils;
 import com.ibm.whc.deid.util.Tuple;
 
 /** The type Name identifier. */
 public class NameIdentifier extends AbstractIdentifier implements IdentifierWithOffset {
-  /** */
+
   private static final long serialVersionUID = -3461223001285905204L;
 
-	private NameManager nameNanager;
   private static final String[] appropriateNames = {"Name", "Surname"};
 
-	protected volatile boolean initialized = false;
-	
-	protected String tenantId;
-	protected String localizationProperty;
+  protected transient volatile NamesManager namesResourceManager = null;
 
-	public NameIdentifier(String tenantId, String localizationProperty) {
-		this.tenantId = tenantId;
-		this.localizationProperty = localizationProperty;
-	}
+  protected String tenantId;
+  protected String localizationProperty;
+
+  public NameIdentifier(String tenantId, String localizationProperty) {
+    this.tenantId = tenantId;
+    this.localizationProperty = localizationProperty;
+  }
 
   @Override
   public ProviderType getType() {
     return ProviderType.NAME;
   }
 
-	protected NameManager getManager() {
-		if (!initialized) {
-			nameNanager = new NameManager(tenantId, localizationProperty);
-			initialized = true;
-		}
-		return nameNanager;
-	}
+  protected NamesManager getManager() {
+    if (namesResourceManager == null) {
+      namesResourceManager = NamesManager.buildNamesManager(tenantId, localizationProperty);
+    }
+    return namesResourceManager;
+  }
 
   @Override
   public boolean isOfThisType(String data) {
@@ -64,9 +61,9 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
         candidate = candidate.toUpperCase();
 
-				if (getManager().isLastName(candidate))
+        if (getManager().isLastName(candidate))
           hasSurname = true;
-				else if (getManager().isFirstName(candidate))
+        else if (getManager().isFirstName(candidate))
           hasName = true;
         else {
           return false; // something does not match, maybe avenue or
@@ -140,9 +137,9 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
         candidate = candidate.toUpperCase();
 
-				if (getManager().isLastName(candidate))
+        if (getManager().isLastName(candidate))
           hasSurname = true;
-				else if (getManager().isFirstName(candidate))
+        else if (getManager().isFirstName(candidate))
           hasName = true;
         else {
           return new Tuple<>(false, null); // something does not match, maybe avenue or so?

@@ -15,6 +15,8 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
   
   private static final long serialVersionUID = 2743280303243192992L;
 
+  protected transient volatile ATCManager atcManager = null;
+  
   protected final int levelsToKeep;
   protected final int prefixPreserveLength;
   protected final int unspecifiedValueHandling;
@@ -41,11 +43,12 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
     }
   }
 
-  protected volatile boolean initialized = false;
-
   protected ATCManager getManager() {
-    return (ATCManager) ManagerFactory.getInstance().getManager(tenantId,
+    if (atcManager == null) {
+      atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.ATC_CODES, null, localizationProperty);
+    }
+    return atcManager;
   }
 
   @Override
@@ -56,9 +59,7 @@ public class ATCMaskingProvider extends AbstractMaskingProvider {
         return null;
       }
 
-      ATCManager atcManager = getManager();
-
-      if (!atcManager.isValidKey(identifier) || prefixPreserveLength == 7) {
+      if (!getManager().isValidKey(identifier) || prefixPreserveLength == 7) {
         // For this provider, we do not return random ATC
         log.logWarn(LogCodes.WPH1011W, "identifier", "ATC masking");
         if (unspecifiedValueHandling == 3) {

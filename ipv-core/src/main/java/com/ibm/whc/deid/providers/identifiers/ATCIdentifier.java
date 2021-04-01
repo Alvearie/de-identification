@@ -21,14 +21,19 @@ public class ATCIdentifier extends AbstractManagerBasedIdentifier {
 
 	private final String[] appropriateNames = new String[] { "ATC" };
 
+	protected transient volatile ATCManager atcManager = null;
+	
 	public ATCIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
 	}
 
 	@Override
 	protected Manager getManager() {
-	  return (ATCManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ATC_CODES, null,
+	  if (atcManager == null) {
+	    atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ATC_CODES, null,
 					localizationProperty);
+	  }
+	  return atcManager;
 	}
 
 	@Override

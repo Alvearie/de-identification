@@ -8,56 +8,114 @@ package com.ibm.whc.deid.providers.masking;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.NameIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
-import com.ibm.whc.deid.util.NamesManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
   private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
-  private final NamesManager.NameManager names =
-      new NamesManager.NameManager(null, localizationProperty);
 
   @Test
   public void testMask() throws Exception {
-    NameMaskingProviderConfig defaultConfiguration = new NameMaskingProviderConfig();
+    NameMaskingProviderConfig config = new NameMaskingProviderConfig();
     NameMaskingProvider nameMaskingProvider =
-        new NameMaskingProvider(defaultConfiguration, tenantId, localizationProperty);
+        new NameMaskingProvider(config, tenantId, localizationProperty);
 
-    String name = "John";
-    String res = nameMaskingProvider.mask(name);
-    assertFalse(name.equals(res));
-    // After enabling the "names.masking.genderPreserve", the Gender can
-    // change so commenting out some Asserts
-    // assertTrue(names.getGender(name) == names.getGender(res));
+    doTestChanged(nameMaskingProvider, "John");
 
     // capitalization shouldn't matter
-    name = "JoHn";
-    res = nameMaskingProvider.mask(name);
-    assertFalse(name.equals(res));
-    // assertTrue(names.getGender(name) == names.getGender(res));
-
-    // female detection
-    name = "Mary";
-    res = nameMaskingProvider.mask(name);
-    assertFalse(name.equals(res));
-    // assertTrue(names.getGender(name) == names.getGender(res));
-
-    // surname detection
-    name = "Smith";
-    res = nameMaskingProvider.mask(name);
-    assertFalse(name.equals(res));
-    assertTrue(names.isLastName(res));
+    doTestChanged(nameMaskingProvider, "JoHn");
   }
 
+  private String doTestChanged(NameMaskingProvider nameMaskingProvider, String input) {
+    String res = null;
+    boolean changed = false;
+    for (int i = 0; i < 10; i++) {
+      res = nameMaskingProvider.mask(input);
+      assertNotNull(res);
+      assertFalse(res.isEmpty());
+      if (!input.equals(res)) {
+        changed = true;
+        break;
+      }
+    }
+    assertTrue(changed);
+    return res;
+  }
 
+  @Test
+  public void testMaskGender() throws Exception {
+    String testProp = "/localization/test.name.localization.properties";
+    List<String> femaleNames = Arrays.asList("Veronica", "Michelle", "Tanya");
+    List<String> maleNames =
+        Arrays.asList("Roger", "Jarrett", "Dumas", "Denis", "Mark", "Rafat", "Bobby");
+    List<String> lastNames = Arrays.asList("Anderson", "Stevenson", "Holm", "Rodriguez", "Stewart");
+    List<String> unisexNames = Arrays.asList("Chris", "Alice");
+
+    NameMaskingProviderConfig config = new NameMaskingProviderConfig();
+    config.setMaskGenderPreserve(true);
+    config.setMaskingAllowUnisex(false);
+    config.setUnspecifiedValueHandling(3);
+    NameMaskingProvider provider = new NameMaskingProvider(config, tenantId, testProp);
+
+    assertEquals("OTHER", provider.mask("John"));
+
+    boolean changed = false;
+    for (int i = 0; i < 20; i++) {
+      String name = provider.mask("Tanya");
+      assertNotNull(name);
+      assertTrue(femaleNames.contains(name));
+      if (!"Tanya".equals(name)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    changed = false;
+    for (int i = 0; i < 20; i++) {
+      String name = provider.mask("Holm");
+      assertNotNull(name);
+      assertTrue(lastNames.contains(name));
+      if (!"Holm".equals(name)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    changed = false;
+    for (int i = 0; i < 20; i++) {
+      String name = provider.mask("Roger");
+      assertNotNull(name);
+      assertTrue(maleNames.contains(name));
+      if (!"Roger".equals(name)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    config.setMaskingAllowUnisex(true);
+    provider = new NameMaskingProvider(config, tenantId, testProp);
+
+    changed = false;
+    for (int i = 0; i < 20; i++) {
+      String name = provider.mask("Roger");
+      assertNotNull(name);
+      assertTrue(maleNames.contains(name) || unisexNames.contains(name));
+      if (!"Roger".equals(name)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+  }
 
   @Test
   public void testMaskNameAndSurname() throws Exception {
@@ -224,6 +282,9 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String maskedName2 = mp.mask(original2);
 
     assertEquals(maskedName1.split(" ")[0], maskedName2.split(" ")[0]);
-  }
 
+    // repeat calls, same results
+    assertEquals(maskedName1, mp.mask(original1));
+    assertEquals(maskedName2, mp.mask(original2));
+  }
 }
