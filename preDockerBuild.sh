@@ -23,8 +23,6 @@ export rootDir=`pwd`
 DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
 
-source toolchain_util.sh
-
 
 #########################################################
 # Setup the artifactory repo settings                   #
@@ -35,13 +33,9 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-# Update dependency version
+
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-GIT_REPO=de-identification
-export gitApiKey=${githubPubApiKey}
-RELEASE_VERSION=0.0.1
-MAVEN_VERSION="${RELEASE_VERSION}.${GIT_BRANCH}-SNAPSHOT"
-CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+echo "-Drevision=${GIT_BRANCH}" >  .mvn/maven.config
 
 #########################################################
 # Main build                                            #
