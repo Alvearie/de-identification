@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+#
+#  (C) Copyright IBM Corp. 2021
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Script to build de-identification in IBM toolchain 
+#
 
 # Note we do not use a -e flag here. The gitCommitPomFiles function relies on return code
 # to determine if a pom.xml file has been changed.  If we set -e, we 'll need to
