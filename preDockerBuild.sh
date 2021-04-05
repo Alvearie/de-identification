@@ -40,6 +40,8 @@ if ! [ -z "$DEVELOPER_ID" ]; then
 else
     echo "-Drevision=1.0.0-SNAPSHOT" >  .mvn/maven.config
 fi
+echo "revision:"
+cat .mvn/maven.config
 
 #########################################################
 # Main build                                            #
