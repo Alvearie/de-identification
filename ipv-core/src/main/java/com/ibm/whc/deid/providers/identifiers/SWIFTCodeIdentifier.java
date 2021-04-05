@@ -23,14 +23,19 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
 
   private static final String[] appropriateNames = {"SWIFT"};
 
+  protected transient volatile SWIFTCodeManager swiftCodeManager = null;
+
   public SWIFTCodeIdentifier(String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);
   }
 
   @Override
   protected Manager getManager() {
-    return (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.SWIFT,
-        null, localizationProperty);
+    if (swiftCodeManager == null) {
+      swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.SWIFT, null, localizationProperty);
+    }
+    return swiftCodeManager;
   }
 
   @Override

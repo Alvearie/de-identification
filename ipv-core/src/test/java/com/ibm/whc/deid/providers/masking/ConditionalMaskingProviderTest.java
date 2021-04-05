@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -79,8 +79,9 @@ public class ConditionalMaskingProviderTest {
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
     System.out.println(mapper.writeValueAsString(conditionalMaskingProviderConfig));
 
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -139,8 +140,9 @@ public class ConditionalMaskingProviderTest {
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -200,8 +202,9 @@ public class ConditionalMaskingProviderTest {
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -260,8 +263,9 @@ public class ConditionalMaskingProviderTest {
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -316,8 +320,9 @@ public class ConditionalMaskingProviderTest {
 
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -373,8 +378,9 @@ public class ConditionalMaskingProviderTest {
 
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -434,8 +440,9 @@ public class ConditionalMaskingProviderTest {
 
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -491,8 +498,9 @@ public class ConditionalMaskingProviderTest {
 
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");
@@ -553,8 +561,9 @@ public class ConditionalMaskingProviderTest {
     // Define JSON data to parse
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
 
-    ConditionalMaskingProvider maskingProvider = new ConditionalMaskingProvider(
-        conditionalMaskingProviderConfig, tenantId, deidMaskingConfig, localizationProperty);
+    ConditionalMaskingProvider maskingProvider =
+        new ConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     JsonNode nodeRoot = mapper.readTree(utLine);
     JsonNode nodeParent = nodeRoot.get("text");

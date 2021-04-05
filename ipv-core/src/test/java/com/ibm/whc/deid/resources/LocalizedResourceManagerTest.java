@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.LocalizedEntity;
 
@@ -327,5 +326,14 @@ public class LocalizedResourceManagerTest {
     ps = mgr.getPseudorandom("frsecond");
     assertNotNull(ps);
     assertTrue(EN_REPLACEMENTS_KEYS.contains(ps) || FR_REPLACEMENTS_KEYS.contains(ps));
+  }
+  
+  @Test
+  public void testDuplicateResourceKey() {
+    TestLocalizedResourceManager mgr = new TestLocalizedResourceManager();
+    mgr.add("en", new TestResource("Value"));
+    mgr.add("en", new TestResource("VALUE"));
+    assertEquals(2, mgr.getValues("en").size());
+    assertEquals(1, mgr.getKeys("en").size());    
   }
 }

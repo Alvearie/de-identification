@@ -11,17 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.providers.identifiers.AddressIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
@@ -42,11 +38,6 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
   @BeforeClass
   public static void setup() {
     maskingProviderFactory = new BasicMaskingProviderFactory();
-  }
-
-  @AfterClass
-  public static void cleanup() {
-    maskingProviderFactory.invalidateCache(tenantId);
   }
 
   protected BasicMaskingProviderFactory getMaskingProviderFactory() {

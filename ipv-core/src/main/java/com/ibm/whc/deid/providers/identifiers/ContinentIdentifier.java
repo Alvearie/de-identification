@@ -25,6 +25,8 @@ public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
 
   private static final String[] appropriateNames = {"Continent"};
 
+  protected transient volatile ContinentManager continentManager = null;
+
   public ContinentIdentifier(String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);
   }
@@ -46,8 +48,11 @@ public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
 
   @Override
   protected Manager getManager() {
-    return (ContinentManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CONTINENT,
-        null, localizationProperty);
+    if (continentManager == null) {
+      continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CONTINENT, null, localizationProperty);
+    }
+    return continentManager;
   }
 
   @Override

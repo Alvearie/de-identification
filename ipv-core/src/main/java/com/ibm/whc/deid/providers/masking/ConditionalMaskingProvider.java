@@ -31,12 +31,15 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   private final List<ConditionalMaskRuleSet> maskRuleSet;
   private final DeidMaskingConfig deidMaskingConfig;
+  private final MaskingProviderFactory maskingProviderFactory;
 
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty,
+      MaskingProviderFactory maskingProviderFactory) {
     super(tenantId, localizationProperty);
     this.deidMaskingConfig = deidMaskingConfig;
     this.maskRuleSet = configuration.getMaskRuleSet();
+    this.maskingProviderFactory = maskingProviderFactory;
   }
 
   @Override
@@ -78,9 +81,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   }
 
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
-    return MaskingProviderFactoryUtil.getMaskingProviderFactory().getProviderFromType(
-        config.getType(), deidMaskingConfig, config, tenantId,
-        localizationProperty);
+    return maskingProviderFactory.getProviderFromType(config.getType(), deidMaskingConfig, config,
+        tenantId, localizationProperty);
   }
 
   /**
@@ -97,11 +99,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     if (condition == null) {
       // If there are no condition, but a masking provider is configured,
       // just return true so that masking provider is used.
-      if (conditionalMaskRuleSet.getMaskingProvider() == null) {
-        return false;
-      } else {
-        return true;
-      }
+      return conditionalMaskRuleSet.getMaskingProvider() != null;
     }
 
     Set<String> valueSet;

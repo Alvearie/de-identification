@@ -26,6 +26,8 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
+  protected transient volatile CityManager cityResourceManager = null;
+
   public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
     super(tenantId, localizationProperty);
@@ -37,8 +39,11 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected CityManager getCityManager() {
-    return (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY, null,
-        localizationProperty);
+    if (cityResourceManager == null) {
+      cityResourceManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CITY, null, localizationProperty);
+    }
+    return cityResourceManager;
   }
 
   @Override

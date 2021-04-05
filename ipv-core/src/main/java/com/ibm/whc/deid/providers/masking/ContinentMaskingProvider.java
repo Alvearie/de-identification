@@ -24,6 +24,8 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
+  protected transient volatile ContinentManager continentResourceManager = null;
+
   public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
     super(tenantId, localizationProperty);
@@ -34,8 +36,11 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected ContinentManager getContinentManager() {
-      return (ContinentManager) ManagerFactory.getInstance().getManager(tenantId,
-          Resource.CONTINENT, null, localizationProperty);
+    if (continentResourceManager == null) {
+      continentResourceManager = (ContinentManager) ManagerFactory.getInstance()
+          .getManager(tenantId, Resource.CONTINENT, null, localizationProperty);
+    }
+    return continentResourceManager;
   }
 
   @Override
@@ -45,9 +50,9 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
         debugFaultyInput("identifier");
         return null;
       }
-      
+
       ContinentManager continentManager = getContinentManager();
-        
+
       Continent continent = continentManager.getValue(identifier);
       if (continent == null) {
         debugFaultyInput("continent");

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,55 +10,64 @@ import java.io.InputStream;
 import java.util.Collection;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import com.ibm.whc.deid.resources.ResourceManager;
-import com.ibm.whc.deid.resources.StringResource;
+import com.ibm.whc.deid.models.FirstName;
+import com.ibm.whc.deid.models.Gender;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
-public class ATCManager extends ResourceManager<StringResource> {
-  
+/**
+ * Class that provides access to known first names of females by localization code.
+ * 
+ * <p>
+ * Instances of this class are thread-safe.
+ */
+public class NameFirstFemaleManager extends LocalizedResourceManager<FirstName> {
+
   private static final LogManager logger = LogManager.getInstance();
-  
-  protected ATCManager() {
-    super();
+
+  protected NameFirstFemaleManager() {
+    // nothing required here
   }
 
   /**
-   * Creates a new ATCManager instance from the definitions in the given properties file.
+   * Creates a new instance from the definitions in the given properties file.
    * 
    * @param localizationProperty path and file name of a properties file consumed by the
    *        LocalizationManager to find the resources for this manager instance.
    * 
-   * @return an ATCManager instance
+   * @return a resource manager instance
    * 
    * @see LocalizationManager
    */
-  public static ATCManager buildATCManager(String localizationProperty) {
-    ATCManager atcManager = new ATCManager();
+  public static NameFirstFemaleManager buildNameFirstFemaleManager(String localizationProperty) {
+    NameFirstFemaleManager manager = new NameFirstFemaleManager();
 
     Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(Resource.ATC_CODES);
+        LocalizationManager.getInstance(localizationProperty).getResources(Resource.FIRST_NAME_FEMALE);
     for (ResourceEntry entry : resourceEntries) {
+
       try (InputStream inputStream = entry.createStream()) {
-        
+        String countryCode = entry.getCountryCode();
+
         try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
           for (CSVRecord line : reader) {
-            String code = line.get(0);
-            if (!code.isEmpty()) {
-              StringResource resource = new StringResource(code);
-              atcManager.add(resource);
+            String name = line.get(0);
+            if (!name.isEmpty()) {
+              FirstName nameResource = new FirstName(name, countryCode, Gender.FEMALE);
+              manager.add(nameResource);
+              manager.add(countryCode, nameResource);
             }
           }
         }
-        
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return atcManager;
+    return manager;
   }
 }

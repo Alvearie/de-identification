@@ -5,11 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.GenericMaskingProvider;
@@ -61,54 +56,14 @@ import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
 
 /**
- * The type Masking provider factory.
- *
+ * Class that creates masking provider instances.
+ * 
+ * <p>
+ * This class is thread-safe.
  */
 public class BasicMaskingProviderFactory implements MaskingProviderFactory {
 
   private static final long serialVersionUID = -7454645556196383954L;
-
-  /**
-   * Per-tenant map of masking provider configurations to masking provider objects
-   */
-  private final Map<String, ConcurrentHashMap<MaskingProviderConfig, MaskingProvider>> maskingProvidersCache;
-
-  public BasicMaskingProviderFactory() {
-    this(null, null);
-  }
-
-  /**
-   * Instantiates a new masking provider factory.
-   *
-   * @param deidMaskingConfig
-   * @param configurationManager the configuration manager
-   * @param identifiedTypes the identified types
-   */
-  public BasicMaskingProviderFactory(DeidMaskingConfig deidMaskingConfig,
-      Map<String, ProviderType> identifiedTypes) {
-    // note - NULL is a possible key for this map
-    maskingProvidersCache = new HashMap<>();
-  }
-
-  /**
-   * Remove masking provider cache for a tenant.
-   *
-   * @param tenantId
-   */
-  public synchronized void invalidateCache(String tenantId) {
-    maskingProvidersCache.remove(tenantId);
-  }
-
-  private synchronized ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> getPerTenantCache(
-      String tenantId) {
-    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviders =
-        maskingProvidersCache.get(tenantId);
-    if (maskingProviders == null) {
-      maskingProviders = new ConcurrentHashMap<>();
-      maskingProvidersCache.put(tenantId, maskingProviders);
-    }
-    return maskingProviders;
-  }
 
   @Override
   public MaskingProvider getProviderFromType(MaskingProviderTypes providerType,
@@ -118,18 +73,8 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
     // Note - as per documentation of the MaskingProviderFactory interface, allow
     // NullPointerException to be thrown if providerType or config are null
 
-    // Check the cache first
-
-    ConcurrentHashMap<MaskingProviderConfig, MaskingProvider> maskingProviderCache =
-        getPerTenantCache(tenantId);
-    MaskingProvider provider = maskingProviderCache.get(config);
-    if (provider != null) {
-      return provider;
-    }
-    provider = getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId,
+    return getNewProviderFromType(providerType, deidMaskingConfig, config, tenantId,
         localizationProperty);
-    maskingProviderCache.put(config, provider);
-    return provider;
   }
 
   protected MaskingProvider getNewProviderFromType(MaskingProviderTypes providerType,
@@ -154,7 +99,7 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case CONDITIONAL:
         provider = new ConditionalMaskingProvider((ConditionalMaskingProviderConfig) config,
-            tenantId, deidMaskingConfig, localizationProperty);
+            tenantId, deidMaskingConfig, localizationProperty, this);
         break;
       case CONTINENT:
         provider = new ContinentMaskingProvider((ContinentMaskingProviderConfig) config, tenantId,
@@ -291,7 +236,7 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case URL:
         provider = new URLMaskingProvider((URLMaskingProviderConfig) config, tenantId,
-            deidMaskingConfig, localizationProperty);
+            deidMaskingConfig, localizationProperty, this);
         break;
       case VIN:
         provider = new VINMaskingProvider((VINMaskingProviderConfig) config, tenantId,

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,14 +26,10 @@ import com.ibm.whc.deid.utils.log.LogManager;
  */
 public class PhoneIdentifier extends AbstractIdentifier {
 
-  /** */
   private static final long serialVersionUID = -5245668163814340807L;
 
   private static final String[] appropriateNames =
       {"Phone Number", "Mobile", "Mobile Number", "Telephone", "Tel."};
-
-  /** The constant msisdnManager. */
-	public final MSISDNManager msisdnManager;
 
   private final static LogManager log = LogManager.getInstance();
 
@@ -54,15 +50,20 @@ public class PhoneIdentifier extends AbstractIdentifier {
   }
 
   // allow users to provide custom patterns.
-  private final Pattern[] customPatterns;
+  protected final Pattern[] customPatterns;
+
+  protected final String tenantId;
+  protected final String localizationProperty;
+  
+  protected transient volatile MSISDNManager msisdnManager = null;
 
   public PhoneIdentifier(List<String> customRegexPatterns, String tenantId, String localizationProperty) {
-
-		msisdnManager = new MSISDNManager(tenantId, localizationProperty);
+    this.tenantId = tenantId;
+    this.localizationProperty = localizationProperty;
     if (customRegexPatterns == null) {
-      customPatterns = null;
+      this.customPatterns = null;
     } else {
-      customPatterns = new Pattern[customRegexPatterns.size()];
+      this.customPatterns = new Pattern[customRegexPatterns.size()];
       customRegexPatterns.stream().map(x -> Pattern.compile(x)).collect(Collectors.toList())
           .toArray(customPatterns);
     }
@@ -93,7 +94,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
     String prefix = getMatchedGroup(m, "prefix");
 
     String countryCode = getMatchedGroup(m, "countryCode");
-    if (countryCode != null && !msisdnManager.isValidCountryCode(countryCode)) {
+    if (countryCode != null && !getMSISDNManager().isValidCountryCode(countryCode)) {
       return null;
     }
 
@@ -168,7 +169,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
       return true;
     }
 
-    if (msisdnManager.isValidUSNumber(data)) {
+    if (getMSISDNManager().isValidUSNumber(data)) {
       return true;
     }
 
@@ -188,5 +189,13 @@ public class PhoneIdentifier extends AbstractIdentifier {
   @Override
   protected Collection<String> getAppropriateNames() {
     return Arrays.asList(appropriateNames);
+  }
+  
+  protected MSISDNManager getMSISDNManager() {
+    if (msisdnManager == null) {
+      // MSISDNManager is a composite resource manager - it uses the ManagerFactory for its components
+      msisdnManager = MSISDNManager.buildMSISDNManager(tenantId, localizationProperty);
+    }
+    return msisdnManager;
   }
 }
