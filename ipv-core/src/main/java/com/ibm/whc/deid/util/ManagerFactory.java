@@ -8,7 +8,6 @@ package com.ibm.whc.deid.util;
 import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 /**
  * Class that provides instances of resource managers of all supported types.
@@ -17,7 +16,7 @@ public class ManagerFactory {
 
   private static final ManagerFactory instance = new ManagerFactory();
 
-  /** 
+  /**
    * Resource manager takes time to instantiate. To save time, we cache resource managers.
    */
   private final ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
@@ -28,18 +27,18 @@ public class ManagerFactory {
     return instance;
   }
 
-	/**
-	 * Get a resource based manager. First check to see if there is a cached
-	 * version, otherwise create a new one.
-	 *
-	 * @param tenantId
-	 * @param resourceType
-	 * @param options      optional options a manager might have. eg zipcode
-	 *                     manager's prefixLength
-	 * @paramlocalizationProperty location of the localization property file
-	 * @return
-	 */
-  public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
+  /**
+   * Get a resource based manager. First check to see if there is a cached version, otherwise create
+   * a new one.
+   *
+   * @param tenantId
+   * @param resourceType
+   * @param options optional options a manager might have. eg zipcode manager's prefixLength
+   * @paramlocalizationProperty location of the localization property file
+   * @return
+   */
+  public Manager getManager(String tenantId, Resources resourceType, Object options,
+      String localizationProperty) {
     String cacheKey = resourceType + "_" + localizationProperty;
     Manager manager = managers.get(cacheKey);
 
@@ -118,7 +117,7 @@ public class ManagerFactory {
           break;
         case PHONE_NUM_DIGITS:
           manager = PhoneNumberLengthManager.buildPhoneNumberLengthManager(localizationProperty);
-          break;          
+          break;
         case RACE_ETHNICITY:
           manager = new RaceManager(tenantId, localizationProperty);
           break;

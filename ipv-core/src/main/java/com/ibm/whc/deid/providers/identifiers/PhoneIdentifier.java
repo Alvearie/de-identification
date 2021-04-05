@@ -50,10 +50,10 @@ public class PhoneIdentifier extends AbstractIdentifier {
   }
 
   // allow users to provide custom patterns.
-  private final Pattern[] customPatterns;
+  protected final Pattern[] customPatterns;
 
-  private final String tenantId;
-  private final String localizationProperty;
+  protected final String tenantId;
+  protected final String localizationProperty;
   
   protected transient volatile MSISDNManager msisdnManager = null;
 
@@ -61,9 +61,9 @@ public class PhoneIdentifier extends AbstractIdentifier {
     this.tenantId = tenantId;
     this.localizationProperty = localizationProperty;
     if (customRegexPatterns == null) {
-      customPatterns = null;
+      this.customPatterns = null;
     } else {
-      customPatterns = new Pattern[customRegexPatterns.size()];
+      this.customPatterns = new Pattern[customRegexPatterns.size()];
       customRegexPatterns.stream().map(x -> Pattern.compile(x)).collect(Collectors.toList())
           .toArray(customPatterns);
     }
@@ -193,6 +193,7 @@ public class PhoneIdentifier extends AbstractIdentifier {
   
   protected MSISDNManager getMSISDNManager() {
     if (msisdnManager == null) {
+      // MSISDNManager is a composite resource manager - it uses the ManagerFactory for its components
       msisdnManager = MSISDNManager.buildMSISDNManager(tenantId, localizationProperty);
     }
     return msisdnManager;

@@ -22,8 +22,8 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
   protected transient volatile NamesManager namesResourceManager = null;
 
-  protected String tenantId;
-  protected String localizationProperty;
+  protected final String tenantId;
+  protected final String localizationProperty;
 
   public NameIdentifier(String tenantId, String localizationProperty) {
     this.tenantId = tenantId;
@@ -37,6 +37,7 @@ public class NameIdentifier extends AbstractIdentifier implements IdentifierWith
 
   protected NamesManager getManager() {
     if (namesResourceManager == null) {
+      // NamesManager is a composite resource manager - it uses the ManagerFactory for its components
       namesResourceManager = NamesManager.buildNamesManager(tenantId, localizationProperty);
     }
     return namesResourceManager;
