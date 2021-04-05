@@ -126,7 +126,10 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String name = "John Smith";
     String res = nameMaskingProvider.mask(name);
     assertFalse(name.equals(res));
-    assertEquals(2, res.split(" ").length);
+    String[] replacements = res.split(" ");
+    assertEquals(2, replacements.length);
+    assertTrue(nameMaskingProvider.getNamesManager().isFirstName(replacements[0]));
+    assertTrue(nameMaskingProvider.getNamesManager().isLastName(replacements[1]));
   }
 
   @Test
@@ -167,17 +170,10 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
     configuration.setMaskingAllowUnisex(true);
 
-    MaskingProvider nameMaskingProvider =
+    NameMaskingProvider nameMaskingProvider =
         new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
-    String name = "Mary";
-
-    for (int i = 0; i < 100; i++) {
-      String res = nameMaskingProvider.mask(name);
-      assertFalse(name.equals(res));
-      // assertTrue(names.getGender(name) == names.getGender(res) ||
-      // (names.getGender(res) == Gender.both));
-    }
+    doTestChanged(nameMaskingProvider, "Mary");
   }
 
   @Test
