@@ -33,9 +33,8 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-
-GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
-echo "-Drevision=${GIT_BRANCH}" >  .mvn/maven.config
+DEVELOPER_ID="${DEVELOPER_BRANCH:-}"
+echo "-Drevision=1.0.0-${DEVELOPER_ID}-SNAPSHOT" >  .mvn/maven.config
 
 #########################################################
 # Main build                                            #
