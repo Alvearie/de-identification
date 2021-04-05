@@ -33,7 +33,7 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-DEVELOPER_ID="${DEVELOPER_BRANCH:-}"
+DEVELOPER_ID="${DEVELOPER_ID:-}"
 echo "-Drevision=1.0.0-${DEVELOPER_ID}-SNAPSHOT" >  .mvn/maven.config
 
 #########################################################
