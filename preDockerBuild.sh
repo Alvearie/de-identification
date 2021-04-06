@@ -33,12 +33,12 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-
+RELEASE_VERSION=1.0.0
 # If DEVELOPER_ID is set, use it as part of the version
 if ! [ -z "$DEVELOPER_ID" ]; then
-    echo "-Drevision=1.0.0-${DEVELOPER_ID}-SNAPSHOT" >  .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}-${DEVELOPER_ID}-SNAPSHOT" >  .mvn/maven.config
 else
-    echo "-Drevision=1.0.0-SNAPSHOT" >  .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}-SNAPSHOT" >  .mvn/maven.config
 fi
 echo "revision:"
 cat .mvn/maven.config
