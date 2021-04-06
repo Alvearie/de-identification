@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,13 +23,13 @@ public class ComplexMaskingProviderFactory {
 
     switch ((ConfigSchemaType) configSchemaType) {
       case FHIR:
-        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+        if (deidMaskingConfig.getJson() == null || deidMaskingConfig.getJson().getSchemaType() == null) {
           // return null if the masking config did not specify json schema
           return null;
         }
         return new FHIRMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
       case GEN:
-        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+        if (deidMaskingConfig.getJson() == null || deidMaskingConfig.getJson().getSchemaType() == null) {
           // return null if the masking config did not specify json schema
           return null;
         }
