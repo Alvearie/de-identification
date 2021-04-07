@@ -18,6 +18,8 @@ import com.ibm.whc.deid.utils.log.LogManager;
 /**
  * A class that provides access to individual items of a particular type recognized by the
  * De-Identification service, such as cities, names, genders, religions, etc.
+ * 
+ * <p>Instances of this class must be thread-safe after construction.
  */
 public abstract class ResourceManager<K extends ManagedResource> implements Manager {
 
