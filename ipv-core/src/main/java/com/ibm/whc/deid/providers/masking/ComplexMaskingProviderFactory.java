@@ -13,11 +13,9 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 
 public class ComplexMaskingProviderFactory {
   /**
-   * This is the entry point to parsing the masking configuration. Once the masking configuration is
-   * obtained, it reads the schemaType and determines whether its FHIR/GEN/TEXT masking provider CSV
-   * support to be added back soon
+   * This is the entry point to parsing the masking configuration.
    */
-  public synchronized MaskingProvider get(ConfigSchemaTypes configSchemaType,
+  public MaskingProvider get(ConfigSchemaTypes configSchemaType,
       DeidMaskingConfig deidMaskingConfig, BasicMaskingProviderFactory maskingProviderFactory,
       String tenantId) {
 
