@@ -4,11 +4,11 @@ set -e
 # Script to create a toolchain.  The toolchain name and the GIT URL is stored in toolchain.properties
 
 # Usage: Set the following property in the environment variable and run the script
+#        If running toolchain from a fork, please change the gitrepourl variable to your fork
 
 # IBM_CLOUD_API_KEY       # IBM cloud API Key used for pipeline execution.  Note the deid function id key does not work.  Please use a personal key
-# DOCKER_API_KEY          # IBM CDT API used to pull docker images
-# GIT_API_KEY
-# DEVELOPER_BRANCH        # name of the GIT branch, if empty or null defaults to master
+# GIT_API_KEY             # github.ibm.com API key
+# DEVELOPER_BRANCH        # name of the GIT branch used for de-id-devops, if empty or null defaults to master
 # DEVELOPER_ID            # name used to specify namespace/umbrella repo
 
 export TOOLCHAIN_BRANCH="stable-3.3.1"
