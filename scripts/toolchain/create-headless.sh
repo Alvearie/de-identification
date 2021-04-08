@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Script to create a toolchain.  The toolchain name and the GIT URL is stored in toolchain.properties
 
@@ -16,7 +16,13 @@ export WHC_COMMONS_BRANCH=${TOOLCHAIN_BRANCH}
 export INPUT_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` # get the current branch
 export gitrepourl="https://github.com/Alvearie/de-identification" # CI git repo url
 
-export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+# If DEVELOPER_ID is set, use it as part of the toolchain name 
+if ! [ -z "$DEVELOPER_ID" ]; then
+  export TOOLCHAIN_NAME=${DEVELOPER_ID}-alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+else
+  export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+fi
+
 export TOOLCHAIN_TEMPLATE_BRANCH=stable-oc-3.3.1
 
 # if DEVELOPER_BRANCH env variable is not set or null, use master branch
