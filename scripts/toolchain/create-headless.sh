@@ -42,5 +42,3 @@ curl -sSL -u "${GIT_USER}:${GIT_API_KEY}" "https://raw.github.ibm.com/de-identif
 source common.properties
 
 ./createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH}  -v ${INPUT_GIT_UMBRELLA_BRANCH} -b ${TOOLCHAIN_TEMPLATE_BRANCH}
-
-
