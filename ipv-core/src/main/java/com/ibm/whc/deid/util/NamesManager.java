@@ -157,10 +157,9 @@ public class NamesManager {
       name = firstManager.getRandomValue(countryCode);
       if (name == null || allowUnisex || !otherManager.isValidKey(name.getKey())) {
         break;
-      } else {
-        // set to null in case loop breaks for number of attempts
-        name = null;
       }
+      // set to null in case loop breaks for number of attempts
+      name = null;
     }
     return name == null ? null : name.getName();
   }
@@ -203,12 +202,10 @@ public class NamesManager {
     if (isMale && isFemale) {
       return Gender.BOTH;
     }
-
     if (isMale) {
       return Gender.MALE;
-    } else {
-      return Gender.FEMALE;
     }
+    return Gender.FEMALE;
   }
 
   /**
@@ -221,25 +218,42 @@ public class NamesManager {
    *        acceptable and <i>false</i> otherwise
    * @param identifier a value from which a name will be calculated
    * 
-   * @return a pseudo-randomly generated first name or <i>null</i> if no name can be generated
+   * @return a pseudo-randomly generated first name or a randomly generated string if no name can be
+   *         generated
    */
   public String getPseudoRandomFirstName(Gender gender, boolean allowUnisex, String identifier) {
     if (identifier == null) {
       identifier = "";
     }
-    if (allowUnisex || Gender.BOTH == gender || gender == null) {
-      if (0 == identifier.hashCode() % 2) {
-        String value = maleNameManager.getPseudorandom(identifier);
-        return value != null ? value : femaleNameManager.getPseudorandom(identifier);
+    String name = null;
+    LocalizedResourceManager<FirstName> firstManager =
+        gender == Gender.MALE ? maleNameManager : femaleNameManager;
+    LocalizedResourceManager<FirstName> otherManager =
+        gender == Gender.MALE ? femaleNameManager : maleNameManager;
+    // need safety check in case all loaded names for the given country and gender
+    // are unisex
+    for (int i = 0; i < 500; i++) {
+      name = firstManager.getPseudorandom(identifier);
+      if (allowUnisex || !otherManager.isValidKey(name)) {
+        break;
       }
-      String value = femaleNameManager.getPseudorandom(identifier);
-      return value != null ? value : maleNameManager.getPseudorandom(identifier);
-    } else if (Gender.MALE == gender) {
-      return maleNameManager.getPseudorandom(identifier);
-    } else {
-      // assuming female
-      return femaleNameManager.getPseudorandom(identifier);
+      // set to null in case loop breaks for number of attempts
+      name = null;
     }
+    if (name == null) {
+      for (int i = 0; i < 500; i++) {
+        name = otherManager.getPseudorandom(identifier);
+        if (allowUnisex || !firstManager.isValidKey(name)) {
+          break;
+        }
+        // set to null in case loop breaks for number of attempts
+        name = null;
+      }
+    }
+    if (name == null) {
+      name = Long.toString(Math.abs(HashUtils.longFromHash(identifier)));
+    }
+    return name;
   }
 
   /**

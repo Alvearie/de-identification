@@ -8,7 +8,6 @@ package com.ibm.whc.deid.util;
 import java.security.SecureRandom;
 import java.util.List;
 import com.ibm.whc.deid.resources.KeyListResource;
-import com.ibm.whc.deid.resources.KeyValueResource;
 import com.ibm.whc.deid.shared.localization.Resource;
 
 public class MSISDNManager {
@@ -43,6 +42,17 @@ public class MSISDNManager {
     return mgr;
   }
 
+  /**
+   * Determines whether the given number of digits is valid for a phone number
+   * in the given country. 
+   * 
+   * @param countryCode a telephone country calling code, such as "1" for USA
+   * @param inputNumDigits the number of digits to check
+   * 
+   * @return <i>True</i> if the number of digits given is valid for a phone number
+   * in the indicated country or <i>False</i> otherwise.  Note that if the number
+   * of digits is not known for the given country, <i>True</i> is returned.
+   */
   public boolean isValidCountryNumDigits(String countryCode, int inputNumDigits) {
     List<Integer> numDigitsList = null;
     KeyListResource<Integer> resource = phoneNumberLengthManager.getValue(countryCode);
@@ -52,14 +62,16 @@ public class MSISDNManager {
 
     if (numDigitsList == null) {
       // since we do not know the number of phone digits for this country
-      // code, assume the digits is valid.
-      return true;
+      // code, assume the digits is valid unless out of range
+      return inputNumDigits > 0;
     }
+    
     for (Integer numDigits : numDigitsList) {
       if (inputNumDigits == numDigits.intValue()) {
         return true;
       }
     }
+    
     return false;
   }
 

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +34,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
   /*
    * Tests all three of the CityMaskingProvider options (city.mask.closest, city.mask.closestK, and
    * city.mask.pseudorandom). When the city.mask.closest flag is true, it uses the
-   * city.mask.closestK default value (10). In addition to locally defined list of related cities,
-   * It also uses the Localization resources to identify the list of related cities to the original
-   * value for verification.
+   * city.mask.closestK default value (10). 
    */
 
   @Test
@@ -217,10 +216,13 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
 
     List<String> neighborsList = Arrays.asList(neighbors);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 100; i++) {
       String maskedCity = maskingProvider.mask(originalCity);
       assertTrue(neighborsList.contains(maskedCity));
     }
+    
+    String value = maskingProvider.mask("DublinXXX");
+    assertNotNull(value);
+    assertFalse(value.isEmpty());
   }
-
 }
