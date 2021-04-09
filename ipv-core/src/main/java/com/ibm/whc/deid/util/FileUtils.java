@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -63,7 +63,7 @@ public class FileUtils {
    * @return
    */
   public static Double parseDouble(String value) {
-    if (value == null || value.isEmpty()) {
+    if (value == null || value.trim().isEmpty()) {
       return 0.0;
     }
 
