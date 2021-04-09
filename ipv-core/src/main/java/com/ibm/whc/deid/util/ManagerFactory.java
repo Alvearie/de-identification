@@ -16,7 +16,7 @@ public class ManagerFactory {
 
   private static final ManagerFactory instance = new ManagerFactory();
 
-  /** 
+  /**
    * Resource manager takes time to instantiate. To save time, we cache resource managers.
    */
   private final ConcurrentHashMap<String, Manager> managers = new ConcurrentHashMap<>();
@@ -27,20 +27,19 @@ public class ManagerFactory {
     return instance;
   }
 
-	/**
-	 * Get a resource based manager. First check to see if there is a cached
-	 * version, otherwise create a new one.
-	 *
-	 * @param tenantId
-	 * @param resourceType
-	 * @param options      optional options a manager might have. eg zipcode
-	 *                     manager's prefixLength
-	 * @paramlocalizationProperty location of the localization property file
-	 * @return
-	 */
-  public Manager getManager(String tenantId, Resources resourceType, Object options, String localizationProperty) {
-    // The manager needs to be tenant specific based on type and localization
-    String cacheKey = tenantId + "_" + resourceType + "_" + localizationProperty;
+  /**
+   * Get a resource based manager. First check to see if there is a cached version, otherwise create
+   * a new one.
+   *
+   * @param tenantId
+   * @param resourceType
+   * @param options optional options a manager might have. eg zipcode manager's prefixLength
+   * @paramlocalizationProperty location of the localization property file
+   * @return
+   */
+  public Manager getManager(String tenantId, Resources resourceType, Object options,
+      String localizationProperty) {
+    String cacheKey = resourceType + "_" + localizationProperty;
     Manager manager = managers.get(cacheKey);
 
     if (manager != null) {
@@ -60,7 +59,7 @@ public class ManagerFactory {
     if (resourceType instanceof Resource) {
       switch ((Resource) resourceType) {
         case ATC_CODES:
-          manager = new ATCManager(tenantId, localizationProperty);
+          manager = ATCManager.buildATCManager(localizationProperty);
           break;
         case CITY:
           manager = CityManager.buildCityManager(localizationProperty);
@@ -80,6 +79,12 @@ public class ManagerFactory {
         case CREDIT_CARD_TYPE:
           manager = new CreditCardTypeManager(tenantId, localizationProperty);
           break;
+        case FIRST_NAME_FEMALE:
+          manager = NameFirstFemaleManager.buildNameFirstFemaleManager(localizationProperty);
+          break;
+        case FIRST_NAME_MALE:
+          manager = NameFirstMaleManager.buildNameFirstMaleManager(localizationProperty);
+          break;
         case GENDER:
           manager = new GenderManager(tenantId, localizationProperty);
           break;
@@ -95,11 +100,23 @@ public class ManagerFactory {
         case TACDB:
           manager = new IMEIManager(tenantId, localizationProperty);
           break;
+        case LAST_NAME:
+          manager = NameLastManager.buildNameLastManager(localizationProperty);
+          break;
         case MARITAL_STATUS:
           manager = new MaritalStatusManager(tenantId, localizationProperty);
           break;
         case OCCUPATION:
           manager = new OccupationManager(tenantId, localizationProperty);
+          break;
+        case PHONE_AREA_CODES:
+          manager = PhoneAreaCodesManager.buildPhoneAreaCodesManager(localizationProperty);
+          break;
+        case PHONE_CALLING_CODES:
+          manager = PhoneCountryCodesManager.buildPhoneCountryCodesManager(localizationProperty);
+          break;
+        case PHONE_NUM_DIGITS:
+          manager = PhoneNumberLengthManager.buildPhoneNumberLengthManager(localizationProperty);
           break;
         case RACE_ETHNICITY:
           manager = new RaceManager(tenantId, localizationProperty);

@@ -22,13 +22,13 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
 
   private static final long serialVersionUID = -6276716005726979282L;
 
+  protected static final LogManager log = LogManager.getInstance();
+
   protected SecureRandom random;
   protected boolean debug_enabled;
 
   protected final String localizationProperty;
   protected final String tenantId;
-
-  protected LogManager log = LogManager.getInstance();
 
   private String name = "";
 

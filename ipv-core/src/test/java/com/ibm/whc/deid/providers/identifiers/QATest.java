@@ -1,16 +1,13 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.identifiers;
 
 import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
-
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -22,9 +19,9 @@ public class QATest {
 
   @Test
   public void testOneLetters() {
-
-    Collection<Identifier> identifiers = IdentifierFactoryUtil.getIdentifierFactory()
-        .getAvailableIdentifiers(tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
+    Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     for (int i = 0; i < charset.length(); i++) {
       String value = "" + charset.charAt(i);
@@ -48,9 +45,9 @@ public class QATest {
 
   @Test
   public void testTwoLetters() {
-
-    Collection<Identifier> identifiers = IdentifierFactoryUtil.getIdentifierFactory()
-        .getAvailableIdentifiers(tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    BuiltInIdentifierFactory identifierFactory = new BuiltInIdentifierFactory();
+    Collection<Identifier> identifiers = identifierFactory.getAvailableIdentifiers(tenantId,
+        LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
 
     for (int i = 0; i < charset.length(); i++) {
       for (int j = 0; j < charset.length(); j++) {

@@ -27,15 +27,13 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
   private final boolean removeQuery;
   private final boolean maskQuery;
   private final int preserveDomains;
-  private final MaskingProviderFactory maskingProviderFactory =
-      MaskingProviderFactoryUtil.getMaskingProviderFactory();
+  private final MaskingProviderFactory maskingProviderFactory;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
   private final DeidMaskingConfig deidMaskingConfig;
 
-
   public URLMaskingProvider(URLMaskingProviderConfig configuration, String tenantId,
-      DeidMaskingConfig deidMaskingConfig, String localizationProperty) {
+      DeidMaskingConfig deidMaskingConfig, String localizationProperty, MaskingProviderFactory maskingProviderFactory) {
     super(tenantId, localizationProperty);
     this.random = new SecureRandom();
     this.maskUsernamePassword = configuration.isMaskUsernamePassword();
@@ -46,6 +44,7 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.deidMaskingConfig = deidMaskingConfig;
+    this.maskingProviderFactory = maskingProviderFactory;
   }
 
   private int randomizePort(int exceptionPort) {

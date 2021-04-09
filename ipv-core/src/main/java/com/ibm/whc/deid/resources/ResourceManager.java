@@ -12,13 +12,19 @@ import java.util.List;
 import java.util.Set;
 import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.Manager;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
 /**
  * A class that provides access to individual items of a particular type recognized by the
  * De-Identification service, such as cities, names, genders, religions, etc.
+ * 
+ * <p>Instances of this class must be thread-safe after construction.
  */
 public abstract class ResourceManager<K extends ManagedResource> implements Manager {
 
+  private static final LogManager logger = LogManager.getInstance();
+  
   protected final SecureRandom random = new SecureRandom();
 
   /**
@@ -41,7 +47,10 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
    */
   protected void add(K resource) {
     resourceList.add(resource);
-    resourceMap.put(resource.getKey().toUpperCase(), resource);
+    K oldValue = resourceMap.put(resource.getKey().toUpperCase(), resource);
+    if (oldValue != null) {
+      logger.logWarn(LogCodes.WPH1021W, oldValue.getKey());
+    }
   }
 
   /**
