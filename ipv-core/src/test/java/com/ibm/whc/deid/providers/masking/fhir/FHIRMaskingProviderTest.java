@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.providers.masking.BasicMaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
-import com.ibm.whc.deid.providers.masking.MaskingProviderFactoryUtil;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
@@ -37,8 +37,7 @@ public class FHIRMaskingProviderTest {
 
   private final String tenantId = "TEST_TENANT";
 
-  private MaskingProviderFactory maskingProviderFactory =
-      MaskingProviderFactoryUtil.getMaskingProviderFactory();
+  private final MaskingProviderFactory maskingProviderFactory = new BasicMaskingProviderFactory();
 
   @Test
   public void testLoadRulesForResource() {

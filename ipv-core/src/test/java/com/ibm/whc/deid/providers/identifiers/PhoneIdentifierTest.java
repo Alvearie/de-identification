@@ -28,7 +28,6 @@ public class PhoneIdentifierTest {
     }
 
     String[] invalidNumbers = {"6653255", "+44", "+44-123444a122"};
-
     for (String number : invalidNumbers) {
       assertFalse(identifier.isOfThisType(number));
     }
@@ -36,15 +35,14 @@ public class PhoneIdentifierTest {
     String[] validUSNumbers = {"3471234567", // New York
         "2601234555" // Indiana
     };
-
     for (String number : validUSNumbers) {
-      assertTrue(identifier.isOfThisType(number));
+      assertTrue("expected number to be valid for US: " + number, identifier.isOfThisType(number));
     }
 
     String[] invalidUSNumbers = {"347123456", // it is not 10-digit
-        "260123455a" // it contains letters
+        "260123455a", // it contains letters
+        "1112521301" // invalid area code
     };
-
     for (String number : invalidUSNumbers) {
       assertFalse(identifier.isOfThisType(number));
     }

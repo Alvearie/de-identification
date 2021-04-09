@@ -10,15 +10,11 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.identifiers.CityIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CityMaskingProviderConfig;
@@ -32,11 +28,6 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
   @BeforeClass
   public static void setup() {
     maskingProviderFactory = new BasicMaskingProviderFactory();
-  }
-
-  @AfterClass
-  public static void cleanup() {
-    maskingProviderFactory.invalidateCache(tenantId);
   }
 
   /*

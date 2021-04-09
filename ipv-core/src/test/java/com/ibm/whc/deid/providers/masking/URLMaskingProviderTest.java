@@ -75,8 +75,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testDefaultMask() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
@@ -88,8 +88,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testURLWithIPv4Address() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
 
     String url = "http://10.22.33.44";
@@ -104,8 +104,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testURLWithIPv6Address() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
 
     String url = "http://[1::4:5:6:7:8]:100/";
@@ -123,8 +123,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(true);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(0);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     // we do not preserve anything
     String url = "http://www.nba.com";
@@ -165,8 +165,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(true);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(1);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
     assertTrue(identifier.isOfThisType(maskedResult));
@@ -185,8 +185,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(true);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(2);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
     assertTrue(identifier.isOfThisType(maskedResult));
@@ -200,8 +200,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(true);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(5);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
     assertTrue(identifier.isOfThisType(maskedResult));
@@ -212,8 +212,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testUsernamePasswordMask() throws Exception {
 
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     /* we test that both username and passwords get randomized */
     String url = "http://user1:pass1@www.nba.com";
@@ -248,8 +248,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(false);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(0);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://user1:pass1@www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
     String originalUserInfo = new URL(url).getUserInfo();
@@ -263,8 +263,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskUsernamePassword(false);
     configuration.setMaskPort(true);
     configuration.setPreserveDomains(0);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com";
     String maskedResult = urlMaskingProvider.mask(url);
     URL maskedURL = new URL(maskedResult);
@@ -277,8 +277,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testRemoveQueryPart() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setMaskRemoveQuery(true);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com?q=abcd";
     String maskedResult = urlMaskingProvider.mask(url);
     URL maskedURL = new URL(maskedResult);
@@ -290,8 +290,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskQueryPart() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setMaskMaskQuery(true);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com?q=John&q2=Mary&q3=foobar&q4=&q5&q6=33&q7=true&state=Montana";
     String maskedResult = urlMaskingProvider.mask(url);
     URL maskedURL = new URL(maskedResult);
@@ -304,8 +304,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskQueryEmpty() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setMaskMaskQuery(true);
-    MaskingProvider urlMaskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider urlMaskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     String url = "http://www.nba.com/?";
     String maskedResult = urlMaskingProvider.mask(url);
     URL maskedURL = new URL(maskedResult);
@@ -317,8 +317,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskNullURLInputReturnNull() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = null;
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -331,8 +331,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidURLInputValidHandlingReturnNull() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = "Invalid URL";
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -345,8 +345,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidURLInputValidHandlingReturnRandom() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = "Invalid URL";
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -360,8 +360,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidURLInputValidHandlingReturnDefaultCustomValue() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = "Invalid URL";
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -375,8 +375,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(3);
     configuration.setUnspecifiedValueReturnMessage("Test URL");
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = "Invalid URL";
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -389,8 +389,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidURLInputInvalidHandlingReturnNull() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
     configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new URLMaskingProvider(configuration, tenantId, deidMaskingConfig, localizationProperty);
+    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
+        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
     String invalidURL = "Invalid URL";
     String maskedURL = maskingProvider.mask(invalidURL);
@@ -413,7 +413,7 @@ public class URLMaskingProviderTest extends TestLogSetUp {
 
     for (URLMaskingProviderConfig maskingConfiguration : configurations) {
       URLMaskingProvider maskingProvider = new URLMaskingProvider(maskingConfiguration, tenantId,
-          deidMaskingConfig, localizationProperty);
+          deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();
 

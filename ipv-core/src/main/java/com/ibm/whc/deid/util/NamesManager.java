@@ -1,463 +1,268 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.FirstName;
 import com.ibm.whc.deid.models.Gender;
 import com.ibm.whc.deid.models.LastName;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.shared.localization.Resources;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
-import com.ibm.whc.deid.util.localization.ResourceEntry;
-import com.ibm.whc.deid.utils.log.LogCodes;
 
 /**
  * The type Names manager.
  *
  */
-public class NamesManager implements Serializable {
-  /** */
-  private static final long serialVersionUID = -8184475896771246147L;
+public class NamesManager {
 
-  protected abstract static class NameResourceBasedManager<T> extends ResourceBasedManager<T>
-      implements Serializable {
+  private final SecureRandom random = new SecureRandom();
 
-    /** */
-    private static final long serialVersionUID = -4285989384152952167L;
+  private final NameLastManager lastNameManager;
+  private final NameFirstMaleManager maleNameManager;
+  private final NameFirstFemaleManager femaleNameManager;
 
-    protected NameResourceBasedManager(String tenantId, Resources resourceType, String localizationProperty) {
-      super(tenantId, resourceType, localizationProperty);
+  protected NamesManager(NameLastManager lastNameManager, NameFirstMaleManager maleNameManager,
+      NameFirstFemaleManager femaleNameManager) {
+    this.lastNameManager = lastNameManager;
+    this.maleNameManager = maleNameManager;
+    this.femaleNameManager = femaleNameManager;
+  }
+
+  public static NamesManager buildNamesManager(String tenantId, String localizationProperty) {
+    NamesManager mgr = new NamesManager(
+        (NameLastManager) ManagerFactory.getInstance().getManager(tenantId, Resource.LAST_NAME,
+            null, localizationProperty),
+        (NameFirstMaleManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.FIRST_NAME_MALE, null, localizationProperty),
+        (NameFirstFemaleManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.FIRST_NAME_FEMALE, null, localizationProperty));
+    return mgr;
+  }
+
+  /**
+   * Determine if a name is a known last name.
+   *
+   * @param candidate the candidate name
+   * 
+   * @return <i>true</i> if a known last name and <i>false</i> otherwise
+   */
+  public boolean isLastName(String candidate) {
+    return lastNameManager.isValidKey(candidate);
+  }
+
+  /**
+   * Determine if a name is a known first name.
+   *
+   * @param candidate the candidate name
+   * 
+   * @return <i>true</i> if a known first name and <i>false</i> otherwise
+   */
+  public boolean isFirstName(String candidate) {
+    return maleNameManager.isValidKey(candidate) || femaleNameManager.isValidKey(candidate);
+  }
+
+  /**
+   * Retrieve a last name for the given key.
+   *
+   * @param identifier the identifier
+   * 
+   * @return the last name or <i>null</i> if the given name is not a known last name
+   */
+  public LastName getLastName(String identifier) {
+    return lastNameManager.getValue(identifier);
+  }
+
+  /**
+   * Retrieve a first name for the given key.
+   *
+   * @param identifier the identifier
+   * 
+   * @return the first name or <i>null</i> if the given name is not a known first name
+   */
+  public FirstName getFirstName(String identifier) {
+    FirstName firstName = maleNameManager.getValue(identifier);
+    if (firstName == null) {
+      firstName = femaleNameManager.getValue(identifier);
+    }
+    return firstName;
+  }
+
+  /**
+   * Gets a random last name.
+   *
+   * @return random last name or <i>null</i> if no last names are loaded
+   */
+  public String getRandomLastName() {
+    LastName name = lastNameManager.getRandomValue();
+    return name == null ? null : name.getName();
+  }
+
+  /**
+   * Gets random last name for a given country code.
+   *
+   * @param countryCode the country code
+   * 
+   * @return random last name or <i>null</i> if no last names are loaded
+   */
+  public String getRandomLastName(String countryCode) {
+    LastName name = lastNameManager.getRandomValue(countryCode);
+    return name == null ? null : name.getName();
+  }
+
+  /**
+   * Gets random first name with random gender and country.
+   *
+   * @return random first name or <i>null</i> if no first names are loaded
+   */
+  public String getRandomFirstName() {
+    FirstName name = null;
+    boolean coin = random.nextBoolean();
+    if (coin) {
+      name = maleNameManager.getRandomValue();
+      if (name == null) {
+        name = femaleNameManager.getRandomValue();
+      }
+    } else {
+      name = femaleNameManager.getRandomValue();
+      if (name == null) {
+        name = maleNameManager.getRandomValue();
+      }
+    }
+    return name == null ? null : name.getName();
+  }
+
+  /**
+   * Retrieve a random first name based on gender, country, and whether to allow unisex names.
+   *
+   * @param gender the gender of the desired name - male or female
+   * @param allowUnisex <i>true</i> if a name that is both a male and a female name is acceptable
+   *        and <i>false</i> otherwise
+   * @param countryCode the country code
+   * 
+   * @return random first name or <i>null</i> if no first names for the given country and gender are
+   *         loaded or none are found that satisfy the requirements
+   */
+  public String getRandomFirstName(Gender gender, boolean allowUnisex, String countryCode) {
+    FirstName name = null;
+    LocalizedResourceManager<FirstName> firstManager =
+        gender == Gender.MALE ? maleNameManager : femaleNameManager;
+    LocalizedResourceManager<FirstName> otherManager =
+        gender == Gender.MALE ? femaleNameManager : maleNameManager;
+    // need safety check in case all loaded names for the given country and gender
+    // are unisex
+    for (int i = 0; i < 500; i++) {
+      name = firstManager.getRandomValue(countryCode);
+      if (name == null || allowUnisex || !otherManager.isValidKey(name.getKey())) {
+        break;
+      } else {
+        // set to null in case loop breaks for number of attempts
+        name = null;
+      }
+    }
+    return name == null ? null : name.getName();
+  }
+
+  /**
+   * Retrieve a random first name for the given country code and whether to allow unisex names.
+   *
+   * @param allowUnisex <i>true</i> if a name that is both a male and a female name is acceptable
+   *        and <i>false</i> otherwise
+   * @param countryCode the country code
+   * 
+   * @return random first name or <i>null</i> if no first names for the given country code are
+   *         loaded or none are found that satisfy the requirements
+   */
+  public String getRandomFirstNameWithoutPreservingGender(boolean allowUnisex, String countryCode) {
+    String value = null;
+    Gender firstGender = random.nextBoolean() ? Gender.MALE : Gender.FEMALE;
+    value = getRandomFirstName(firstGender, allowUnisex, countryCode);
+    if (value == null) {
+      // no acceptable values, try other gender
+      Gender otherGender = firstGender == Gender.MALE ? Gender.FEMALE : Gender.MALE;
+      value = getRandomFirstName(otherGender, allowUnisex, countryCode);
+    }
+    return value;
+  }
+
+  /**
+   * Determines whether a given first name is a male name, a female name, or can be either male or
+   * female.
+   *
+   * @param candidate the candidate first name
+   * 
+   * @return The gender - male, female, both. If the name is not recognized, it is considered
+   *         female.
+   */
+  public Gender getGender(String candidate) {
+    boolean isMale = maleNameManager.isValidKey(candidate);
+    boolean isFemale = femaleNameManager.isValidKey(candidate);
+
+    if (isMale && isFemale) {
+      return Gender.BOTH;
     }
 
-    /**
-     * Read CSV files
-     *
-     * @param entries
-     * @param fn function that stores names into HashMap
-     * @param index
-     */
-    protected void readFile(Collection<ResourceEntry> entries, Function<NameCountryModel, Void> fn,
-        int index) {
-      for (ResourceEntry entry : entries) {
-        InputStream inputStream = entry.createStream();
-        String countryCode = entry.getCountryCode();
-
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-
-          for (CSVRecord line : reader) {
-            String name = line.get(index);
-            NameCountryModel nameCountry = new NameCountryModel();
-            nameCountry.setName(name);
-            nameCountry.setCountry(countryCode);
-            fn.apply(nameCountry);
-          }
-
-          inputStream.close();
-        } catch (IOException | NullPointerException e) {
-          logger.logError(LogCodes.WPH1013E, e);
-        }
-      }
+    if (isMale) {
+      return Gender.MALE;
+    } else {
+      return Gender.FEMALE;
     }
   }
 
-  protected static class LastNameManager extends NameResourceBasedManager<LastName>
-      implements Serializable {
-
-    protected LastNameManager(String tenantId, String localizationProperty) {
-      super(tenantId, Resource.LAST_NAME, localizationProperty);
+  /**
+   * Calculates a first name based on the given identifier, gender, and whether to allow unisex
+   * names. While the list of loaded resources is not changed, multiple calls to this method with
+   * the same parameters will return the same name.
+   *
+   * @param gender the gender of the desired name
+   * @param allowUnisex <i>true</i> if a name that is both a male name and a female name is
+   *        acceptable and <i>false</i> otherwise
+   * @param identifier a value from which a name will be calculated
+   * 
+   * @return a pseudo-randomly generated first name or <i>null</i> if no name can be generated
+   */
+  public String getPseudoRandomFirstName(Gender gender, boolean allowUnisex, String identifier) {
+    if (identifier == null) {
+      identifier = "";
     }
-
-    /** */
-    private static final long serialVersionUID = 340645986264058332L;
-
-    @Override
-    public Collection<ResourceEntry> getResources() {
-			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.LAST_NAME);
-    }
-
-    /**
-     * Get the function that reads last and and stores in the map.
-     *
-     * @param namesMap
-     * @return
-     */
-    protected Function<NameCountryModel, Void> getReadFunction(
-        Map<String, Map<String, LastName>> namesMap) {
-      Function<NameCountryModel, Void> fn = nameCountry -> {
-        String name = nameCountry.getName();
-        String key = nameCountry.getName().toUpperCase();
-        String countryCode = nameCountry.getCountry();
-
-        LastName lastName = new LastName(name, countryCode);
-        addToMapByLocale(namesMap, countryCode, key, lastName);
-        addToMapByLocale(namesMap, getAllCountriesName(), key, lastName);
-        return null;
-      };
-      return fn;
-    }
-
-    @Override
-    public Map<String, Map<String, LastName>> readResourcesFromFile(
-        Collection<ResourceEntry> entries) throws NullPointerException {
-      Map<String, Map<String, LastName>> namesMap = new HashMap<>();
-
-      // last name is stored in column 0
-      int index = 0;
-      readFile(entries, getReadFunction(namesMap), index);
-
-      return namesMap;
-    }
-
-    @Override
-    public Collection<LastName> getItemList() {
-      return getValues();
+    if (allowUnisex || Gender.BOTH == gender || gender == null) {
+      if (0 == identifier.hashCode() % 2) {
+        String value = maleNameManager.getPseudorandom(identifier);
+        return value != null ? value : femaleNameManager.getPseudorandom(identifier);
+      }
+      String value = femaleNameManager.getPseudorandom(identifier);
+      return value != null ? value : maleNameManager.getPseudorandom(identifier);
+    } else if (Gender.MALE == gender) {
+      return maleNameManager.getPseudorandom(identifier);
+    } else {
+      // assuming female
+      return femaleNameManager.getPseudorandom(identifier);
     }
   }
 
-  protected static class MaleNameManager extends NameResourceBasedManager<FirstName>
-      implements Serializable {
-
-    protected MaleNameManager(String tenantId, String localizationProperty) {
-      super(tenantId, Resource.FIRST_NAME_MALE, localizationProperty);
-    }
-
-    /** */
-    private static final long serialVersionUID = 3798419386305168471L;
-
-    @Override
-    public Collection<ResourceEntry> getResources() {
-			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.FIRST_NAME_MALE);
-    }
-
-    /**
-     * Get the function that reads the name and put into the map.
-     *
-     * @param namesMap
-     * @return
-     */
-    protected Function<NameCountryModel, Void> getReadFunction(
-        Map<String, Map<String, FirstName>> namesMap) {
-
-      Function<NameCountryModel, Void> fn = nameCountry -> {
-        String name = nameCountry.getName();
-        String key = nameCountry.getName().toUpperCase();
-        String countryCode = nameCountry.getCountry();
-
-        FirstName firstName = new FirstName(name, countryCode, Gender.MALE);
-        addToMapByLocale(namesMap, countryCode, key, firstName);
-        addToMapByLocale(namesMap, getAllCountriesName(), key, firstName);
-        return null;
-      };
-      return fn;
-    }
-
-    @Override
-    public Map<String, Map<String, FirstName>> readResourcesFromFile(
-        Collection<ResourceEntry> entries) {
-
-      Map<String, Map<String, FirstName>> namesMap = new HashMap<>();
-
-      // first name is stored in column 0
-      int index = 0;
-      readFile(entries, getReadFunction(namesMap), index);
-
-      return namesMap;
-    }
-
-    @Override
-    public Collection<FirstName> getItemList() {
-      return getValues();
-    }
+  /**
+   * Calculates a first name based on a given identifier. While the list of loaded resources is not
+   * changed, multiple calls to this method with the same identifier will return the same name.
+   * 
+   * @param identifier a value from which a name will be calculated
+   * 
+   * @return a pseudo-randomly generated first name or <i>null</i> if no name can be generated
+   */
+  public String getPseudoRandomFirstName(String identifier) {
+    return getPseudoRandomFirstName(null, true, identifier);
   }
 
-  protected static class FemaleNameManager extends NameResourceBasedManager<FirstName>
-      implements Serializable {
-
-    protected FemaleNameManager(String tenantId, String localizationProperty) {
-      super(tenantId, Resource.FIRST_NAME_FEMALE, localizationProperty);
-    }
-
-    /** */
-    private static final long serialVersionUID = 4460091056804556534L;
-
-    @Override
-    public Collection<ResourceEntry> getResources() {
-			return LocalizationManager.getInstance(localizationProperty).getResources(Resource.FIRST_NAME_FEMALE);
-    }
-
-    /**
-     * Get the function that read name and store into the map.
-     *
-     * @param namesMap
-     * @return
-     */
-    protected Function<NameCountryModel, Void> getReadFunction(
-        Map<String, Map<String, FirstName>> namesMap) {
-      Function<NameCountryModel, Void> fn = nameCountry -> {
-        String name = nameCountry.getName();
-        String key = nameCountry.getName().toUpperCase();
-        String countryCode = nameCountry.getCountry();
-
-        FirstName firstName = new FirstName(name, countryCode, Gender.FEMALE);
-        addToMapByLocale(namesMap, countryCode, key, firstName);
-        addToMapByLocale(namesMap, getAllCountriesName(), key, firstName);
-        return null;
-      };
-      return fn;
-    }
-
-    @Override
-    public Map<String, Map<String, FirstName>> readResourcesFromFile(
-        Collection<ResourceEntry> entries) {
-      Map<String, Map<String, FirstName>> namesMap = new HashMap<>();
-
-      // first name is stored in column 0
-      int index = 0;
-      readFile(entries, getReadFunction(namesMap), index);
-
-      return namesMap;
-    }
-
-    @Override
-    public Collection<FirstName> getItemList() {
-      return getValues();
-    }
-  }
-
-  /** The type Names. */
-  public static class NameManager implements Serializable {
-
-    /** */
-    private static final long serialVersionUID = -1913711626600968977L;
-
-    protected LastNameManager lastNameManager;
-    protected MaleNameManager maleNameManager;
-    protected FemaleNameManager femaleNameManager;
-
-    protected final SecureRandom random;
-
-    public NameManager(String tenantId, String localizationProperty) {
-
-			initializeManagers(tenantId, localizationProperty);
-      this.random = new SecureRandom();
-    }
-
-		protected void initializeManagers(String tenantId, String localizationProperty) {
-      lastNameManager = new LastNameManager(tenantId, localizationProperty);
-      maleNameManager = new MaleNameManager(tenantId, localizationProperty);
-      femaleNameManager = new FemaleNameManager(tenantId, localizationProperty);
-    }
-
-    /**
-     * Is last name boolean.
-     *
-     * @param candidate the candidate
-     * @return the boolean
-     */
-    public boolean isLastName(String candidate) {
-      return lastNameManager.isValidKey(candidate);
-    }
-
-    /**
-     * Is first name boolean.
-     *
-     * @param candidate the candidate
-     * @return the boolean
-     */
-    public boolean isFirstName(String candidate) {
-      return maleNameManager.isValidKey(candidate) || femaleNameManager.isValidKey(candidate);
-    }
-
-    /**
-     * Gets last name.
-     *
-     * @param identifier the identifier
-     * @return the last name
-     */
-    public LastName getLastName(String identifier) {
-      return lastNameManager.getKey(identifier);
-    }
-
-    /**
-     * Gets first name.
-     *
-     * @param identifier the identifier
-     * @return the first name
-     */
-    public FirstName getFirstName(String identifier) {
-      FirstName firstName = maleNameManager.getKey(identifier);
-
-      if (firstName != null) {
-        return firstName;
-      }
-
-      return femaleNameManager.getKey(identifier);
-    }
-
-    /**
-     * Gets random last name.
-     *
-     * @return random last name
-     */
-    public String getRandomLastName() {
-      return lastNameManager.getRandomKey();
-    }
-
-    /**
-     * Gets random last name based on country.
-     *
-     * @param countryCode the country code
-     * @return random last name
-     */
-    public String getRandomLastName(String countryCode) {
-      return lastNameManager.getRandomKey(countryCode);
-    }
-
-    /**
-     * Gets random first name with random gender and country.
-     *
-     * @return random first name
-     */
-    public String getRandomFirstName() {
-      boolean coin = random.nextBoolean();
-
-      if (coin) {
-        return maleNameManager.getRandomKey();
-      } else {
-        return femaleNameManager.getRandomKey();
-      }
-    }
-
-    /**
-     * Get random first name with specified gender and country.
-     *
-     * @param gender either male or female
-     * @param countryCode country that name belongs to
-     * @return random first name
-     */
-    private String getRandomFirstName(Gender gender, String countryCode) {
-      if (gender == Gender.MALE) {
-        return maleNameManager.getRandomKey(countryCode);
-      } else {
-        return femaleNameManager.getRandomKey(countryCode);
-      }
-    }
-
-    /**
-     * Gets random first name based on gender, country, and whether to allow unisex.
-     *
-     * @param gender the gender
-     * @param allowUnisex to allow unisex
-     * @param countryCode the country code
-     * @return random first name
-     */
-    public String getRandomFirstName(Gender gender, boolean allowUnisex, String countryCode) {
-
-      do {
-        String name = getRandomFirstName(gender, countryCode);
-        if (allowUnisex) {
-          return name;
-        } else {
-          Gender newGender = getGender(name);
-          if (newGender == gender) {
-            return name;
-          }
-        }
-      } while (true);
-    }
-
-    public String getRandomFirstNameWithoutPreservingGender(boolean allowUnisex,
-        String countryCode) {
-      boolean coin = random.nextBoolean();
-      if (coin) {
-        return getRandomFirstName(Gender.MALE, allowUnisex, countryCode);
-      }
-      return getRandomFirstName(Gender.FEMALE, allowUnisex, countryCode);
-    }
-
-    /**
-     * Gets gender.
-     *
-     * @param candidate the candidate
-     * @return the gender
-     */
-    public Gender getGender(String candidate) {
-      boolean isMale = maleNameManager.isValidKey(candidate);
-      boolean isFemale = femaleNameManager.isValidKey(candidate);
-
-      if (isMale && isFemale) {
-        return Gender.BOTH;
-      }
-
-      if (isMale) {
-        return Gender.MALE;
-      } else {
-        return Gender.FEMALE;
-      }
-    }
-
-    /**
-     * Get pseudo random first name based on the identifier, gender, and whether to allow unisex.
-     *
-     * @param gender the gender
-     * @param allowUnisex to allow unisex
-     * @param identifier the identifier
-     * @return pseudo random first name
-     */
-    public String getPseudoRandomFirstName(Gender gender, boolean allowUnisex, String identifier) {
-      if (allowUnisex || Gender.BOTH == gender) {
-        if (0 == identifier.hashCode() % 2) {
-          return maleNameManager.getPseudorandom(identifier);
-        } else {
-          return femaleNameManager.getPseudorandom(identifier);
-        }
-      } else if (Gender.MALE == gender) {
-        return maleNameManager.getPseudorandom(identifier);
-      } else {
-        // assuming female
-        return femaleNameManager.getPseudorandom(identifier);
-      }
-    }
-
-    /**
-     * Get pseudo random first name based on the identifier.
-     *
-     * @param identifier the identifier
-     * @return pseudo random first name
-     */
-    public String getPseudoRandomFirstName(String identifier) {
-      boolean coin = random.nextBoolean();
-      if (coin) {
-        return maleNameManager.getPseudorandom(identifier);
-      } else {
-        return femaleNameManager.getPseudorandom(identifier);
-      }
-    }
-
-    /**
-     * Get pseudo random last name based on the identifier
-     *
-     * @param identifier the identifier
-     * @return pseudo random last name
-     */
-    public String getPseudoRandomLastName(String identifier) {
-      return lastNameManager.getPseudorandom(identifier);
-    }
-
+  /**
+   * Calculates a last name based on a given identifier. While the list of loaded resources is not
+   * changed, multiple calls to this method with the same identifier will return the same name.
+   * 
+   * @param identifier a value from which a name will be calculated
+   * 
+   * @return a pseudo-randomly generated last name or <i>null</i> if no name can be generated
+   */
+  public String getPseudoRandomLastName(String identifier) {
+    return lastNameManager.getPseudorandom(identifier);
   }
 }

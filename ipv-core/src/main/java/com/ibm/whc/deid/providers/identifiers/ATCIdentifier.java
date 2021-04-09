@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,28 +16,24 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 public class ATCIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+	
 	private static final long serialVersionUID = 4135301254440626321L;
-
-	private ATCManager atcManager;
 
 	private final String[] appropriateNames = new String[] { "ATC" };
 
-	protected volatile boolean initialized = false;
-
+	protected transient volatile ATCManager atcManager = null;
+	
 	public ATCIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
 	}
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ATC_CODES, null,
+	  if (atcManager == null) {
+	    atcManager = (ATCManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ATC_CODES, null,
 					localizationProperty);
-
-			initialized = true;
-		}
-		return atcManager;
+	  }
+	  return atcManager;
 	}
 
 	@Override

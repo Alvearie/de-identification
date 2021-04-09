@@ -1,20 +1,33 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
+import com.ibm.whc.deid.resources.ManagedResource;
 
-public class FirstName implements LocalizedEntity, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4173369720649054384L;
-	private final String name;
+public class FirstName implements LocalizedEntity, ManagedResource, Serializable {
+
+  private static final long serialVersionUID = -4173369720649054384L;
+
+  private final String name;
   private final Gender gender;
   private final String nameCountryCode;
+
+  /**
+   * Instantiates a new First name.
+   *
+   * @param name the name
+   * @param nameCountryCode the name country code
+   * @param gender the gender
+   */
+  public FirstName(String name, String nameCountryCode, Gender gender) {
+    this.name = name;
+    this.nameCountryCode = nameCountryCode;
+    this.gender = gender;
+  }
 
   /**
    * Gets name country code.
@@ -22,7 +35,7 @@ public class FirstName implements LocalizedEntity, Serializable {
    * @return the name country code
    */
   @Override
-public String getNameCountryCode() {
+  public String getNameCountryCode() {
     return nameCountryCode;
   }
 
@@ -44,16 +57,8 @@ public String getNameCountryCode() {
     return this.gender;
   }
 
-  /**
-   * Instantiates a new First name.
-   *
-   * @param name the name
-   * @param nameCountryCode the name country code
-   * @param gender the gender
-   */
-  public FirstName(String name, String nameCountryCode, Gender gender) {
-    this.name = name;
-    this.nameCountryCode = nameCountryCode;
-    this.gender = gender;
+  @Override
+  public String getKey() {
+    return name;
   }
 }

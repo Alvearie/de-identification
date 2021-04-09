@@ -19,16 +19,16 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = 3798105506081000286L;
 
-  protected NamesManager.NameManager names;
-  private final boolean allowUnisex;
-  private final boolean genderPreserve;
   private static final String[] initials = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+  
+  private final boolean allowUnisex;
+  private final boolean genderPreserve;
   private final boolean getPseudorandom;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile NamesManager namesResourceManager = null;
 
   public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
@@ -43,12 +43,13 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
+    NamesManager names = getNamesManager();
+    
     StringBuilder builder = new StringBuilder();
 
     for (String token : identifier.split("\\b")) {
@@ -117,10 +118,10 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
     return builder.toString().trim();
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      names = new NamesManager.NameManager(tenantId, localizationProperty);
-      initialized = true;
+  protected NamesManager getNamesManager() {
+    if (namesResourceManager == null) {
+      namesResourceManager = NamesManager.buildNamesManager(tenantId,  localizationProperty);
     }
+    return namesResourceManager;
   }
 }

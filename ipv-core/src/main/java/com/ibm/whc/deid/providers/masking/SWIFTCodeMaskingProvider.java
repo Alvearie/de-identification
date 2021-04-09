@@ -21,6 +21,8 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
   public static final Pattern SWIFTCODE_PATTERN =
       Pattern.compile("[A-Z0-9]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?");
 
+  protected transient volatile SWIFTCodeManager swiftCodeResourceManager = null;
+
   protected final boolean preserveCountry;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
@@ -122,7 +124,10 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected SWIFTCodeManager getSWIFTCodeManager() {
-    return (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.SWIFT,
-        null, localizationProperty);
+    if (swiftCodeResourceManager == null) {
+      swiftCodeResourceManager = (SWIFTCodeManager) ManagerFactory.getInstance()
+          .getManager(tenantId, Resource.SWIFT, null, localizationProperty);
+    }
+    return swiftCodeResourceManager;
   }
 }
