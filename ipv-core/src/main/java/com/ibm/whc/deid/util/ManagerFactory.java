@@ -77,7 +77,7 @@ public class ManagerFactory {
           manager = new CountyManager(tenantId, localizationProperty);
           break;
         case CREDIT_CARD_TYPE:
-          manager = new CreditCardTypeManager(tenantId, localizationProperty);
+          manager = CreditCardTypeManager.buildCreditCardTypeManager(localizationProperty);
           break;
         case FIRST_NAME_FEMALE:
           manager = NameFirstFemaleManager.buildNameFirstFemaleManager(localizationProperty);

@@ -5,28 +5,36 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
+import com.ibm.whc.deid.util.ManagerFactory;
 
 public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = 3375383479009603851L;
 
-  private final CreditCardTypeManager ccTypeManager;
+  protected transient volatile CreditCardTypeManager ccTypeManager = null;
 
   /**
    * Instantiates a new Credit card type masking provider.
    * 
-   * @param tenantId TODO
+   * @param tenantId the tenant associated with the current request
    * @paramlocalizationProperty location of the localization property file
    */
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);
+  }
 
-    ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
+  protected CreditCardTypeManager getCreditCardTypeManager() {
+    if (ccTypeManager == null) {
+      ccTypeManager = (CreditCardTypeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CREDIT_CARD_TYPE, null, localizationProperty);
+    }
+    return ccTypeManager;
   }
 
   @Override
   public String mask(String identifier) {
-    return ccTypeManager.getRandomKey();
+    return getCreditCardTypeManager().getRandomKey();
   }
 }
