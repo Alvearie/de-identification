@@ -65,13 +65,13 @@ public class ManagerFactory {
           manager = CityManager.buildCityManager(localizationProperty);
           break;
         case POSTAL_CODES:
-          manager = new PostalCodeManager(tenantId, localizationProperty);
+          manager = PostalCodeManager.buildPostalCodeManager(localizationProperty);
           break;
         case CONTINENT:
           manager = ContinentManager.buildContinentManager(localizationProperty);
           break;
         case COUNTRY:
-          manager = new CountryManager(tenantId, localizationProperty);
+          manager = CountryManager.buildCountryManager(localizationProperty);
           break;
         case COUNTY:
           manager = new CountyManager(tenantId, localizationProperty);

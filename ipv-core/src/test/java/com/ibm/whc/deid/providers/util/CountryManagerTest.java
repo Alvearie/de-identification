@@ -7,12 +7,9 @@ package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Test;
-
 import com.ibm.whc.deid.util.CountryManager;
 import com.ibm.whc.deid.util.CountryNameSpecification;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -22,7 +19,8 @@ public class CountryManagerTest {
 
   @Test
   public void testLookupSuccessful() throws Exception {
-    CountryManager countryManager = new CountryManager(null, localizationProperty);
+    CountryManager countryManager = CountryManager.buildCountryManager(localizationProperty);
+
     String country = "United States of America";
     assertTrue(countryManager.isValidKey(country));
     assertTrue(countryManager.isValidCountry(country, CountryNameSpecification.NAME));
@@ -50,7 +48,8 @@ public class CountryManagerTest {
 
   @Test
   public void testRandomCountryGenerator() throws Exception {
-    CountryManager countryManager = new CountryManager(null, localizationProperty);
+    CountryManager countryManager = CountryManager.buildCountryManager(localizationProperty);
+
     // test random country
     assertTrue(
         countryManager.isValidKey(countryManager.getRandomKey(CountryNameSpecification.NAME)));
@@ -64,7 +63,7 @@ public class CountryManagerTest {
 
   @Test
   public void testClosestCountry() throws Exception {
-    CountryManager countryManager = new CountryManager(null, localizationProperty);
+    CountryManager countryManager = CountryManager.buildCountryManager(localizationProperty);
 
     String originalCountry = "Greece";
     String[] neighbors = {"CYPRUS", "MALTA", "TURKEY", "SERBIA", "BOSNIA AND HERZEGOVINA",
@@ -80,7 +79,8 @@ public class CountryManagerTest {
 
   @Test
   public void testClosestCountryOverrun() throws Exception {
-    CountryManager countryManager = new CountryManager(null, localizationProperty);
+    CountryManager countryManager = CountryManager.buildCountryManager(localizationProperty);
+
     String originalCountry = "Greece";
 
     for (int i = 0; i < 100; i++) {

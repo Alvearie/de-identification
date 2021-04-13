@@ -1,18 +1,18 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
+import com.ibm.whc.deid.resources.ManagedResource;
 
-public class PostalCode implements Location,Serializable {
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5510030912035883146L;
-private String code;
+public class PostalCode implements Location, ManagedResource, Serializable {
+
+  private static final long serialVersionUID = 5510030912035883146L;
+
+  private String code;
   private LatitudeLongitude latitudeLongitude;
 
   /**
@@ -40,5 +40,10 @@ private String code;
    */
   public String getName() {
     return this.code;
+  }
+
+  @Override
+  public String getKey() {
+    return getName();
   }
 }
