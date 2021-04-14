@@ -43,17 +43,7 @@ public class ManagerFactory {
     Manager manager = managers.get(cacheKey);
 
     if (manager != null) {
-      // check prefix length for ZIPCodeManager. Only return the cached
-      // version if the prefixLength is the same
-      if (resourceType == Resource.ZIPCODE) {
-        int newPrefixLength = (int) options;
-        int cachedPrefixLength = ((ZIPCodeManager) manager).getPrefixLength();
-        if (newPrefixLength == cachedPrefixLength) {
-          return manager;
-        }
-      } else {
-        return manager;
-      }
+      return manager;
     }
 
     if (resourceType instanceof Resource) {
@@ -125,7 +115,7 @@ public class ManagerFactory {
           manager = new ReligionManager(tenantId, localizationProperty);
           break;
         case STREET_NAMES:
-          manager = new StreetNameManager(tenantId, localizationProperty);
+          manager = StreetNameManager.buildStreetNameManager(localizationProperty);
           break;
         case STATES_US:
           manager = new StatesUSManager(tenantId, localizationProperty);
@@ -137,8 +127,7 @@ public class ManagerFactory {
           manager = new VINManager(tenantId, localizationProperty);
           break;
         case ZIPCODE:
-          int prefixLength = (int) options;
-          manager = new ZIPCodeManager(prefixLength, tenantId, localizationProperty);
+          manager = ZIPCodeManager.buildZIPCodeManager(localizationProperty);
           break;
         default:
           throw new IllegalArgumentException("Unsupported resource type:" + resourceType);

@@ -6,95 +6,62 @@
 package com.ibm.whc.deid.providers.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import java.util.Arrays;
+import java.util.HashSet;
 import org.junit.Test;
-
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 import com.ibm.whc.deid.util.ZIPCodeManager;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
-public class ZIPCodeManagerTest {
-  String tenantId = "TEST_TENANT";
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+public class ZIPCodeManagerTest implements MaskingProviderTest {
 
   @Test
-  public void test() {
-    ZIPCodeManager zipCodeManager = new ZIPCodeManager(3, tenantId, localizationProperty);
+  public void testDefault() {
+    ZIPCodeManager zipCodeManager = ZIPCodeManager.buildZIPCodeManager(localizationProperty);
+    testDefault(zipCodeManager);
+  }
+
+  protected void testDefault(ZIPCodeManager zipCodeManager) {
+    assertEquals(5, zipCodeManager.getZipCodeLength("uS"));
+    assertEquals("000", zipCodeManager.getZipCodeReplacement("uS"));
+    assertEquals(5, zipCodeManager.getZipCodeLength("Us"));
+    assertEquals("000", zipCodeManager.getZipCodeReplacement("Us"));
+
+    assertEquals(-1, zipCodeManager.getZipCodeLength("en"));
+    assertEquals("", zipCodeManager.getZipCodeReplacement("en"));
+
+    assertEquals(-1, zipCodeManager.getZipCodeLength("ca"));
+    assertEquals("", zipCodeManager.getZipCodeReplacement("ca"));
+
+    assertEquals(-1, zipCodeManager.getZipCodeLength(null));
+    assertEquals("", zipCodeManager.getZipCodeReplacement(null));
+
+    assertEquals(-1, zipCodeManager.getZipCodeLength(""));
+    assertEquals("", zipCodeManager.getZipCodeReplacement(""));
+
+    Integer testDataPop = new Integer(51917 + 21968 + 26332 + 17598 + 1428);
+    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590X", 4));
+    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590", 4));
+    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "559000", 4));
+    assertNull(zipCodeManager.getPopulationByPrefix("us", "559", 4));
+    assertNull(zipCodeManager.getPopulationByPrefix("us", "55901", 0));
+    assertNull(zipCodeManager.getPopulationByPrefix("us", "55901", -1));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("us", "00000", 5));
+    assertNull(zipCodeManager.getPopulationByPrefix(null, "5590", 4));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("en", "5590", 4));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("#$@", "00601", 3));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("US", "!@$@%%", 3));
+
+    HashSet<String> candidates = new HashSet<>(
+        Arrays.asList("58001", "58002", "58004", "58005", "58006", "58007", "58008", "58009"));
+    for (int i = 0; i < 40; i++) {
+      assertTrue(candidates.contains(zipCodeManager.getRandomZipCodeByPrefix("us", "58003", 4)));
+    }
+
     assertTrue(zipCodeManager.isValidKey("US", "00601"));
-  }
+    assertTrue(zipCodeManager.isValidKey("us", "55901"));
 
-  @Test
-  public void testPopulation() {
-    ZIPCodeManager zipCodeManager = new ZIPCodeManager(3, tenantId, localizationProperty);
-
-    Integer population = zipCodeManager.getPopulation("US", "00601");
-    assertNotNull(population);
-    assertEquals(18570, population.intValue());
-  }
-
-  @Test
-  public void testPopulationThreeDigitPrefix() {
-
-    ZIPCodeManager zipCodeManager = new ZIPCodeManager(3, tenantId, localizationProperty);
-
-    Integer population = zipCodeManager.getPopulationByPrefix("US", "00601");
-    assertNotNull(population);
-    assertEquals(1214568, population.intValue());
-  }
-
-  @Test
-  public void testInvalidCountry() {
-    ZIPCodeManager zipCodeManager = new ZIPCodeManager(3, tenantId, localizationProperty);
-
-    Integer population = zipCodeManager.getPopulationByPrefix("#$@", "00601");
-    assertEquals(0, population.intValue());
-
-    population = zipCodeManager.getPopulation("#$@", "00601");
-    assertEquals(0, population.intValue());
-  }
-
-  @Test
-  public void testInvalidCode() {
-    ZIPCodeManager zipCodeManager = new ZIPCodeManager(3, tenantId, localizationProperty);
-
-    Integer population = zipCodeManager.getPopulationByPrefix("US", "!@$@%%");
-    assertEquals(0, population.intValue());
-
-    population = zipCodeManager.getPopulation("US", "!#!#!@#!#!");
-    assertEquals(0, population.intValue());
-  }
-
-  /** Verify that the zip code length is properly acquired for a state that is known to have one. */
-  @Test
-  public void testZipCodeLength() {
-    String zipLength =
-        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-            .getLocaleProperties("US").getProperty("zipcode.length");
-    assertTrue(zipLength.equals("5"));
-  }
-
-  /** Verify that the zip code length of an invalid country is returned as null */
-  @Test
-  public void testZipCodeLengthInvalidCountry() {
-    String zipLength =
-        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-            .getLocaleProperties("$#!").getProperty("zipcode.length");
-    assertTrue(zipLength == null);
-  }
-
-  @Test
-  public void testZipCodeReplacement() {
-    System.out.println(
-        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-            .getLocaleProperties("US").getProperty("zipcode.underPopulated"));
-    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getLocaleProperties("US").getProperty("zipcode.underPopulated").equals("000"));
-  }
-
-  @Test
-  public void testZipCodeReplacementInvalidCountry() {
-    assertTrue(LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getLocaleProperties("$#!").getProperty("zipcode.underPopulated") == null);
+    assertEquals(13508, zipCodeManager.getValue("99901").getPopulation());
   }
 }

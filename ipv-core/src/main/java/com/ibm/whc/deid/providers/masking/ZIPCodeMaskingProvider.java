@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,9 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
-
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
@@ -19,7 +17,7 @@ import com.ibm.whc.deid.util.RandomGenerators;
 import com.ibm.whc.deid.util.ZIPCodeManager;
 
 public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 2186695347144836127L;
 
   private final String countryCode;
@@ -35,10 +33,9 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
   private final boolean suffixReplaceWithValidOnly;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
-  protected ZIPCodeManager zipCodeManager;
-  protected PostalCodeManager postalCodeManager;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile ZIPCodeManager zipCodeResourceManager = null;
+  protected transient volatile PostalCodeManager postalCodeResourceManager = null;
 
   public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
@@ -62,17 +59,18 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
-
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
-    if (identifier.length() != zipCodeManager.getZipCodeLength(this.countryCode)) {
+    ZIPCodeManager zipCodeManager = getZIPCodeManager();
+
+    if (identifier.length() != zipCodeManager.getZipCodeLength(countryCode)) {
       debugFaultyInput("identifier");
       if (unspecifiedValueHandling == 2) {
-        return zipCodeManager.getRandomKey();
+        String key = zipCodeManager.getRandomKey(countryCode);
+        return key == null ? zipCodeManager.getRandomKey() : key;
       } else if (unspecifiedValueHandling == 3) {
         return unspecifiedValueReturnMessage;
       } else {
@@ -83,8 +81,9 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     // Check if ZIP code should be randomly replaced by a neighboring
     // ZIP code
     if (replaceWithNeighbor && replaceWithNeighborNearestCount > 0) {
+      PostalCodeManager postalCodeManager = getPostalCodeManager();
       List<PostalCode> nearest =
-          postalCodeManager.getClosestPostalCodes(identifier, replaceWithNeighborNearestCount + 1);
+          postalCodeManager.getClosestPostalCodes(identifier, replaceWithNeighborNearestCount);
       if (nearest.size() > 0) {
         identifier = nearest.get(random.nextInt(nearest.size())).getName();
       } else {
@@ -93,33 +92,33 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     }
 
     // Check if total population of ZIP codes with the same prefix must
-    // reach a minimum value, if not, then replace prefix with zeros
+    // reach a minimum value, and if not, then replace prefix with zeros
     if (prefixRequireMinPopulation || truncateIfNotMinPopulation) {
 
       if (identifier.length() >= prefixLength) {
         String prefix = identifier.substring(0, prefixLength);
         String suffix = identifier.substring(prefixLength);
-        Integer population = zipCodeManager.getPopulationByPrefix(countryCode, prefix);
-        if (population == null || population < prefixMinPopulation) {
+        Integer population =
+            zipCodeManager.getPopulationByPrefix(countryCode, prefix, prefixLength);
+        if (population == null || population.intValue() < prefixMinPopulation) {
+
           if (prefixRequireMinPopulation) {
             identifier = StringUtils.leftPad(suffix, prefixLength + suffix.length(), '0');
           }
 
-          // Check if truncate ZIP code if total population of ZIP
-          // codes with the same prefix must reach a minimum value
           if (truncateIfNotMinPopulation) {
             if (identifier.length() > truncateLengthIfNotMinPopulation) {
               identifier = identifier.substring(0, truncateLengthIfNotMinPopulation);
             }
           }
         }
+
       } else if (prefixMinPopulation > 0) {
+
         if (prefixRequireMinPopulation) {
           identifier = StringUtils.leftPad("", prefixLength, '0');
         }
 
-        // Check if truncate ZIP code if total population of ZIP
-        // codes with the same prefix must reach a minimum value
         if (truncateIfNotMinPopulation) {
           if (identifier.length() > truncateLengthIfNotMinPopulation) {
             identifier = identifier.substring(0, truncateLengthIfNotMinPopulation);
@@ -132,10 +131,10 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     if (suffixReplaceWithRandom) {
       if (identifier.length() > prefixLength) {
 
-        // Check if suffix must be replaced to create a valid zip
-        // code
+        // Check if suffix must be replaced to create a valid zipcode
         if (suffixReplaceWithValidOnly) {
-          String randomZip = zipCodeManager.getRandomZipCodeByPrefix(countryCode, identifier);
+          String randomZip =
+              zipCodeManager.getRandomZipCodeByPrefix(countryCode, identifier, prefixLength);
           if (randomZip != null) {
             identifier = randomZip;
           }
@@ -157,15 +156,19 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     return identifier;
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+  protected PostalCodeManager getPostalCodeManager() {
+    if (postalCodeResourceManager == null) {
+      postalCodeResourceManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
-
-      zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId,
-          Resource.ZIPCODE, prefixLength, localizationProperty);
-
-      initialized = true;
     }
+    return postalCodeResourceManager;
+  }
+
+  protected ZIPCodeManager getZIPCodeManager() {
+    if (zipCodeResourceManager == null) {
+      zipCodeResourceManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ZIPCODE, null, localizationProperty);
+    }
+    return zipCodeResourceManager;
   }
 }
