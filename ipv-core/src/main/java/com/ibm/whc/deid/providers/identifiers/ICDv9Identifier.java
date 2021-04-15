@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,17 +16,15 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 /**
- * The type Ic dv 9 identifier.
- *
+ * Class that identifies ICDv9 codes.
  */
 public class ICDv9Identifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -23792857075066172L;
 
 	private static final String[] appropriateNames = { "ICD", "Disease code", "ICD9" };
-	protected volatile boolean initialized = false;
 
-	private ICDv9Manager icdv9Manager;
+    protected transient volatile ICDv9Manager icdv9Manager = null;
 
 	public ICDv9Identifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -49,13 +47,12 @@ public class ICDv9Identifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			icdv9Manager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV9, null,
+      if (icdv9Manager == null) {
+        icdv9Manager =
+            (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV9, null,
 					localizationProperty);
-
-			initialized = true;
-		}
-		return icdv9Manager;
+      }
+      return icdv9Manager;
 	}
 
 	@Override

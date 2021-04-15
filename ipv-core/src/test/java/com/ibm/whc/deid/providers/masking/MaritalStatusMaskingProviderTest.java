@@ -17,10 +17,8 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.MaritalStatusIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaritalStatusMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
@@ -44,8 +42,6 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
     }
     assertTrue(randomizationOK > 0);
   }
-
-
 
   @Test
   public void testMaskNullMaritalStatusInputReturnNull() throws Exception {
@@ -172,5 +168,4 @@ public class MaritalStatusMaskingProviderTest extends TestLogSetUp implements Ma
       }
     }
   }
-
 }

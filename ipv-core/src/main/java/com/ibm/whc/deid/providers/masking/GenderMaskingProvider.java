@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,14 +13,13 @@ import com.ibm.whc.deid.util.ManagerFactory;
 
 
 public class GenderMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -5037078935103051994L;
 
-  protected GenderManager genderManager;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile GenderManager genderResourceManager = null;
 
   public GenderMaskingProvider(GenderMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
@@ -31,13 +30,14 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
-    Sex sex = genderManager.getKey(identifier);
+    GenderManager genderManager = getGenderManager();
+
+    Sex sex = genderManager.getValue(identifier);
     if (sex == null) {
       debugFaultyInput("sex");
       if (unspecifiedValueHandling == 2) {
@@ -52,12 +52,11 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
     return genderManager.getRandomKey(sex.getNameCountryCode());
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      genderManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId,
+  protected GenderManager getGenderManager() {
+    if (genderResourceManager == null) {
+      genderResourceManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.GENDER, null, localizationProperty);
-
-      initialized = true;
     }
+    return genderResourceManager;
   }
 }

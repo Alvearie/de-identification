@@ -41,23 +41,24 @@ public class ZIPCodeManagerTest implements MaskingProviderTest {
     assertEquals("", zipCodeManager.getZipCodeReplacement(""));
 
     Integer testDataPop = new Integer(51917 + 21968 + 26332 + 17598 + 1428);
-    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590X", 4));
-    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590", 4));
-    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "559000", 4));
-    assertNull(zipCodeManager.getPopulationByPrefix("us", "559", 4));
-    assertNull(zipCodeManager.getPopulationByPrefix("us", "55901", 0));
-    assertNull(zipCodeManager.getPopulationByPrefix("us", "55901", -1));
-    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("us", "00000", 5));
-    assertNull(zipCodeManager.getPopulationByPrefix(null, "5590", 4));
-    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("en", "5590", 4));
-    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("#$@", "00601", 3));
-    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("US", "!@$@%%", 3));
+    assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590"));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("us", "00000"));
+    assertNull(zipCodeManager.getPopulationByPrefix(null, "5590"));
+    assertNull(zipCodeManager.getPopulationByPrefix("us", null));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("en", "5590"));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("#$@", "559"));
+    assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("us", "!@$@%%"));
 
     HashSet<String> candidates = new HashSet<>(
         Arrays.asList("58001", "58002", "58004", "58005", "58006", "58007", "58008", "58009"));
     for (int i = 0; i < 40; i++) {
-      assertTrue(candidates.contains(zipCodeManager.getRandomZipCodeByPrefix("us", "58003", 4)));
+      assertTrue(candidates.contains(zipCodeManager.getRandomZipCodeByPrefix("us", "5800")));
     }
+    assertEquals("58001", zipCodeManager.getRandomZipCodeByPrefix("us", "58001"));
+    assertNull(zipCodeManager.getRandomZipCodeByPrefix("en", "580"));
+    assertNull(zipCodeManager.getRandomZipCodeByPrefix("us", "0000"));
+    assertNull(zipCodeManager.getRandomZipCodeByPrefix(null, "5800"));
+    assertNull(zipCodeManager.getRandomZipCodeByPrefix("us", null));
 
     assertTrue(zipCodeManager.isValidKey("US", "00601"));
     assertTrue(zipCodeManager.isValidKey("us", "55901"));

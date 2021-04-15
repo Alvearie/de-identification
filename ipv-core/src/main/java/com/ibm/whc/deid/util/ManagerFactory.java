@@ -64,7 +64,7 @@ public class ManagerFactory {
           manager = CountryManager.buildCountryManager(localizationProperty);
           break;
         case COUNTY:
-          manager = new CountyManager(tenantId, localizationProperty);
+          manager = CountyManager.buildCountyManager(localizationProperty);
           break;
         case CREDIT_CARD_TYPE:
           manager = CreditCardTypeManager.buildCreditCardTypeManager(localizationProperty);
@@ -76,16 +76,16 @@ public class ManagerFactory {
           manager = NameFirstMaleManager.buildNameFirstMaleManager(localizationProperty);
           break;
         case GENDER:
-          manager = new GenderManager(tenantId, localizationProperty);
+          manager = GenderManager.buildGenderManager(localizationProperty);
           break;
         case HOSPITAL_NAMES:
-          manager = new HospitalManager(tenantId, localizationProperty);
+          manager = HospitalManager.buildHospitalManager(localizationProperty);
           break;
         case ICDV10:
-          manager = new ICDv10Manager(tenantId, localizationProperty);
+          manager = ICDv10Manager.buildICDv10Manager(localizationProperty);
           break;
         case ICDV9:
-          manager = new ICDv9Manager(tenantId, localizationProperty);
+          manager = ICDv9Manager.buildICDv9Manager(localizationProperty);
           break;
         case TACDB:
           manager = new IMEIManager(tenantId, localizationProperty);
@@ -94,7 +94,7 @@ public class ManagerFactory {
           manager = NameLastManager.buildNameLastManager(localizationProperty);
           break;
         case MARITAL_STATUS:
-          manager = new MaritalStatusManager(tenantId, localizationProperty);
+          manager = MaritalStatusManager.buildMaritalStatusManager(localizationProperty);
           break;
         case OCCUPATION:
           manager = new OccupationManager(tenantId, localizationProperty);

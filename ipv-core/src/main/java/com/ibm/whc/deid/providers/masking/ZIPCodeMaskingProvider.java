@@ -99,7 +99,7 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
         String prefix = identifier.substring(0, prefixLength);
         String suffix = identifier.substring(prefixLength);
         Integer population =
-            zipCodeManager.getPopulationByPrefix(countryCode, prefix, prefixLength);
+            zipCodeManager.getPopulationByPrefix(countryCode, prefix);
         if (population == null || population.intValue() < prefixMinPopulation) {
 
           if (prefixRequireMinPopulation) {
@@ -130,17 +130,16 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     // Check if the suffix is being replaced
     if (suffixReplaceWithRandom) {
       if (identifier.length() > prefixLength) {
+        String prefix = identifier.substring(0, prefixLength);
+        String suffix = identifier.substring(prefixLength);
 
         // Check if suffix must be replaced to create a valid zipcode
         if (suffixReplaceWithValidOnly) {
-          String randomZip =
-              zipCodeManager.getRandomZipCodeByPrefix(countryCode, identifier, prefixLength);
+          String randomZip = zipCodeManager.getRandomZipCodeByPrefix(countryCode, prefix);
           if (randomZip != null) {
             identifier = randomZip;
           }
         } else {
-          String prefix = identifier.substring(0, prefixLength);
-          String suffix = identifier.substring(prefixLength);
           identifier = prefix + RandomGenerators.randomReplacement(suffix);
         }
       }

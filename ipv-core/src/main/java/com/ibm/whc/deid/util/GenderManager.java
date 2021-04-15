@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,59 +8,63 @@ package com.ibm.whc.deid.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.Sex;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class GenderManager extends ResourceBasedManager<Sex> {
-  /** */
-  private static final long serialVersionUID = -7343046175769273053L;
+public class GenderManager extends LocalizedResourceManager<Sex> {
 
-  public GenderManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.GENDER, localizationProperty);
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.GENDER;
+
+  protected GenderManager() {
+    // nothing required here
   }
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.GENDER);
-  }
+  /**
+   * Creates a new GenderManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a GenderManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static GenderManager buildGenderManager(String localizationProperty) {
+    GenderManager manager = new GenderManager();
 
-  @Override
-  public Map<String, Map<String, Sex>> readResourcesFromFile(Collection<ResourceEntry> entries) {
-    Map<String, Map<String, Sex>> map = new HashMap<>();
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          String key = name.toUpperCase();
-
-          Sex sex = new Sex(name, countryCode);
-          addToMapByLocale(map, entry.getCountryCode(), key, sex);
-          addToMapByLocale(map, getAllCountriesName(), key, sex);
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+            String name = line.get(0);
+            if (!name.trim().isEmpty()) {
+              Sex sex = new Sex(name, countryCode);
+              manager.add(sex);
+              manager.add(countryCode, sex);
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return map;
-  }
-
-  @Override
-  public Collection<Sex> getItemList() {
-    return getValues();
+    return manager;
   }
 }

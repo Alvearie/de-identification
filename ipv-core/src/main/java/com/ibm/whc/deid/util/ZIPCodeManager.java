@@ -155,65 +155,56 @@ public class ZIPCodeManager extends LocalizedResourceManager<ZIPCode> {
   }
 
   /**
-   * Gets the total population of ZIP codes with same prefix as the specified ZIP code.
+   * Gets the total population of ZIP codes for the given country with the given ZIP code prefix.
    *
    * @param countryCode the country code
-   * @param zipCode the ZIP code
-   * @param prefixLength the length of the prefix to use to group ZIP codes
+   * @param zipCodePrefix the ZIP code prefix
    * 
-   * @return the total population of all known codes with the same prefix or <i>null</i> if the ZIP
-   *         code is shorter than the given prefix length or any of the other input is <i>null</i>.
+   * @return the total population of all known ZIP codes that begin with the given prefix or
+   *         <i>null</i> if any of the input is <i>null</i>.
    */
-  public Integer getPopulationByPrefix(String countryCode, String zipCode, int prefixLength) {
-    if (countryCode == null || zipCode == null || zipCode.length() < prefixLength
-        || prefixLength < 1) {
-      return null;
-    }
-
-    String prefix = zipCode.substring(0, prefixLength);
-
-    int population = 0;
-    for (ZIPCode code : getValues(countryCode.toLowerCase())) {
-      if (code.getCode().startsWith(prefix)) {
-        population += code.getPopulation();
+  public Integer getPopulationByPrefix(String countryCode, String zipCodePrefix) {
+    Integer populationI = null;
+    if (countryCode != null && zipCodePrefix != null) {
+      int population = 0;
+      for (ZIPCode code : getValues(countryCode.toLowerCase())) {
+        if (code.getCode().startsWith(zipCodePrefix)) {
+          population += code.getPopulation();
+        }
       }
+      populationI = Integer.valueOf(population);
     }
-
-    return Integer.valueOf(population);
+    return populationI;
   }
 
   /**
-   * Gets a random ZIP code with same prefix as the specified ZIP code.
+   * Gets a random ZIP code in the given country with the given ZIP code prefix.
    *
    * @param countryCode the country code
-   * @param zipCode the ZIP code
-   * @param prefixLength the length of the prefix to use to group ZIP codes
+   * @param zipCodePrefix the ZIP code prefix
    * 
-   * @return a random ZIP code with the same prefix or <i>null</i> if no such ZIP codes have been
-   *         loaded for the given country
+   * @return a random ZIP code from the given country with the given prefix or <i>null</i> if no
+   *         such ZIP codes have been loaded
    */
-  public String getRandomZipCodeByPrefix(String countryCode, String zipCode, int prefixLength) {
-    if (countryCode == null || zipCode == null || zipCode.length() < prefixLength
-        || prefixLength < 1) {
-      return null;
-    }
+  public String getRandomZipCodeByPrefix(String countryCode, String zipCodePrefix) {
+    String code = null;
+    if (countryCode != null && zipCodePrefix != null) {
 
-    String prefix = zipCode.substring(0, prefixLength);
-    ArrayList<ZIPCode> candidates = new ArrayList<>(100);
+      ArrayList<ZIPCode> candidates = new ArrayList<>(100);
+      for (ZIPCode zcode : getValues(countryCode)) {
+        if (zcode.getCode().startsWith(zipCodePrefix)) {
+          candidates.add(zcode);
+        }
+      }
 
-    for (ZIPCode code : getValues(countryCode)) {
-      if (code.getCode().startsWith(prefix)) {
-        candidates.add(code);
+      int count = candidates.size();
+      if (count == 1) {
+        code = candidates.get(0).getCode();
+      } else if (count > 1) {
+        code = candidates.get(random.nextInt(count)).getCode();
       }
     }
 
-    String code = null;
-    int count = candidates.size();
-    if (count == 1) {
-      code = candidates.get(0).getCode();
-    } else if (count > 1) {
-      code = candidates.get(random.nextInt(count)).getCode();
-    }
     return code;
   }
 }

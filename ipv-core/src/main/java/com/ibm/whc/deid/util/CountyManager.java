@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,68 +8,84 @@ package com.ibm.whc.deid.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.County;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class CountyManager extends ResourceBasedManager<County> {
-  /** */
-  private static final long serialVersionUID = -7331835176814737907L;
+public class CountyManager extends LocalizedResourceManager<County> {
 
-  public CountyManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.COUNTY, localizationProperty);
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.COUNTY;
+
+  protected CountyManager() {
+    // nothing required here
   }
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.COUNTY);
-  }
+  /**
+   * Creates a new CountyManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a CountyManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static CountyManager buildCountyManager(String localizationProperty) {
+    CountyManager manager = new CountyManager();
 
-  @Override
-  public Map<String, Map<String, County>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, County>> counties = new HashMap<>();
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          String shortName = line.get(1);
-          String state = line.get(2);
-          Integer population = Integer.valueOf(line.get(3));
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+            String name = line.get(0);
+            String shortName = line.get(1);
+            String state = line.get(2);
+            String populationString = line.get(3);
 
-          County county = new County(name, countryCode, shortName, state, population);
+            if (!name.trim().isEmpty()) {
+              Integer population = null;
+              if (!populationString.trim().isEmpty()) {
+                try {
+                  population = Integer.valueOf(populationString);
+                } catch (NumberFormatException e) {
+                  logger.logWarn(LogCodes.WPH1014W, populationString, "county.population");
+                }
+              }
 
-          String key = name.toUpperCase();
-          addToMapByLocale(counties, entry.getCountryCode(), key, county);
-          addToMapByLocale(counties, getAllCountriesName(), key, county);
+              County county =
+                  new County(name, countryCode, shortName, state, population, name.toUpperCase());
+              manager.add(county);
+              manager.add(countryCode, county);
 
-          String shortNameKey = shortName.toUpperCase();
-          addToMapByLocale(counties, entry.getCountryCode(), shortNameKey, county);
-          addToMapByLocale(counties, getAllCountriesName(), shortNameKey, county);
+              if (!shortName.trim().isEmpty()) {
+                County countyShort = new County(name, countryCode, shortName, state, population,
+                    shortName.toUpperCase());
+                manager.add(countyShort);
+                manager.add(countryCode, countyShort);
+              }
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return counties;
-  }
-
-  @Override
-  public Collection<County> getItemList() {
-    return getValues();
+    return manager;
   }
 }
