@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -28,6 +28,12 @@ public class VINIdentifierTest implements MaskingProviderTest {
     assertFalse(vinIdentifier.isOfThisType(vin));
     vin = "AOB12345678901234"; // char O is invalid
     assertFalse(vinIdentifier.isOfThisType(vin));
+    vin = "ABq12345678901234"; // char Q is invalid
+    assertFalse(vinIdentifier.isOfThisType(vin));
+    vin = "AiB12345678901234"; // char I is invalid
+    assertFalse(vinIdentifier.isOfThisType(vin));
+    vin = "AoB12345678901234"; // char O is invalid
+    assertFalse(vinIdentifier.isOfThisType(vin));
 
     /* VIN contains non-digits or non-letters */
     vin = "1B312-45678901234"; // char O is invalid
@@ -39,7 +45,10 @@ public class VINIdentifierTest implements MaskingProviderTest {
     vin = "11112345678901234";
     assertFalse(vinIdentifier.isOfThisType(vin));
 
-    vin = "1B312345678901234"; // char O is invalid
+    vin = "1B312345678901234";
     assertTrue(vinIdentifier.isOfThisType(vin));
+
+    /* null */
+    assertFalse(vinIdentifier.isOfThisType(null));
   }
 }

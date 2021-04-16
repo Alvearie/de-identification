@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -35,7 +35,7 @@ public class IMEIMaskingProviderTest extends TestLogSetUp implements MaskingProv
   @Test
   public void testMaskNoTACPreservation() {
     IMEIMaskingProviderConfig config = new IMEIMaskingProviderConfig();
-    config.setPreserveTAC(Boolean.FALSE);
+    config.setPreserveTAC(false);
     MaskingProvider maskingProvider =
         new IMEIMaskingProvider(config, tenantId, localizationProperty);
 

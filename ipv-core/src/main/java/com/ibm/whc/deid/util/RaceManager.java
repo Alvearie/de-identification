@@ -35,7 +35,7 @@ public class RaceManager extends LocalizedResourceManager<Race> {
    * @param localizationProperty path and file name of a properties file consumed by the
    *        LocalizationManager to find the resources for this manager instance.
    * 
-   * @return an RaceManager instance
+   * @return a RaceManager instance
    * 
    * @see LocalizationManager
    */

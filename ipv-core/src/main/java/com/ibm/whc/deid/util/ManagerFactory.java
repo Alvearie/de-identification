@@ -41,7 +41,6 @@ public class ManagerFactory {
       String localizationProperty) {
     String cacheKey = resourceType + "_" + localizationProperty;
     Manager manager = managers.get(cacheKey);
-
     if (manager != null) {
       return manager;
     }
@@ -88,7 +87,7 @@ public class ManagerFactory {
           manager = ICDv9Manager.buildICDv9Manager(localizationProperty);
           break;
         case TACDB:
-          manager = new IMEIManager(tenantId, localizationProperty);
+          manager = IMEIManager.buildIMEIManager(localizationProperty);
           break;
         case LAST_NAME:
           manager = NameLastManager.buildNameLastManager(localizationProperty);
@@ -118,13 +117,13 @@ public class ManagerFactory {
           manager = StreetNameManager.buildStreetNameManager(localizationProperty);
           break;
         case STATES_US:
-          manager = new StatesUSManager(tenantId, localizationProperty);
+          manager = StatesUSManager.buildStatesUSManager(localizationProperty);
           break;
         case SWIFT:
           manager = SWIFTCodeManager.buildSWIFTCodeManager(localizationProperty, tenantId);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
-          manager = new VINManager(tenantId, localizationProperty);
+          manager = VINManager.buildVINManager(localizationProperty);
           break;
         case ZIPCODE:
           manager = ZIPCodeManager.buildZIPCodeManager(localizationProperty);

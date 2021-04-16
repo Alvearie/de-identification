@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,12 +13,10 @@ import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.StatesUSManager;
 
 public class StatesUSIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = 710170960599545348L;
 
-	private StatesUSManager statesUSManager = new StatesUSManager(null, localizationProperty);
-
-	protected volatile boolean initialized = false;
+    protected transient volatile StatesUSManager statesUSManager = null;
 
 	public StatesUSIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -26,13 +24,11 @@ public class StatesUSIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(tenantId, Resource.STATES_US,
-					null, localizationProperty);
-
-			initialized = true;
-		}
-		return statesUSManager;
+      if (statesUSManager == null) {
+        statesUSManager = (StatesUSManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.STATES_US, null, localizationProperty);
+      }
+      return statesUSManager;
 	}
 
 	@Override
