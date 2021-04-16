@@ -97,7 +97,7 @@ public class ManagerFactory {
           manager = MaritalStatusManager.buildMaritalStatusManager(localizationProperty);
           break;
         case OCCUPATION:
-          manager = new OccupationManager(tenantId, localizationProperty);
+          manager = OccupationManager.buildOccupationManager(localizationProperty);
           break;
         case PHONE_AREA_CODES:
           manager = PhoneAreaCodesManager.buildPhoneAreaCodesManager(localizationProperty);
@@ -109,10 +109,10 @@ public class ManagerFactory {
           manager = PhoneNumberLengthManager.buildPhoneNumberLengthManager(localizationProperty);
           break;
         case RACE_ETHNICITY:
-          manager = new RaceManager(tenantId, localizationProperty);
+          manager = RaceManager.buildRaceManager(localizationProperty);
           break;
         case RELIGION:
-          manager = new ReligionManager(tenantId, localizationProperty);
+          manager = ReligionManager.buildReligionManager(localizationProperty);
           break;
         case STREET_NAMES:
           manager = StreetNameManager.buildStreetNameManager(localizationProperty);
