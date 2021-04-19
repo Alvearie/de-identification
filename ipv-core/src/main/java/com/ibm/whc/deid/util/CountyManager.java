@@ -26,7 +26,7 @@ public class CountyManager extends LocalizedResourceManager<County> {
   protected static final Resources resourceType = Resource.COUNTY;
 
   protected CountyManager() {
-    // nothing required here
+    super(3200, 3200);
   }
 
   /**

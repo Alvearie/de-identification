@@ -31,7 +31,7 @@ public class CityManager extends LocalizedResourceManager<City> {
   private static final LogManager logger = LogManager.getInstance();
 
   protected CityManager() {
-    // nothing required here
+    super(3000, 3000);
   }
 
   /**

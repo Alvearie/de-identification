@@ -28,7 +28,7 @@ public class VINManager extends ResourceManager<WorldManufacturerId> {
   protected static final Resources resourceType = Resource.WORLD_MANUFACTURERS_IDENTIFIER;
 
   protected VINManager() {
-    // nothing required here
+    super(500);
   }
 
   /**

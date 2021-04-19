@@ -33,7 +33,7 @@ public class PhoneAreaCodesManager extends LocalizedResourceManager<PhoneAreaCod
   private static final LogManager logger = LogManager.getInstance();
 
   protected PhoneAreaCodesManager() {
-    // nothing required here
+    super(300, 300);
   }
 
   /**

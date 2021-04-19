@@ -41,7 +41,7 @@ public class ZIPCodeManager extends LocalizedResourceManager<ZIPCode> {
   private Map<String, String> replacementsMap = new HashMap<>();
 
   protected ZIPCodeManager() {
-    // nothing required here
+    super(34000, 34000);
   }
 
   /**

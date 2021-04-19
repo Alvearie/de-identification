@@ -29,7 +29,7 @@ public class NameLastManager extends LocalizedResourceManager<LastName> {
   private static final LogManager logger = LogManager.getInstance();
 
   protected NameLastManager() {
-    // nothing required here
+    super(163000, 163000);
   }
 
   /**

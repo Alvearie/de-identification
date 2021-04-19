@@ -31,7 +31,7 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
   protected LatLonDistance<PostalCode> latLonTree = null;
 
   protected PostalCodeManager() {
-    // nothing required here
+    super(44000);
   }
 
   /**

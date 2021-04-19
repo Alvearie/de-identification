@@ -26,7 +26,7 @@ public class StreetNameManager extends LocalizedResourceManager<StringResource> 
   protected static final Resources resourceType = Resource.STREET_NAMES;
 
   protected StreetNameManager() {
-    // nothing required here
+    super(200, 200);
   }
 
   /**

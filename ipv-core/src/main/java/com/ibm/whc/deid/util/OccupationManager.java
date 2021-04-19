@@ -28,7 +28,7 @@ public class OccupationManager extends LocalizedResourceManager<Occupation> {
   protected static final Resources resourceType = Resource.OCCUPATION;
 
   protected OccupationManager() {
-    // nothing required here
+    super(22000, 22000);
   }
 
   /**
