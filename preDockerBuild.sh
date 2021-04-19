@@ -35,7 +35,7 @@ curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devop
 
 # Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
 # If the branch is not master, include branch name in the version
-RELEASE_VERSION=1.0.0
+RELEASE_VERSION=1.0.1
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then
     echo "-Drevision=${RELEASE_VERSION}-SNAPSHOT" >  .mvn/maven.config

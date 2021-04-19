@@ -4,7 +4,7 @@ replicaCount: 1
 image:
   repository: alvearie/deid
   pullPolicy: IfNotPresent
-  tag: 1.0.0
+  tag: 1.0.1
 service:
   type: ClusterIP
   port: 8080

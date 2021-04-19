@@ -2,14 +2,14 @@ The De-Identification Services can be accessed from within your cluster at the f
 
   {{ include "deid.fullname" .}}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain}}
  
-To connect to your NiFi Registry from outside the cluster, follow the instructions below:
+To connect to your De-Identification server from outside the cluster, follow the instructions below:
  
 Get the application URL by running these commands:
 {{- if contains "NodePort" .Values.service.type }}
 
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "deid.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")  
-  echo NiFi Registry: http://$NODE_IP:$NODE_PORT/api/v1/deidentification
+  echo De-Identification server : http://$NODE_IP:$NODE_PORT/api/v1/deidentification
   
 {{- else if contains "LoadBalancer" .Values.service.type }}
 
@@ -22,7 +22,7 @@ You can watch the status by running the following command and wait unti the exte
 Once the external IP has been assigned run the following:
 
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "deid.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') 
-  echo NiFi Registry: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/deidentification
+  echo De-Identification server: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/deidentification
 
 {{- else if contains "ClusterIP" .Values.service.type }}
 
