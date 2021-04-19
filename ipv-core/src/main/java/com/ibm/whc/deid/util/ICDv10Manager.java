@@ -30,14 +30,21 @@ public class ICDv10Manager implements Manager {
 
   protected static final Resources resourceType = Resource.ICDV10;
 
+  // The number of codes expected to be loaded from the resource file.
+  // Modify this value if the resource file is modified.
+  private static final int EXPECTED_COUNT = 42000;
+
   private final SecureRandom random = new SecureRandom();
 
-  private final ArrayList<ICDWithoutFormat> icdList = new ArrayList<>(75000);
-  private final HashMap<String, ICDWithoutFormat> icdByCodeMap = new HashMap<>(100000);
-  private final HashMap<String, ICDWithoutFormat> icdByNameMap = new HashMap<>(100000);
+  private final ArrayList<ICDWithoutFormat> icdList;
+  private final HashMap<String, ICDWithoutFormat> icdByCodeMap;
+  private final HashMap<String, ICDWithoutFormat> icdByNameMap;
 
   protected ICDv10Manager() {
-    // nothing required here
+    icdList = new ArrayList<>(EXPECTED_COUNT);
+    int hashMapInitialSize = Math.round(EXPECTED_COUNT / 0.75f) + 1;
+    icdByCodeMap = new HashMap<>(hashMapInitialSize, 0.75f);
+    icdByNameMap = new HashMap<>(hashMapInitialSize, 0.75f);
   }
 
   protected void add(ICDWithoutFormat icdCode) {
