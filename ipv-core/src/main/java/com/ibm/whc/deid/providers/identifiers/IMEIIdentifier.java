@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,17 +17,16 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 public class IMEIIdentifier extends AbstractManagerBasedIdentifier {
-  /** */
+
   private static final long serialVersionUID = -8398288614698641845L;
 
   private static final String[] appropriateNames = new String[] {"IMEI"};
-	private IMEIManager imeiManager;
 
-	protected volatile boolean initialized = false;
+  protected transient volatile IMEIManager imeiManager = null;
 
-	public IMEIIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  public IMEIIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
   @Override
   protected Collection<String> getAppropriateNames() {
@@ -71,13 +70,12 @@ public class IMEIIdentifier extends AbstractManagerBasedIdentifier {
     return ValueClass.TEXT;
   }
 
-	@Override
-	protected Manager getManager() {
-		if (!initialized) {
-			imeiManager = (IMEIManager) ManagerFactory.getInstance().getManager(tenantId, Resource.TACDB, null,
-					localizationProperty);
-			initialized = true;
-		}
-		return imeiManager;
-	}
+  @Override
+  protected Manager getManager() {
+    if (imeiManager == null) {
+      imeiManager = (IMEIManager) ManagerFactory.getInstance().getManager(tenantId, Resource.TACDB,
+          null, localizationProperty);
+    }
+    return imeiManager;
+  }
 }

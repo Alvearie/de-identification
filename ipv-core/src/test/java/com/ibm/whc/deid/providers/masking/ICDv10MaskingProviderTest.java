@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,8 +25,6 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
    * false). That is, tests converting the ICDv10 code or name to category or chapter. It also tests
    * for format, case , and invalid value.
    */
-
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMaskConvertToCategory() throws Exception {

@@ -1,12 +1,19 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
-public class CreditCard {
+import com.ibm.whc.deid.resources.ManagedResource;
+
+/**
+ * Object that holds information about a type/brand of credit card.
+ */
+public class CreditCardType implements ManagedResource {
+
   private final String name;
+  private final String key;
   private final String[] prefixes;
   private final int minimumLength;
   private final int maximumLength;
@@ -19,8 +26,9 @@ public class CreditCard {
    * @param minimumLength the minimum length
    * @param maximumLength the maximum length
    */
-  public CreditCard(String name, String[] prefixes, int minimumLength, int maximumLength) {
+  public CreditCardType(String name, String[] prefixes, int minimumLength, int maximumLength) {
     this.name = name;
+    this.key = name.toUpperCase();
     this.prefixes = prefixes;
     this.minimumLength = minimumLength;
     this.maximumLength = maximumLength;
@@ -60,5 +68,10 @@ public class CreditCard {
    */
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
   }
 }

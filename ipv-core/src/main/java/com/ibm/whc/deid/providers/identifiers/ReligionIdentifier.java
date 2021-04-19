@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,12 +16,12 @@ import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.ReligionManager;
 
 public class ReligionIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -3355052206753857563L;
 
 	private final Collection<String> appropriateNames = Collections.singletonList("Religion");
-	private ReligionManager religionManager;
-	protected volatile boolean initialized = false;
+
+    protected transient volatile ReligionManager religionManager = null;
 
 	public ReligionIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -29,13 +29,11 @@ public class ReligionIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(tenantId, Resource.RELIGION,
-					null, localizationProperty);
-
-			initialized = true;
-		}
-		return religionManager;
+      if (religionManager == null) {
+        religionManager = (ReligionManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.RELIGION, null, localizationProperty);
+      }
+      return religionManager;
 	}
 
 	@Override

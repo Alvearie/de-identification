@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -14,46 +14,43 @@ import com.ibm.whc.deid.util.ManagerFactory;
 
 
 /**
- * The type Ic dv 9 masking provider.
- *
+ * Privacy provider for ICDv9 codes.
  */
 public class ICDv9MaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -5706336758492457693L;
 
-  protected ICDv9Manager icdV9Manager;
   private final boolean randomizeToCategory;
   private final boolean randomizeToRange;
   private final int unspecifiedValueHandling;
   private final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile ICDv9Manager icdV9ResourceManager = null;
 
   /**
-   * Instantiates a new Ic dv 9 masking provider.
+   * Instantiates a new masking provider.
    *
-   * @param configuration the configuration
-   * @param tenantId tenant id
-   * @paramlocalizationProperty location of the localization property file
-   * @param random the random
+   * @param configuration the provider configuration
+   * @param tenantId tenant associated with the current request
+   * @param localizationProperty location of the localization property file
    */
   public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
     super(tenantId, localizationProperty);
     this.randomizeToCategory = configuration.isRandomizeCategory();
     this.randomizeToRange = configuration.isRandomizeChapter();
-
     this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
+
+    ICDv9Manager icdV9Manager = getManager();
 
     ICD icd = icdV9Manager.lookupICD(identifier);
     if (icd == null) {
@@ -73,25 +70,25 @@ public class ICDv9MaskingProvider extends AbstractMaskingProvider {
     if (this.randomizeToRange) {
       if (format == ICDFormat.CODE) {
         return icd.getChapterCode();
-      } else {
-        return icd.getChapterName();
       }
-    } else if (this.randomizeToCategory) {
+      return icd.getChapterName();
+    }
+
+    if (this.randomizeToCategory) {
       if (format == ICDFormat.CODE) {
         return icd.getCategoryCode();
-      } else {
-        return icd.getCategoryName();
       }
+      return icd.getCategoryName();
     }
 
     return icdV9Manager.getRandomKey();
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      icdV9Manager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId,
+  protected ICDv9Manager getManager() {
+    if (icdV9ResourceManager == null) {
+      icdV9ResourceManager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.ICDV9, null, localizationProperty);
-      initialized = true;
     }
+    return icdV9ResourceManager;
   }
 }

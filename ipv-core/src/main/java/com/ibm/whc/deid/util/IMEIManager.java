@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,53 +8,61 @@ package com.ibm.whc.deid.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
+import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.resources.StringResource;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class IMEIManager extends ResourceBasedManager<String> {
-  /** */
-  private static final long serialVersionUID = -5860856726235946681L;
+public class IMEIManager extends ResourceManager<StringResource> {
 
-  public IMEIManager(String tenantId, String localizationProperty) {
-		super(tenantId, Resource.TACDB, localizationProperty);
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.TACDB;
+
+  protected IMEIManager() {
+    // nothing required here
   }
 
-  @Override
-  protected Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.TACDB);
-  }
+  /**
+   * Creates a new IMEIManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return an IMEIManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static IMEIManager buildIMEIManager(String localizationProperty) {
+    IMEIManager manager = new IMEIManager();
 
-  @Override
-  protected Map<String, Map<String, String>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, String>> tacs = new HashMap<>();
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String tac = line.get(0);
-          addToMapByLocale(tacs, getAllCountriesName(), tac.toUpperCase(), tac);
+      try (InputStream inputStream = entry.createStream()) {
+
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+
+            String tac = line.get(0);
+            if (!tac.trim().isEmpty()) {
+              manager.add(new StringResource(tac));
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return tacs;
-  }
-
-  @Override
-  public Collection<String> getItemList() {
-    return getValues();
+    return manager;
   }
 }

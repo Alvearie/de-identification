@@ -32,6 +32,6 @@ public class StringResource implements Serializable, ManagedResource {
 
   @Override
   public String getKey() {
-    return value.toString();
+    return value.toUpperCase();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,17 +16,16 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 /**
- * The type Ic dv 10 identifier.
+ * The type ICDv10 Identifier.
  *
  */
 public class ICDv10Identifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -7484093125257873714L;
 
 	private static final String[] appropriateNames = { "ICD", "Disease code", "ICD10", "ICDv10" };
 
-	protected volatile boolean initialized = false;
-	private ICDv10Manager icdv10Manager;
+    protected transient volatile ICDv10Manager icdv10Manager = null;
 
 	public ICDv10Identifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -49,14 +48,11 @@ public class ICDv10Identifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId, Resource.ICDV10, null,
-					localizationProperty);
-
-			initialized = true;
-		}
-
-		return icdv10Manager;
+      if (icdv10Manager == null) {
+        icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.ICDV10, null, localizationProperty);
+      }
+      return icdv10Manager;
 	}
 
 	@Override

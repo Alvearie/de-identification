@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,10 +9,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
 import org.apache.commons.lang3.StringUtils;
-
-import com.ibm.whc.deid.models.CreditCard;
+import com.ibm.whc.deid.models.CreditCardType;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.LatitudeLongitudeFormat;
 import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
@@ -25,15 +23,14 @@ public class RandomGenerators {
   private static final IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
   private static final IPAddressMaskingProvider ipAddressMaskingProvider =
       new IPAddressMaskingProvider();
-	private static final TLDManager tldManager = TLDManager.instance();
-	private final CreditCardManager creditCardManager;
+  private static final TLDManager tldManager = TLDManager.instance();
 
   private static final char[] alphaDigitSubset =
       "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
 
-	public RandomGenerators(String localizationProperty) {
-		creditCardManager = new CreditCardManager(localizationProperty);
-	}
+  private RandomGenerators() {
+    // no need to instantiate
+  }
 
   /**
    * Luhn check digit int.
@@ -66,8 +63,8 @@ public class RandomGenerators {
    *
    * @return the string
    */
-	public String generateRandomCreditCard() {
-    CreditCard creditCard = creditCardManager.randomCreditCardInformation();
+  public static String generateRandomCreditCard(CreditCardTypeManager creditCardTypeManager) {
+    CreditCardType creditCard = creditCardTypeManager.getRandomValue();
 
     String[] prefixes = creditCard.getPrefixes();
     String randomCC = prefixes[random.nextInt(prefixes.length)];

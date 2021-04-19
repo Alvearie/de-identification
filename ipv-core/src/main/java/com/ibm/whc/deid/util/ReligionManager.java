@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,60 +8,64 @@ package com.ibm.whc.deid.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.Religion;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class ReligionManager extends ResourceBasedManager<Religion> {
-  /** */
-  private static final long serialVersionUID = -2918967366667277711L;
+public class ReligionManager extends LocalizedResourceManager<Religion> {
 
-  public ReligionManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.RELIGION, localizationProperty);
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.RELIGION;
+
+  protected ReligionManager() {
+    // nothing required here
   }
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.RELIGION);
-  }
+  /**
+   * Creates a new ReligionManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return an ReligionManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static ReligionManager buildReligionManager(String localizationProperty) {
+    ReligionManager manager = new ReligionManager();
 
-  @Override
-  public Map<String, Map<String, Religion>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, Religion>> religions = new HashMap<>();
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          String key = name.toUpperCase();
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
 
-          Religion religion = new Religion(name, countryCode);
-          addToMapByLocale(religions, entry.getCountryCode(), key, religion);
-          addToMapByLocale(religions, getAllCountriesName(), key, religion);
+            String name = line.get(0);
+            if (!name.trim().isEmpty()) {
+              Religion religion = new Religion(name, countryCode);
+              manager.add(religion);
+              manager.add(countryCode, religion);
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return religions;
-  }
-
-  @Override
-  public Collection<Religion> getItemList() {
-    return getValues();
+    return manager;
   }
 }

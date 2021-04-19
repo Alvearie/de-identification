@@ -7,18 +7,14 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
+import com.ibm.whc.deid.resources.ResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -26,81 +22,60 @@ import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
-public class PostalCodeManager implements Manager, Serializable {
-
-  private static final long serialVersionUID = -5126260477789733871L;
-
-	protected final Collection<ResourceEntry> resourceList;
-  protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
-  protected List<PostalCode> postalCodeList;
-  private LatLonDistance<PostalCode> latLonTree = null;
+public class PostalCodeManager extends ResourceManager<PostalCode> {
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.POSTAL_CODES;
 
-  protected final String tenantId;
+  protected static final Resources resourceType = Resource.POSTAL_CODES;
 
-  public PostalCodeManager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-		resourceList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.POSTAL_CODES);
-    this.postalCodeList = new ArrayList<>();
+  protected LatLonDistance<PostalCode> latLonTree = null;
 
-    this.postalCodeMap = new MapWithRandomPick<>(new HashMap<String, PostalCode>());
-
-    readResources(resourceType, tenantId);
-    this.postalCodeMap.setKeyList();
-
-    try {
-      this.latLonTree = new LatLonDistance<>(postalCodeList);
-    } catch (Exception e) {
-      logger.logError(LogCodes.WPH1013E, e);
-    }
-
-  }
-
-  protected void readResources(Resources resourceType, String tenantId) {
-    this.postalCodeMap.getMap().putAll(readPostalCodeCodeListFromFile(resourceList));
+  protected PostalCodeManager() {
+    super(44000);
   }
 
   /**
-   * Read postal code list from the default CSV file
-   *
-   * @param entries
-   * @return
+   * Creates a new PostalCodeManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a PostalCodeManager instance
+   * 
+   * @see LocalizationManager
    */
-  protected Map<? extends String, ? extends PostalCode> readPostalCodeCodeListFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, PostalCode> postals = new HashMap<>();
+  public static PostalCodeManager buildPostalCodeManager(String localizationProperty) {
+    PostalCodeManager manager = new PostalCodeManager();
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      entry.getCountryCode();
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          line.get(0);
-          String code = line.get(1);
-          Double latitude = FileUtils.parseDouble(line.get(2));
-          Double longitude = FileUtils.parseDouble(line.get(3));
-          /* TODO : replace hardcoded locale */
-          PostalCode postalCode = new PostalCode(code, latitude, longitude);
-          this.postalCodeList.add(postalCode);
-          postals.put(code.toUpperCase(), postalCode);
+      try (InputStream inputStream = entry.createStream()) {
+        String locale = entry.getCountryCode();
+
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
+            // column 0 skipped
+            String code = line.get(1);
+            if (!code.trim().isEmpty()) {
+              Double latitude = FileUtils.parseDouble(line.get(2));
+              Double longitude = FileUtils.parseDouble(line.get(3));
+              // TODO : replace hardcoded locale
+              PostalCode postalCode = new PostalCode(code, latitude, longitude);
+              manager.add(postalCode);
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return postals;
-  }
+    manager.latLonTree = new LatLonDistance<>(manager.getValues());
 
-  public String getPseudorandom(String identifier) {
-    int position =
-        (int) (Math.abs(HashUtils.longFromHash(identifier)) % this.postalCodeList.size());
-    return this.postalCodeList.get(position).getName();
+    return manager;
   }
 
   /**
@@ -111,8 +86,7 @@ public class PostalCodeManager implements Manager, Serializable {
    * @return the closest postal codes
    */
   public List<PostalCode> getClosestPostalCodes(String postalCode, int k) {
-    String key = postalCode.toUpperCase();
-    PostalCode lookup = this.postalCodeMap.getMap().get(key);
+    PostalCode lookup = getValue(postalCode);
 
     if (lookup == null) {
       return new ArrayList<>();
@@ -122,15 +96,4 @@ public class PostalCodeManager implements Manager, Serializable {
 
     return this.latLonTree.findNearestK(latlon.getLatitude(), latlon.getLongitude(), k);
   }
-
-  @Override
-  public String getRandomKey() {
-    return this.postalCodeMap.getRandomKey();
-  }
-
-  @Override
-  public boolean isValidKey(String postalCode) {
-    return postalCodeMap.getMap().containsKey(postalCode.toUpperCase());
-  }
-
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,7 +7,6 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -16,27 +15,24 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 public class CreditCardTypeIdentifier extends AbstractManagerBasedIdentifier {
-  /** */
+
   private static final long serialVersionUID = 8292073040447713030L;
 
   private static final String[] appropriateNames = {"Credit Card Type"};
-	private CreditCardTypeManager creditCardTypeManager;
 
-	protected volatile boolean initialized = false;
+  protected transient volatile CreditCardTypeManager creditCardTypeManager = null;
 
-	public CreditCardTypeIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  public CreditCardTypeIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
   @Override
   protected Manager getManager() {
-		if (!initialized) {
-			creditCardTypeManager = (CreditCardTypeManager) ManagerFactory.getInstance().getManager(tenantId,
-					Resource.CREDIT_CARD_TYPE, null, localizationProperty);
-
-			initialized = true;
-		}
-		return creditCardTypeManager;
+    if (creditCardTypeManager == null) {
+      creditCardTypeManager = (CreditCardTypeManager) ManagerFactory.getInstance()
+          .getManager(tenantId, Resource.CREDIT_CARD_TYPE, null, localizationProperty);
+    }
+    return creditCardTypeManager;
   }
 
   @Override

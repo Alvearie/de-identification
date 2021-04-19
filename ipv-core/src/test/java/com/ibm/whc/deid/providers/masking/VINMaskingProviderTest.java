@@ -41,7 +41,6 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     assertTrue(vinIdentifier.isOfThisType(vin));
     String maskedResult = vinMaskingProvider.mask(vin);
     // default is to preserve WMI and VDS
-    System.out.println(maskedResult);
     assertTrue(vinIdentifier.isOfThisType(maskedResult));
     assertTrue(maskedResult.startsWith("1B3"));
     assertFalse(maskedResult.equals(vin));

@@ -77,6 +77,25 @@ public class AddressIdentifierTest {
   }
 
   @Test
+  public void testParseRoadTypes() throws Exception {
+    AddressIdentifier identifier = new AddressIdentifier();
+    StringBuilder buffer = new StringBuilder(100);
+    buffer.append("200 E Main ");
+    int startLen = buffer.length();
+    String suffix = ", Phoenix AZ 85123, USA";
+    String[] rdtypes = new String[] {"STREET", "ST.", "ST", "DRIVE", "DR.", "DR", "BOULEVARD",
+        "BLVD.", "BLVD", "COURT", "CT.", "CT", "ROAD", "RD.", "RD", "AVENUE", "AVE.", "AVE", "LANE",
+        "LN.", "LN"};
+
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertEquals(rd, address.getRoadType());
+    }
+  }
+
+  @Test
   public void testQA() {
     String value = "The patient gives his own history and appears to be a reliable source.";
     AddressIdentifier identifier = new AddressIdentifier();

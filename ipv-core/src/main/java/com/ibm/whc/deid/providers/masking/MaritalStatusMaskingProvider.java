@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,23 +12,24 @@ import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.MaritalStatusManager;
 
 
-/** The type Marital status masking provider. */
+/**
+ * Privacy provider to protect marital status.
+ */
 public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -1898529887780962978L;
 
-  protected MaritalStatusManager statusManager;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile MaritalStatusManager maritalStatusResourceManager = null;
 
   /**
-   * Instantiates a new Marital status masking provider.
+   * Instantiates a new marital status masking provider.
    * 
    * @param configuration the configuration
-   * @paramlocalizationProperty location of the localization property file
-   * @param random the random
+   * @param tenantId identifier of the tenant associated with the current request
+   * @param localizationProperty location of the localization property file
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
@@ -39,13 +40,14 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
-    MaritalStatus maritalStatus = statusManager.getKey(identifier);
+    MaritalStatusManager statusManager = getManager();
+
+    MaritalStatus maritalStatus = statusManager.getValue(identifier);
 
     if (maritalStatus == null) {
       debugFaultyInput("maritalStatus");
@@ -61,12 +63,12 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
     return statusManager.getRandomKey(maritalStatus.getNameCountryCode());
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      statusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
+  protected MaritalStatusManager getManager() {
+    if (maritalStatusResourceManager == null) {
+      maritalStatusResourceManager =
+          (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.MARITAL_STATUS, null, localizationProperty);
-
-      initialized = true;
     }
+    return maritalStatusResourceManager;
   }
 }

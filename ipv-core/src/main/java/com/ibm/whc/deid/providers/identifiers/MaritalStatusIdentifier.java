@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,37 +7,32 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.MaritalStatusManager;
 
 public class MaritalStatusIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = 8801786121068734933L;
 
 	private Collection<String> appropriateNames = Arrays.asList(new String[] { "Marital Status" });
 
-	protected volatile boolean initialized = false;
-	private MaritalStatusManager maritalStatusManager;
+    protected transient volatile MaritalStatusManager maritalStatusResourceManager = null;
 	
 	public MaritalStatusIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
 	}
 
 	@Override
-	protected Manager getManager() {
-		if (!initialized) {
-			maritalStatusManager = (MaritalStatusManager) ManagerFactory.getInstance().getManager(tenantId,
-					Resource.MARITAL_STATUS, null, localizationProperty);
-
-			initialized = true;
-		}
-		return maritalStatusManager;
-	}
+    protected MaritalStatusManager getManager() {
+      if (maritalStatusResourceManager == null) {
+        maritalStatusResourceManager = (MaritalStatusManager) ManagerFactory.getInstance()
+            .getManager(tenantId, Resource.MARITAL_STATUS, null, localizationProperty);
+      }
+      return maritalStatusResourceManager;
+    }
 
 	@Override
 	protected Collection<String> getAppropriateNames() {

@@ -19,14 +19,13 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
   
   private static final long serialVersionUID = -4599680318202749305L;
 
-  protected CountryManager countryManager;
   protected final boolean getClosest;
   protected final int closestK;
   protected final boolean getPseudorandom;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
   
-  protected volatile boolean initialized = false;
+  protected transient volatile CountryManager countryResourceManager = null;
 
   public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
@@ -38,21 +37,22 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
     this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
+  protected CountryManager getCountryManager() {
+    if (countryResourceManager == null) {
+      countryResourceManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.COUNTRY, null, localizationProperty);
-      initialized = true;
     }
+    return countryResourceManager;
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
+
+    CountryManager countryManager = getCountryManager();
 
     if (this.getPseudorandom) {
       return countryManager.getPseudorandom(identifier);

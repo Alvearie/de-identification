@@ -1,12 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,23 +25,101 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 /** The type Country manager. */
-public class CountryManager extends AbstractManager<Country>
-    implements Serializable {
-  /** */
-  private static final long serialVersionUID = -1974159797966269524L;
-  protected final Resources resourceType = Resource.COUNTRY;
-	protected final Collection<ResourceEntry> resourceCountryList;
-  protected final SecureRandom random;
-
-  protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
-  protected Map<String, List<Location>> countryListMap;
-  protected String tenantId;
-
-  protected static final String allCountriesName = "__all__";
-  private LatLonDistance<Country> distanceCalc;
-
+public class CountryManager implements Manager {
 
   private static final LogManager logger = LogManager.getInstance();
+
+  protected static final String allCountriesName = "__all__";
+
+  protected final Resources resourceType = Resource.COUNTRY;
+
+  protected final SecureRandom random;
+  protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
+  protected final Map<String, List<Location>> countryListMap;
+
+  private LatLonDistance<Country> distanceCalc;
+
+  /**
+   * Instantiates a new Country manager.
+   * 
+   * @paramlocalizationProperty location of the localization property file
+   */
+  protected CountryManager() {
+    this.random = new SecureRandom();
+    this.countryMap = new HashMap<>();
+    this.countryListMap = new HashMap<>();
+  }
+
+  /**
+   * Creates a new CountryManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a CountryManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static CountryManager buildCountryManager(String localizationProperty) {
+    CountryManager manager = new CountryManager();
+
+    String allCountriesNameToken = manager.getAllCountriesName();
+
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(manager.resourceType);
+    for (ResourceEntry entry : resourceEntries) {
+
+      try (InputStream inputStream = entry.createStream()) {
+        String locale = entry.getCountryCode();
+
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord record : reader) {
+            String countryName = record.get(0).toUpperCase();
+            String iso2Letter = record.get(1).toUpperCase();
+            String iso3Letter = record.get(2).toUpperCase();
+            String friendlyName = record.get(3).toUpperCase();
+            String continent = record.get(4);
+            Double latitude = FileUtils.parseDouble(record.get(5));
+            Double longitude = FileUtils.parseDouble(record.get(6));
+
+            /* TODO: temp fix until data is finished */
+            if (continent.equals("Unknown")) {
+              continue;
+            }
+
+            Country country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude,
+                longitude, locale);
+
+            manager.addToCountryListMap(country, locale);
+            manager.addToCountryListMap(country, allCountriesNameToken);
+
+            manager.addToCountryMap(country, countryName, CountryNameSpecification.NAME, locale);
+            manager.addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2, locale);
+            manager.addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3, locale);
+
+            manager.addToCountryMap(country, countryName, CountryNameSpecification.NAME,
+                allCountriesNameToken);
+            manager.addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2,
+                allCountriesNameToken);
+            manager.addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3,
+                allCountriesNameToken);
+
+            if (!friendlyName.equals("")) {
+              manager.addToCountryMap(country, friendlyName, CountryNameSpecification.NAME, locale);
+              manager.addToCountryMap(country, friendlyName, CountryNameSpecification.NAME,
+                  allCountriesNameToken);
+            }
+          }
+        }
+      } catch (IOException | NullPointerException e) {
+        logger.logError(LogCodes.WPH1013E, e);
+      }
+    }
+
+    manager.postRead();
+
+    return manager;
+  }
 
   /**
    * Gets all countries name.
@@ -52,44 +130,16 @@ public class CountryManager extends AbstractManager<Country>
     return CountryManager.allCountriesName;
   }
 
-  /** Instantiates a new Country manager. 
- * @paramlocalizationProperty location of the localization property file*/
-  public CountryManager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-    this.random = new SecureRandom();
-
-    this.countryMap = new HashMap<>();
-    this.countryListMap = new HashMap<>();
-
-		resourceCountryList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(resourceType);
-
-    readResources(resourceType, tenantId);
-
-    for (String key : countryMap.keySet()) {
-      MapWithRandomPick<String, Country>[] cntMap = countryMap.get(key);
-      for (MapWithRandomPick<?, ?> map : cntMap) {
-        map.setKeyList();
-      }
-    }
-
-    this.distanceCalc = new LatLonDistance(getItemList());
-  }
-
-  protected void readResources(Resources resourceType, String tenantId) {
-    readCountryListFromFile(resourceCountryList);
-  }
-
   private MapWithRandomPick<String, Country>[] initCountryMap() {
     int specSize = CountryNameSpecification.values().length;
     @SuppressWarnings("unchecked")
-    MapWithRandomPick<String, Country>[] countryMap = new MapWithRandomPick[specSize];
+    MapWithRandomPick<String, Country>[] countryMaps = new MapWithRandomPick[specSize];
 
-    for (int i = 0; i < countryMap.length; i++) {
-      countryMap[i] = new MapWithRandomPick<>(new HashMap<String, Country>());
+    for (int i = 0; i < countryMaps.length; i++) {
+      countryMaps[i] = new MapWithRandomPick<>(new HashMap<String, Country>());
     }
 
-    return countryMap;
+    return countryMaps;
   }
 
   protected void addToCountryListMap(Country country, String countryCode) {
@@ -101,29 +151,6 @@ public class CountryManager extends AbstractManager<Country>
       countryListMap.put(countryCode, countryList);
     } else {
       countryList.add(country);
-    }
-  }
-
-  private String getPseudorandomElement(List<Location> keys, String key) {
-    Long hash = Math.abs(HashUtils.longFromHash(key));
-
-    if (keys == null || keys.size() == 0) {
-      return hash.toString();
-    }
-
-    int position = (int) (hash % keys.size());
-    return ((Country) (keys.get(position))).getName();
-  }
-
-  public String getPseudorandom(String identifier) {
-    String key = identifier.toUpperCase();
-    Country country = lookupCountry(identifier);
-
-    if (country == null) {
-      return getPseudorandomElement(this.countryListMap.get(allCountriesName), key);
-    } else {
-      String countryCode = country.getNameCountryCode();
-      return getPseudorandomElement(this.countryListMap.get(countryCode), key);
     }
   }
 
@@ -140,51 +167,37 @@ public class CountryManager extends AbstractManager<Country>
     }
   }
 
-  protected void readCountryListFromFile(Collection<ResourceEntry> entries) {
-    for (ResourceEntry entry : entries) {
-      String locale = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(entry.createStream())) {
-        for (CSVRecord record : reader) {
-          String countryName = record.get(0).toUpperCase();
-          String iso2Letter = record.get(1).toUpperCase();
-          String iso3Letter = record.get(2).toUpperCase();
-          String friendlyName = record.get(3).toUpperCase();
-          String continent = record.get(4);
-          Double latitude = FileUtils.parseDouble(record.get(5));
-          Double longitude = FileUtils.parseDouble(record.get(6));
-
-          /* TODO: temp fix until data is finished */
-          if (continent.equals("Unknown")) {
-            continue;
-          }
-
-          Country country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude,
-              longitude, locale);
-
-          addToCountryListMap(country, locale);
-          addToCountryListMap(country, getAllCountriesName());
-
-          addToCountryMap(country, countryName, CountryNameSpecification.NAME, locale);
-          addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2, locale);
-          addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3, locale);
-
-          addToCountryMap(country, countryName, CountryNameSpecification.NAME,
-              getAllCountriesName());
-          addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2,
-              getAllCountriesName());
-          addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3,
-              getAllCountriesName());
-
-          if (!friendlyName.equals("")) {
-            addToCountryMap(country, friendlyName, CountryNameSpecification.NAME, locale);
-            addToCountryMap(country, friendlyName, CountryNameSpecification.NAME,
-                getAllCountriesName());
-          }
-        }
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
+  protected void postRead() {
+    for (String key : countryMap.keySet()) {
+      MapWithRandomPick<String, Country>[] cntMap = countryMap.get(key);
+      for (MapWithRandomPick<?, ?> map : cntMap) {
+        map.setKeyList();
       }
+    }
+
+    this.distanceCalc = new LatLonDistance<>(getCountries());
+  }
+
+  private String getPseudorandomElement(List<Location> keys, String key) {
+    long hash = Math.abs(HashUtils.longFromHash(key));
+
+    if (keys == null || keys.size() == 0) {
+      return Long.toString(hash);
+    }
+
+    int position = (int) (hash % keys.size());
+    return ((Country) (keys.get(position))).getName();
+  }
+
+  public String getPseudorandom(String identifier) {
+    String key = identifier.toUpperCase();
+    Country country = lookupCountry(identifier);
+
+    if (country == null) {
+      return getPseudorandomElement(this.countryListMap.get(allCountriesName), key);
+    } else {
+      String countryCode = country.getNameCountryCode();
+      return getPseudorandomElement(this.countryListMap.get(countryCode), key);
     }
   }
 
@@ -347,15 +360,15 @@ public class CountryManager extends AbstractManager<Country>
     return false;
   }
 
-  @Override
-  public Collection<Country> getItemList() {
-    List<Country> list = new ArrayList<>();
-
-    for (Location location : countryListMap.get(getAllCountriesName())) {
-      list.add((Country) location);
+  public Collection<Country> getCountries() {
+    List<Location> locations = countryListMap.get(getAllCountriesName());
+    int count = locations == null ? 0 : locations.size();
+    List<Country> list = new ArrayList<>(count);
+    if (count > 0) {
+      for (Location location : locations) {
+        list.add((Country) location);
+      }
     }
-
     return list;
   }
-
 }

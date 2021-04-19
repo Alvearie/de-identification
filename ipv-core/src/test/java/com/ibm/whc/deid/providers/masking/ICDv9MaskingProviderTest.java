@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,18 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.identifiers.ICDv9Identifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv9MaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests for both randomize chapter and category options and their boolean values (true and
    * false). That is, tests converting the ICDv9 code or name to category or chapter. It also tests

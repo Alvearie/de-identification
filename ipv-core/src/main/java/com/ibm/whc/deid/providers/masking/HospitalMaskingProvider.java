@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,15 +13,14 @@ import com.ibm.whc.deid.util.ManagerFactory;
 
 
 public class HospitalMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 7964959969532210677L;
 
-  protected HospitalManager hospitalManager;
   protected final boolean preserveCountry;
   protected final int unspecifiedValueHandling;
   protected final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile HospitalManager hospitalResourceManager = null;
 
   public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
@@ -33,17 +32,18 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
+    HospitalManager hospitalManager = getHospitalManager();
+
     if (!this.preserveCountry) {
       return hospitalManager.getRandomKey();
     }
 
-    Hospital hospital = hospitalManager.getKey(identifier);
+    Hospital hospital = hospitalManager.getValue(identifier);
 
     if (hospital == null) {
       // TODO: verify is hospital is an essential field
@@ -60,12 +60,11 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
     return hospitalManager.getRandomKey(hospital.getNameCountryCode());
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
+  protected HospitalManager getHospitalManager() {
+    if (hospitalResourceManager == null) {
+      hospitalResourceManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.HOSPITAL_NAMES, null, localizationProperty);
-      initialized = true;
     }
+    return hospitalResourceManager;
   }
-
 }

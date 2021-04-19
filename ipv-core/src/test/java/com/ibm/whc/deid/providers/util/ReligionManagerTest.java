@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,11 +13,12 @@ import com.ibm.whc.deid.util.ReligionManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ReligionManagerTest {
+
   private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testLookupSuccessful() throws Exception {
-    ReligionManager religionManager = new ReligionManager(null, localizationProperty);
+    ReligionManager religionManager = ReligionManager.buildReligionManager(localizationProperty);
     String religion = "Catholic";
     assertTrue(religionManager.isValidKey(religion));
 
@@ -27,7 +28,7 @@ public class ReligionManagerTest {
 
   @Test
   public void testRandomCodeGenerator() throws Exception {
-    ReligionManager religionManager = new ReligionManager(null, localizationProperty);
+    ReligionManager religionManager = ReligionManager.buildReligionManager(localizationProperty);
     assertTrue(religionManager.isValidKey(religionManager.getRandomKey()));
   }
 }

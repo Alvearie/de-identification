@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,75 +7,65 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.MaritalStatus;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class MaritalStatusManager extends ResourceBasedManager<MaritalStatus>
-    implements Serializable {
-  public MaritalStatusManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.MARITAL_STATUS, localizationProperty);
+public class MaritalStatusManager extends LocalizedResourceManager<MaritalStatus> {
+
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.MARITAL_STATUS;
+
+  protected MaritalStatusManager() {
+    // nothing required here
   }
 
-  /** */
-  private static final long serialVersionUID = -8386476906766371438L;
+  /**
+   * Creates a new MaritalStatusManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a MaritalStatusManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static MaritalStatusManager buildMaritalStatusManager(String localizationProperty) {
+    MaritalStatusManager manager = new MaritalStatusManager();
 
-  private List<MaritalStatus> statusList;
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-  @Override
-  public void init() {
-    statusList = new ArrayList<>();
-  }
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-  @Override
-  public Collection<MaritalStatus> getItemList() {
-    return statusList;
-  }
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord record : reader) {
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.MARITAL_STATUS);
-  }
-
-  @Override
-  public Map<String, Map<String, MaritalStatus>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, MaritalStatus>> statuses = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord record : reader) {
-          String status = record.get(0);
-          String key = status.toUpperCase();
-
-          MaritalStatus maritalStatus = new MaritalStatus(status, countryCode);
-
-          addToMapByLocale(statuses, entry.getCountryCode(), key, maritalStatus);
-          addToMapByLocale(statuses, getAllCountriesName(), key, maritalStatus);
-          statusList.add(maritalStatus);
+            String status = record.get(0);
+            if (!status.trim().isEmpty()) {
+              MaritalStatus maritalStatus = new MaritalStatus(status, countryCode);
+              manager.add(maritalStatus);
+              manager.add(countryCode, maritalStatus);
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return statuses;
+    return manager;
   }
-
 }

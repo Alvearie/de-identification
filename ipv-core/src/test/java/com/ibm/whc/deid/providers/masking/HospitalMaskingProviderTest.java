@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -24,7 +24,6 @@ import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class HospitalMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
    * Tests for hospital.mask.preserveCountry option and its boolean values (true and false). It also
    * tests for the localization of the hospital.
@@ -63,16 +62,14 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
       HospitalManager hospitalManager =
           (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
               Resource.HOSPITAL_NAMES, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-      Hospital original = hospitalManager.getKey(hospitalName);
-      Hospital masked = hospitalManager.getKey(maskedValue);
+      Hospital original = hospitalManager.getValue(hospitalName);
+      Hospital masked = hospitalManager.getValue(maskedValue);
 
       assertTrue(original.getNameCountryCode().equals(masked.getNameCountryCode()));
     }
 
     assertTrue(randomizationOK > 0);
   }
-
-
 
   @Test
   public void testMaskNullHospitalInputReturnNull() throws Exception {
@@ -160,5 +157,4 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     assertEquals(null, maskedHospital);
     assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
   }
-
 }
