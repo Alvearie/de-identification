@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,11 +16,8 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.OccupationIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.OccupationMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class OccupationMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   /*
    * Tests mask generalize to occupation category and its boolean values (true and false). It also
@@ -37,8 +34,6 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedValue = maskingProvider.mask(occupation);
     assertTrue(identifier.isOfThisType(maskedValue));
   }
-
-
 
   @Test
   public void testMaskNullOccupationInputReturnNull() throws Exception {
@@ -139,17 +134,4 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedValue = maskingProvider.mask(occupation);
     assertTrue(maskedValue.equals("Actors, entertainers and presenters"));
   }
-
-  @Test
-  public void testMaskGeneralizeToRandomCategoryIfNotFound() {
-    OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
-    configuration.setMaskGeneralize(true);
-    MaskingProvider maskingProvider =
-        new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String occupation = "adadad";
-    String maskedValue = maskingProvider.mask(occupation);
-    assertEquals(null, maskedValue);
-  }
-
 }

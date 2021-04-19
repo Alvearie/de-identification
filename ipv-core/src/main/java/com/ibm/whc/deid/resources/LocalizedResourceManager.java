@@ -23,6 +23,8 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
 
   private static final LogManager logger = LogManager.getInstance();
   
+  private final int expectedCountPerLocale;
+
   /**
    * A map of a locale identifier (key) to the list (value) of resources related to that locale
    */
@@ -33,6 +35,20 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
    * by the resource key
    */
   private final HashMap<String, HashMap<String, K>> localizedResourceMapMap = new HashMap<>();
+
+
+  public LocalizedResourceManager() {
+    this(-1);
+  }
+
+  public LocalizedResourceManager(int expectedCount) {
+    this(expectedCount, -1);
+  }
+
+  public LocalizedResourceManager(int expectedCount, int perLocaleExpectedCount) {
+    super(expectedCount);
+    this.expectedCountPerLocale = perLocaleExpectedCount < 1 ? 16 : perLocaleExpectedCount;
+  }
 
   /**
    * Adds a new resource associated with the given locale to the manager instance.
@@ -47,13 +63,13 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
     String lcode = localeCode.toLowerCase();
     ArrayList<K> list = localizedResourceListMap.get(lcode);
     if (list == null) {
-      list = new ArrayList<>();
+      list = new ArrayList<>(expectedCountPerLocale);
       localizedResourceListMap.put(lcode, list);
     }
     list.add(resource);
     HashMap<String, K> map = localizedResourceMapMap.get(lcode);
     if (map == null) {
-      map = new HashMap<>();
+      map = new HashMap<>(Math.round(expectedCountPerLocale / 0.75f) + 1, 0.75f);
       localizedResourceMapMap.put(lcode, map);
     }
     K oldValue = map.put(resource.getKey().toUpperCase(), resource);

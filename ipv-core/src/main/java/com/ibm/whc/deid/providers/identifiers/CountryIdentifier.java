@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,7 +7,6 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -20,13 +19,12 @@ import com.ibm.whc.deid.util.ManagerFactory;
  *
  */
 public class CountryIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -2813196255656831409L;
 
 	private static final String[] appropriateNames = { "Country" };
-	private CountryManager countryManager;
 
-	protected volatile boolean initialized = false;
+    protected transient volatile CountryManager countryManager = null;
 
 	@Override
 	public ProviderType getType() {
@@ -53,16 +51,14 @@ public class CountryIdentifier extends AbstractManagerBasedIdentifier {
 		return ValueClass.LOCATION;
 	}
 
-	@Override
-	protected Manager getManager() {
-		if (!initialized) {
-			countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId, Resource.COUNTRY, null,
-					localizationProperty);
-
-			initialized = true;
-		}
-		return countryManager;
-	}
+    @Override
+    protected Manager getManager() {
+      if (countryManager == null) {
+        countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.COUNTRY, null, localizationProperty);
+      }
+      return countryManager;
+    }
 
 	@Override
 	protected Collection<String> getAppropriateNames() {

@@ -30,7 +30,7 @@ public class NameFirstMaleManager extends LocalizedResourceManager<FirstName> {
   private static final LogManager logger = LogManager.getInstance();
 
   protected NameFirstMaleManager() {
-    // nothing required here
+    super(1100, 1100);
   }
 
   /**

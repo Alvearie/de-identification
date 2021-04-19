@@ -30,12 +30,24 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
   /**
    * The known items stored in a list
    */
-  private final ArrayList<K> resourceList = new ArrayList<>();
+  private final ArrayList<K> resourceList;
 
   /**
    * The known items/resources stored as a map from the resource key to the resource/item itself
    */
-  private final HashMap<String, K> resourceMap = new HashMap<>();
+  private final HashMap<String, K> resourceMap;
+
+  public ResourceManager() {
+    this(-1);
+  }
+
+  public ResourceManager(int expectedCount) {
+    if (expectedCount < 1) {
+      expectedCount = 16;
+    }
+    resourceList = new ArrayList<>(expectedCount);
+    resourceMap = new HashMap<>(Math.round(expectedCount / 0.75f) + 1, 0.75f);
+  }
 
   /**
    * Adds a new resource to the manager instance.

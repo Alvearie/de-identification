@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,17 +16,16 @@ import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.RaceManager;
 
 /**
- * The type Race ethnicity identifier.
+ * The type race-ethnicity identifier.
  *
  */
 public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -2694410982440148058L;
 
-	private RaceManager raceManager;
 	private static final String[] appropriateNames = { "Race", "Ethnicity" };
 
-	protected volatile boolean initialized = false;
+    protected transient volatile RaceManager raceManager = null;
 
 	public RaceEthnicityIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -39,13 +38,11 @@ public class RaceEthnicityIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			raceManager = (RaceManager) ManagerFactory.getInstance().getManager(tenantId, Resource.RACE_ETHNICITY, null,
-					localizationProperty);
-
-			initialized = true;
-		}
-		return raceManager;
+      if (raceManager == null) {
+        raceManager = (RaceManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.RACE_ETHNICITY, null, localizationProperty);
+      }
+      return raceManager;
 	}
 
 	@Override

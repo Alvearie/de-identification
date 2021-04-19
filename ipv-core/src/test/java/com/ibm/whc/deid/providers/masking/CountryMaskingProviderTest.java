@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -88,7 +88,7 @@ public class CountryMaskingProviderTest extends TestLogSetUp implements MaskingP
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     MaskingProvider countryMaskingProvider =
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-    CountryManager countryManager = new CountryManager(null, localizationProperty);
+    CountryManager countryManager = CountryManager.buildCountryManager(localizationProperty);
 
     String originalCountry = "GB";
     String randomCountry = countryMaskingProvider.mask(originalCountry);

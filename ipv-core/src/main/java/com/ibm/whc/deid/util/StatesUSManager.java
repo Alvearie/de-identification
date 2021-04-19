@@ -8,73 +8,86 @@ package com.ibm.whc.deid.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.State;
 import com.ibm.whc.deid.models.StateNameFormat;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
 
-public class StatesUSManager extends ResourceBasedManager<State> {
-  /** */
-  private static final long serialVersionUID = -5599163280173053663L;
+/**
+ * Class that manages information about US states.
+ */
+public class StatesUSManager extends LocalizedResourceManager<State> {
 
-  public StatesUSManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.STATES_US, localizationProperty);
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.STATES_US;
+
+  protected StatesUSManager() {
+    // nothing required here
   }
 
+  /**
+   * Creates a new StatesUSManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return an StatesUSManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static StatesUSManager buildStatesUSManager(String localizationProperty) {
+    StatesUSManager manager = new StatesUSManager();
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.STATES_US);
-  }
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+    for (ResourceEntry entry : resourceEntries) {
 
-  @Override
-  public Map<String, Map<String, State>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, State>> states = new HashMap<>();
+      try (InputStream inputStream = entry.createStream()) {
+        String countryCode = entry.getCountryCode();
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
+        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+          for (CSVRecord line : reader) {
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          String abbreviation = line.get(1);
-          Long population = Long.valueOf(line.get(2));
-          String key = name.toUpperCase();
+            String name = line.get(0);
+            String abbreviation = line.get(1);
+            if (!name.trim().isEmpty() && !abbreviation.trim().isEmpty()) {
 
-          State state =
-              new State(name, countryCode, abbreviation, population, StateNameFormat.FULL_NAME);
+              Long population = null;
+              String populationString = line.get(2);
+              if (populationString != null && !populationString.trim().isEmpty()) {
+                try {
+                  population = Long.valueOf(populationString);
+                } catch (NumberFormatException e) {
+                  logger.logWarn(LogCodes.WPH1014W, populationString, "state.population");
+                }
+              }
 
-          addToMapByLocale(states, entry.getCountryCode(), key, state);
-          addToMapByLocale(states, getAllCountriesName(), key, state);
+              State state = new State(name, countryCode, abbreviation, population,
+                  StateNameFormat.FULL_NAME, name.toUpperCase());
+              manager.add(state);
+              manager.add(countryCode, state);
 
-          String abbrvKey = abbreviation.toUpperCase();
-          State stateAbbrv =
-              new State(name, countryCode, abbreviation, population, StateNameFormat.ABBREVIATION);
-          addToMapByLocale(states, entry.getCountryCode(), abbrvKey, stateAbbrv);
-          addToMapByLocale(states, getAllCountriesName(), abbrvKey, stateAbbrv);
+              State stateAbbrv = new State(name, countryCode, abbreviation, population,
+                  StateNameFormat.ABBREVIATION, abbreviation.toUpperCase());
+              manager.add(stateAbbrv);
+              manager.add(countryCode, stateAbbrv);
+            }
+          }
         }
-        inputStream.close();
+
       } catch (IOException | NullPointerException e) {
         logger.logError(LogCodes.WPH1013E, e);
       }
     }
 
-    return states;
+    return manager;
   }
-
-  @Override
-  public Collection<State> getItemList() {
-    return getValues();
-  }
-
 }

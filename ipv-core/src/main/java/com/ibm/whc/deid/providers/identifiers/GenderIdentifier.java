@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,26 +13,22 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 public class GenderIdentifier extends AbstractManagerBasedIdentifier {
-  /** */
+
   private static final long serialVersionUID = 3989458440094688035L;
 
-	private GenderManager genderManager;
+  protected transient volatile GenderManager genderResourceManager = null;
 
-	protected volatile boolean initialized = false;
-
-	public GenderIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  public GenderIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
   @Override
   protected Manager getManager() {
-		if (!initialized) {
-			genderManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId, Resource.GENDER, null,
-					localizationProperty);
-
-			initialized = true;
-		}
-		return genderManager;
+    if (genderResourceManager == null) {
+      genderResourceManager = (GenderManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.GENDER, null, localizationProperty);
+    }
+    return genderResourceManager;
   }
 
   @Override

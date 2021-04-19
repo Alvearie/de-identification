@@ -1,10 +1,11 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.util;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -18,20 +19,23 @@ public class MaritalStatusManagerTest {
   private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
-  public void testLookupSuccessful() throws Exception {
+  public void testLookup() throws Exception {
     MaritalStatusManager maritalStatusManager =
-        new MaritalStatusManager(tenantId, localizationProperty);
+        MaritalStatusManager.buildMaritalStatusManager(localizationProperty);
     String status = "Single";
     assertTrue(maritalStatusManager.isValidKey(status));
 
     status = "singLE";
     assertTrue(maritalStatusManager.isValidKey(status));
+
+    status = "xxx";
+    assertFalse(maritalStatusManager.isValidKey(status));
   }
 
   @Test
   public void testRandomCodeGenerator() throws Exception {
     MaritalStatusManager maritalStatusManager =
-        new MaritalStatusManager(tenantId, localizationProperty);
+        MaritalStatusManager.buildMaritalStatusManager(localizationProperty);
     assertTrue(maritalStatusManager.isValidKey(maritalStatusManager.getRandomKey()));
   }
 }

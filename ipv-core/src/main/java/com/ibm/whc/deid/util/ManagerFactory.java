@@ -41,19 +41,8 @@ public class ManagerFactory {
       String localizationProperty) {
     String cacheKey = resourceType + "_" + localizationProperty;
     Manager manager = managers.get(cacheKey);
-
     if (manager != null) {
-      // check prefix length for ZIPCodeManager. Only return the cached
-      // version if the prefixLength is the same
-      if (resourceType == Resource.ZIPCODE) {
-        int newPrefixLength = (int) options;
-        int cachedPrefixLength = ((ZIPCodeManager) manager).getPrefixLength();
-        if (newPrefixLength == cachedPrefixLength) {
-          return manager;
-        }
-      } else {
-        return manager;
-      }
+      return manager;
     }
 
     if (resourceType instanceof Resource) {
@@ -65,19 +54,19 @@ public class ManagerFactory {
           manager = CityManager.buildCityManager(localizationProperty);
           break;
         case POSTAL_CODES:
-          manager = new PostalCodeManager(tenantId, localizationProperty);
+          manager = PostalCodeManager.buildPostalCodeManager(localizationProperty);
           break;
         case CONTINENT:
           manager = ContinentManager.buildContinentManager(localizationProperty);
           break;
         case COUNTRY:
-          manager = new CountryManager(tenantId, localizationProperty);
+          manager = CountryManager.buildCountryManager(localizationProperty);
           break;
         case COUNTY:
-          manager = new CountyManager(tenantId, localizationProperty);
+          manager = CountyManager.buildCountyManager(localizationProperty);
           break;
         case CREDIT_CARD_TYPE:
-          manager = new CreditCardTypeManager(tenantId, localizationProperty);
+          manager = CreditCardTypeManager.buildCreditCardTypeManager(localizationProperty);
           break;
         case FIRST_NAME_FEMALE:
           manager = NameFirstFemaleManager.buildNameFirstFemaleManager(localizationProperty);
@@ -86,28 +75,28 @@ public class ManagerFactory {
           manager = NameFirstMaleManager.buildNameFirstMaleManager(localizationProperty);
           break;
         case GENDER:
-          manager = new GenderManager(tenantId, localizationProperty);
+          manager = GenderManager.buildGenderManager(localizationProperty);
           break;
         case HOSPITAL_NAMES:
-          manager = new HospitalManager(tenantId, localizationProperty);
+          manager = HospitalManager.buildHospitalManager(localizationProperty);
           break;
         case ICDV10:
-          manager = new ICDv10Manager(tenantId, localizationProperty);
+          manager = ICDv10Manager.buildICDv10Manager(localizationProperty);
           break;
         case ICDV9:
-          manager = new ICDv9Manager(tenantId, localizationProperty);
+          manager = ICDv9Manager.buildICDv9Manager(localizationProperty);
           break;
         case TACDB:
-          manager = new IMEIManager(tenantId, localizationProperty);
+          manager = IMEIManager.buildIMEIManager(localizationProperty);
           break;
         case LAST_NAME:
           manager = NameLastManager.buildNameLastManager(localizationProperty);
           break;
         case MARITAL_STATUS:
-          manager = new MaritalStatusManager(tenantId, localizationProperty);
+          manager = MaritalStatusManager.buildMaritalStatusManager(localizationProperty);
           break;
         case OCCUPATION:
-          manager = new OccupationManager(tenantId, localizationProperty);
+          manager = OccupationManager.buildOccupationManager(localizationProperty);
           break;
         case PHONE_AREA_CODES:
           manager = PhoneAreaCodesManager.buildPhoneAreaCodesManager(localizationProperty);
@@ -119,26 +108,25 @@ public class ManagerFactory {
           manager = PhoneNumberLengthManager.buildPhoneNumberLengthManager(localizationProperty);
           break;
         case RACE_ETHNICITY:
-          manager = new RaceManager(tenantId, localizationProperty);
+          manager = RaceManager.buildRaceManager(localizationProperty);
           break;
         case RELIGION:
-          manager = new ReligionManager(tenantId, localizationProperty);
+          manager = ReligionManager.buildReligionManager(localizationProperty);
           break;
         case STREET_NAMES:
-          manager = new StreetNameManager(tenantId, localizationProperty);
+          manager = StreetNameManager.buildStreetNameManager(localizationProperty);
           break;
         case STATES_US:
-          manager = new StatesUSManager(tenantId, localizationProperty);
+          manager = StatesUSManager.buildStatesUSManager(localizationProperty);
           break;
         case SWIFT:
           manager = SWIFTCodeManager.buildSWIFTCodeManager(localizationProperty, tenantId);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
-          manager = new VINManager(tenantId, localizationProperty);
+          manager = VINManager.buildVINManager(localizationProperty);
           break;
         case ZIPCODE:
-          int prefixLength = (int) options;
-          manager = new ZIPCodeManager(prefixLength, tenantId, localizationProperty);
+          manager = ZIPCodeManager.buildZIPCodeManager(localizationProperty);
           break;
         default:
           throw new IllegalArgumentException("Unsupported resource type:" + resourceType);

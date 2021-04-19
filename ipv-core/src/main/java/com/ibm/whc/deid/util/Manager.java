@@ -8,7 +8,7 @@ package com.ibm.whc.deid.util;
 /**
  * Interface supported by classes that manage groups of items, such as cities, genders, names, religions, etc. 
  */
-public interface Manager extends ManagerFactorySupported {
+public interface Manager {
 
   /**
    * Is valid key boolean.
