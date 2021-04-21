@@ -74,7 +74,7 @@ public abstract class LocalizedResourceManager<K extends ManagedResource>
     }
     K oldValue = map.put(resource.getKey().toUpperCase(), resource);
     if (oldValue != null) {
-      logger.logWarn(LogCodes.WPH1022W, localeCode, oldValue.getKey());
+      // logger.logWarn(LogCodes.WPH1022W, localeCode, oldValue.getKey());
     }
   }
 

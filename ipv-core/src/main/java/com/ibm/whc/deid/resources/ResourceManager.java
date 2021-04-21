@@ -61,7 +61,7 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
     resourceList.add(resource);
     K oldValue = resourceMap.put(resource.getKey().toUpperCase(), resource);
     if (oldValue != null) {
-      logger.logWarn(LogCodes.WPH1021W, oldValue.getKey());
+      // logger.logWarn(LogCodes.WPH1021W, oldValue.getKey());
     }
   }
 
