@@ -7,10 +7,13 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.function.Supplier;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
@@ -30,6 +33,11 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   protected final String localizationProperty;
   protected final String tenantId;
 
+  protected final UnexpectedMaskingInputHandler unexpectedInputHandler;
+  protected final String unexpectedInputReturnMessage;
+  protected final int unspecifiedValueHandling;
+  protected final String unspecifiedValueReturnMessage;
+
   private String name = "";
 
   public AbstractMaskingProvider() {
@@ -37,8 +45,19 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   }
 
   public AbstractMaskingProvider(String tenantId, String localizationProperty) {
+    this(tenantId, localizationProperty, null);
+  }
+
+  public AbstractMaskingProvider(String tenantId, String localizationProperty,
+      MaskingProviderConfig config) {
     this.tenantId = tenantId;
     this.localizationProperty = localizationProperty;
+    this.unexpectedInputHandler = config == null ? null : config.getUnexpectedInputHandling();
+    this.unexpectedInputReturnMessage =
+        config == null ? null : config.getUnexpectedInputReturnMessage();
+    this.unspecifiedValueHandling = config == null ? 1 : config.getUnspecifiedValueHandling();
+    this.unspecifiedValueReturnMessage =
+        config == null ? null : config.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -121,5 +140,38 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   @Override
   public String getName() {
     return name;
+  }
+
+  protected String applyUnexpectedValueHandling(String input, Supplier<String> randomGenerator) {
+    debugFaultyInput(getName());
+    String response;
+
+    if (unexpectedInputHandler != null) {
+      switch (unexpectedInputHandler) {
+        case NULL:
+          response = null;
+          break;
+        case RANDOM:
+          response = randomGenerator == null ? null : randomGenerator.get();
+          break;
+        case MESSAGE:
+          response = unexpectedInputReturnMessage;
+          break;
+        case ERROR_EXIT:
+          throw new PrivacyProviderInvalidInputException(input, getName());
+        default:
+          response = null;
+      }
+    } else {
+      if (unspecifiedValueHandling == 2) {
+        response = randomGenerator == null ? null : randomGenerator.get();
+      } else if (unspecifiedValueHandling == 3) {
+        response = unspecifiedValueReturnMessage;
+      } else {
+        response = null;
+      }
+    }
+
+    return response;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,43 +8,59 @@ package com.ibm.whc.deid.models;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * The latitude and longitude of a location on the globe.
+ * 
+ * <p>
+ * This class is immutable and thread-safe.
+ */
 public class LatitudeLongitude implements Serializable {
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7543687706274544761L;
-  /** The Latitude. */
-  Double latitude;
-  /** The Longitude. */
-  Double longitude;
-  /** The Format. */
-  LatitudeLongitudeFormat format;
+  private static final long serialVersionUID = -7543687706274544761L;
+
+  private final double latitude;
+  private final double longitude;
+  private final LatitudeLongitudeFormat format;
 
   /**
-   * Instantiates a new Latitude longitude.
+   * Instantiates a new object with the DECIMAL string representation format.
    *
-   * @param latitude the latitude
-   * @param longitude the longitude
+   * @param latitude the latitude, -90.0 <= latitude <= 90.0
+   * @param longitude the longitude, -180.0 < longitude < 180.0
+   * 
+   *        throws IllegalArgumentException if the latitude or longitude is out of range
    */
-  public LatitudeLongitude(Double latitude, Double longitude) {
+  public LatitudeLongitude(double latitude, double longitude) {
     this(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
   }
 
   /**
-   * Instantiates a new Latitude longitude.
+   * Instantiates a new object.
    *
-   * @param latitude the latitude
-   * @param longitude the longitude
-   * @param format the format
+   * @param latitude the latitude, -90.0 <= latitude <= 90.0
+   * @param longitude the longitude, -180.0 < longitude < 180.0
+   * @param format the default format used by the toString() method to represent this location -
+   *        DECIMAL is used if <i>null</i> is given
+   * 
+   *        throws IllegalArgumentException if the latitude or longitude is out of range
    */
-  public LatitudeLongitude(Double latitude, Double longitude, LatitudeLongitudeFormat format) {
+  public LatitudeLongitude(double latitude, double longitude, LatitudeLongitudeFormat format) {
+    if (latitude < -90.0 || latitude > 90.0) {
+      throw new IllegalArgumentException(
+          "latitude is out of range: " + Double.toString(latitude));
+    }
+    if (longitude < -180.0 || longitude > 180.0) {
+      throw new IllegalArgumentException(
+          "longitude is out of range: " + Double.toString(longitude));
+    }
     this.latitude = latitude;
-    this.longitude = longitude;
-    this.format = format;
+    // -180 and +180 longitude are same meridian
+    // use east in all cases to simplify equals() and hashCode()
+    this.longitude = longitude == -180.0 ? 180.0 : longitude;
+    this.format = format == null ? LatitudeLongitudeFormat.DECIMAL : format;
   }
 
   /**
-   * Gets format.
+   * Retrieves the default format used by the toString() method to represent this location.
    *
    * @return the format
    */
@@ -53,20 +69,11 @@ public class LatitudeLongitude implements Serializable {
   }
 
   /**
-   * Sets format.
-   *
-   * @param format the format
-   */
-  public void setFormat(LatitudeLongitudeFormat format) {
-    this.format = format;
-  }
-
-  /**
    * Gets latitude.
    *
    * @return the latitude
    */
-  public Double getLatitude() {
+  public double getLatitude() {
     return this.latitude;
   }
 
@@ -75,7 +82,7 @@ public class LatitudeLongitude implements Serializable {
    *
    * @return the longitude
    */
-  public Double getLongitude() {
+  public double getLongitude() {
     return this.longitude;
   }
 
@@ -84,13 +91,16 @@ public class LatitudeLongitude implements Serializable {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-
     LatitudeLongitude latlon = (LatitudeLongitude) obj;
     return latlon.getLatitude() == latitude && latlon.getLongitude() == longitude;
   }
 
   @Override
   public String toString() {
+    return toString(format);
+  }
+
+  public String toString(LatitudeLongitudeFormat format) {
     if (format == LatitudeLongitudeFormat.DECIMAL) {
       return String.format("%f,%f", getLatitude(), getLongitude());
       /*
@@ -102,13 +112,13 @@ public class LatitudeLongitude implements Serializable {
     String ns = "N";
     String ew = "E";
 
-    Double latitude = this.latitude;
+    Double latitude = Double.valueOf(this.latitude);
     if (latitude < 0) {
       ns = "S";
       latitude = -latitude;
     }
 
-    Double longitude = this.longitude;
+    Double longitude = Double.valueOf(this.longitude);
     if (longitude < 0) {
       ew = "W";
       longitude = -longitude;
@@ -132,6 +142,6 @@ public class LatitudeLongitude implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(latitude, longitude, format);
+    return Objects.hash(Double.valueOf(latitude), Double.valueOf(longitude));
   }
 }

@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.providers.util;
+package com.ibm.whc.deid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,7 +14,6 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.PostalCode;
-import com.ibm.whc.deid.util.PostalCodeManager;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 
@@ -30,8 +29,8 @@ public class PostalCodeManagerTest {
     PostalCode postalCode = postalCodeManager.getValue(code);
     assertNotNull(postalCode);
     assertEquals(code, postalCode.getName());
-    assertTrue(61.19 == postalCode.getLocation().getLatitude().doubleValue());
-    assertTrue(-149.8938 == postalCode.getLocation().getLongitude().doubleValue());
+    assertTrue(61.19 == postalCode.getLocation().getLatitude());
+    assertTrue(-149.8938 == postalCode.getLocation().getLongitude());
 
     code = "xx";
     assertFalse(postalCodeManager.isValidKey(code));

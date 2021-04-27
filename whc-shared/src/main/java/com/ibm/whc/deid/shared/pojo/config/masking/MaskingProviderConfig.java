@@ -109,6 +109,10 @@ public abstract class MaskingProviderConfig implements Serializable {
   protected String unspecifiedValueReturnMessage =
       ConfigConstant.UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER;
 
+  protected UnexpectedMaskingInputHandler unexpectedInputHandling = null;
+  protected String unexpectedInputReturnMessage =
+      ConfigConstant.UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER;
+
   // Jackson already set the type value when property and visible are set in
   // @JsonTypeInfo
   @JsonIgnore
@@ -136,6 +140,22 @@ public abstract class MaskingProviderConfig implements Serializable {
     this.unspecifiedValueReturnMessage = unspecifiedValueReturnMessage;
   }
 
+  public UnexpectedMaskingInputHandler getUnexpectedInputHandling() {
+    return unexpectedInputHandling;
+  }
+
+  public void setUnexpectedInputHandling(UnexpectedMaskingInputHandler unexpectedInputHandling) {
+    this.unexpectedInputHandling = unexpectedInputHandling;
+  }
+
+  public String getUnexpectedInputReturnMessage() {
+    return unexpectedInputReturnMessage;
+  }
+
+  public void setUnexpectedInputReturnMessage(String unexpectedInputReturnMessage) {
+    this.unexpectedInputReturnMessage = unexpectedInputReturnMessage;
+  }
+
   /**
    * Determines if this masking provider configuration is valid. A configuration might be invalid if
    * it has been given conflicting information or is missing required information.
@@ -153,8 +173,11 @@ public abstract class MaskingProviderConfig implements Serializable {
    */
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
-    if (unspecifiedValueHandling < 0 || unspecifiedValueHandling > 3) {
-      throw new InvalidMaskingConfigurationException("`unspecifiedValueHandling` must be [0..3]");
+    // check new handling property first - if not provided, validate the old one
+    if (unexpectedInputHandling == null) {
+      if (unspecifiedValueHandling < 0 || unspecifiedValueHandling > 3) {
+        throw new InvalidMaskingConfigurationException("`unspecifiedValueHandling` must be [0..3]");
+      }
     }
   }
 
@@ -270,6 +293,10 @@ public abstract class MaskingProviderConfig implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result
+        + ((unexpectedInputHandling == null) ? 0 : unexpectedInputHandling.hashCode());
+    result = prime * result
+        + ((unexpectedInputReturnMessage == null) ? 0 : unexpectedInputReturnMessage.hashCode());
     result = prime * result + unspecifiedValueHandling;
     result = prime * result
         + ((unspecifiedValueReturnMessage == null) ? 0 : unspecifiedValueReturnMessage.hashCode());
@@ -285,7 +312,17 @@ public abstract class MaskingProviderConfig implements Serializable {
     if (getClass() != obj.getClass())
       return false;
     MaskingProviderConfig other = (MaskingProviderConfig) obj;
-    if (type != other.type)
+    if (type == null) {
+      if (other.type != null)
+        return false;
+    } else if (!type.equals(other.type))
+      return false;
+    if (unexpectedInputHandling != other.unexpectedInputHandling)
+      return false;
+    if (unexpectedInputReturnMessage == null) {
+      if (other.unexpectedInputReturnMessage != null)
+        return false;
+    } else if (!unexpectedInputReturnMessage.equals(other.unexpectedInputReturnMessage))
       return false;
     if (unspecifiedValueHandling != other.unspecifiedValueHandling)
       return false;

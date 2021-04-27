@@ -9,6 +9,7 @@ import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountryMaskingProviderConfig;
 import com.ibm.whc.deid.util.CountryManager;
+import com.ibm.whc.deid.util.CountryNameSpecification;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 /**
@@ -22,19 +23,15 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
   protected final boolean getClosest;
   protected final int closestK;
   protected final boolean getPseudorandom;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
   
   protected transient volatile CountryManager countryResourceManager = null;
 
   public CountryMaskingProvider(CountryMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   protected CountryManager getCountryManager() {
@@ -54,27 +51,25 @@ public class CountryMaskingProvider extends AbstractMaskingProvider {
 
     CountryManager countryManager = getCountryManager();
 
-    if (this.getPseudorandom) {
+    if (getPseudorandom) {
       return countryManager.getPseudorandom(identifier);
     }
 
     if (getClosest) {
-      return countryManager.getClosestCountry(identifier, this.closestK);
-    }
-
-    Country country = countryManager.lookupCountry(identifier);
-
-    if (country == null) {
-      debugFaultyInput("country");
-      if (unspecifiedValueHandling == 2) {
-        return countryManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+      String selected = countryManager.getClosestCountry(identifier, closestK);
+      if (selected == null) {
+        selected = applyUnexpectedValueHandling(identifier, () -> {
+          Country randomCountry = countryManager.getRandomValue(CountryNameSpecification.NAME);
+          return randomCountry == null ? null : randomCountry.getName();
+        });
       }
+      return selected;
     }
 
-    return countryManager.getRandomKey(identifier, country.getNameCountryCode());
+    Country country = countryManager.getValue(identifier);
+    CountryNameSpecification spec =
+        country == null ? CountryNameSpecification.NAME : country.getCountryNameSpecification();
+    Country selectedCountry = countryManager.getRandomValue(spec);
+    return selectedCountry == null ? null : selectedCountry.getName(spec);
   }
 }

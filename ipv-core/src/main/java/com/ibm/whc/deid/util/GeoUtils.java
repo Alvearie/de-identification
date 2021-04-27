@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,13 +8,13 @@ package com.ibm.whc.deid.util;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 
 public class GeoUtils {
-  private static Double R = 6378137.0;
+  private static double R = 6378137.0;
 
   private static final double asq = Math.pow(R, 2);
   private static final double e = 8.1819190842622e-2;
   private static final double esq = Math.pow(e, 2);
 
-  public static Double getR() {
+  public static double getR() {
     return R;
   }
 
@@ -63,7 +63,7 @@ public class GeoUtils {
    * @param seconds the seconds
    * @return the double
    */
-  public static Double degreesToDecimal(Double degrees, Double minutes, Double seconds) {
+  public static double degreesToDecimal(double degrees, double minutes, double seconds) {
     return degrees + minutes / 60 + seconds / 3600;
   }
 
@@ -84,8 +84,8 @@ public class GeoUtils {
    * @param lon2 the lon 2
    * @return the double
    */
-  public static Double latitudeLongitudeDistance(Double lat1, Double lon1, Double lat2,
-      Double lon2) {
+  public static double latitudeLongitudeDistance(double lat1, double lon1, double lat2,
+      double lon2) {
     double dLat = Math.toRadians(lat2 - lat1);
     double dLng = Math.toRadians(lon2 - lon1);
     double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
@@ -101,7 +101,7 @@ public class GeoUtils {
    * @param latlon2 the latlon 2
    * @return the double
    */
-  public static Double latitudeLongitudeDistance(LatitudeLongitude latlon1,
+  public static double latitudeLongitudeDistance(LatitudeLongitude latlon1,
       LatitudeLongitude latlon2) {
     return latitudeLongitudeDistance(latlon1.getLatitude(), latlon1.getLongitude(),
         latlon2.getLatitude(), latlon2.getLongitude());

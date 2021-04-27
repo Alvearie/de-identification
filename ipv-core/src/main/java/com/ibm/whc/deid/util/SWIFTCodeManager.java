@@ -86,7 +86,7 @@ public class SWIFTCodeManager extends ResourceManager<SWIFTCode> {
     if (code.length() >= 8) {
       String countryCode = code.substring(4, 6);
 
-      Country country = countryManager.lookupCountry(countryCode, "en");
+      Country country = countryManager.getValue(countryCode);
       if (country != null) {
 
         SWIFTCode swiftCode = new SWIFTCode(code, country);
