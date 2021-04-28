@@ -5,23 +5,24 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.ibm.whc.deid.providers.identifiers.ICDv10Identifier;
-import com.ibm.whc.deid.providers.identifiers.Identifier;
+import com.ibm.whc.deid.models.ICD;
+import com.ibm.whc.deid.models.ICDFormat;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv10MaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
-public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class ICDv10MaskingProviderTest implements MaskingProviderTest {
   /*
-   * Tests for both randomize chapter and category options and their boolean values (true and
+   * Tests for both generalize chapter and category options and their boolean values (true and
    * false). That is, tests converting the ICDv10 code or name to category or chapter. It also tests
    * for format, case , and invalid value.
    */
@@ -29,19 +30,22 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testMaskConvertToCategory() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     // default configuration is to convert to category
     String originalICD = "A01.0";
     String maskedICD = maskingProvider.mask(originalICD);
-    assertFalse(originalICD.equals(maskedICD));
-    assertTrue(maskedICD.equals("A00-A09"));
+    assertEquals("A00-A09", maskedICD);
 
     originalICD = "Typhoid Fever";
     maskedICD = maskingProvider.mask(originalICD);
-    assertFalse(originalICD.equals(maskedICD));
-    assertTrue(maskedICD.equals("Intestinal infectious diseases"));
+    assertEquals("Intestinal infectious diseases", maskedICD);
+
+    originalICD = "not found";
+    maskedICD = maskingProvider.mask(originalICD);
+    assertEquals("OTHER", maskedICD);
   }
 
   @Ignore
@@ -50,10 +54,10 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
     ICDv10MaskingProviderConfig defaultMaskingConfiguration = new ICDv10MaskingProviderConfig();
     ICDv10MaskingProviderConfig chapterConfiguration = new ICDv10MaskingProviderConfig();
 
-    defaultMaskingConfiguration.setRandomizeCategory(false);
+    defaultMaskingConfiguration.setGeneralizeToCategory(false);
 
-    chapterConfiguration.setRandomizeCategory(false);
-    chapterConfiguration.setRandomizeChapter(true);
+    chapterConfiguration.setGeneralizeToCategory(false);
+    chapterConfiguration.setGeneralizeToChapter(true);
 
     ICDv10MaskingProviderConfig[] configurations =
         new ICDv10MaskingProviderConfig[] {defaultMaskingConfiguration, chapterConfiguration};
@@ -86,143 +90,107 @@ public class ICDv10MaskingProviderTest extends TestLogSetUp implements MaskingPr
   @Test
   public void testMaskConvertToChapter() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-
-    configuration.setRandomizeCategory(false);
-    configuration.setRandomizeChapter(true);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("msg1");
+    configuration.setGeneralizeToCategory(false);
+    configuration.setGeneralizeToChapter(true);
     MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
-    // default configuration is to convert to category
     String originalICD = "A01.0";
     String maskedICD = maskingProvider.mask(originalICD);
     assertFalse(originalICD.equals(maskedICD));
     assertTrue(maskedICD.equals("A00-B99"));
 
-    // test that format is preserved
-    originalICD = "Typhoid Fever";
+    originalICD = "typhoid Fever";
     maskedICD = maskingProvider.mask(originalICD);
     assertFalse(originalICD.equals(maskedICD));
     assertTrue(maskedICD.equals("Certain infectious and parasitic diseases"));
 
-    // check that case is ignored
-    originalICD = "Typhoid Fever".toLowerCase();
+    originalICD = "not found";
     maskedICD = maskingProvider.mask(originalICD);
-    assertFalse(originalICD.equals(maskedICD));
-    assertTrue(maskedICD.equals("Certain infectious and parasitic diseases"));
+    assertEquals("msg1", maskedICD);
   }
 
   @Test
   public void testMaskConvertToRandom() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-
-    configuration.setRandomizeCategory(false);
-    configuration.setRandomizeChapter(false);
-
-    MaskingProvider maskingProvider =
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
+    configuration.setGeneralizeToCategory(false);
+    configuration.setGeneralizeToChapter(false);
+    ICDv10MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
-    // Test convert to chapter
-    String originalICD = "002.0";
-    String maskedICD = maskingProvider.mask(originalICD);
-    assertEquals(null, maskedICD);
+    String originalICD = "a04.0";
+    for (int i = 0; i < 20; i++) {
+      String maskedICD = maskingProvider.mask(originalICD);
+      assertNotNull(maskedICD);
+      ICD icd = maskingProvider.getManager().lookupICD(maskedICD);
+      assertNotNull(icd);
+      assertEquals(ICDFormat.CODE, icd.getFormat());
+    }
 
-    // test that format is preserved
-    originalICD = "Typhoid Fever";
-    maskedICD = maskingProvider.mask(originalICD);
-    assertFalse(maskedICD.isEmpty());
+    originalICD = "enteropathogenic escherichia cOLI infection";
+    for (int i = 0; i < 20; i++) {
+      String maskedICD = maskingProvider.mask(originalICD);
+      assertNotNull(maskedICD);
+      ICD icd = maskingProvider.getManager().lookupICD(maskedICD);
+      assertNotNull(icd);
+      assertEquals(ICDFormat.NAME, icd.getFormat());
+    }
 
-    // check that case is ignored
-    originalICD = "Typhoid Fever".toLowerCase();
-    maskedICD = maskingProvider.mask(originalICD);
-    assertFalse(maskedICD.isEmpty());
-  }
-
-  @Test
-  public void testMaskNullICDv10InputReturnNull() throws Exception {
-    ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-
-    MaskingProvider maskingProvider =
-        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidICDv10 = null;
-    String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertEquals(null, maskedICDv10);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    // original not required to be recognized - replace with a code
+    originalICD = "not found";
+    for (int i = 0; i < 20; i++) {
+      String maskedICD = maskingProvider.mask(originalICD);
+      assertNotNull(maskedICD);
+      ICD icd = maskingProvider.getManager().lookupICD(maskedICD);
+      assertNotNull(icd);
+      assertEquals(ICDFormat.CODE, icd.getFormat());
+    }
   }
 
   @Test
   public void testMaskInvalidICDv10InputValidHandlingReturnNull() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
-    String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertEquals(null, maskedICDv10);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertNull(maskingProvider.mask(invalidICDv10));
   }
 
   @Test
   public void testMaskInvalidICDv10InputValidHandlingReturnRandom() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider =
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    ICDv10MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new ICDv10Identifier(tenantId, localizationProperty);
 
     String invalidICDv10 = "Invalid ICDv10";
     String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertFalse(maskedICDv10.equals(invalidICDv10));
-    assertTrue(identifier.isOfThisType(maskedICDv10));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertNotNull(maskedICDv10);
+    ICD icd = maskingProvider.getManager().lookupICD(maskedICDv10);
+    assertNotNull(icd);
+    assertEquals(ICDFormat.CODE, icd.getFormat());
   }
 
   @Test
-  public void testMaskInvalidICDv10InputValidHandlingReturnDefaultCustomValue() throws Exception {
+  public void testLoadError() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
-        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
+        new ICDv10MaskingProvider(configuration, tenantId, ERROR_LOCALIZATION_PROPERTIES);
 
-    String invalidICDv10 = "Invalid ICDv10";
-    String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertEquals("OTHER", maskedICDv10);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    // default configuration is to convert to category
+    try {
+      maskingProvider.mask("A01.0");
+      fail("expected exception");
+    } catch (KeyedRuntimeException e) {
+      assertEquals(LogCodes.WPH1023E, e.getMessageKey());
+      assertTrue(e.getMessage(), e.getMessage().contains("ICD code is missing"));
+      assertTrue(e.getMessage(), e.getMessage().contains("Test X Name X"));
+    }
   }
-
-  @Test
-  public void testMaskInvalidICDv10InputValidHandlingReturnNonDefaultCustomValue()
-      throws Exception {
-    ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test ICDv10");
-    MaskingProvider maskingProvider =
-        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidICDv10 = "Invalid ICDv10";
-    String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertEquals("Test ICDv10", maskedICDv10);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidICDv10InputInvalidHandlingReturnNull() throws Exception {
-    ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidICDv10 = "Invalid ICDv10";
-    String maskedICDv10 = maskingProvider.mask(invalidICDv10);
-
-    assertEquals(null, maskedICDv10);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
 }

@@ -13,4 +13,5 @@ public interface MaskingProviderTest {
 
   String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
+  String ERROR_LOCALIZATION_PROPERTIES = "/localization/test.localization.error.properties";
 }

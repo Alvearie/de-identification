@@ -20,20 +20,16 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -8704305813210528438L;
 
-  protected final boolean randomizeToCategory;
-  protected final boolean randomizeToRange;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
+  protected final boolean generalizeToCategory;
+  protected final boolean generalizeToChapter;
 
   protected transient volatile ICDv10Manager icdv10ResourceManager = null;
 
   public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.randomizeToCategory = configuration.isRandomizeCategory();
-    this.randomizeToRange = configuration.isRandomizeChapter();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
+    this.generalizeToCategory = configuration.isGeneralizeToCategory();
+    this.generalizeToChapter = configuration.isGeneralizeToChapter();
   }
 
   @Override
@@ -47,35 +43,30 @@ public class ICDv10MaskingProvider extends AbstractMaskingProvider {
 
     ICD icd = icdv10Manager.lookupICD(identifier);
 
-    if (icd == null) {
-      // TODO: check is icd is required
-      debugFaultyInput("icd");
-      if (unspecifiedValueHandling == 2) {
-        return icdv10Manager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+    if (generalizeToChapter || generalizeToCategory) {
+      if (icd == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> icdv10Manager.getRandomValue(ICDFormat.CODE));
+      }
+      ICDFormat format = icd.getFormat();
+
+      if (this.generalizeToChapter) {
+        if (format == ICDFormat.CODE) {
+          return icd.getChapterCode();
+        }
+        return icd.getChapterName();
+      }
+
+      if (this.generalizeToCategory) {
+        if (format == ICDFormat.CODE) {
+          return icd.getCategoryCode();
+        }
+        return icd.getCategoryName();
       }
     }
 
-    ICDFormat format = icd.getFormat();
-
-    if (this.randomizeToRange) {
-      if (format == ICDFormat.CODE) {
-        return icd.getChapterCode();
-      }
-      return icd.getChapterName();
-    }
-
-    if (this.randomizeToCategory) {
-      if (format == ICDFormat.CODE) {
-        return icd.getCategoryCode();
-      }
-      return icd.getCategoryName();
-    }
-
-    return icdv10Manager.getRandomKey();
+    ICDFormat targetFormat = icd == null ? ICDFormat.CODE : icd.getFormat();
+    return icdv10Manager.getRandomValue(targetFormat);
   }
 
   protected ICDv10Manager getManager() {

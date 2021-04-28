@@ -16,14 +16,18 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.ICDWithoutFormat;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.models.ICD;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-/** The type ICDv10 Manager. */
+/**
+ * Class that manages ICD version 10 codes loaded into the service.
+ */
 public class ICDv10Manager implements Manager {
 
   private static final LogManager logger = LogManager.getInstance();
@@ -66,48 +70,57 @@ public class ICDv10Manager implements Manager {
   public static ICDv10Manager buildICDv10Manager(String localizationProperty) {
     ICDv10Manager manager = new ICDv10Manager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
-    for (ResourceEntry entry : resourceEntries) {
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (InputStream inputStream = entry.createStream()) {
+        try (InputStream inputStream = entry.createStream()) {
 
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              try {
+                String code = line.get(0);
+                String fullName = line.get(1);
+                String categoryCode = line.get(2);
+                String categoryName = line.get(3);
+                String chapterCode = line.get(4);
+                String chapterName = line.get(5);
 
-            String code = line.get(0);
-            String fullName = line.get(1);
+                manager.add(new ICDWithoutFormat(code, fullName, fullName, chapterCode, chapterName,
+                    categoryCode, categoryName));
 
-            if (!code.trim().isEmpty() && !fullName.trim().isEmpty()) {
-              String categoryCode = line.get(2);
-              String categoryName = line.get(3);
-              String chapterCode = line.get(4);
-              String chapterName = line.get(5);
-
-              manager.add(new ICDWithoutFormat(code, fullName, fullName, chapterCode, chapterName, categoryCode,
-                  categoryName));
+              } catch (RuntimeException e) {
+                // CSVRecord has a very descriptive toString() implementation
+                String logmsg = Messages.getMessage(LogCodes.WPH1023E, String.valueOf(line),
+                    entry.getFilename(), e.getMessage());
+                throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+              }
             }
           }
         }
-
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return manager;
   }
 
-  @Override
-  public String getRandomKey() {
-    String key = null;
+  public String getRandomValue(ICDFormat format) {
+    String value = null;
+    ICDWithoutFormat icd = null;
     int count = this.icdList.size();
     if (count == 1) {
-      key = this.icdList.get(0).getCode();
+      icd = this.icdList.get(0);
     } else {
-      key = this.icdList.get(random.nextInt(count)).getCode();
+      icd = this.icdList.get(random.nextInt(count));
     }
-    return key;
+    if (icd != null) {
+      value = format == ICDFormat.NAME ? icd.getFullName() : icd.getCode();
+    }
+    return value;
   }
 
   /**

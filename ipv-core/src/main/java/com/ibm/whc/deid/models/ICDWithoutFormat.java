@@ -27,6 +27,28 @@ public class ICDWithoutFormat {
    */
   public ICDWithoutFormat(String code, String shortName, String fullName, String chapterCode, String chapterName,
       String categoryCode, String categoryName) {
+    if (code == null || code.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD code is missing");
+    }
+    if (shortName == null || shortName.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD short name is missing");
+    }
+    if (fullName == null || fullName.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD full bame is missing");
+    }
+    if (chapterCode == null || chapterCode.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD chapter code is missing");
+    }
+    if (chapterName == null || chapterName.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD chapter name is missing");
+    }
+    if (categoryCode == null || categoryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD category code is missing");
+    }
+    if (categoryName == null || categoryName.trim().isEmpty()) {
+      throw new IllegalArgumentException("ICD category name is missing");
+    }
+
     this.code = code;
     this.shortName = shortName;
     this.fullName = fullName;
