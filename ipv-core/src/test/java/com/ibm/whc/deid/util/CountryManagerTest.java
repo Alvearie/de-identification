@@ -15,10 +15,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Test;
 import com.ibm.whc.deid.models.Country;
-import com.ibm.whc.deid.providers.masking.TestLogSetUp;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
-public class CountryManagerTest extends TestLogSetUp {
+public class CountryManagerTest {
   private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
@@ -27,19 +28,22 @@ public class CountryManagerTest extends TestLogSetUp {
       CountryManager
           .buildCountryManager("/localization/test.country.bad_long.localization.properties");
       fail("expected exception");
-    } catch (RuntimeException e) {
-      assertEquals("longitude is out of range: 819.8", e.getMessage());
-      String logs = outContent.toString();
-      assertTrue(logs, logs.contains(
-          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[Albania, AL, ALB, , Europe, 41.333, 819.800]] from file /localization/test.country.bad_long.csv: longitude is out of range: 819.8"));
+    } catch (KeyedRuntimeException e) {
+      assertEquals(LogCodes.WPH1023E, e.getMessageKey());
+      assertEquals(
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[Albania, AL, ALB, , Europe, 41.333, 819.800]] from /localization/test.country.bad_long.csv: longitude is out of range: 819.8",
+          e.getMessage());
     }
 
     try {
       CountryManager
           .buildCountryManager("/localization/test.country.bad_name.localization.properties");
       fail("expected exception");
-    } catch (RuntimeException e) {
-      assertEquals("`name` is missing", e.getMessage());
+    } catch (KeyedRuntimeException e) {
+      assertEquals(LogCodes.WPH1023E, e.getMessageKey());
+      assertEquals(
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[ , AL, ALB, , Europe, 41.333, 19.800]] from /localization/test.country.bad_name.csv: country name is missing",
+          e.getMessage());
     }
   }
 

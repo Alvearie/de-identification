@@ -14,12 +14,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.resources.LocalizedResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 /**
  * Class that manages known countries loaded into the service.
@@ -107,9 +109,9 @@ public class CountryManager implements Manager {
 
               } catch (RuntimeException e) {
                 // CSVRecord has a very descriptive toString() implementation
-                logger.logError(LogCodes.WPH1023E, e, String.valueOf(record), entry.getFilename(),
-                    e.getMessage());
-                throw e;
+                String logmsg = Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record),
+                    entry.getFilename(), e.getMessage());
+                throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
               }
             }
           }

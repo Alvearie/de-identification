@@ -60,22 +60,22 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
       double longitude, String nameCountryCode, CountryNameSpecification specification,
       String key) {
     if (name == null || name.trim().isEmpty()) {
-      throw new IllegalArgumentException("`name` is missing");
+      throw new IllegalArgumentException("country name is missing");
     }
     if (iso2code == null || iso2code.length() != 2) {
-      throw new IllegalArgumentException("`iso2code` is incorrect length");
+      throw new IllegalArgumentException("country iso2code is incorrect length");
     }
     if (iso3code == null || iso3code.length() != 3) {
-      throw new IllegalArgumentException("`iso3code` is incorrect length");
+      throw new IllegalArgumentException("country iso3code is incorrect length");
     }
     if (continent == null || continent.trim().isEmpty()) {
-      throw new IllegalArgumentException("`continent` is missing");
+      throw new IllegalArgumentException("country continent is missing");
     }
     if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
-      throw new IllegalArgumentException("`nameCountryCode` is missing");
+      throw new IllegalArgumentException("country locale is missing");
     }
     if (specification == null) {
-      throw new IllegalArgumentException("`specification` is missing");
+      throw new IllegalArgumentException("country identifier specification is missing");
     }
 
     this.name = name;
