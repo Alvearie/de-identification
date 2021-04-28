@@ -30,22 +30,30 @@ public class IMEIMaskingProvider extends AbstractMaskingProvider {
    */
   public IMEIMaskingProvider(IMEIMaskingProviderConfig config, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, config);
     this.imeiIdentifier = new IMEIIdentifier(tenantId, localizationProperty);
     this.preserveTAC = config.getPreserveTAC();
   }
 
   @Override
   public String mask(String identifier) {
-    if (!imeiIdentifier.isOfThisType(identifier)) {
+    if (identifier == null) {
+      debugFaultyInput("identifier");
       return null;
     }
 
-    String tac = this.preserveTAC ? identifier.substring(0, 8) : getIMEIManager().getRandomKey();
+    if (preserveTAC && !imeiIdentifier.isOfThisType(identifier)) {
+      return applyUnexpectedValueHandling(identifier,
+          () -> generateValue(getIMEIManager().getRandomKey()));
+    }
 
+    return generateValue(
+        this.preserveTAC ? identifier.substring(0, 8) : getIMEIManager().getRandomKey());
+  }
+
+  private String generateValue(String tac) {
     String body = tac + RandomGenerators.generateRandomDigitSequence(6);
     body += (char) ('0' + RandomGenerators.luhnCheckDigit(body));
-
     return body;
   }
 
