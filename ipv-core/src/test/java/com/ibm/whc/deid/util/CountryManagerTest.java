@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Test;
 import com.ibm.whc.deid.models.Country;
+import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -31,7 +32,7 @@ public class CountryManagerTest {
     } catch (KeyedRuntimeException e) {
       assertEquals(LogCodes.WPH1023E, e.getMessageKey());
       assertEquals(
-          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[Albania, AL, ALB, , Europe, 41.333, 819.800]] from /localization/test.country.bad_long.csv: longitude is out of range: 819.8",
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[Albania, AL, ALB, , Europe, 41.333, 819.800]] from /localization/test.country.bad_long.csv: The value \"819.8\" for \"longitude\" is invalid",
           e.getMessage());
     }
 
@@ -42,9 +43,217 @@ public class CountryManagerTest {
     } catch (KeyedRuntimeException e) {
       assertEquals(LogCodes.WPH1023E, e.getMessageKey());
       assertEquals(
-          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[ , AL, ALB, , Europe, 41.333, 19.800]] from /localization/test.country.bad_name.csv: country name is missing",
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=3, values=[ , AL, ALB, , Europe, 41.333, 19.800]] from /localization/test.country.bad_name.csv: The value \" \" for \"country name\" is invalid",
           e.getMessage());
     }
+  }
+
+  @Test
+  public void testLoadRecord() {
+    String[] record =
+        new String[] {"Canada", "CA", "CAN", "home", "north america", "23.3", "-78.3"};
+    CountryManager manager = new CountryManager();
+    String locale = "en";
+
+    CountryManager.loadRecord(locale, manager, record);
+    Country country = manager.getValue("canada");
+    assertNotNull(country);
+    assertEquals("Canada", country.getName());
+    assertEquals("CA", country.getName(CountryNameSpecification.ISO2));
+    assertEquals("CAN", country.getName(CountryNameSpecification.ISO3));
+    assertEquals("north america", country.getContinent());
+    LatitudeLongitude location = country.getLocation();
+    assertNotNull(location);
+    assertEquals(23.3, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+
+    assertEquals("Canada", manager.getValue("CA").getName());
+    assertEquals("Canada", manager.getValue("can").getName());
+    assertEquals("Canada", manager.getValue("HOme").getName());
+
+    // bad name
+    String temp = record[0];
+    record[0] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country name"));
+    }
+    record[0] = " ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country name"));
+    }
+    record[0] = temp;
+
+    // bad ISO2
+    temp = record[1];
+    record[1] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso2code"));
+    }
+    record[1] = "  ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso2code"));
+    }
+    record[1] = "AXE";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso2code"));
+    }
+    record[1] = temp;
+
+    // bad ISO3
+    temp = record[2];
+    record[2] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso3code"));
+    }
+    record[2] = "   ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso3code"));
+    }
+    record[2] = "AX";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso3code"));
+    }
+    record[2] = temp;
+
+    // bad continent
+    temp = record[4];
+    record[4] = "  ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country continent"));
+    }
+    record[4] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country continent"));
+    }
+    record[4] = temp;
+
+    // bad latitude
+    temp = record[5];
+    record[5] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("latitude"));
+    }
+    record[5] = "   ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[5] = "AX";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[5] = "-91.4";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[5] = "91.4";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[5] = temp;
+
+    // bad longitude
+    temp = record[6];
+    record[6] = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[6] = "   ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[6] = "AX";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[6] = "-181.4";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[6] = "191.4";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[6] = temp;
+
+    // missing continent not loaded
+    String[] record2 = new String[] {"United States of America", "US", "USA", "United States",
+        "Unknown", "23.3", "-78.3"};
+    CountryManager.loadRecord(locale, manager, record2);
+    assertNull(manager.getValue("United States of America"));
+    assertEquals(2, manager.countryNames.getKeys().size());
+
+    // friendly name not loaded when null or missing
+
+    String[] record3 =
+        new String[] {"country3", "c3", "cc3", null, "north america", "23.3", "-78.3"};
+    CountryManager.loadRecord(locale, manager, record3);
+    assertNotNull(manager.getValue("c3"));
+    assertEquals(3, manager.countryNames.getKeys().size());
+    String[] record4 =
+        new String[] {"country4", "c4", "cc4", "  ", "north america", "23.3", "-78.3"};
+    CountryManager.loadRecord(locale, manager, record4);
+    assertNotNull(manager.getValue("cc4"));
+    assertEquals(4, manager.countryNames.getKeys().size());
   }
 
   @Test

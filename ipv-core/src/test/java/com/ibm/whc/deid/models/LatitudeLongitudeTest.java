@@ -56,28 +56,75 @@ public class LatitudeLongitudeTest {
       new LatitudeLongitude(90.01, 180.0);
       fail("expected exception");
     } catch (IllegalArgumentException e) {
-      assertEquals("latitude is out of range: 90.01", e.getMessage());
+      assertEquals("The value \"90.01\" for \"latitude\" is invalid", e.getMessage());
     }
 
     try {
       new LatitudeLongitude(-90.01, -180.0);
       fail("expected exception");
     } catch (IllegalArgumentException e) {
-      assertEquals("latitude is out of range: -90.01", e.getMessage());
+      assertEquals("The value \"-90.01\" for \"latitude\" is invalid", e.getMessage());
     }
 
     try {
       new LatitudeLongitude(90.0, 180.01);
       fail("expected exception");
     } catch (IllegalArgumentException e) {
-      assertEquals("longitude is out of range: 180.01", e.getMessage());
+      assertEquals("The value \"180.01\" for \"longitude\" is invalid", e.getMessage());
     }
 
     try {
       new LatitudeLongitude(-90.0, -180.01);
       fail("expected exception");
     } catch (IllegalArgumentException e) {
-      assertEquals("longitude is out of range: -180.01", e.getMessage());
+      assertEquals("The value \"-180.01\" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    latlon = new LatitudeLongitude("10", "-11");
+    assertEquals(10.0, latlon.getLatitude(), 0);
+    assertEquals(-11.0, latlon.getLongitude(), 0);
+    assertEquals(LatitudeLongitudeFormat.DECIMAL, latlon.getFormat());
+
+    try {
+      new LatitudeLongitude(null, "-11");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"null\" for \"latitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      new LatitudeLongitude("", "-11");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"\" for \"latitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      new LatitudeLongitude("10", "");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"\" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      new LatitudeLongitude("10", "  ");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"  \" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      new LatitudeLongitude("10", "600");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"600.0\" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      new LatitudeLongitude("100", "60");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"100.0\" for \"latitude\" is invalid", e.getMessage());
     }
   }
 }

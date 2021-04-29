@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import com.ibm.whc.deid.resources.ManagedResource;
 import com.ibm.whc.deid.util.CountryNameSpecification;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class Country implements Location, LocalizedEntity, ManagedResource, Serializable {
 
@@ -32,13 +34,13 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
    * @param iso2code the ISO 2-char country code
    * @param iso3code the ISO 3-code country code
    * @param continent the continent
-   * @param latitude the latitude
-   * @param longitude the longitude
+   * @param latitude the latitude in string format
+   * @param longitude the longitude in string format
    * @param nameCountryCode the locale
    * @param specification the type of identifier used to find this resource
    */
-  public Country(String name, String iso2code, String iso3code, String continent, double latitude,
-      double longitude, String nameCountryCode, CountryNameSpecification specification) {
+  public Country(String name, String iso2code, String iso3code, String continent, String latitude,
+      String longitude, String nameCountryCode, CountryNameSpecification specification) {
     this(name, iso2code, iso3code, continent, latitude, longitude, nameCountryCode, specification,
         null);
   }
@@ -50,32 +52,41 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
    * @param iso2code the ISO 2-char country code
    * @param iso3code the ISO 3-code country code
    * @param continent the continent
-   * @param latitude the latitude
-   * @param longitude the longitude
+   * @param latitude the latitude in string format
+   * @param longitude the longitude in string format
    * @param nameCountryCode the locale
    * @param specification the type of identifier used to find this resource
    * @param key a unique key used to find this resource - if <i>null</i> the value is generated
+   * 
+   * @throws IllegalArgumentException if any of the input values is null, whitespace, or invalid.
    */
-  public Country(String name, String iso2code, String iso3code, String continent, double latitude,
-      double longitude, String nameCountryCode, CountryNameSpecification specification,
+  public Country(String name, String iso2code, String iso3code, String continent, String latitude,
+      String longitude, String nameCountryCode, CountryNameSpecification specification,
       String key) {
     if (name == null || name.trim().isEmpty()) {
-      throw new IllegalArgumentException("country name is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "country name"));
     }
-    if (iso2code == null || iso2code.length() != 2) {
-      throw new IllegalArgumentException("country iso2code is incorrect length");
+    if (iso2code == null || iso2code.length() != 2 || iso2code.trim().length() != 2) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso2code), "country iso2code"));
     }
-    if (iso3code == null || iso3code.length() != 3) {
-      throw new IllegalArgumentException("country iso3code is incorrect length");
+    if (iso3code == null || iso3code.length() != 3 || iso3code.trim().length() != 3) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso3code), "country iso3code"));
     }
     if (continent == null || continent.trim().isEmpty()) {
-      throw new IllegalArgumentException("country continent is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(continent), "country continent"));
     }
     if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
-      throw new IllegalArgumentException("country locale is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(nameCountryCode),
+              "country locale"));
     }
     if (specification == null) {
-      throw new IllegalArgumentException("country identifier specification is missing");
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(specification), "country identifier specification"));
     }
 
     this.name = name;
@@ -84,8 +95,8 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
     this.continent = continent;
     this.nameCountryCode = nameCountryCode;
     this.specification = specification;
-    this.latitudeLongitude =
-        new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
+
+    this.latitudeLongitude = new LatitudeLongitude(latitude, longitude);
 
     if (key == null || key.trim().isEmpty()) {
       switch (specification) {

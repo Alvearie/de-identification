@@ -5,6 +5,9 @@
  */
 package com.ibm.whc.deid.models;
 
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
+
 public class ICDWithoutFormat {
   private final String code;
   private final String shortName;
@@ -24,29 +27,38 @@ public class ICDWithoutFormat {
    * @param chapterName the chapter name
    * @param categoryCode the category code
    * @param categoryName the category name
+   * 
+   * @throws IllegalArgumentException if any of the given input values is null or whitespace.
    */
   public ICDWithoutFormat(String code, String shortName, String fullName, String chapterCode, String chapterName,
       String categoryCode, String categoryName) {
     if (code == null || code.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD code is missing");
-    }
-    if (shortName == null || shortName.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD short name is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(code), "ICD code"));
     }
     if (fullName == null || fullName.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD full bame is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(fullName), "ICD full name"));
+    }
+    if (shortName == null || shortName.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(shortName), "ICD short name"));
     }
     if (chapterCode == null || chapterCode.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD chapter code is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(chapterCode), "ICD chapter code"));
     }
     if (chapterName == null || chapterName.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD chapter name is missing");
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(chapterName), "ICD chapter name"));
     }
     if (categoryCode == null || categoryCode.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD category code is missing");
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(categoryCode), "ICD category code"));
     }
     if (categoryName == null || categoryName.trim().isEmpty()) {
-      throw new IllegalArgumentException("ICD category name is missing");
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(categoryName), "ICD category name"));
     }
 
     this.code = code;

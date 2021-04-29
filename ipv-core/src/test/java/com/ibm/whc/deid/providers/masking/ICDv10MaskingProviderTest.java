@@ -189,8 +189,8 @@ public class ICDv10MaskingProviderTest implements MaskingProviderTest {
       fail("expected exception");
     } catch (KeyedRuntimeException e) {
       assertEquals(LogCodes.WPH1023E, e.getMessageKey());
-      assertTrue(e.getMessage(), e.getMessage().contains("ICD code is missing"));
-      assertTrue(e.getMessage(), e.getMessage().contains("Test X Name X"));
+      assertTrue(e.getMessage(), e.getMessage().contains("ICD code"));
+      assertTrue(e.getMessage(), e.getMessage().contains("Test X Name X,"));
     }
   }
 }

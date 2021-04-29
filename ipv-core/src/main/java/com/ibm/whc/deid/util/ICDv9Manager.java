@@ -53,13 +53,6 @@ public class ICDv9Manager implements Manager {
     icdByShortMap = new HashMap<>(hashMapInitialSize, 0.75f);
   }
 
-  protected void add(ICDWithoutFormat icdCode) {
-    icdList.add(icdCode);
-    icdByCodeMap.put(icdCode.getCode(), icdCode);
-    icdByNameMap.put(icdCode.getFullName().toUpperCase(), icdCode);
-    icdByShortMap.put(icdCode.getShortName().toUpperCase(), icdCode);
-  }
-
   /**
    * Creates a new ICDv10Manager instance from the definitions in the given properties file.
    * 
@@ -83,17 +76,8 @@ public class ICDv9Manager implements Manager {
           try (CSVParser parser = Readers.createCSVReaderFromStream(inputStream, ';', '"')) {
             for (CSVRecord record : parser) {
               try {
-                String code = record.get(0);
-                String shortName = record.get(1);
-                String fullName = record.get(2);
-                String chapterCode = record.get(3);
-                String chapterName = record.get(4);
-                String categoryCode = record.get(5);
-                String categoryName = record.get(6);
-
-                manager
-                    .add(new ICDWithoutFormat(code, shortName, fullName, chapterCode, chapterName,
-                  categoryCode, categoryName));
+                loadRecord(manager, record.get(0), record.get(1), record.get(2),
+                    record.get(3), record.get(4), record.get(5), record.get(6));
 
               } catch (RuntimeException e) {
                 // CSVRecord has a very descriptive toString() implementation
@@ -111,6 +95,34 @@ public class ICDv9Manager implements Manager {
     }
 
     return manager;
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(ICDv9Manager manager, String... record) {
+    String code = record[0];
+    String shortName = record[1];
+    String fullName = record[2];
+    String chapterCode = record[3];
+    String chapterName = record[4];
+    String categoryCode = record[5];
+    String categoryName = record[6];
+
+    manager.add(new ICDWithoutFormat(code, shortName, fullName, chapterCode, chapterName,
+        categoryCode, categoryName));
+  }
+
+  protected void add(ICDWithoutFormat icdCode) {
+    icdList.add(icdCode);
+    icdByCodeMap.put(icdCode.getCode().toUpperCase(), icdCode);
+    icdByNameMap.put(icdCode.getFullName().toUpperCase(), icdCode);
+    icdByShortMap.put(icdCode.getShortName().toUpperCase(), icdCode);
   }
 
   public String getRandomValue(ICDFormat format) {

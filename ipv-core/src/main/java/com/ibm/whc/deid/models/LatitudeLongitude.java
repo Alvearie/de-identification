@@ -7,6 +7,8 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 /**
  * The latitude and longitude of a location on the globe.
@@ -24,10 +26,33 @@ public class LatitudeLongitude implements Serializable {
   /**
    * Instantiates a new object with the DECIMAL string representation format.
    *
+   * @param latitude the latitude in string format, -90.0 <= latitude <= 90.0
+   * @param longitude the longitude in string format, -180.0 < longitude < 180.0
+   * 
+   * @throws IllegalArgumentException if the latitude or longitude cannot be converted into a double
+   *         value or is out of range
+   */
+  public LatitudeLongitude(String latitude, String longitude) {
+    this(convertToDouble(latitude, "latitude"), convertToDouble(longitude, "longitude"),
+        LatitudeLongitudeFormat.DECIMAL);
+  }
+
+  private static double convertToDouble(String value, String component) {
+    try {
+      return Double.parseDouble(value);
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(value), component));
+    }
+  }
+
+  /**
+   * Instantiates a new object with the DECIMAL string representation format.
+   *
    * @param latitude the latitude, -90.0 <= latitude <= 90.0
    * @param longitude the longitude, -180.0 < longitude < 180.0
    * 
-   *        throws IllegalArgumentException if the latitude or longitude is out of range
+   * @throws IllegalArgumentException if the latitude or longitude is out of range
    */
   public LatitudeLongitude(double latitude, double longitude) {
     this(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
@@ -41,16 +66,16 @@ public class LatitudeLongitude implements Serializable {
    * @param format the default format used by the toString() method to represent this location -
    *        DECIMAL is used if <i>null</i> is given
    * 
-   *        throws IllegalArgumentException if the latitude or longitude is out of range
+   * @throws IllegalArgumentException if the latitude or longitude is out of range
    */
   public LatitudeLongitude(double latitude, double longitude, LatitudeLongitudeFormat format) {
     if (latitude < -90.0 || latitude > 90.0) {
       throw new IllegalArgumentException(
-          "latitude is out of range: " + Double.toString(latitude));
+          Messages.getMessage(LogCodes.WPH1010E, Double.toString(latitude), "latitude"));
     }
     if (longitude < -180.0 || longitude > 180.0) {
       throw new IllegalArgumentException(
-          "longitude is out of range: " + Double.toString(longitude));
+          Messages.getMessage(LogCodes.WPH1010E, Double.toString(longitude), "longitude"));
     }
     this.latitude = latitude;
     // -180 and +180 longitude are same meridian

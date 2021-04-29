@@ -192,8 +192,8 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
       fail("expected exception");
     } catch (KeyedRuntimeException e) {
       assertEquals(LogCodes.WPH1023E, e.getMessageKey());
-      assertTrue(e.getMessage(), e.getMessage().contains("X10-X19"));
-      assertTrue(e.getMessage(), e.getMessage().contains("ICD chapter code is missing"));
+      assertTrue(e.getMessage(), e.getMessage().contains(", X10-X19,"));
+      assertTrue(e.getMessage(), e.getMessage().contains("ICD chapter code"));
     }
   }
 }

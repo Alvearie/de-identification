@@ -30,7 +30,7 @@ public class CountryManager implements Manager {
 
   private static final LogManager logger = LogManager.getInstance();
 
-  private static class CountrySpecificationResourceManager
+  protected static class CountrySpecificationResourceManager
       extends LocalizedResourceManager<Country> {
 
     public CountrySpecificationResourceManager(int expectedCount) {
@@ -92,20 +92,8 @@ public class CountryManager implements Manager {
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
             for (CSVRecord record : reader) {
               try {
-                String countryName = record.get(0);
-                String iso2Letter = record.get(1);
-                String iso3Letter = record.get(2);
-                String friendlyName = record.get(3);
-                String continent = record.get(4);
-                /* TODO: temp fix until data is finished */
-                if (continent.equals("Unknown")) {
-                  continue;
-                }
-                double latitude = FileUtils.parseRequiredDouble(record.get(5));
-                double longitude = FileUtils.parseRequiredDouble(record.get(6));
-
-                manager.add(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
-                    locale, friendlyName);
+                loadRecord(locale, manager, record.get(0), record.get(1), record.get(2),
+                    record.get(3), record.get(4), record.get(5), record.get(6));
 
               } catch (RuntimeException e) {
                 // CSVRecord has a very descriptive toString() implementation
@@ -126,8 +114,34 @@ public class CountryManager implements Manager {
     return manager;
   }
 
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(String locale, CountryManager manager, String... record) {
+    String countryName = record[0];
+    String iso2Letter = record[1];
+    String iso3Letter = record[2];
+    String friendlyName = record[3];
+    String continent = record[4];
+    /* TODO: temp fix until data is finished */
+    if (continent != null && continent.equals("Unknown")) {
+      return;
+    }
+    String latitude = record[5];
+    String longitude = record[6];
+
+    manager.add(countryName, iso2Letter, iso3Letter, continent, latitude, longitude, locale,
+        friendlyName);
+  }
+
   protected void add(String countryName, String iso2Letter, String iso3Letter, String continent,
-      double latitude, double longitude, String countryCode, String friendlyName) {
+      String latitude, String longitude, String countryCode, String friendlyName) {
     Country country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude,
         longitude, countryCode, CountryNameSpecification.NAME);
     countryNames.add(country);

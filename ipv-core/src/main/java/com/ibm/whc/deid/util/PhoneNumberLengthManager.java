@@ -14,11 +14,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.resources.KeyListResource;
 import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 /**
  * Class that provides access to information about the lengths of phone numbers  
@@ -52,84 +54,90 @@ public class PhoneNumberLengthManager extends ResourceManager<KeyListResource<In
   public static PhoneNumberLengthManager buildPhoneNumberLengthManager(String localizationProperty) {
     PhoneNumberLengthManager mgr = new PhoneNumberLengthManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(Resource.PHONE_NUM_DIGITS);
-    
-    for (ResourceEntry entry : resourceEntries) {
-      try (InputStream inputStream = entry.createStream()) {
+    try {
+      Collection<ResourceEntry> resourceEntries = LocalizationManager
+          .getInstance(localizationProperty).getResources(Resource.PHONE_NUM_DIGITS);
 
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {          
-            String callingCode = line.get(0);  
-            String currArrayString = line.get(1);
-            
-            if (callingCode.isEmpty() || currArrayString.isEmpty()) {
-              continue;
+      for (ResourceEntry entry : resourceEntries) {
+        try (InputStream inputStream = entry.createStream()) {
+
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              try {
+                loadRecord(mgr, line.get(0), line.get(1));
+
+              } catch (RuntimeException e) {
+                // CSVRecord has a very descriptive toString() implementation
+                String logmsg = Messages.getMessage(LogCodes.WPH1023E, String.valueOf(line),
+                    entry.getFilename(), e.getMessage());
+                throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+              }
             }
-            List<Integer> currList = convertStringValueToList(currArrayString);
-            if (currList == null || currList.isEmpty()) {
-              continue;
-            }
-            
-            KeyListResource<Integer> resource = new KeyListResource<>(callingCode, currList);
-            mgr.add(resource);
           }
         }
-        
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Failed to load telephone number length list " + " for tenant ", e);
       }
+
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return mgr;
   }
   
-  protected static List<Integer> convertStringValueToList(String currArrayString) {
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(PhoneNumberLengthManager manager, String... record) {
+    String callingCode = record[0];
+    String currArrayString = record[1];
+
     List<Integer> currList = new ArrayList<>();
-    if (currArrayString.contains("-")) {
-      String[] currArray = currArrayString.split("-");
-      if (currArray.length == 2) {
-        int startNum;
-        try {
-          startNum = Integer.parseInt(currArray[0]);
-        } catch (NumberFormatException e) {
-          logger.logError(LogCodes.WPH2003E,
-              "Ignoring non-numeric data in telephone number length list: " + currArray[0]);
-          return null;
+    try {
+      if (currArrayString.contains("-")) {
+        String[] currArray = currArrayString.split("-");
+        if (currArray.length == 2) {
+          int startNum = Integer.parseInt(currArray[0]);
+          int endNum = Integer.parseInt(currArray[1]);
+          if (startNum < 1) {
+            throw new IllegalArgumentException(currArrayString);
+          }
+          if (startNum > endNum) {
+            throw new IllegalArgumentException(currArrayString);
+          }
+          for (int idx = startNum; idx <= endNum; idx++) {
+            currList.add(Integer.valueOf(idx));
+          }
+        } else {
+          throw new IllegalArgumentException(currArrayString);
         }
-        int endNum;
-        try {
-          endNum = Integer.parseInt(currArray[1]);
-        } catch (NumberFormatException e) {
-          logger.logError(LogCodes.WPH2003E,
-              "Ignoring non-numeric data in telephone number length list: " + currArray[1]);
-          return null;
+      } else if (currArrayString.contains("|")) {
+        String[] currArray = currArrayString.split("\\|");
+        for (int idx = 0; idx < currArray.length; idx++) {
+          Integer val = Integer.valueOf(currArray[idx]);
+          if (val.intValue() < 1) {
+            throw new IllegalArgumentException(currArrayString);
+          }
+          currList.add(val);
         }
-        for (int idx = startNum; idx <= endNum; idx++) {
-          currList.add(Integer.valueOf(idx));
+      } else {
+        Integer val = Integer.valueOf(currArrayString);
+        if (val.intValue() < 1) {
+          throw new IllegalArgumentException(currArrayString);
         }
+        currList.add(val);
       }
-    } else if (currArrayString.contains("|")) {
-      String[] currArray = currArrayString.split("\\|");
-      for (int idx = 0; idx < currArray.length; idx++) {
-        try {
-          currList.add(Integer.valueOf(currArray[idx]));
-        } catch (NumberFormatException e) {
-          logger.logError(LogCodes.WPH2003E,
-              "Ignoring non-numeric data in telephone number length list: " + currArray[idx]);
-          return null;
-        }
-      }
-    } else {
-      try {
-        currList.add(Integer.valueOf(currArrayString));
-      } catch (NumberFormatException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Ignoring non-numeric data in telephone number length list: " + currArrayString);
-        return null;
-      }
+    } catch (RuntimeException e) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(currArrayString), "list resource value"), e);
     }
-    return currList;
+
+    KeyListResource<Integer> resource = new KeyListResource<>(callingCode, currList);
+    manager.add(resource);
   }
 }
