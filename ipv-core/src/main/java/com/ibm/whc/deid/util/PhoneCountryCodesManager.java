@@ -32,7 +32,7 @@ public class PhoneCountryCodesManager extends ResourceManager<KeyValueResource> 
   private static final LogManager logger = LogManager.getInstance();
 
   protected PhoneCountryCodesManager() {
-    // nothing required here
+    super(300);
   }
 
   /**

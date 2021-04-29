@@ -23,7 +23,7 @@ public class PhoneCountryCodesManagerTest implements MaskingProviderTest {
     } catch (KeyedRuntimeException e) {
       assertEquals(LogCodes.WPH1023E, e.getMessageKey());
       assertEquals(
-          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=4, values=[684]] from /localization/test.phone_calling_codes.bad.csv: Array index out of range: 1",
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=4, values=[684, ]] from /localization/test.phone_calling_codes.bad.csv: The value \"\" for \"resource value\" is invalid",
           e.getMessage());
     }
   }

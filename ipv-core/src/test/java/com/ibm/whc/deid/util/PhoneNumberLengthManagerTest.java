@@ -177,6 +177,13 @@ public class PhoneNumberLengthManagerTest implements MaskingProviderTest {
     } catch (RuntimeException e) {
       assertTrue(e.getMessage().contains("resource value"));
     }
+    record[1] = "|";
+    try {
+      PhoneNumberLengthManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("resource value"));
+    }
     record[1] = "|5";
     try {
       PhoneNumberLengthManager.loadRecord(manager, record);

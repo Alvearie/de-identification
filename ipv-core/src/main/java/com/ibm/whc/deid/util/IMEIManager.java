@@ -26,7 +26,7 @@ public class IMEIManager extends ResourceManager<StringResource> {
   protected static final Resources resourceType = Resource.TACDB;
 
   protected IMEIManager() {
-    // nothing required here
+    super(103300);
   }
 
   /**

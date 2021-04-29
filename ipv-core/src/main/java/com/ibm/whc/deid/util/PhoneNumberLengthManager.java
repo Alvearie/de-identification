@@ -38,7 +38,7 @@ public class PhoneNumberLengthManager extends ResourceManager<KeyListResource<In
   private static final LogManager logger = LogManager.getInstance();
 
   protected PhoneNumberLengthManager() {
-    // nothing required here
+    super(200);
   }
 
   /**

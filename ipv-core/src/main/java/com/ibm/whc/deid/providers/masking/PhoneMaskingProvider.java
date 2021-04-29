@@ -27,21 +27,17 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
   private final boolean preserveCountryCode;
   private final boolean preserveAreaCode;
   private final String invNdigitsReplaceWith;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
   private final List<String> phoneRegexPatterns;
 
   private final PhoneIdentifier phoneIdentifier;
 
   public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.random = new SecureRandom();
     this.preserveCountryCode = configuration.isCountryCodePreserve();
     this.preserveAreaCode = configuration.isAreaCodePreserve();
     this.invNdigitsReplaceWith = configuration.getInvNdigitsReplaceWith();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.phoneRegexPatterns = configuration.getPhoneRegexPatterns();
     this.phoneIdentifier =
         new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
@@ -70,7 +66,6 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     } else {
       countryCode = getMSISDNManager().getRandomCountryCode();
     }
-
     return countryCode;
   }
 
@@ -161,13 +156,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     PhoneNumber phoneNumber = phoneIdentifier.getPhoneNumber(identifier);
     if (phoneNumber == null) {
       debugFaultyInput("phoneNumber");
-      if (unspecifiedValueHandling == 2) {
-        return generateRandomPhoneNumber(invNdigitsReplaceWith);
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier,
+          () -> generateRandomPhoneNumber(invNdigitsReplaceWith));
     }
 
     String maskedCountryCode = maskCountryCode(phoneNumber);

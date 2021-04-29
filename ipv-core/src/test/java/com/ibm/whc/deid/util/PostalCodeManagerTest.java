@@ -10,15 +10,143 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
+import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
 
-public class PostalCodeManagerTest {
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+public class PostalCodeManagerTest implements MaskingProviderTest {
+
+  @Test
+  public void testBadInput() throws Exception {
+    try {
+      PostalCodeManager.buildPostalCodeManager(ERROR_LOCALIZATION_PROPERTIES);
+      fail("expected exception");
+    } catch (KeyedRuntimeException e) {
+      assertEquals(LogCodes.WPH1023E, e.getMessageKey());
+      assertEquals(
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=5, values=[US, 99583, 54.841, -183.4368]] from /localization/test.postal_codes.bad.csv: The value \"-183.4368\" for \"longitude\" is invalid",
+          e.getMessage());
+    }
+  }
+
+  @Test
+  public void testLoadRecord() {
+    String[] record =
+        new String[] {"55901", "23.3", "-78.3"};
+    PostalCodeManager manager = new PostalCodeManager();
+
+    PostalCodeManager.loadRecord(manager, record);
+    PostalCode postal = manager.getValue("55901");
+    assertNotNull(postal);
+    assertEquals("55901", postal.getName());
+    LatitudeLongitude location = postal.getLocation();
+    assertNotNull(location);
+    assertEquals(23.3, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+
+    // bad name
+    String temp = record[0];
+    record[0] = null;
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("postal code"));
+    }
+    record[0] = " ";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("postal code"));
+    }
+    record[0] = temp;
+
+    // bad latitude
+    temp = record[1];
+    record[1] = null;
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[1] = "   ";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[1] = "AX";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[1] = "-91.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[1] = "91.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("latitude"));
+    }
+    record[1] = temp;
+
+    // bad longitude
+    temp = record[2];
+    record[2] = null;
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[2] = "   ";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[2] = "AX";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[2] = "-181.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[2] = "191.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[2] = temp;
+  }
 
   @Test
   public void testLookup() throws Exception {

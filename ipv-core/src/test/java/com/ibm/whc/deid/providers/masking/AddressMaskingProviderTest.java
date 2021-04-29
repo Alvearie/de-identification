@@ -22,6 +22,7 @@ import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.providers.identifiers.AddressIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -223,6 +224,24 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidAddressInputValidHandlingReturnRandom() throws Exception {
     AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
     maskingConfiguration.setUnspecifiedValueHandling(2);
+    AddressMaskingProvider addressMaskingProvider =
+        (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
+            MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
+            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    Identifier identifier = new AddressIdentifier();
+
+    String invalidAddress = "PA BOX 1234";
+    String randomAddress = addressMaskingProvider.mask(invalidAddress);
+
+    assertFalse(randomAddress.equals(invalidAddress));
+    assertTrue(identifier.isOfThisType(randomAddress));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+  }
+
+  @Test
+  public void testMaskInvalidAddressInputValidHandlingReturnRandomNew() throws Exception {
+    AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,

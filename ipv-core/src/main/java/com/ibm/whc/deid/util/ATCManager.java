@@ -23,7 +23,7 @@ public class ATCManager extends ResourceManager<StringResource> {
   private static final LogManager logger = LogManager.getInstance();
 
   protected ATCManager() {
-    super();
+    super(3700);
   }
 
   /**
