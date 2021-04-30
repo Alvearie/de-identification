@@ -7,6 +7,8 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class Continent implements Location, LocalizedEntity, Serializable, ManagedResource {
 
@@ -20,15 +22,22 @@ public class Continent implements Location, LocalizedEntity, Serializable, Manag
    * Instantiates a new Continent.
    *
    * @param name the name
-   * @param nameCountryCode the name country code
-   * @param latitude the latitude
-   * @param longitude the longitude
+   * @param nameCountryCode the locale code of the source data set
+   * @param latitude the latitude in decimal format as a string
+   * @param longitude the longitude in decimal format as a string
    */
-  public Continent(String name, String nameCountryCode, Double latitude, Double longitude) {
+  public Continent(String name, String nameCountryCode, String latitude, String longitude) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "continent name"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(nameCountryCode), "continent locale"));
+    }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
-    this.latitudeLongitude =
-        new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
+    this.latitudeLongitude = new LatitudeLongitude(latitude, longitude);
   }
 
   /**

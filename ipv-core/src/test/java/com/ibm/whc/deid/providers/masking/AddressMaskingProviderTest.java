@@ -56,7 +56,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     int randomizationOK = 0;
 
@@ -87,7 +87,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String validAddress = "200 E Main St";
     String randomAddress = addressMaskingProvider.mask(validAddress);
@@ -101,7 +101,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     AddressIdentifier identifier = new AddressIdentifier();
 
@@ -127,7 +127,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "PO BOX 1234";
@@ -162,7 +162,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "PO BOX 1234";
@@ -193,7 +193,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String invalidAddress = null;
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
@@ -211,7 +211,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String invalidAddress = "PA BOX 1234";
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
@@ -227,7 +227,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     Identifier identifier = new AddressIdentifier();
 
     String invalidAddress = "PA BOX 1234";
@@ -235,7 +235,6 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     assertFalse(randomAddress.equals(invalidAddress));
     assertTrue(identifier.isOfThisType(randomAddress));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -245,7 +244,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     Identifier identifier = new AddressIdentifier();
 
     String invalidAddress = "PA BOX 1234";
@@ -253,7 +252,6 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     assertFalse(randomAddress.equals(invalidAddress));
     assertTrue(identifier.isOfThisType(randomAddress));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -263,7 +261,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String invalidAddress = "PA BOX 1234";
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
@@ -281,7 +279,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String invalidAddress = "PA BOX 1234";
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
@@ -297,7 +295,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
 
     String invalidAddress = "PA BOX 1234";
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
@@ -314,7 +312,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
@@ -346,7 +344,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
@@ -378,7 +376,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
@@ -410,7 +408,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
@@ -440,7 +438,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
@@ -473,7 +471,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "PO BOX 1234";
@@ -502,7 +500,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            localizationProperty);
     AddressIdentifier identifier = new AddressIdentifier();
 
     // postal codes near 85123
@@ -559,7 +557,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
       AddressMaskingProvider addressMaskingProvider =
           (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
               MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-              LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+              localizationProperty);
 
       for (String originalValue : originalValues) {
         long startMillis = System.currentTimeMillis();

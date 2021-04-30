@@ -16,12 +16,11 @@ import java.util.HashSet;
 import org.junit.Test;
 import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.LatitudeLongitude;
+import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.utils.log.LogCodes;
 
-public class CountryManagerTest {
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
+public class CountryManagerTest implements MaskingProviderTest {
 
   @Test
   public void testBadInput() throws Exception {

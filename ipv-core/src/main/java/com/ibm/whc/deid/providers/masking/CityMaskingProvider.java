@@ -23,19 +23,15 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
   protected final boolean getClosest;
   protected final int closestK;
   protected final boolean getPseudorandom;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile CityManager cityResourceManager = null;
 
   public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   protected CityManager getCityManager() {
@@ -48,34 +44,31 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    CityManager cityManager = getCityManager();
-
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
+
+    CityManager cityManager = getCityManager();
 
     if (getPseudorandom) {
       return cityManager.getPseudorandom(identifier);
     }
 
     if (getClosest) {
-      return cityManager.getClosestCity(identifier, this.closestK);
-    }
-
-    City city = cityManager.getValue(identifier);
-
-    if (city == null) {
-      debugFaultyInput("city");
-      if (unspecifiedValueHandling == 2) {
-        return cityManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+      City inputCity = cityManager.getValue(identifier);
+      if (inputCity == null) {
+        return applyUnexpectedValueHandling(identifier, () -> getRandomCityName(cityManager));
       }
+      City selected = cityManager.getClosestCity(inputCity, closestK);
+      return selected == null ? null : selected.getName();
     }
 
-    return cityManager.getRandomKey(city.getNameCountryCode());
+    return getRandomCityName(cityManager);
+  }
+
+  protected String getRandomCityName(CityManager manager) {
+    City city = manager.getRandomValue();
+    return city == null ? null : city.getName();
   }
 }

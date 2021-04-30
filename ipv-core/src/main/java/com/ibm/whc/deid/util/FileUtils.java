@@ -57,20 +57,6 @@ public class FileUtils {
   }
 
   /**
-   * Parse double value.
-   *
-   * @param value
-   * @return
-   */
-  public static Double parseDouble(String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return 0.0;
-    }
-
-    return Double.parseDouble(value);
-  }
-
-  /**
    * Parse a double value from the given string
    *
    * @param value the string to parse

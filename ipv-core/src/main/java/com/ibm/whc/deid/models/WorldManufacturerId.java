@@ -7,6 +7,8 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class WorldManufacturerId implements ManagedResource, Serializable {
 
@@ -18,11 +20,22 @@ public class WorldManufacturerId implements ManagedResource, Serializable {
   /**
    * Instantiates a new WorldManufacturerId.
    *
-   * @param name the WMI 
+   * @param wmi the world manufacturer identifier (WMI)
    * @param manufacturer the manufacturer to whom the WMI is assigned
+   * 
+   * @throws IllegalArgumentException if any of the input values is null, whitespace, or, for the
+   *         WMI, not of the correct length (3).
    */
-  public WorldManufacturerId(String id, String manufacturer) {
-    this.id = id.toUpperCase();
+  public WorldManufacturerId(String wmi, String manufacturer) {
+    if (wmi == null || wmi.trim().length() != 3 || wmi.length() != 3) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(wmi), "WMI"));
+    }
+    if (manufacturer == null || manufacturer.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(manufacturer), "manufacturer"));
+    }
+    this.id = wmi.toUpperCase();
     this.manufacturer = manufacturer;
   }
 

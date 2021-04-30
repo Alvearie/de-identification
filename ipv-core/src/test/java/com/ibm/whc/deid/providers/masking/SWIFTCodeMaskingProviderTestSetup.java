@@ -15,9 +15,6 @@ import com.ibm.whc.deid.models.SWIFTCode;
 
 public class SWIFTCodeMaskingProviderTestSetup extends TestLogSetUp implements MaskingProviderTest {
 
-  protected static final String TEST_LOCALIZATION_PROPERTIES =
-      "/localization/test.swift.localization.properties";
-
   // values from the TEST_LOCALIZATION_PROPERTIES file
   protected static final String[] REPLACEMENTS = {"AAAACA11", "BBBBCABB", "CCCCCACC", "DDDDCADD004",
       "EEEEUS55XX5", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH", "IIIIXXII"};
