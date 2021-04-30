@@ -60,18 +60,11 @@ public class PhoneNumberLengthManager extends ResourceManager<KeyListResource<In
 
       for (ResourceEntry entry : resourceEntries) {
         try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
 
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
             for (CSVRecord line : reader) {
-              try {
-                loadRecord(mgr, line.get(0), line.get(1));
-
-              } catch (RuntimeException e) {
-                // CSVRecord has a very descriptive toString() implementation
-                String logmsg = Messages.getMessage(LogCodes.WPH1023E, String.valueOf(line),
-                    entry.getFilename(), e.getMessage());
-                throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
-              }
+              loadCSVRecord(fileName, mgr, line);
             }
           }
         }
@@ -85,6 +78,30 @@ public class PhoneNumberLengthManager extends ResourceManager<KeyListResource<In
     return mgr;
   }
   
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, PhoneNumberLengthManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
   /**
    * Retrieves data from the given record and loads it into the given resource manager.
    *

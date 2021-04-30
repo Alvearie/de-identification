@@ -57,19 +57,11 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
         try (InputStream inputStream = entry.createStream()) {
           // TODO: take advantage of locale
           // String locale = entry.getCountryCode();
+          String fileName = entry.getFilename();
 
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
             for (CSVRecord line : reader) {
-              try {
-                // column 0 skipped
-                loadRecord(manager, line.get(1), line.get(2), line.get(3));
-
-              } catch (RuntimeException e) {
-                // CSVRecord has a very descriptive toString() implementation
-                String logmsg = Messages.getMessage(LogCodes.WPH1023E, String.valueOf(line),
-                    entry.getFilename(), e.getMessage());
-                throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
-              }
+              loadCSVRecord(fileName, manager, line);
             }
           }
         }
@@ -82,6 +74,31 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
     manager.latLonTree = new LatLonDistance<>(manager.getValues());
 
     return manager;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, PostalCodeManager manager,
+      CSVRecord record) {
+    try {
+      // column 0 skipped
+      loadRecord(manager, record.get(1), record.get(2), record.get(3));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
   }
 
   /**
