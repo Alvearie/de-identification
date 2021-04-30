@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -136,5 +137,46 @@ public class AbstractMaskingProviderTest {
     config.setUnspecifiedValueReturnMessage(null);
     provider = new TestAbstractMaskingProvider(config);
     assertNull(provider.applyUnexpectedValueHandling("input", () -> "random-value"));
+  }
+
+  @Test
+  public void testIsUnexpectedValueHandlingRandom() {
+
+    // no config
+    TestAbstractMaskingProvider provider = new TestAbstractMaskingProvider(null);
+    assertFalse(provider.isUnexpectedValueHandlingRandom());
+
+    // with config
+    MaskingProviderConfig config = new MaintainMaskingProviderConfig();
+
+    for (int i = -1; i < 5; i++) {
+      config.setUnspecifiedValueHandling(i);
+      provider = new TestAbstractMaskingProvider(config);
+      boolean random = provider.isUnexpectedValueHandlingRandom();
+      if (i == 2) {
+        assertTrue(random);
+      } else {
+        assertFalse(random);
+      }
+    }
+    // even though old says random, new enum takes precedence
+    config.setUnspecifiedValueHandling(2);
+
+    for (UnexpectedMaskingInputHandler handler : UnexpectedMaskingInputHandler.values()) {
+      config.setUnexpectedInputHandling(handler);
+      provider = new TestAbstractMaskingProvider(config);
+      boolean random = provider.isUnexpectedValueHandlingRandom();
+      if (handler == UnexpectedMaskingInputHandler.RANDOM) {
+        assertTrue(random);
+      } else {
+        assertFalse(random);
+      }
+    }
+
+    // verify random still returns true even when old value is not 2
+    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    provider = new TestAbstractMaskingProvider(config);
+    assertTrue(provider.isUnexpectedValueHandlingRandom());
   }
 }

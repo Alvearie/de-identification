@@ -174,4 +174,10 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
 
     return response;
   }
+
+  protected boolean isUnexpectedValueHandlingRandom() {
+    // unexpectedInputHandler has priority
+    return unexpectedInputHandler == null ? unspecifiedValueHandling == 2
+        : unexpectedInputHandler == UnexpectedMaskingInputHandler.RANDOM;
+  }
 }

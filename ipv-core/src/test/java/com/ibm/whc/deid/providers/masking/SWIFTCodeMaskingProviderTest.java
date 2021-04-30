@@ -23,7 +23,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkRandomGenerated("EMCRGRA1XXX", maskingProvider);
     checkRandomGenerated("EMCR", maskingProvider);
     checkRandomGenerated("", maskingProvider);
-    checkRandomGenerated(null, maskingProvider);
     checkRandomGenerated("12345678", maskingProvider);
     checkRandomGenerated("&&&", maskingProvider);
     checkRandomGenerated("&&&&&&&&", maskingProvider);
@@ -63,7 +62,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkRandomGenerated("EMCRGRA1XXX", maskingProvider, "GR");
     checkRandomGenerated("EMCR", maskingProvider);
     checkRandomGenerated("", maskingProvider);
-    checkRandomGenerated(null, maskingProvider);
     checkRandomGenerated("12345678", maskingProvider);
     checkRandomGenerated("&&&", maskingProvider);
     checkRandomGenerated("&&&&&&&&", maskingProvider);
@@ -84,7 +82,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkRandomGenerated("EMCRGRA1222", maskingProvider, "GR");
     assertEquals("slow", maskingProvider.mask("EMCR"));
     assertEquals("slow", maskingProvider.mask(""));
-    assertEquals("slow", maskingProvider.mask(null));
     assertEquals("slow", maskingProvider.mask("12345678"));
     assertEquals("slow", maskingProvider.mask("&&&"));
     assertEquals("slow", maskingProvider.mask("&&&&&&&&"));
@@ -103,7 +100,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     checkOneOf("EMCR", maskingProvider, REPLACEMENTS);
     checkOneOf("", maskingProvider, REPLACEMENTS);
-    checkOneOf(null, maskingProvider, REPLACEMENTS);
     checkOneOf("12345678", maskingProvider, REPLACEMENTS);
     checkOneOf("&&&", maskingProvider, REPLACEMENTS);
     checkOneOf("&&&&&&&&", maskingProvider, REPLACEMENTS);
@@ -148,7 +144,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     checkOneOf("EMCR", maskingProvider, REPLACEMENTS);
     checkOneOf("", maskingProvider, REPLACEMENTS);
-    checkOneOf(null, maskingProvider, REPLACEMENTS);
     checkOneOf("12345678", maskingProvider, REPLACEMENTS);
     checkOneOf("&&&", maskingProvider, REPLACEMENTS);
     checkOneOf("&&&&&&&&", maskingProvider, REPLACEMENTS);
@@ -172,7 +167,6 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
     checkOneOf("EMCRGRA1XXX", maskingProvider, REPLACEMENTS);
     assertEquals("OTHER", maskingProvider.mask("EMCR"));
     assertEquals("OTHER", maskingProvider.mask(""));
-    assertEquals("OTHER", maskingProvider.mask(null));
     assertEquals("OTHER", maskingProvider.mask("12345678"));
     assertEquals("OTHER", maskingProvider.mask("&&&"));
     assertEquals("OTHER", maskingProvider.mask("&&&&&&&&"));

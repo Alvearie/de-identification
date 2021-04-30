@@ -81,9 +81,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
 
     Address address = addressIdentifier.parseAddress(identifier);
     if (address == null) {
-      debugFaultyInput("address");
-      if (unspecifiedValueHandling == 2
-          || unexpectedInputHandler == UnexpectedMaskingInputHandler.RANDOM) {
+      if (isUnexpectedValueHandlingRandom()) {
         address = new Address("", "", "", "", "", "");
       } else {
         return applyUnexpectedValueHandling(identifier, null);

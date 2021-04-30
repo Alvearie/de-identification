@@ -97,7 +97,6 @@ public class CountryManager implements Manager {
           }
         }
       }
-
     } catch (IOException e) {
       logger.logError(LogCodes.WPH1013E, e);
       throw new RuntimeException(e);
