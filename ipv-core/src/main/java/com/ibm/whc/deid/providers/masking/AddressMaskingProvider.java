@@ -13,6 +13,7 @@ import com.ibm.whc.deid.models.RoadTypes;
 import com.ibm.whc.deid.providers.identifiers.AddressIdentifier;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.ManagerFactory;
@@ -37,8 +38,6 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   private final boolean randomizeCity;
   private final boolean randomizeName;
   private final boolean getPseudorandom;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   protected final AddressMaskingProviderConfig configuration;
   protected final MaskingProviderFactory maskingProviderFactory;
@@ -50,7 +49,7 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
 
   public AddressMaskingProvider(AddressMaskingProviderConfig configuration, String tenantId,
       MaskingProviderFactory maskingProviderFactory, String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
 
     this.maskingProviderFactory = maskingProviderFactory;
 
@@ -70,9 +69,6 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
     this.nearestPostalCodeK = configuration.getPostalCodeNearestK();
     this.randomizeCity = configuration.isCityMask();
     this.randomizeName = configuration.isStreetNameMask();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -83,22 +79,16 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    Address randomAddress;
-
     Address address = addressIdentifier.parseAddress(identifier);
     if (address == null) {
-      debugFaultyInput("address");
-      if (unspecifiedValueHandling == 2) {
+      if (isUnexpectedValueHandlingRandom()) {
         address = new Address("", "", "", "", "", "");
-        randomAddress = new Address();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
       } else {
-        return null;
+        return applyUnexpectedValueHandling(identifier, null);
       }
-    } else {
-      randomAddress = new Address(address);
     }
+
+    Address randomAddress = new Address(address);
 
     if (address.isPOBox()) {
       randomAddress.setPoBox(true);

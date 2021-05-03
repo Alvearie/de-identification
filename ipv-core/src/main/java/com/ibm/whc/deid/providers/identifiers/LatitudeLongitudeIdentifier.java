@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,7 +21,7 @@ import com.ibm.whc.deid.util.GeoUtils;
  *
  */
 public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
-  /** */
+
   private static final long serialVersionUID = 9183031051457340625L;
 
   private static final String[] appropriateNames = {"Latitude", "Longitude", "LatitudeLongitude"};
@@ -65,7 +65,6 @@ public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
     } else if (format == LatitudeLongitudeFormat.DMS) {
       return dmsCoordinatePattern;
     }
-
     return null;
   }
 
@@ -111,7 +110,6 @@ public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
     } else if (isCompassFormat(identifier) || isDMSFormat(identifier)) {
       return parseCompassFormat(identifier);
     }
-
     return null;
   }
 
@@ -124,8 +122,8 @@ public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
   public static LatitudeLongitude parseGPSFormat(String identifier) {
     // GPS format is "x,y"
     String[] parts = identifier.split(",");
-    Double latitude = Double.parseDouble(parts[0]);
-    Double longitude = Double.parseDouble(parts[1]);
+    double latitude = Double.parseDouble(parts[0]);
+    double longitude = Double.parseDouble(parts[1]);
     return new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
   }
 
@@ -136,11 +134,11 @@ public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
    * @return the latitude longitude
    */
   public LatitudeLongitude parseCompassFormat(String identifier) {
-    Double latitude;
-    Double longitude;
-    Double nsDegrees, ewDegrees;
-    Double nsMinutes, ewMinutes;
-    Double nsSeconds, ewSeconds;
+    double latitude;
+    double longitude;
+    double nsDegrees, ewDegrees;
+    double nsMinutes, ewMinutes;
+    double nsSeconds, ewSeconds;
     String ns = null;
     String ew = null;
     LatitudeLongitudeFormat format = LatitudeLongitudeFormat.COMPASS;

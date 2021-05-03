@@ -57,16 +57,19 @@ public class FileUtils {
   }
 
   /**
-   * Parse double value.
+   * Parse a double value from the given string
    *
-   * @param value
-   * @return
+   * @param value the string to parse
+   * 
+   * @return the double value
+   * 
+   * @throws NumberFormatException if the input is null, whitespace, or otherwise not parsable into
+   *         a double value.
    */
-  public static Double parseDouble(String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return 0.0;
+  public static double parseRequiredDouble(String value) {
+    if (value == null) {
+      throw new NumberFormatException(String.valueOf(value));
     }
-
     return Double.parseDouble(value);
   }
 }

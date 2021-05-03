@@ -1,19 +1,17 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.providers.util;
+package com.ibm.whc.deid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import com.ibm.whc.deid.models.LatitudeLongitude;
-import com.ibm.whc.deid.util.GeoUtils;
-import com.ibm.whc.deid.util.XYZ;
 import org.junit.Test;
+import com.ibm.whc.deid.models.LatitudeLongitude;
 
 public class GeoUtilsTest {
+
   @Test
   public void testXYZToLatlon() {
     double x = 3785510.99716482;
@@ -42,10 +40,28 @@ public class GeoUtilsTest {
   @Test
   public void testLatitudeLongitudeDistance() throws Exception {
 
-    Double distance = GeoUtils.latitudeLongitudeDistance(10.0, 10.0, 10.0, 10.0);
+    double distance = GeoUtils.latitudeLongitudeDistance(10.0, 10.0, 10.0, 10.0);
     assertTrue(distance == 0.0);
 
     distance = GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, -6.4144412);
     assertTrue(distance >= 280.0 && distance <= 300.0);
+
+    double distanceWest179 =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, -179.0);
+    double distanceEast179 =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, 179.0);
+    double distanceWest1799 =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, -179.99);
+    double distanceEast1799 =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, 179.99);
+    double distanceWest =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, -180.0);
+    double distanceEast =
+        GeoUtils.latitudeLongitudeDistance(53.4185907, -6.4164366, 53.4162888, 180.0);
+    assertTrue(distanceWest179 < distanceWest1799);
+    assertTrue(distanceWest1799 < distanceWest);
+    assertTrue(distanceWest == distanceEast);
+    assertTrue(distanceEast < distanceEast1799);
+    assertTrue(distanceEast1799 < distanceEast179);
   }
 }

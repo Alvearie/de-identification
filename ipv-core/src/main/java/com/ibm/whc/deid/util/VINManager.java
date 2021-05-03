@@ -12,12 +12,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.WorldManufacturerId;
 import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class VINManager extends ResourceManager<WorldManufacturerId> {
 
@@ -44,34 +46,65 @@ public class VINManager extends ResourceManager<WorldManufacturerId> {
   public static VINManager buildVINManager(String localizationProperty) {
     VINManager manager = new VINManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
-    for (ResourceEntry entry : resourceEntries) {
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (InputStream inputStream = entry.createStream()) {
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
-            
-            String wmi = line.get(0);
-            String mnf = line.get(1);
-            
-            if (!wmi.trim().isEmpty() && !mnf.trim().isEmpty()) {
-              if (wmi.length() != 3) {
-                logger.logWarn(LogCodes.WPH1014W, wmi, "vin.wmi");
-              } else {
-                WorldManufacturerId id = new WorldManufacturerId(wmi, mnf);
-                manager.add(id);
-              }
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
+
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, manager, line);
             }
           }
         }
-
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return manager;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, VINManager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(VINManager manager, String... record) {
+    String wmi = record[0];
+    String mnf = record[1];
+    WorldManufacturerId id = new WorldManufacturerId(wmi, mnf);
+    manager.add(id);
   }
 
   /**

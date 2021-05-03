@@ -1,28 +1,24 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
 import org.junit.Test;
-
 import com.ibm.whc.deid.shared.pojo.config.masking.ATCMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
-public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-  // @formatter:off
+public class ATCMaskingProviderTest implements MaskingProviderTest {
+
   /*
    * Tests for mask levelsToKeep option for all 5 level values (1 through 5).
    * It also tests for an invalid value.
    */
-
-	private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
   @Test
   public void testMask() {
@@ -50,99 +46,35 @@ public class ATCMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     assertTrue(maskedValue.equals("A04AA"));
 
     configuration.setMaskLevelsToKeep(5);
-    maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
-    maskedValue = maskingProvider.mask(atc);
-    assertEquals(null, maskedValue);
-  }
-
-  @Test
-  public void testMaskNullValueReturnNull() {
-    ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String atc = null;
-    String maskedValue = maskingProvider.mask(atc);
-    assertEquals(null, maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
+    try {
+      maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause() instanceof InvalidMaskingConfigurationException);
+      assertTrue(e.getCause().getMessage().contains("`maskLevelsToKeep`"));
+    }
   }
 
   @Test
   public void testMaskInvalidValueValidHandlingReturnNull() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
-    assertEquals(null, maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
+    assertNull(maskedValue);
   }
 
   @Test
   public void testMaskInvalidValueValidHandlingReturnRandom() {
     ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
 
+    // return NULL, no random generation
     String atc = "foobar";
     String maskedValue = maskingProvider.mask(atc);
-    assertEquals(null, maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
+    assertNull(maskedValue);
   }
-
-  @Test
-  public void testMaskInvalidValueValidHandlingReturnDefaultCustomValue() {
-    ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String atc = "foobar";
-    String maskedValue = maskingProvider.mask(atc);
-    assertEquals("OTHER", maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
-  }
-
-  @Test
-  public void testMaskInvalidValueValidHandlingReturnNonDefaultCustomValue() {
-    ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test ATC");
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String atc = "foobar";
-    String maskedValue = maskingProvider.mask(atc);
-    assertEquals("Test ATC", maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
-  }
-
-  @Test
-  public void testMaskInvalidValueInvalidHandlingReturnNull() {
-    ATCMaskingProviderConfig configuration = new ATCMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new ATCMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String atc = "foobar";
-    String maskedValue = maskingProvider.mask(atc);
-    assertEquals(null, maskedValue);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W - "));
-    assertThat(
-        outContent.toString(),
-        containsString("The value \"identifier\" for \"ATC masking\" is NULL"));
-  }
-
 }

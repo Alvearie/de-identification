@@ -12,9 +12,6 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
 
 public class SWIFTCodeIdentifierTest implements MaskingProviderTest {
 
-  private static final String TEST_LOCALIZATION_PROPERTIES =
-      "/localization/test.swift.localization.properties";
-
   @Test
   public void testCodesLoaded() {
     SWIFTCodeIdentifier id = new SWIFTCodeIdentifier(tenantId, TEST_LOCALIZATION_PROPERTIES);

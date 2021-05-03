@@ -120,7 +120,7 @@ public class ManagerFactory {
           manager = StatesUSManager.buildStatesUSManager(localizationProperty);
           break;
         case SWIFT:
-          manager = SWIFTCodeManager.buildSWIFTCodeManager(localizationProperty, tenantId);
+          manager = SWIFTCodeManager.buildSWIFTCodeManager(localizationProperty);
           break;
         case WORLD_MANUFACTURERS_IDENTIFIER:
           manager = VINManager.buildVINManager(localizationProperty);

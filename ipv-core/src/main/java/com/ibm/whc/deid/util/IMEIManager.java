@@ -26,7 +26,7 @@ public class IMEIManager extends ResourceManager<StringResource> {
   protected static final Resources resourceType = Resource.TACDB;
 
   protected IMEIManager() {
-    // nothing required here
+    super(103300);
   }
 
   /**
@@ -42,25 +42,27 @@ public class IMEIManager extends ResourceManager<StringResource> {
   public static IMEIManager buildIMEIManager(String localizationProperty) {
     IMEIManager manager = new IMEIManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
-    for (ResourceEntry entry : resourceEntries) {
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (InputStream inputStream = entry.createStream()) {
+        try (InputStream inputStream = entry.createStream()) {
 
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
 
-            String tac = line.get(0);
-            if (!tac.trim().isEmpty()) {
-              manager.add(new StringResource(tac));
+              String tac = line.get(0);
+              if (!tac.trim().isEmpty()) {
+                manager.add(new StringResource(tac));
+              }
             }
           }
         }
-
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return manager;

@@ -16,14 +16,18 @@ import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.models.ICDWithoutFormat;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-/** The type ICDv9Manager. */
+/**
+ * Class that manages ICD version 9 codes loaded into the service.
+ */
 public class ICDv9Manager implements Manager {
 
   private static final LogManager logger = LogManager.getInstance();
@@ -49,16 +53,6 @@ public class ICDv9Manager implements Manager {
     icdByShortMap = new HashMap<>(hashMapInitialSize, 0.75f);
   }
 
-  protected void add(ICDWithoutFormat icdCode) {
-    icdList.add(icdCode);
-    icdByCodeMap.put(icdCode.getCode(), icdCode);
-    icdByNameMap.put(icdCode.getFullName().toUpperCase(), icdCode);
-    String shortName = icdCode.getShortName();
-    if (!shortName.trim().isEmpty()) {
-      icdByShortMap.put(icdCode.getShortName().toUpperCase(), icdCode);
-    }
-  }
-
   /**
    * Creates a new ICDv10Manager instance from the definitions in the given properties file.
    * 
@@ -72,49 +66,94 @@ public class ICDv9Manager implements Manager {
   public static ICDv9Manager buildICDv9Manager(String localizationProperty) {
     ICDv9Manager manager = new ICDv9Manager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
-    for (ResourceEntry entry : resourceEntries) {
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (InputStream inputStream = entry.createStream()) {
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
 
-        try (CSVParser parser = Readers.createCSVReaderFromStream(inputStream, ';', '"')) {
-          for (CSVRecord record : parser) {
-
-            String code = record.get(0);
-            String shortName = record.get(1);
-            String fullName = record.get(2);
-
-            if (!code.trim().isEmpty() && !fullName.trim().isEmpty()) {
-              String chapterCode = record.get(3);
-              String chapterName = record.get(4);
-              String categoryCode = record.get(5);
-              String categoryName = record.get(6);
-
-              manager.add(new ICDWithoutFormat(code, shortName, fullName, chapterCode, chapterName,
-                  categoryCode, categoryName));
+          try (CSVParser parser = Readers.createCSVReaderFromStream(inputStream, ';', '"')) {
+            for (CSVRecord record : parser) {
+              loadCSVRecord(fileName, manager, record);
             }
           }
         }
-
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return manager;
   }
 
-  @Override
-  public String getRandomKey() {
-    String key = null;
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, ICDv9Manager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1), record.get(2), record.get(3), record.get(4),
+          record.get(5), record.get(6));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(ICDv9Manager manager, String... record) {
+    String code = record[0];
+    String shortName = record[1];
+    String fullName = record[2];
+    String chapterCode = record[3];
+    String chapterName = record[4];
+    String categoryCode = record[5];
+    String categoryName = record[6];
+
+    manager.add(new ICDWithoutFormat(code, shortName, fullName, chapterCode, chapterName,
+        categoryCode, categoryName));
+  }
+
+  protected void add(ICDWithoutFormat icdCode) {
+    icdList.add(icdCode);
+    icdByCodeMap.put(icdCode.getCode().toUpperCase(), icdCode);
+    icdByNameMap.put(icdCode.getFullName().toUpperCase(), icdCode);
+    icdByShortMap.put(icdCode.getShortName().toUpperCase(), icdCode);
+  }
+
+  public String getRandomValue(ICDFormat format) {
+    String value = null;
+    ICDWithoutFormat icd = null;
     int count = this.icdList.size();
     if (count == 1) {
-      key = this.icdList.get(0).getCode();
+      icd = this.icdList.get(0);
     } else {
-      key = this.icdList.get(random.nextInt(count)).getCode();
+      icd = this.icdList.get(random.nextInt(count));
     }
-    return key;
+    if (icd != null) {
+      value = format == ICDFormat.NAME ? icd.getFullName() : icd.getCode();
+    }
+    return value;
   }
 
   /**

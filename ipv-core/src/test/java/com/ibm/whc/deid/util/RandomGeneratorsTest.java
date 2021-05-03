@@ -1,9 +1,9 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.providers.util;
+package com.ibm.whc.deid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,8 +18,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
-import com.ibm.whc.deid.util.GeoUtils;
-import com.ibm.whc.deid.util.RandomGenerators;
 
 public class RandomGeneratorsTest {
   @Test
@@ -103,8 +101,8 @@ public class RandomGeneratorsTest {
 
   @Test
   public void testGenerateRandomCoordinates() throws Exception {
-    Double latitude = 90.0;
-    Double longitude = 180.0;
+    double latitude = 90.0;
+    double longitude = 180.0;
 
     LatitudeLongitude originalLatitudeLongitude = new LatitudeLongitude(latitude, longitude);
 
@@ -119,7 +117,7 @@ public class RandomGeneratorsTest {
 
       assertFalse(originalLatitudeLongitude.equals(randomLatitudeLongitude));
 
-      Double distance =
+      double distance =
           GeoUtils.latitudeLongitudeDistance(originalLatitudeLongitude, randomLatitudeLongitude);
       assertTrue(distance <= (100.0 + 0.5));
     }
@@ -133,15 +131,15 @@ public class RandomGeneratorsTest {
       LatitudeLongitude original = RandomGenerators.generateRandomCoordinate();
       LatitudeLongitude randomCoordinate =
           RandomGenerators.generateRandomCoordinateRandomDirection(original, radius);
-      Double distance = GeoUtils.latitudeLongitudeDistance(original, randomCoordinate);
+      double distance = GeoUtils.latitudeLongitudeDistance(original, randomCoordinate);
       assertEquals(100.0, distance, 0.1);
     }
   }
 
   @Test
   public void testGenerateRandomCoordinatesDonut() throws Exception {
-    Double latitude = 40.0;
-    Double longitude = 120.0;
+    double latitude = 40.0;
+    double longitude = 120.0;
 
     LatitudeLongitude originalLatitudeLongitude = new LatitudeLongitude(latitude, longitude);
 
@@ -156,7 +154,7 @@ public class RandomGeneratorsTest {
 
       assertFalse(originalLatitudeLongitude.equals(randomLatitudeLongitude));
 
-      Double distance =
+      double distance =
           GeoUtils.latitudeLongitudeDistance(originalLatitudeLongitude, randomLatitudeLongitude);
       assertTrue(distance >= (50.0));
       assertTrue(distance <= (100.0 + 0.5));

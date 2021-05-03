@@ -7,6 +7,8 @@ package com.ibm.whc.deid.util;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class PhoneAreaCodeResource implements Serializable, ManagedResource {
 
@@ -18,8 +20,19 @@ public class PhoneAreaCodeResource implements Serializable, ManagedResource {
    * Instantiates a new telephone area code resource.
    *
    * @param code the area code as a string
+   * 
+   * @throws IllegalArgumentException if the given code is null or whitespace
    */
   public PhoneAreaCodeResource(String code) {
+    try {
+      if (code == null || code.trim().isEmpty() || Integer.parseInt(code) < 0) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, String.valueOf(code), "area code"));
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(code), "area code"), e);
+    }
     this.code = code;
   }
 
