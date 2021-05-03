@@ -16,8 +16,6 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
   private static final long serialVersionUID = 7519844993295356265L;
 
   protected final boolean getPseudorandom;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile CountyManager countyResourceManager = null;
 
@@ -32,8 +30,6 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
       String localizationProperty) {
     super(tenantId, localizationProperty);
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   protected CountyManager getCountyManager() {
@@ -57,19 +53,17 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
       return countyManager.getPseudorandom(identifier);
     }
 
-    County county = countyManager.getValue(identifier);
-
-    if (county == null) {
-      debugFaultyInput("county");
-      if (unspecifiedValueHandling == 2) {
-        return countyManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
+    String value = null;
+    County randomCounty = countyManager.getRandomValue();
+    if (randomCounty != null) {
+      County inputCounty = countyManager.getValue(identifier);
+      if (inputCounty != null) {
+        value =
+            inputCounty.isUseFullNameAsKey() ? randomCounty.getName() : randomCounty.getShortName();
       } else {
-        return null;
+        value = randomCounty.getName();
       }
     }
-
-    return countyManager.getRandomKey(county.getNameCountryCode());
+    return value;
   }
 }

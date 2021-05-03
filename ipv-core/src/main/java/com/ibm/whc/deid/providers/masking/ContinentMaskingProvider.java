@@ -50,7 +50,7 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
     if (getClosest) {
       Continent continent = continentManager.getValue(identifier);
-      if (continent == null) {
+      if (continent == null || continent.getLocation() == null) {
         return applyUnexpectedValueHandling(identifier,
             () -> getRandomContinentName(continentManager));
       }

@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.models.CreditCardType;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
 import com.ibm.whc.deid.util.ManagerFactory;
@@ -35,6 +36,7 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    return getCreditCardTypeManager().getRandomKey();
+    CreditCardType ccType = getCreditCardTypeManager().getRandomValue();
+    return ccType == null ? null : ccType.getName();
   }
 }

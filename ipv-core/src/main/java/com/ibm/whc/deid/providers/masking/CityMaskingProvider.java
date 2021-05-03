@@ -57,7 +57,7 @@ public class CityMaskingProvider extends AbstractMaskingProvider {
 
     if (getClosest) {
       City inputCity = cityManager.getValue(identifier);
-      if (inputCity == null) {
+      if (inputCity == null || inputCity.getLocation() == null) {
         return applyUnexpectedValueHandling(identifier, () -> getRandomCityName(cityManager));
       }
       City selected = cityManager.getClosestCity(inputCity, closestK);

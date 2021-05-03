@@ -31,13 +31,16 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
    * Instantiates a new Country.
    *
    * @param name the name of the country
-   * @param iso2code the ISO 2-char country code
-   * @param iso3code the ISO 3-code country code
-   * @param continent the continent
-   * @param latitude the latitude in string format
-   * @param longitude the longitude in string format
+   * @param iso2code the ISO 2-char country code - optional
+   * @param iso3code the ISO 3-code country code - optional
+   * @param continent the continent - optional
+   * @param latitude the latitude in string format - optional
+   * @param longitude the longitude in string format - optional
    * @param nameCountryCode the locale
    * @param specification the type of identifier used to find this resource
+   * 
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
    */
   public Country(String name, String iso2code, String iso3code, String continent, String latitude,
       String longitude, String nameCountryCode, CountryNameSpecification specification) {
@@ -49,16 +52,17 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
    * Instantiates a new Country.
    *
    * @param name the name of the country
-   * @param iso2code the ISO 2-char country code
-   * @param iso3code the ISO 3-code country code
-   * @param continent the continent
-   * @param latitude the latitude in string format
-   * @param longitude the longitude in string format
+   * @param iso2code the ISO 2-char country code - optional
+   * @param iso3code the ISO 3-code country code - optional
+   * @param continent the continent - optional
+   * @param latitude the latitude in string format - optional
+   * @param longitude the longitude in string format - optional
    * @param nameCountryCode the locale
    * @param specification the type of identifier used to find this resource
    * @param key a unique key used to find this resource - if <i>null</i> the value is generated
    * 
-   * @throws IllegalArgumentException if any of the input values is null, whitespace, or invalid.
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
    */
   public Country(String name, String iso2code, String iso3code, String continent, String latitude,
       String longitude, String nameCountryCode, CountryNameSpecification specification,
@@ -67,17 +71,21 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
       throw new IllegalArgumentException(
           Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "country name"));
     }
-    if (iso2code == null || iso2code.length() != 2 || iso2code.trim().length() != 2) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso2code), "country iso2code"));
+    if (iso2code != null) {
+      if (iso2code.trim().isEmpty()) {
+        iso2code = null;
+      } else if (iso2code.length() != 2 || iso2code.trim().length() != 2) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso2code), "country iso2code"));
+      }
     }
-    if (iso3code == null || iso3code.length() != 3 || iso3code.trim().length() != 3) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso3code), "country iso3code"));
-    }
-    if (continent == null || continent.trim().isEmpty()) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(continent), "country continent"));
+    if (iso3code != null) {
+      if (iso3code.trim().isEmpty()) {
+        iso3code = null;
+      } else if (iso3code.length() != 3 || iso3code.trim().length() != 3) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso3code), "country iso3code"));
+      }
     }
     if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
       throw new IllegalArgumentException(
@@ -90,13 +98,12 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
     }
 
     this.name = name;
-    this.iso2code = iso2code.toUpperCase();
-    this.iso3code = iso3code.toUpperCase();
+    this.iso2code = iso2code == null ? null : iso2code.toUpperCase();
+    this.iso3code = iso3code == null ? null : iso3code.toUpperCase();
     this.continent = continent;
     this.nameCountryCode = nameCountryCode;
     this.specification = specification;
-
-    this.latitudeLongitude = new LatitudeLongitude(latitude, longitude);
+    this.latitudeLongitude = LatitudeLongitude.buildLatitudeLongitude(latitude, longitude);
 
     if (key == null || key.trim().isEmpty()) {
       switch (specification) {

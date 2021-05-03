@@ -7,6 +7,7 @@ package com.ibm.whc.deid.models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class LatitudeLongitudeTest {
     }
 
     try {
-      new LatitudeLongitude(-90.01, -180.0);
+      new LatitudeLongitude(-90.01, -180.0, LatitudeLongitudeFormat.COMPASS);
       fail("expected exception");
     } catch (IllegalArgumentException e) {
       assertEquals("The value \"-90.01\" for \"latitude\" is invalid", e.getMessage());
@@ -79,52 +80,63 @@ public class LatitudeLongitudeTest {
     } catch (IllegalArgumentException e) {
       assertEquals("The value \"-180.01\" for \"longitude\" is invalid", e.getMessage());
     }
+  }
 
-    latlon = new LatitudeLongitude("10", "-11");
+  @Test
+  public void testBuildLatitudeLongitude() {
+
+    LatitudeLongitude latlon = LatitudeLongitude.buildLatitudeLongitude("10", "-11");
     assertEquals(10.0, latlon.getLatitude(), 0);
     assertEquals(-11.0, latlon.getLongitude(), 0);
     assertEquals(LatitudeLongitudeFormat.DECIMAL, latlon.getFormat());
 
-    try {
-      new LatitudeLongitude(null, "-11");
-      fail("expected exception");
-    } catch (IllegalArgumentException e) {
-      assertEquals("The value \"null\" for \"latitude\" is invalid", e.getMessage());
-    }
+    assertNull(LatitudeLongitude.buildLatitudeLongitude(null, "-11"));
+    assertNull(LatitudeLongitude.buildLatitudeLongitude("", "-11"));
+    assertNull(LatitudeLongitude.buildLatitudeLongitude(" ", "-11"));
+    assertNull(LatitudeLongitude.buildLatitudeLongitude("10", null));
+    assertNull(LatitudeLongitude.buildLatitudeLongitude("10", ""));
+    assertNull(LatitudeLongitude.buildLatitudeLongitude("10", " "));
 
     try {
-      new LatitudeLongitude("", "-11");
-      fail("expected exception");
-    } catch (IllegalArgumentException e) {
-      assertEquals("The value \"\" for \"latitude\" is invalid", e.getMessage());
-    }
-
-    try {
-      new LatitudeLongitude("10", "");
-      fail("expected exception");
-    } catch (IllegalArgumentException e) {
-      assertEquals("The value \"\" for \"longitude\" is invalid", e.getMessage());
-    }
-
-    try {
-      new LatitudeLongitude("10", "  ");
-      fail("expected exception");
-    } catch (IllegalArgumentException e) {
-      assertEquals("The value \"  \" for \"longitude\" is invalid", e.getMessage());
-    }
-
-    try {
-      new LatitudeLongitude("10", "600");
+      LatitudeLongitude.buildLatitudeLongitude("10", "600");
       fail("expected exception");
     } catch (IllegalArgumentException e) {
       assertEquals("The value \"600.0\" for \"longitude\" is invalid", e.getMessage());
     }
 
     try {
-      new LatitudeLongitude("100", "60");
+      LatitudeLongitude.buildLatitudeLongitude("10", "-181.0");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"-181.0\" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      LatitudeLongitude.buildLatitudeLongitude("10", "abc");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"abc\" for \"longitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      LatitudeLongitude.buildLatitudeLongitude("100", "60");
       fail("expected exception");
     } catch (IllegalArgumentException e) {
       assertEquals("The value \"100.0\" for \"latitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      LatitudeLongitude.buildLatitudeLongitude("-91", "60");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"-91.0\" for \"latitude\" is invalid", e.getMessage());
+    }
+
+    try {
+      LatitudeLongitude.buildLatitudeLongitude("def", "60");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("The value \"def\" for \"latitude\" is invalid", e.getMessage());
     }
   }
 }
