@@ -51,26 +51,6 @@ public class County implements LocalizedEntity, ManagedResource, Serializable {
       throw new IllegalArgumentException(
           Messages.getMessage(LogCodes.WPH1010E, String.valueOf(shortName), "county short name"));
     }
-    if (state == null || state.trim().isEmpty()) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(state), "county state"));
-    }
-    if (population == null) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(population), "county population"));
-    }
-    int populationInt;
-    try {
-      populationInt = Integer.parseInt(population);
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, population, "county population"));
-    }
-    if (populationInt < 0) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, population, "county population"));
-    }
-
     this.name = name;
     this.shortName = shortName;
     this.nameCountryCode = nameCountryCode;

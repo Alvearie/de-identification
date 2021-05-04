@@ -75,19 +75,23 @@ public class LatitudeLongitude implements Serializable {
     LatitudeLongitude value = null;
     if (latitude != null && longitude != null && !latitude.trim().isEmpty()
         && !longitude.trim().isEmpty()) {
-      value = new LatitudeLongitude(convertToDouble(latitude, "latitude"),
-          convertToDouble(longitude, "longitude"), LatitudeLongitudeFormat.DECIMAL);
+      double lat;
+      double lon;
+      try {
+        lat = Double.parseDouble(latitude);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, latitude, "latitude"));
+      }
+      try {
+        lon = Double.parseDouble(longitude);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, longitude, "longitude"));
+      }
+      value = new LatitudeLongitude(lat, lon, LatitudeLongitudeFormat.DECIMAL);
     }
     return value;
-  }
-
-  private static double convertToDouble(String value, String component) {
-    try {
-      return Double.parseDouble(value);
-    } catch (RuntimeException e) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(value), component));
-    }
   }
 
   /**

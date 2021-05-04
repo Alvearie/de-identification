@@ -30,7 +30,7 @@ public class PostalCode implements Location, ManagedResource, Serializable {
           Messages.getMessage(LogCodes.WPH1010E, String.valueOf(code), "postal code"));
     }
     this.code = code;
-    this.latitudeLongitude = new LatitudeLongitude(latitude, longitude);
+    this.latitudeLongitude = LatitudeLongitude.buildLatitudeLongitude(latitude, longitude);
   }
 
   @Override

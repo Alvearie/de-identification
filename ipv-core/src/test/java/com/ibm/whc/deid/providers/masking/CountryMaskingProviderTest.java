@@ -119,7 +119,8 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
     String originalCountry = "Greece";
     HashSet<String> neighbors =
         new HashSet<>(Arrays.asList("CYPRUS", "MALTA", "TURKEY", "SERBIA", "BOSNIA AND HERZEGOVINA",
-            "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE", "HUNGARY"));
+            "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE", "HUNGARY",
+            "MACEDONIA (THE FORMER YUGOSLAV REPUBLIC OF)"));
     for (int i = 0; i < 30; i++) {
       String randomCountry = countryMaskingProvider.mask(originalCountry);
       assertNotNull(randomCountry);
@@ -128,7 +129,7 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
 
     originalCountry = "Gr";
     neighbors = new HashSet<>(
-        Arrays.asList("CY", "MT", "TR", "RS", "BA", "RO", "ME", "BG", "AL", "GR", "HU"));
+        Arrays.asList("CY", "MT", "TR", "RS", "BA", "RO", "ME", "BG", "AL", "GR", "HU", "MK"));
     for (int i = 0; i < 30; i++) {
       String randomCountry = countryMaskingProvider.mask(originalCountry);
       assertTrue(neighbors.contains(randomCountry.toUpperCase()));
@@ -136,7 +137,8 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
 
     originalCountry = "GrC";
     neighbors = new HashSet<>(
-        Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR", "ALB", "GRC", "HUN"));
+        Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR", "ALB", "GRC", "HUN",
+            "MKD"));
     for (int i = 0; i < 30; i++) {
       String randomCountry = countryMaskingProvider.mask(originalCountry);
       assertTrue(neighbors.contains(randomCountry.toUpperCase()));

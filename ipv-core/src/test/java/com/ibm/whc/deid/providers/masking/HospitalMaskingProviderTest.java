@@ -40,13 +40,22 @@ public class HospitalMaskingProviderTest implements MaskingProviderTest {
       String maskedValue = maskingProvider.mask(hospitalName);
       assertNotNull(maskedValue);
       assertNotEquals("OTHER", maskedValue);
+      maskingProvider.getHospitalManager().isValidKey(maskedValue);
       if (!hospitalName.equalsIgnoreCase(maskedValue)) {
         changed = true;
       }
     }
     assertTrue(changed);
-  }
 
+    hospitalName = "XXXXX";
+    for (int i = 0; i < 20; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertNotNull(maskedValue);
+      assertNotEquals("OTHER", maskedValue);
+      maskingProvider.getHospitalManager().isValidKey(maskedValue);
+    }
+  }
+  
   @Test
   public void testMask_multiCountry() {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();

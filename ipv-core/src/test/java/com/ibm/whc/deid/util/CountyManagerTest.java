@@ -92,59 +92,6 @@ public class CountyManagerTest implements MaskingProviderTest {
     }
     record[1] = temp;
 
-    // bad state
-    temp = record[2];
-    record[2] = null;
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("county state"));
-      assertTrue(e.getMessage().contains("null"));
-    }
-    record[2] = "   ";
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("county state"));
-    }
-    record[2] = temp;
-
-    // bad population
-    temp = record[3];
-    record[3] = null;
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("county population"));
-      assertTrue(e.getMessage().contains("null"));
-    }
-    record[3] = "   ";
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("county population"));
-    }
-    record[3] = "axe";
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("county population"));
-      assertTrue(e.getMessage().contains("axe"));
-    }
-    record[3] = "-1";
-    try {
-      CountyManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("county population"));
-      assertTrue(e.getMessage().contains("-1"));
-    }
-
     // bad locale
     temp = locale;
     locale = null;

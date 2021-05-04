@@ -72,20 +72,25 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
           Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "country name"));
     }
     if (iso2code != null) {
-      if (iso2code.trim().isEmpty()) {
+      iso2code = iso2code.trim();
+      if (iso2code.isEmpty()) {
         iso2code = null;
-      } else if (iso2code.length() != 2 || iso2code.trim().length() != 2) {
+      } else if (iso2code.length() != 2) {
         throw new IllegalArgumentException(
             Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso2code), "country iso2code"));
       }
     }
     if (iso3code != null) {
-      if (iso3code.trim().isEmpty()) {
+      iso3code = iso3code.trim();
+      if (iso3code.isEmpty()) {
         iso3code = null;
-      } else if (iso3code.length() != 3 || iso3code.trim().length() != 3) {
+      } else if (iso3code.length() != 3) {
         throw new IllegalArgumentException(
             Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso3code), "country iso3code"));
       }
+    }
+    if (continent != null && continent.trim().isEmpty()) {
+      continent = null;
     }
     if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
       throw new IllegalArgumentException(
