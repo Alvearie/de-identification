@@ -25,20 +25,16 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
   private final boolean allowUnisex;
   private final boolean genderPreserve;
   private final boolean getPseudorandom;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   protected transient volatile NamesManager namesResourceManager = null;
 
   public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.random = new SecureRandom();
     this.allowUnisex = configuration.isMaskingAllowUnisex();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -93,20 +89,16 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
               maskedToken = names.getRandomLastName(lookupLastName.getNameCountryCode());
             }
           } else {
-            debugFaultyInput("lookupLastName");
-            if (unspecifiedValueHandling == 2) {
+            return applyUnexpectedValueHandling(identifier, () -> {
+              String randomName;
               if (getPseudorandom) {
-                return builder.append(names.getPseudoRandomFirstName(token)).append(' ')
-                    .append(names.getPseudoRandomLastName(token)).toString().trim();
+                randomName = names.getPseudoRandomFirstName(identifier) + " "
+                    + names.getPseudoRandomLastName(identifier);
               } else {
-                return builder.append(names.getRandomFirstName()).append(' ')
-                    .append(names.getRandomLastName()).toString().trim();
+                randomName = names.getRandomFirstName() + " " + names.getRandomLastName();
               }
-            } else if (unspecifiedValueHandling == 3) {
-              return unspecifiedValueReturnMessage;
-            } else {
-              return null;
-            }
+              return randomName;
+            });
           }
         }
       }

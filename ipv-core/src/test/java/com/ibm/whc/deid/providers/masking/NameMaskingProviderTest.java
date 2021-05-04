@@ -18,6 +18,7 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.NameIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.NameMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
@@ -64,7 +65,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     NameMaskingProviderConfig config = new NameMaskingProviderConfig();
     config.setMaskGenderPreserve(true);
     config.setMaskingAllowUnisex(false);
-    config.setUnspecifiedValueHandling(3);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     NameMaskingProvider provider = new NameMaskingProvider(config, tenantId, testProp);
 
     assertEquals("OTHER", provider.mask("John"));
@@ -193,12 +194,12 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   @Test
   public void testMaskInvalidNameInputValidHandlingReturnNull() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
 
     MaskingProvider maskingProvider =
         new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
-    String invalidName = "Invalid Name";
+    String invalidName = "Mary Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
 
     assertEquals(null, maskedName);
@@ -208,59 +209,35 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
   @Test
   public void testMaskInvalidNameInputValidHandlingReturnRandom() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider =
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    NameMaskingProvider maskingProvider =
         new NameMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new NameIdentifier(tenantId, localizationProperty);
 
-    String invalidName = "Invalid Name";
+    String invalidName = "Mary Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
 
     assertFalse(maskedName.equals(invalidName));
     assertTrue(identifier.isOfThisType(maskedName));
+    String[] replacements = maskedName.split(" ");
+    assertEquals(2, replacements.length);
+    assertTrue(maskingProvider.getNamesManager().isFirstName(replacements[0]));
+    assertTrue(maskingProvider.getNamesManager().isLastName(replacements[1]));
+
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
   public void testMaskInvalidNameInputValidHandlingReturnDefaultCustomValue() throws Exception {
     NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new NameMaskingProvider(configuration, tenantId, localizationProperty);
 
-    String invalidName = "Invalid Name";
+    String invalidName = "Steve Invalid Name";
     String maskedName = maskingProvider.mask(invalidName);
 
     assertEquals("OTHER", maskedName);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidNameInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
-    NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test Name");
-    MaskingProvider maskingProvider =
-        new NameMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidName = "Invalid Name";
-    String maskedName = maskingProvider.mask(invalidName);
-
-    assertEquals("Test Name", maskedName);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidNameInputInvalidHandlingReturnNull() throws Exception {
-    NameMaskingProviderConfig configuration = new NameMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new NameMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidName = "Invalid Name";
-    String maskedName = maskingProvider.mask(invalidName);
-
-    assertEquals(null, maskedName);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

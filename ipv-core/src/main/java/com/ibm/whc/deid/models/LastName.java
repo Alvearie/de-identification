@@ -7,7 +7,12 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
+/**
+ * A family name or surname.
+ */
 public class LastName implements LocalizedEntity, ManagedResource, Serializable {
 
   private static final long serialVersionUID = 7778507725528126383L;
@@ -19,9 +24,19 @@ public class LastName implements LocalizedEntity, ManagedResource, Serializable 
    * Instantiates a new Last name.
    *
    * @param name the name
-   * @param nameCountryCode the name country code
+   * @param nameCountryCode a code for the containing country or locale for this resource
+   * 
+   * @throws IllegalArgumentException if any of the input is null, empty, or otherwise invalid
    */
   public LastName(String name, String nameCountryCode) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "last name"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(nameCountryCode), "last name locale"));
+    }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
   }
@@ -47,6 +62,6 @@ public class LastName implements LocalizedEntity, ManagedResource, Serializable 
 
   @Override
   public String getKey() {
-    return name;
+    return name.toUpperCase();
   }
 }

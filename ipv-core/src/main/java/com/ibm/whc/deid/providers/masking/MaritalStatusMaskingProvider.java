@@ -19,9 +19,6 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -1898529887780962978L;
 
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
-
   protected transient volatile MaritalStatusManager maritalStatusResourceManager = null;
 
   /**
@@ -34,8 +31,6 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -45,22 +40,8 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    MaritalStatusManager statusManager = getManager();
-
-    MaritalStatus maritalStatus = statusManager.getValue(identifier);
-
-    if (maritalStatus == null) {
-      debugFaultyInput("maritalStatus");
-      if (unspecifiedValueHandling == 2) {
-        return statusManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
-    return statusManager.getRandomKey(maritalStatus.getNameCountryCode());
+    MaritalStatus status = getManager().getRandomValue();
+    return status == null ? null : status.getName();
   }
 
   protected MaritalStatusManager getManager() {
