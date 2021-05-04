@@ -11,7 +11,6 @@ import java.util.List;
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
-import com.ibm.whc.deid.providers.masking.SWIFTCodeMaskingProvider;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
@@ -62,7 +61,7 @@ public class SWIFTCodeIdentifier extends AbstractManagerBasedIdentifier {
         valid = super.isOfThisType(identifier);
       } else {
         valid =
-            SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(identifier.toUpperCase()).matches();
+            SWIFTCode.SWIFTCODE_PATTERN.matcher(identifier.toUpperCase()).matches();
       }
     }
     return valid;

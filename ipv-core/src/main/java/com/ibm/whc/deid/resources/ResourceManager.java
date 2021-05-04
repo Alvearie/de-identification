@@ -117,7 +117,6 @@ public abstract class ResourceManager<K extends ManagedResource> implements Mana
    * @return the key from one of the loaded resources or <i>null</i> if no resources have been
    *         loaded
    */
-  @Override
   public String getRandomKey() {
     String key = null;
     ManagedResource resource = getRandomResource(resourceList);

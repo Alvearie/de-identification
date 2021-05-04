@@ -12,11 +12,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.resources.KeyValueResource;
 import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 /**
  * Class that provides access to information about the telephone country calling codes 
@@ -30,7 +32,7 @@ public class PhoneCountryCodesManager extends ResourceManager<KeyValueResource> 
   private static final LogManager logger = LogManager.getInstance();
 
   protected PhoneCountryCodesManager() {
-    // nothing required here
+    super(300);
   }
 
   /**
@@ -46,28 +48,66 @@ public class PhoneCountryCodesManager extends ResourceManager<KeyValueResource> 
   public static PhoneCountryCodesManager buildPhoneCountryCodesManager(String localizationProperty) {
     PhoneCountryCodesManager mgr = new PhoneCountryCodesManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(Resource.PHONE_CALLING_CODES);
-    
-    for (ResourceEntry entry : resourceEntries) {
-      try (InputStream inputStream = entry.createStream()) {
+    try {
+      Collection<ResourceEntry> resourceEntries = LocalizationManager
+          .getInstance(localizationProperty).getResources(Resource.PHONE_CALLING_CODES);
 
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
-            String key = line.get(0);
-            String value = line.get(1);
-            if (!key.isEmpty() && !value.isEmpty()) {
-              mgr.add(new KeyValueResource(key, value));
+      for (ResourceEntry entry : resourceEntries) {
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
+
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, mgr, line);
             }
           }
         }
-        
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH2003E,
-            "Failed to load telephone country calling code list " + " for tenant ", e);
       }
+
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return mgr;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, PhoneCountryCodesManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(PhoneCountryCodesManager manager, String... record) {
+    String key = record[0];
+    String value = record[1];
+    manager.add(new KeyValueResource(key, value));
   }
 }

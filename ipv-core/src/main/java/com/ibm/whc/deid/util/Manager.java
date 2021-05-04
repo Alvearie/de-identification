@@ -17,11 +17,4 @@ public interface Manager {
    * @return the boolean
    */
   boolean isValidKey(String identifier);
-
-  /**
-   * Gets random key.
-   *
-   * @return the random key
-   */
-  String getRandomKey();
 }

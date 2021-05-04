@@ -7,10 +7,10 @@ package com.ibm.whc.deid.providers.masking;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Ignore;
@@ -18,12 +18,9 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.ContinentIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class ContinentMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
-
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
-
 
   @Test
   public void testMaskClosest() throws Exception {
@@ -44,8 +41,36 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   }
 
   @Test
+  public void testMask() throws Exception {
+    ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
+    configuration.setMaskClosest(false);
+    ContinentMaskingProvider maskingProvider =
+        new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
+
+    boolean changed = false;
+    String originalContinent = "Europe";
+    for (int i = 0; i < 100; i++) {
+      String maskedContinent = maskingProvider.mask(originalContinent);
+      assertTrue(maskingProvider.getContinentManager().isValidKey(maskedContinent));
+      if (!originalContinent.equalsIgnoreCase(maskedContinent)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    // original continent need not be recognized
+    originalContinent = "Canada";
+    for (int i = 0; i < 100; i++) {
+      String maskedContinent = maskingProvider.mask(originalContinent);
+      assertNotNull(maskedContinent);
+      assertTrue(maskingProvider.getContinentManager().isValidKey(maskedContinent));
+    }
+  }
+
+  @Test
   public void testMaskNullContinentInputReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
+    configuration.setMaskClosest(true); // force input recognition
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -59,7 +84,8 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testMaskInvalidContinentInputValidHandlingReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setMaskClosest(true); // force input recognition
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -73,7 +99,8 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testMaskInvalidContinentInputValidHandlingReturnRandom() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setMaskClosest(true); // force input recognition
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new ContinentIdentifier(tenantId, localizationProperty);
@@ -82,7 +109,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
     assertNotNull(maskedContinent);
-    assertFalse(maskedContinent.equals(invalidContinent));
     assertTrue(identifier.isOfThisType(maskedContinent));
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
@@ -91,7 +117,8 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskInvalidContinentInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setMaskClosest(true); // force input recognition
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -106,8 +133,9 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   public void testMaskInvalidContinentInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test Continent");
+    configuration.setMaskClosest(true); // force input recognition
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test Continent");
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -121,15 +149,18 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
   @Test
   public void testMaskInvalidContinentInputInvalidHandlingReturnNull() throws Exception {
     ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
+    configuration.setMaskClosest(true); // force input recognition
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
     MaskingProvider maskingProvider =
         new ContinentMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidContinent = "Invalid Continent";
-    String maskedContinent = maskingProvider.mask(invalidContinent);
-
-    assertEquals(null, maskedContinent);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    try {
+      maskingProvider.mask(invalidContinent);
+      fail("expected exception");
+    } catch (PrivacyProviderInvalidInputException e) {
+      assertTrue(e.getMessage().contains(invalidContinent));
+    }
   }
 
   @Test

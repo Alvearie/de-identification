@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -87,9 +87,8 @@ public class LatitudeLongitudeMaskingProvider extends AbstractMaskingProvider {
     } else {
       randomLatLon = RandomGenerators.generateRandomCoordinate();
     }
-    randomLatLon.setFormat(latitudeLongitude.getFormat());
 
-    return randomLatLon.toString();
+    return randomLatLon.toString(latitudeLongitude.getFormat());
   }
 
   @Override

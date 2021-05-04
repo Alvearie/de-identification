@@ -18,7 +18,7 @@ public class ManagerFactoryTest {
   @Test
   public void testCaching() {
     ArrayList<Manager> list = new ArrayList<>();
-    String TEST_LOCALIZATION_PROPERTIES = "/localization/test.swift.localization.properties";
+    String TEST_LOCALIZATION_PROPERTIES = "/localization/test.localization.properties";
     ManagerFactory factory = ManagerFactory.getInstance();
 
     Manager mgrSwiftDflt = factory.getManager("t2", Resource.SWIFT, null,

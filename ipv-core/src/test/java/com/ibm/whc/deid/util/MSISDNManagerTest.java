@@ -10,10 +10,25 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.masking.MaskingProviderTest;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 
 public class MSISDNManagerTest implements MaskingProviderTest {
+
+  @Test
+  public void testLoadError() {
+    try {
+      MSISDNManager.buildMSISDNManager(tenantId, ERROR_LOCALIZATION_PROPERTIES);
+      fail("expected exception");
+    } catch (KeyedRuntimeException e) {
+      // first manager to load is the phone calling codes manager
+      assertEquals(
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=4, values=[684, ]] from /localization/test.phone_calling_codes.bad.csv: The value \"\" for \"resource value\" is invalid",
+          e.getMessage());
+    }
+  }
 
   @Test
   public void testIsValidCountryNumDigits() {

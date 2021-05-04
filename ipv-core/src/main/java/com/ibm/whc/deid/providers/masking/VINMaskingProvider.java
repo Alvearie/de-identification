@@ -20,18 +20,14 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
 
   protected final boolean preserveWMI;
   protected final boolean preserveVDS;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile VINManager vinResourceManager = null;
 
   public VINMaskingProvider(VINMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.preserveWMI = configuration.isWmiPreserve();
     this.preserveVDS = configuration.isVdsPreserve();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   private String randomVIN(VINManager vinManager) {
@@ -50,14 +46,9 @@ public class VINMaskingProvider extends AbstractMaskingProvider {
 
     VINManager vinManager = getVINManager();
 
-    if (!vinManager.isValidKey(identifier)) {
-      debugFaultyInput("vinIdentifier");
-      if (unspecifiedValueHandling == 2) {
-        return this.randomVIN(vinManager);
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+    if (preserveWMI || preserveVDS) {
+      if (!vinManager.isValidKey(identifier)) {
+        return applyUnexpectedValueHandling(identifier, () -> randomVIN(vinManager));
       }
     }
 

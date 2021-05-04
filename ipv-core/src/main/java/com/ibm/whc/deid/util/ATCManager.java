@@ -19,11 +19,11 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 public class ATCManager extends ResourceManager<StringResource> {
-  
+
   private static final LogManager logger = LogManager.getInstance();
-  
+
   protected ATCManager() {
-    super();
+    super(3700);
   }
 
   /**
@@ -39,24 +39,26 @@ public class ATCManager extends ResourceManager<StringResource> {
   public static ATCManager buildATCManager(String localizationProperty) {
     ATCManager atcManager = new ATCManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(Resource.ATC_CODES);
-    for (ResourceEntry entry : resourceEntries) {
-      try (InputStream inputStream = entry.createStream()) {
-        
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
-            String code = line.get(0);
-            if (!code.isEmpty()) {
-              StringResource resource = new StringResource(code);
-              atcManager.add(resource);
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(Resource.ATC_CODES);
+      for (ResourceEntry entry : resourceEntries) {
+        try (InputStream inputStream = entry.createStream()) {
+
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              String code = line.get(0);
+              if (!code.isEmpty()) {
+                StringResource resource = new StringResource(code);
+                atcManager.add(resource);
+              }
             }
           }
         }
-        
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     return atcManager;

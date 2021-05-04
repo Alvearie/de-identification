@@ -21,18 +21,14 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
   protected final boolean getClosest;
   protected final int getClosestK;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile ContinentManager continentResourceManager = null;
 
   public ContinentMaskingProvider(ContinentMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.getClosest = configuration.isMaskClosest();
     this.getClosestK = configuration.getMaskClosestK();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   protected ContinentManager getContinentManager() {
@@ -45,38 +41,28 @@ public class ContinentMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    try {
-      if (identifier == null) {
-        debugFaultyInput("identifier");
-        return null;
-      }
-
-      ContinentManager continentManager = getContinentManager();
-
-      Continent continent = continentManager.getValue(identifier);
-      if (continent == null) {
-        debugFaultyInput("continent");
-        if (unspecifiedValueHandling == 2) {
-          Continent randomContinent = continentManager.getRandomValue();
-          return randomContinent == null ? null : randomContinent.getName();
-        } else if (unspecifiedValueHandling == 3) {
-          return unspecifiedValueReturnMessage;
-        } else {
-          return null;
-        }
-      }
-
-      if (getClosest) {
-        Continent selected = continentManager.getClosestContinent(continent, getClosestK);
-        return selected == null ? null : selected.getName();
-      }
-
-      Continent randomContinent = continentManager.getRandomValue(continent.getNameCountryCode());
-      return randomContinent == null ? null : randomContinent.getName();
-
-    } catch (Exception e) {
-      logException(e);
+    if (identifier == null) {
+      debugFaultyInput("identifier");
       return null;
     }
+
+    ContinentManager continentManager = getContinentManager();
+
+    if (getClosest) {
+      Continent continent = continentManager.getValue(identifier);
+      if (continent == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> getRandomContinentName(continentManager));
+      }
+      Continent selected = continentManager.getClosestContinent(continent, getClosestK);
+      return selected == null ? null : selected.getName();
+    }
+
+    return getRandomContinentName(continentManager);
+  }
+
+  protected String getRandomContinentName(ContinentManager manager) {
+    Continent randomContinent = manager.getRandomValue();
+    return randomContinent == null ? null : randomContinent.getName();
   }
 }

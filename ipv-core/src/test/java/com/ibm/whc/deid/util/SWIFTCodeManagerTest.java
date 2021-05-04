@@ -3,23 +3,23 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.providers.util;
+package com.ibm.whc.deid.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Collection;
+import static org.junit.Assert.fail;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.providers.masking.SWIFTCodeMaskingProviderTestSetup;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.util.ManagerFactory;
-import com.ibm.whc.deid.util.SWIFTCodeManager;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class SWIFTCodeManagerTest extends SWIFTCodeMaskingProviderTestSetup {
 
@@ -107,5 +107,62 @@ public class SWIFTCodeManagerTest extends SWIFTCodeMaskingProviderTestSetup {
     assertEquals(0, list.size());
 
     assertFalse(mgr.isValidKey("ABCDEFGH"));
+  }
+
+  @Test
+  public void testBadInput() throws Exception {
+    try {
+      SWIFTCodeManager.buildSWIFTCodeManager(ERROR_LOCALIZATION_PROPERTIES);
+      fail("expected exception");
+    } catch (KeyedRuntimeException e) {
+      assertEquals(LogCodes.WPH1023E, e.getMessageKey());
+      assertEquals(
+          "Invalid values were encountered while reading record CSVRecord [comment='null', recordNumber=10, values=[jjjjJJJ]] from /localization/test.swift.codes.bad.csv: The value \"jjjjJJJ\" for \"SWIFT code\" is invalid",
+          e.getMessage());
+    }
+  }
+
+  @Test
+  public void testLoadRecord() {
+    String[] record = new String[] {"FFFFUSFF"};
+    SWIFTCodeManager manager = new SWIFTCodeManager();
+
+    SWIFTCodeManager.loadRecord(manager, record);
+    SWIFTCode swiftCode = manager.getValue("FFFFUSFF");
+    assertNotNull(swiftCode);
+    assertEquals("US", swiftCode.getCountry());
+    // only value loaded for US
+    assertEquals(record[0], manager.getRandomValueFromCountry("US"));
+
+    record[0] = null;
+    try {
+      SWIFTCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("SWIFT code"));
+    }
+    record[0] = " ";
+    try {
+      SWIFTCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("SWIFT code"));
+    }
+    record[0] = "FFFF77ff";
+    try {
+      SWIFTCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("SWIFT code"));
+      assertTrue(e.getMessage().contains("FFFF77ff"));
+    }
+    record[0] = "FFFF77ffABCD";
+    try {
+      SWIFTCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("SWIFT code"));
+      assertTrue(e.getMessage().contains("FFFF77ffABCD"));
+    }
   }
 }

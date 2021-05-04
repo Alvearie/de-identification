@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.util.localization;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -85,71 +86,72 @@ public class LocalizationManager {
     this.countryLocalizationOptions = new HashMap<>();
 
     try (InputStream is = getClass().getResourceAsStream(propertyFile)) {
-      if (null != is) {
-        Properties properties = new Properties();
-        properties.load(is);
+      if (is == null) {
+        throw new FileNotFoundException(propertyFile);
+      }
 
-        // load enabledCountries
-        for (final String country : properties.getProperty("country").split(",")) {
-          // logger.debug("Enabling country {}", country);
-          enabledCountries.add(country.trim());
+      Properties properties = new Properties();
+      properties.load(is);
 
-          // Get any locale properties for this country
-          try (InputStream countryOptionStream = getClass().getResourceAsStream(
-              "/identifier/" + country.trim().toLowerCase() + "/locale.properties")) {
-            if (null != countryOptionStream) {
-              Properties localeProperties = new Properties();
-              localeProperties.load(countryOptionStream);
-              countryLocalizationOptions.put(country.trim().toLowerCase(), localeProperties);
-            }
-          } catch (IOException e) {
-            logger.logError(LogCodes.WPH1013E, e);
+      // load enabledCountries
+      for (final String country : properties.getProperty("country").split(",")) {
+        // logger.debug("Enabling country {}", country);
+        enabledCountries.add(country.trim());
+
+        // Get any locale properties for this country
+        try (InputStream countryOptionStream = getClass().getResourceAsStream(
+            "/identifier/" + country.trim().toLowerCase() + "/locale.properties")) {
+          // the supplemental properties are not required for each country
+          if (null != countryOptionStream) {
+            Properties localeProperties = new Properties();
+            localeProperties.load(countryOptionStream);
+            countryLocalizationOptions.put(country.trim().toLowerCase(), localeProperties);
           }
         }
+      }
 
-        // common map
+      // common map
+      for (final String country : enabledCountries) {
+        // logger.debug("Verifying mapping for {}", country);
+        final String language = properties.getProperty(country);
+
+        if (null != language) {
+          // logger.info("Adding mapping for {}, {}", country,
+          // language);
+          countryCommonMap.put(country, language);
+        }
+      }
+
+      for (final Resources resource : Resource.values()) {
+        // logger.debug("Adding localization for {}", resource);
+
+        // initialize resources
         for (final String country : enabledCountries) {
-          // logger.debug("Verifying mapping for {}", country);
-          final String language = properties.getProperty(country);
-
-          if (null != language) {
-            // logger.info("Adding mapping for {}, {}", country,
-            // language);
-            countryCommonMap.put(country, language);
+          final String path = properties.getProperty(country + '.' + resource.name());
+          if (null != path) {
+            // logger.debug("Creating resources for country {}",
+            // country);
+            registerResource(resource,
+                new ResourceEntry(path, country, ResourceEntryType.INTERNAL_RESOURCE));
           }
         }
 
-        for (final Resources resource : Resource.values()) {
-          // logger.debug("Adding localization for {}", resource);
-
-          // initialize resources
-          for (final String country : enabledCountries) {
-            final String path = properties.getProperty(country + '.' + resource.name());
-            if (null != path) {
-              // logger.debug("Creating resources for country {}",
-              // country);
-              registerResource(resource,
-                  new ResourceEntry(path, country, ResourceEntryType.INTERNAL_RESOURCE));
-            }
-          }
-
-          for (final String country : countryCommonMap.values()) {
-            final String path = properties.getProperty(country + '.' + resource.name());
-            if (null != path) {
-              // logger.debug("Creating resources for language
-              // {}",
-              // country);
-              registerResource(resource,
-                  new ResourceEntry(path, country, ResourceEntryType.INTERNAL_RESOURCE));
-            }
-          }
-
-          final String path = properties.getProperty(COMMON + '.' + resource.name());
+        for (final String country : countryCommonMap.values()) {
+          final String path = properties.getProperty(country + '.' + resource.name());
           if (null != path) {
-            // logger.debug("Creating resources as common");
+            // logger.debug("Creating resources for language
+            // {}",
+            // country);
             registerResource(resource,
-                new ResourceEntry(path, COMMON, ResourceEntryType.INTERNAL_RESOURCE));
+                new ResourceEntry(path, country, ResourceEntryType.INTERNAL_RESOURCE));
           }
+        }
+
+        final String path = properties.getProperty(COMMON + '.' + resource.name());
+        if (null != path) {
+          // logger.debug("Creating resources as common");
+          registerResource(resource,
+              new ResourceEntry(path, COMMON, ResourceEntryType.INTERNAL_RESOURCE));
         }
       }
 
@@ -157,6 +159,7 @@ public class LocalizationManager {
           registeredResources.size());
     } catch (IOException e) {
       logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -168,7 +171,6 @@ public class LocalizationManager {
    */
   public void registerResourceForSupportedCountries(InputStream localizationProps,
       Resources resource) {
-
     try {
       Properties properties = new Properties();
       properties.load(localizationProps);
@@ -196,6 +198,7 @@ public class LocalizationManager {
       }
     } catch (IOException e) {
       logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
   }
 

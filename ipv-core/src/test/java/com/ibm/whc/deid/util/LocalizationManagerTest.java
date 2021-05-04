@@ -7,10 +7,12 @@ package com.ibm.whc.deid.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
@@ -96,5 +98,17 @@ public class LocalizationManagerTest {
   public void getLocalPropertiesCountryWithNoLocale() throws Exception {
     Properties props = manager.getLocaleProperties("uk");
     assertTrue(props.size() == 0);
+  }
+
+  @Test
+  public void testFileNotFound() throws Exception {
+    String filename = "/not.found.!@#$.properties";
+    try {
+      LocalizationManager.getInstance(filename);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getCause() instanceof FileNotFoundException);
+      assertEquals(filename, e.getCause().getMessage());
+    }
   }
 }

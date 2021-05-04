@@ -144,10 +144,9 @@ public class RandomGenerators {
     if (useUpRange) {
       return (base + rangeUpMin)
           + (rangeUpMax > rangeUpMin ? random.nextInt(1 + rangeUpMax - rangeUpMin) : 0);
-    } else {
-      return (base - rangeDownMin)
-          - (rangeDownMax > rangeDownMin ? random.nextInt(1 + rangeDownMax - rangeDownMin) : 0);
     }
+    return (base - rangeDownMin)
+        - (rangeDownMax > rangeDownMin ? random.nextInt(1 + rangeDownMax - rangeDownMin) : 0);
   }
 
   /**
@@ -177,11 +176,10 @@ public class RandomGenerators {
     if (useUpRange) {
       return (base + rangeUpMin)
           + (rangeUpMax > rangeUpMin ? (1 + rangeUpMax - rangeUpMin) * random.nextDouble() : 0);
-    } else {
-      return (base - rangeDownMin)
-          - (rangeDownMax > rangeDownMin ? (1 + rangeDownMax - rangeDownMin) * random.nextDouble()
-              : 0);
     }
+    return (base - rangeDownMin)
+        - (rangeDownMax > rangeDownMin ? (1 + rangeDownMax - rangeDownMin) * random.nextDouble()
+            : 0);
   }
 
   /**
@@ -351,13 +349,13 @@ public class RandomGenerators {
         latitudeLongitude.getLongitude(), minimumOffsetRadius, maximumOffsetRadius);
   }
 
-  public static LatitudeLongitude generateRandomCoordinate(Double latitude, Double longitude,
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
       int minimumOffsetRadius, int maximumOffsetRadius) {
 
     while (true) {
       LatitudeLongitude latitudeLongitude =
           generateRandomCoordinate(latitude, longitude, maximumOffsetRadius);
-      Double distance = GeoUtils.latitudeLongitudeDistance(latitude, longitude,
+      double distance = GeoUtils.latitudeLongitudeDistance(latitude, longitude,
           latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude());
 
       if (distance >= minimumOffsetRadius) {
@@ -374,8 +372,23 @@ public class RandomGenerators {
    * @param offsetRadius the offset radius
    * @return the latitude longitude
    */
-  public static LatitudeLongitude generateRandomCoordinate(Double latitude, Double longitude,
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
       int offsetRadius) {
+    return generateRandomCoordinate(latitude, longitude, offsetRadius,
+        LatitudeLongitudeFormat.DECIMAL);
+  }
+
+  /**
+   * Generate random coordinate latitude longitude.
+   *
+   * @param latitude the latitude
+   * @param longitude the longitude
+   * @param offsetRadius the offset radius
+   * @param format the default format to use when writing the latitude-longitude value
+   * @return the latitude longitude
+   */
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
+      int offsetRadius, LatitudeLongitudeFormat format) {
 
     double radiusInDegrees = offsetRadius / 111000f;
 
@@ -402,7 +415,7 @@ public class RandomGenerators {
       foundLongitude = Math.abs(-180 + diff);
     }
 
-    return new LatitudeLongitude(foundLatitude, foundLongitude, LatitudeLongitudeFormat.DECIMAL);
+    return new LatitudeLongitude(foundLatitude, foundLongitude, format);
   }
 
   /**
@@ -415,8 +428,8 @@ public class RandomGenerators {
   public static LatitudeLongitude generateRandomCoordinate(LatitudeLongitude latitudeLongitude,
       int offsetRadius) {
     LatitudeLongitude randomLatitudeLongitude = generateRandomCoordinate(
-        latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude(), offsetRadius);
-    randomLatitudeLongitude.setFormat(latitudeLongitude.getFormat());
+        latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude(), offsetRadius,
+        latitudeLongitude.getFormat());
     return randomLatitudeLongitude;
   }
 
@@ -426,8 +439,8 @@ public class RandomGenerators {
    * @return the latitude longitude
    */
   public static LatitudeLongitude generateRandomCoordinate() {
-    Double latitude = (double) random.nextInt(90);
-    Double longitude = (double) random.nextInt(180);
+    double latitude = random.nextInt(90);
+    double longitude = random.nextInt(180);
 
     if (random.nextBoolean()) {
       latitude = -latitude;
