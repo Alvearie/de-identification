@@ -11,9 +11,9 @@ import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.models.RoadTypes;
 import com.ibm.whc.deid.providers.identifiers.AddressIdentifier;
+import com.ibm.whc.deid.resources.StringResource;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.util.ManagerFactory;
@@ -129,7 +129,8 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
         String sname = randomAddress.getName();
         randomAddress.setName(streetNameManager.getPseudorandom(sname));
       } else {
-        randomAddress.setName(streetNameManager.getRandomKey());
+        StringResource streetName = streetNameManager.getRandomValue();
+        randomAddress.setName(streetName == null ? null : streetName.getValue());
       }
     }
 
@@ -174,7 +175,6 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected void initialize() {
-
     if (streetNameManager == null) {
       streetNameManager = (StreetNameManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.STREET_NAMES, null, localizationProperty);

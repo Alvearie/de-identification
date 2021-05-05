@@ -29,8 +29,8 @@ public class County implements LocalizedEntity, ManagedResource, Serializable {
    * @param name the full or formal name of the county
    * @param nameCountryCode a code for the containing country or locale for this resource
    * @param shortName the shorter or informal name of the county
-   * @param state the sub-national political authority that contains this county
-   * @param population the population of this county in string format
+   * @param state the sub-national political authority that contains this county, optional
+   * @param population the population of this county in string format, optional
    * @param useFullNameKey <i>true</i> if the unique key used to identify this resource should be
    *        based on the full, formal name of the county and <i>false</i> if it should be based on
    *        the short, informal name.

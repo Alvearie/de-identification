@@ -7,7 +7,13 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
+/**
+ * An object that describes the values of the first political subdivision of a nation, generally a
+ * state or province.
+ */
 public class State implements LocalizedEntity, ManagedResource, Serializable {
   private static final long serialVersionUID = 8995106047926366446L;
 
@@ -21,19 +27,39 @@ public class State implements LocalizedEntity, ManagedResource, Serializable {
    * Instantiates a new State.
    *
    * @param name the name of the state
-   * @param nameCountryCode the name country code for localized states
-   * @param abbreviation the abbreviation
-   * @param population the population, which may be <i>null</i>
-   * @param nameFormat the format by which this object is recognized
-   * @param key the key used to identify this state object
+   * @param nameCountryCode a code for the containing country or locale for this resource
+   * @param abbreviation the standard abbreviation of the state
+   * @param nameFormat the format by which this resource is recognized
+   * @param key the key used to identify this resource
    */
-  public State(String name, String nameCountryCode, String abbreviation, Long population,
-      StateNameFormat nameFormat, String key) {
+  public State(String name, String nameCountryCode, String abbreviation, StateNameFormat nameFormat,
+      String key) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "state name"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(nameCountryCode), "state locale"));
+    }
+    if (abbreviation == null || abbreviation.trim().isEmpty()) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(abbreviation), "state abbreviation"));
+    }
+    if (nameFormat == null) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, "null", "state name format"));
+    }
+    if (key == null || key.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(key), "state key"));
+    }
+
     this.name = name;
     this.nameCountryCode = nameCountryCode;
     this.abbreviation = abbreviation;
     this.nameFormat = nameFormat;
-    this.key = key;
+    this.key = key.toUpperCase();
   }
 
   @Override

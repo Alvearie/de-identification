@@ -28,7 +28,7 @@ public class CountyMaskingProvider extends AbstractMaskingProvider {
    */
   public CountyMaskingProvider(CountyMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.getPseudorandom = configuration.isMaskPseudorandom();
   }
 

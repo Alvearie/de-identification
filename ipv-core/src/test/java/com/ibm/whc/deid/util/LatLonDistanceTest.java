@@ -3,10 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.providers.util;
+package com.ibm.whc.deid.util;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,7 +14,6 @@ import java.util.List;
 import org.junit.Test;
 import com.ibm.whc.deid.models.City;
 import com.ibm.whc.deid.models.LatitudeLongitude;
-import com.ibm.whc.deid.util.LatLonDistance;
 
 public class LatLonDistanceTest {
 

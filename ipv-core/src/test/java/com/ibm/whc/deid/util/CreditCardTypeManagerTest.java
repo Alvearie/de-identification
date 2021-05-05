@@ -87,6 +87,13 @@ public class CreditCardTypeManagerTest implements MaskingProviderTest {
     } catch (RuntimeException e) {
       assertTrue(e.getMessage().contains("card prefixes"));
     }
+    record[1] = ":";
+    try {
+      CreditCardTypeManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("card prefixes"));
+    }
     record[1] = ":88";
     try {
       CreditCardTypeManager.loadRecord(locale, manager, record);

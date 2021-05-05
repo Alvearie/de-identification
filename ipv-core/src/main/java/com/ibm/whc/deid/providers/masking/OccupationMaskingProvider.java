@@ -22,18 +22,14 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
   private static final long serialVersionUID = 118800423304584769L;
 
   protected final boolean generalizeToCategory;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile OccupationManager occupationResourceManager = null;
 
   public OccupationMaskingProvider(OccupationMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.generalizeToCategory = configuration.isMaskGeneralize();
     this.random = new SecureRandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -45,20 +41,14 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
 
     OccupationManager occupationManager = getOccupationManager();
 
-    Occupation occupation = occupationManager.getValue(identifier);
-
-    if (occupation == null) {
-      debugFaultyInput("occupation");
-      if (unspecifiedValueHandling == 2) {
-        return occupationManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
     if (this.generalizeToCategory) {
+      Occupation occupation = occupationManager.getValue(identifier);
+
+      if (occupation == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> getRandomOccupationName(occupationManager));
+      }
+
       List<String> categories = occupation.getCategories();
       int count = categories.size();
       if (count == 0) {
@@ -71,7 +61,12 @@ public class OccupationMaskingProvider extends AbstractMaskingProvider {
       return categories.get(randomIndex);
     }
 
-    return occupationManager.getRandomKey(occupation.getNameCountryCode());
+    return getRandomOccupationName(occupationManager);
+  }
+
+  protected String getRandomOccupationName(OccupationManager occupationManager) {
+    Occupation occ = occupationManager.getRandomValue();
+    return occ == null ? null : occ.getName();
   }
 
   protected OccupationManager getOccupationManager() {

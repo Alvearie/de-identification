@@ -20,7 +20,7 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
 
   public GenderMaskingProvider(GenderMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
   }
 
   @Override

@@ -46,6 +46,10 @@ public class CreditCardType implements ManagedResource {
             Messages.getMessage(LogCodes.WPH1010E, String.valueOf(prefixList), "card prefixes"));
       }
     }
+    if (prefixes.length == 0) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(prefixList), "card prefixes"));
+    }
 
     if (minimumLength == null) {
       throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
@@ -104,12 +108,14 @@ public class CreditCardType implements ManagedResource {
   }
 
   /**
-   * Get prefixes string [ ].
+   * Get card number prefixes used by this credit card type.
    *
-   * @return the string [ ]
+   * @return the card number prefixes
    */
   public String[] getPrefixes() {
-    return prefixes;
+    String[] out = new String[prefixes.length];
+    System.arraycopy(prefixes, 0, out, 0, prefixes.length);
+    return out;
   }
 
   /**

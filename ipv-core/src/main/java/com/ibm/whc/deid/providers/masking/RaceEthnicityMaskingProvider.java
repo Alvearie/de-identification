@@ -19,9 +19,6 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -101305368159790864L;
 
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
-
   protected transient volatile RaceManager raceResourceManager = null;
 
   /**
@@ -31,9 +28,7 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
    */
   public RaceEthnicityMaskingProvider(RaceEthnicityMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
   }
 
   @Override
@@ -43,22 +38,8 @@ public class RaceEthnicityMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    RaceManager raceManager = getRaceManager();
-
-    Race race = raceManager.getValue(identifier);
-
-    if (race == null) {
-      debugFaultyInput("race");
-      if (unspecifiedValueHandling == 2) {
-        return raceManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
-    return raceManager.getRandomKey(race.getNameCountryCode());
+    Race randomRace = getRaceManager().getRandomValue();
+    return randomRace == null ? null : randomRace.getName();
   }
 
   protected RaceManager getRaceManager() {

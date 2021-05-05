@@ -92,6 +92,15 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
             return applyUnexpectedValueHandling(identifier, () -> {
               String randomName;
               if (getPseudorandom) {
+                // For other privacy providers, requesting pseudorandom masking means
+                // unexpected value handling does not apply, since the input does not
+                // need to be recognized to apply pseudorandom masking. Therefore,
+                // those providers do not look at any pseudorandom configuration option
+                // when generating random values during unexpected value handling. It
+                // is consistent to look at the pseudorandom setting here, though, since
+                // this is generating a complete replacement for the name and had it been
+                // known that complete replacement of the name was required, pseudorandom
+                // would have been used to do that if it had been configured.
                 randomName = names.getPseudoRandomFirstName(identifier) + " "
                     + names.getPseudoRandomLastName(identifier);
               } else {

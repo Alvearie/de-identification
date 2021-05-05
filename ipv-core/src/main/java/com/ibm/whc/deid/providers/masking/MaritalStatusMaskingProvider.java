@@ -30,7 +30,7 @@ public class MaritalStatusMaskingProvider extends AbstractMaskingProvider {
    */
   public MaritalStatusMaskingProvider(MaritalStatusMaskingProviderConfig configuration,
       String tenantId, String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
   }
 
   @Override

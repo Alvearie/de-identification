@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.models.State;
+import com.ibm.whc.deid.models.StateNameFormat;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.StatesUSMaskingProviderConfig;
 import com.ibm.whc.deid.util.ManagerFactory;
@@ -26,7 +27,7 @@ public class StatesUSMaskingProvider extends AbstractMaskingProvider {
    */
   public StatesUSMaskingProvider(StatesUSMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
   }
 
   protected StatesUSManager getStateManager() {
@@ -46,10 +47,10 @@ public class StatesUSMaskingProvider extends AbstractMaskingProvider {
 
     if (state == null) {
       State selectedState = statesUSManager.getRandomValue();
-      return selectedState == null ? null : selectedState.toString(selectedState.getNameFormat());
+      return selectedState == null ? null : selectedState.toString(StateNameFormat.FULL_NAME);
     }
 
-    State randomState = statesUSManager.getRandomValue(state.getNameCountryCode());
-    return randomState.toString(state.getNameFormat());
+    State randomState = statesUSManager.getRandomValue();
+    return randomState == null ? null : randomState.toString(state.getNameFormat());
   }
 }

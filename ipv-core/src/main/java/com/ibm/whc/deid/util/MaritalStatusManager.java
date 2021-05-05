@@ -65,7 +65,6 @@ public class MaritalStatusManager extends LocalizedResourceManager<MaritalStatus
       throw new RuntimeException(e);
     }
 
-
     return manager;
   }
 
@@ -75,16 +74,16 @@ public class MaritalStatusManager extends LocalizedResourceManager<MaritalStatus
    *
    * @param fileName the name of the file from which the CSV data was obtained - used for logging
    *        and error messages
-   * @param locale the locale or country code to associate with the resource
+   * @param countryCode the locale or country code to associate with the resource
    * @param manager the resource manager
    * @param record a single record read from a source that provides CSV format data
    * 
    * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
    */
-  protected static void loadCSVRecord(String fileName, String locale, MaritalStatusManager manager,
+  protected static void loadCSVRecord(String fileName, String countryCode, MaritalStatusManager manager,
       CSVRecord record) {
     try {
-      loadRecord(locale, manager, record.get(0));
+      loadRecord(countryCode, manager, record.get(0));
 
     } catch (RuntimeException e) {
       // CSVRecord has a very descriptive toString() implementation
@@ -97,16 +96,16 @@ public class MaritalStatusManager extends LocalizedResourceManager<MaritalStatus
   /**
    * Retrieves data from the given record and loads it into the given resource manager.
    *
-   * @param locale the locale or country code to associate with the resource
+   * @param countryCode the locale or country code to associate with the resource
    * @param manager the resource manager
    * @param record the data from an input record to be loaded as resources into the manager
    * 
    * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
    */
-  protected static void loadRecord(String locale, MaritalStatusManager manager, String... record) {
+  protected static void loadRecord(String countryCode, MaritalStatusManager manager, String... record) {
     String status = record[0];
-    MaritalStatus maritalStatus = new MaritalStatus(status, locale);
+    MaritalStatus maritalStatus = new MaritalStatus(status, countryCode);
     manager.add(maritalStatus);
-    manager.add(locale, maritalStatus);
+    manager.add(countryCode, maritalStatus);
   }
 }

@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
-import java.util.List;
 import com.ibm.whc.deid.resources.ManagedResource;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.Messages;
@@ -17,9 +16,8 @@ public class City implements Location, LocalizedEntity, Serializable, ManagedRes
 
   private final String name;
   private final String key;
-  private String nameCountryCode;
-  private LatitudeLongitude latitudeLongitude;
-  private List<City> neighbors;
+  private final String nameCountryCode;
+  private final LatitudeLongitude latitudeLongitude;
 
   /**
    * Instantiates a new City.
@@ -82,24 +80,6 @@ public class City implements Location, LocalizedEntity, Serializable, ManagedRes
   @Override
   public String getNameCountryCode() {
     return this.nameCountryCode;
-  }
-
-  /**
-   * Gets neighbors.
-   *
-   * @return the neighbors
-   */
-  public List<City> getNeighbors() {
-    return neighbors;
-  }
-
-  /**
-   * Sets neighbors.
-   *
-   * @param neighbors the neighbors
-   */
-  public void setNeighbors(List<City> neighbors) {
-    this.neighbors = neighbors;
   }
 
   @Override

@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import com.ibm.whc.deid.resources.ManagedResource;
 import com.ibm.whc.deid.util.CountryNameSpecification;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -24,8 +23,6 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
   private final CountryNameSpecification specification;
   private final LatitudeLongitude latitudeLongitude;
   private final String key;
-
-  private Country[] neighbors;
 
   /**
    * Instantiates a new Country.
@@ -136,24 +133,6 @@ public class Country implements Location, LocalizedEntity, ManagedResource, Seri
   @Override
   public String getNameCountryCode() {
     return nameCountryCode;
-  }
-
-  /**
-   * Get neighbors country [ ].
-   *
-   * @return the country [ ]
-   */
-  public Country[] getNeighbors() {
-    return neighbors;
-  }
-
-  /**
-   * Sets neighbors.
-   *
-   * @param neighbors the neighbors
-   */
-  public void setNeighbors(final Country[] neighbors) {
-    this.neighbors = Arrays.copyOf(neighbors, neighbors.length);
   }
 
   /**
