@@ -9,12 +9,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.LatitudeLongitudeIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.LatitudeLongitudeMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
   /*
@@ -23,7 +25,7 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
    */
 
   @Test
-  public void testMask() throws Exception {
+  public void testMaskWithinCircle() throws Exception {
     // By default randomWithinCircle option is true and others are false
     MaskingProvider latlonMaskingProvider = new LatitudeLongitudeMaskingProvider();
     LatitudeLongitudeIdentifier latitudeLongitudeIdentifier = new LatitudeLongitudeIdentifier();
@@ -32,7 +34,6 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     String maskedResult = latlonMaskingProvider.mask(gpsCoords);
     // System.out.println("=======> randomWithinCircle = true, gpsCoords ["
     // + gpsCoords + ", maskedResult [" + maskedResult + "}" );
-
     assertFalse(maskedResult.equals(gpsCoords));
     assertTrue(latitudeLongitudeIdentifier.isOfThisType(maskedResult));
     assertTrue(latitudeLongitudeIdentifier.isGPSFormat(maskedResult));
@@ -42,7 +43,6 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     // System.out.println("=======> randomWithinCircle = true, compassCoords
     // ["
     // + compassCoords + ", maskedResult [" + maskedResult + "}" );
-
     assertFalse(maskedResult.equals(compassCoords));
     assertTrue(latitudeLongitudeIdentifier.isOfThisType(maskedResult));
     assertTrue(latitudeLongitudeIdentifier.isCompassFormat(maskedResult));
@@ -50,7 +50,6 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     String dmsCoords = "12:30'23.256547S 12:30'23.256547E";
     // System.out.println("=======> randomWithinCircle = true, dmsCoords ["
     // + dmsCoords + ", maskedResult [" + maskedResult + "}" );
-
     assertTrue(latitudeLongitudeIdentifier.isOfThisType(dmsCoords));
     maskedResult = latlonMaskingProvider.mask(dmsCoords);
     assertFalse(maskedResult.equals(dmsCoords));
@@ -62,7 +61,8 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
   public void testMaskFixedRadiusRandomDirection() throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-
+    configuration.setMaskFixedRadiusRandomDirection(true);
+    configuration.setMaskRandomWithinCircle(false);
     MaskingProvider latlonMaskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
     LatitudeLongitudeIdentifier latitudeLongitudeIdentifier = new LatitudeLongitudeIdentifier();
 
@@ -83,7 +83,7 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     // + compassCoords + ", maskedResult [" + maskedResult + "}" );
 
     assertFalse(maskedResult.equals(compassCoords));
-    assertTrue(latitudeLongitudeIdentifier.isOfThisType(maskedResult));
+    assertTrue(maskedResult, latitudeLongitudeIdentifier.isOfThisType(maskedResult));
     assertTrue(latitudeLongitudeIdentifier.isCompassFormat(maskedResult));
 
     String dmsCoords = "12:30'23.256547S 12:30'23.256547E";
@@ -102,7 +102,6 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
   public void testMaskDonut() throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-
     configuration.setMaskRandomWithinCircle(false);
     configuration.setMaskDonutMasking(true);
     configuration.setOffsetMaximumRadius(500);
@@ -140,6 +139,47 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     assertTrue(latitudeLongitudeIdentifier.isDMSFormat(maskedResult));
   }
 
+  @Test
+  public void testMask() throws Exception {
+    // By default randomWithinCircle option is true and others are false
+    LatitudeLongitudeMaskingProviderConfig configuration =
+        new LatitudeLongitudeMaskingProviderConfig();
+    configuration.setMaskRandomWithinCircle(false);
+    MaskingProvider latlonMaskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
+    LatitudeLongitudeIdentifier latitudeLongitudeIdentifier = new LatitudeLongitudeIdentifier();
+
+    String gpsCoords = "10.0000,12.0000";
+    for (int i = 0; i < 20; i++) {
+      String maskedResult = latlonMaskingProvider.mask(gpsCoords);
+      // System.out.println("=======> randomWithinCircle = true, gpsCoords ["
+      // + gpsCoords + ", maskedResult [" + maskedResult + "}" );
+      assertNotEquals(gpsCoords, maskedResult);
+      assertTrue(latitudeLongitudeIdentifier.isOfThisType(maskedResult));
+      assertTrue(latitudeLongitudeIdentifier.isGPSFormat(maskedResult));
+    }
+
+    for (int i = 0; i < 20; i++) {
+      String compassCoords = "N90.00.00 E180.00.00";
+      String maskedResult = latlonMaskingProvider.mask(compassCoords);
+      // System.out.println("=======> randomWithinCircle = true, compassCoords
+      // ["
+      // + compassCoords + ", maskedResult [" + maskedResult + "}" );
+      assertNotEquals(compassCoords, maskedResult);
+      assertTrue(latitudeLongitudeIdentifier.isOfThisType(maskedResult));
+      assertTrue(latitudeLongitudeIdentifier.isCompassFormat(maskedResult));
+    }
+
+    for (int i = 0; i < 20; i++) {
+      String dmsCoords = "12:30'23.256547S 12:30'23.256547E";
+      // System.out.println("=======> randomWithinCircle = true, dmsCoords ["
+      // + dmsCoords + ", maskedResult [" + maskedResult + "}" );
+      String maskedResult = latlonMaskingProvider.mask(dmsCoords);
+      assertNotEquals(dmsCoords, maskedResult);
+      assertTrue(maskedResult, latitudeLongitudeIdentifier.isOfThisType(maskedResult));
+      assertTrue(maskedResult, latitudeLongitudeIdentifier.isDMSFormat(maskedResult));
+    }
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testAssertThatInvalidArgumentIsCaught() throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
@@ -165,7 +205,8 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidLatitudeLongitudeInputValidHandlingReturnNull() throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
+    configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
 
     String invalidLatitudeLongitude = "Invalid Latitude Longitude";

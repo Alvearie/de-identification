@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,8 +17,6 @@ public class MACAddressMaskingProvider extends AbstractMaskingProvider {
   private static final MACAddressIdentifier macAddressIdentifier = new MACAddressIdentifier();
 
   private final boolean preserveVendor;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   /** Instantiates a new Mac address masking provider. */
   public MACAddressMaskingProvider() {
@@ -31,10 +29,9 @@ public class MACAddressMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public MACAddressMaskingProvider(MACAddressMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.preserveVendor = configuration.isMaskingPreserveVendor();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   private String randomMACAddress(int octets) {
@@ -65,14 +62,7 @@ public class MACAddressMaskingProvider extends AbstractMaskingProvider {
     }
 
     if (!macAddressIdentifier.isOfThisType(identifier)) {
-      debugFaultyInput("macAddressIdentifier");
-      if (unspecifiedValueHandling == 2) {
-        return randomMACAddress(6);
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier, () -> randomMACAddress(6));
     }
 
     return identifier.substring(0, 9) + randomMACAddress(3);

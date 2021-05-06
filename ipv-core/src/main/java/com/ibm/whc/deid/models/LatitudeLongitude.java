@@ -167,7 +167,7 @@ public class LatitudeLongitude implements Serializable {
     Double ewSeconds = (longitude - ewDegrees - ewMinutes / 60.0) * 3600;
 
     if (format == LatitudeLongitudeFormat.COMPASS) {
-      return String.format("%s%02d.%02d.%02d %s%02d.%02d.%02d", ns, nsDegrees, nsMinutes,
+      return String.format("%s%02d.%02d.%02d %s%03d.%02d.%02d", ns, nsDegrees, nsMinutes,
           nsSeconds.intValue(), ew, ewDegrees, ewMinutes, ewSeconds.intValue());
     }
 

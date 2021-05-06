@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -18,8 +18,6 @@ public class SSNUSMaskingProvider extends AbstractMaskingProvider {
 
   private final boolean preserveAreaNumber;
   private final boolean preserveGroup;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   /** Instantiates a new Ssnus masking provider. */
   public SSNUSMaskingProvider() {
@@ -32,18 +30,17 @@ public class SSNUSMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public SSNUSMaskingProvider(SSNUSMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.preserveAreaNumber = configuration.isMaskPreserveAreaNumber();
     this.preserveGroup = configuration.isMaskPreserveGroup();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   /*
    * The Social Security number is a nine-digit number in the format "AAA-GG-SSSS".[27] The number
    * is divided into three parts. The area number, the first three digits, is assigned by
-   * geographical region. The middle two digits are the group number The last four digits are serial
-   * numbers
+   * geographical region. The middle two digits are the group number. The last four digits are
+   * serial numbers.
    */
   @Override
   public String mask(String identifier) {
@@ -52,38 +49,43 @@ public class SSNUSMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    SSNUS ssn = ssnUSIdentifier.parseSSNUS(identifier);
-    String areaNumber;
-    String group;
-    String serialNumber = String.format("%04d", random.nextInt(9999));
+    String areaNumber = null;
+    String group = null;
 
-    if (ssn != null) {
-      if (this.preserveAreaNumber) {
-        areaNumber = ssn.getAreaNumber();
-      } else {
-        int areaNumberInt = 0;
-        while (areaNumberInt == 0 || areaNumberInt == 666) {
-          areaNumberInt = random.nextInt(999);
+    if (this.preserveAreaNumber || this.preserveGroup) {
+      SSNUS ssn = ssnUSIdentifier.parseSSNUS(identifier);
+
+      if (ssn == null) {
+        if (isUnexpectedValueHandlingRandom()) {
+          // write the log record, but keep going to get a random value
+          debugFaultyInput(identifier);
+        } else {
+          return applyUnexpectedValueHandling(identifier, null);
         }
-        areaNumber = String.format("%03d", areaNumberInt);
-      }
 
-      if (this.preserveGroup) {
-        group = ssn.getGroup();
       } else {
-        group = String.format("%02d", random.nextInt(99));
-      }
-    } else {
-      debugFaultyInput("ssn");
-      if (unspecifiedValueHandling == 2) {
-        areaNumber = String.format("%03d", random.nextInt(999));
-        group = String.format("%02d", random.nextInt(99));
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+        if (this.preserveAreaNumber) {
+          areaNumber = ssn.getAreaNumber();
+        }
+        if (this.preserveGroup) {
+          group = ssn.getGroup();
+        }
       }
     }
+
+    if (areaNumber == null) {
+      int areaNumberInt = 0;
+      while (areaNumberInt == 0 || areaNumberInt == 666) {
+        areaNumberInt = random.nextInt(999);
+      }
+      areaNumber = String.format("%03d", areaNumberInt);
+    }
+
+    if (group == null) {
+      group = String.format("%02d", random.nextInt(99));
+    }
+
+    String serialNumber = String.format("%04d", random.nextInt(9999));
 
     return (new SSNUS(areaNumber, group, serialNumber)).toString();
   }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,39 +9,45 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
 import com.ibm.whc.deid.models.SSNUS;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.SSNUSIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SSNUSMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import org.junit.Test;
 
 public class SSNUSMaskingProviderTest extends TestLogSetUp {
-  // @formatter:off
+
   /*
    * Tests for both preserve area number and group options and their boolean
    * values (true and false). Also tests for an invalid value.
    */
+
   @Test
   public void testMaskPreserveAreaAndGroup() {
-
     // The preserve area number and group options default values are set to
     // TRUE.
     MaskingProvider maskingProvider = new SSNUSMaskingProvider();
     SSNUSIdentifier identifier = new SSNUSIdentifier();
 
     String ssn = "123-54-9876";
-    String maskedValue = maskingProvider.mask(ssn);
-
-    assertFalse(maskedValue.equals(ssn));
-    assertTrue(identifier.isOfThisType(maskedValue));
-    assertTrue(maskedValue.startsWith("123-54-"));
+    boolean changed = false;
+    for (int i = 0; i < 10; i++) {
+      String maskedValue = maskingProvider.mask(ssn);
+      if (!ssn.equals(maskedValue)) {
+        changed = true;
+      }
+      assertTrue(maskedValue, identifier.isOfThisType(maskedValue));
+      assertTrue(maskedValue.startsWith("123-54-"));
+    }
+    assertTrue(changed);
   }
 
   @Test
   public void testMaskPreserveGroup() {
-
     // The preserve area number and group options default values are set to
     // TRUE.
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
@@ -50,14 +56,18 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
     SSNUSIdentifier identifier = new SSNUSIdentifier();
 
     String ssn = "123-54-9876";
-    String maskedValue = maskingProvider.mask(ssn);
     SSNUS ssnUS = identifier.parseSSNUS(ssn);
-    SSNUS maskedUS = identifier.parseSSNUS(maskedValue);
-
-    assertFalse(maskedValue.equals(ssn));
-    assertTrue(identifier.isOfThisType(maskedValue));
-    assertFalse("Masked value:" + maskedValue, maskedValue.startsWith("123"));
-    assertTrue(ssnUS.getGroup().equals(maskedUS.getGroup()));
+    String ssnGroup = ssnUS.getGroup();
+    boolean changed = false;
+    for (int i = 0; i < 10; i++) {
+      String maskedValue = maskingProvider.mask(ssn);
+      if (!ssn.equals(maskedValue)) {
+        changed = true;
+      }
+      assertTrue(identifier.isOfThisType(maskedValue));
+      assertEquals(ssnGroup, identifier.parseSSNUS(maskedValue).getGroup());
+    }
+    assertTrue(changed);
   }
 
   @Test
@@ -72,25 +82,29 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
 
     int randomizationOKGroup = 0;
     int randomizationOKArea = 0;
-
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10; i++) {
       String maskedValue = maskingProvider.mask(ssnValue);
-      assertFalse(maskedValue.equals(ssnValue));
-
       assertTrue(identifier.isOfThisType(maskedValue));
+
       SSNUS ssn = identifier.parseSSNUS(maskedValue);
 
-      if (!(ssn.getAreaNumber().equals("123"))) {
+      if (!"123".equals(ssn.getAreaNumber())) {
         randomizationOKArea++;
       }
-
-      if (!(ssn.getGroup().equals("12"))) {
+      if (!"12".equals(ssn.getGroup())) {
         randomizationOKGroup++;
       }
     }
-
     assertTrue(randomizationOKGroup > 0);
     assertTrue(randomizationOKArea > 0);
+
+    // since not preserving, input need not be valid
+
+    ssnValue = "invalid";
+    for (int i = 0; i < 10; i++) {
+      String maskedValue = maskingProvider.mask(ssnValue);
+      assertTrue(identifier.isOfThisType(maskedValue));
+    }
   }
 
   @Test
@@ -101,26 +115,30 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
     String invalidSSNUS = null;
     String maskedSSNUS = maskingProvider.mask(invalidSSNUS);
 
-    assertEquals(null, maskedSSNUS);
+    assertNull(maskedSSNUS);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
   public void testMaskInvalidSSNUSInputValidHandlingReturnNull() throws Exception {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
+    configuration.setMaskPreserveAreaNumber(false);
+    configuration.setMaskPreserveGroup(true);
     configuration.setUnspecifiedValueHandling(1);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
     String invalidSSNUS = "Invalid SSNUS";
     String maskedSSNUS = maskingProvider.mask(invalidSSNUS);
 
-    assertEquals(null, maskedSSNUS);
+    assertNull(maskedSSNUS);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
   public void testMaskInvalidSSNUSInputValidHandlingReturnRandom() throws Exception {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
+    configuration.setMaskPreserveAreaNumber(true);
+    configuration.setMaskPreserveGroup(false);
     configuration.setUnspecifiedValueHandling(2);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
     Identifier identifier = new SSNUSIdentifier();
@@ -136,6 +154,8 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidSSNUSInputValidHandlingReturnDefaultCustomValue() throws Exception {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
+    configuration.setMaskPreserveAreaNumber(true);
+    configuration.setMaskPreserveGroup(true);
     configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
@@ -149,8 +169,9 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidSSNUSInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test SSNUS");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    // default preserve true
+    configuration.setUnexpectedInputReturnMessage("Test SSNUS");
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
     String invalidSSNUS = "Invalid SSNUS";
@@ -161,15 +182,17 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskInvalidSSNUSInputInvalidHandlingReturnNull() throws Exception {
+  public void testMaskInvalidSSNUSInputInvalidHandlingExit() throws Exception {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
     String invalidSSNUS = "Invalid SSNUS";
-    String maskedSSNUS = maskingProvider.mask(invalidSSNUS);
-
-    assertEquals(null, maskedSSNUS);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    try {
+      maskingProvider.mask(invalidSSNUS);
+      fail("expected exception");
+    } catch (PrivacyProviderInvalidInputException e) {
+      assertTrue(e.getMessage().contains(invalidSSNUS));
+    }
   }
 }
