@@ -41,7 +41,11 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   private String name = "";
 
   public AbstractMaskingProvider() {
-    this(null, null);
+    this(null, null, null);
+  }
+
+  public AbstractMaskingProvider(MaskingProviderConfig config) {
+    this(null, null, config);
   }
 
   public AbstractMaskingProvider(String tenantId, String localizationProperty) {

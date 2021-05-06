@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,14 +9,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.ibm.whc.deid.providers.identifiers.IBANIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IBANMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import org.junit.Test;
 
 public class IBANMaskingProviderTest extends TestLogSetUp {
+
   /*
    * Tests preserve country option and its boolean values (true and false). Also tests for an
    * invalid value
@@ -45,19 +49,22 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
     IBANIdentifier identifier = new IBANIdentifier();
 
     String iban = "IE71WZXH31864186813343";
-
     int randomizationOK = 0;
-
     for (int i = 0; i < 500; i++) {
       String maskedValue = maskingProvider.mask(iban);
-      assertFalse(maskedValue.equals(iban));
       assertTrue(identifier.isOfThisType(maskedValue));
       if (!maskedValue.startsWith("IE")) {
         randomizationOK++;
       }
     }
-
     assertTrue(randomizationOK > 0);
+
+    // input not needed to be valid if not preserving
+    iban = "";
+    for (int i = 0; i < 500; i++) {
+      String maskedValue = maskingProvider.mask(iban);
+      assertTrue(identifier.isOfThisType(maskedValue));
+    }
   }
 
   @Test
@@ -96,6 +103,23 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
     String maskedIBAN = maskingProvider.mask(invalidIBAN);
 
     assertFalse(maskedIBAN.equals(invalidIBAN));
+    assertTrue(identifier.isOfThisType(maskedIBAN));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+  }
+
+  @Test
+  public void testMaskInvalidIBANInputValidHandlingReturnRandomNew() throws Exception {
+    IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    configuration.setUnspecifiedValueHandling(1);
+    MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
+    Identifier identifier = new IBANIdentifier();
+
+    String invalidIBAN = "Invalid IBAN";
+    String maskedIBAN = maskingProvider.mask(invalidIBAN);
+
+    assertNotNull(maskedIBAN);
+    assertNotEquals(maskedIBAN, invalidIBAN);
     assertTrue(identifier.isOfThisType(maskedIBAN));
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
