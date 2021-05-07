@@ -442,11 +442,11 @@ public class RandomGenerators {
     double latitude = random.nextInt(90);
     double longitude = random.nextInt(180);
 
-    if (random.nextBoolean()) {
+    // don't switch from 0.0 to -0.0
+    if (latitude != 0.0 && random.nextBoolean()) {
       latitude = -latitude;
     }
-
-    if (random.nextBoolean()) {
+    if (longitude != 0.0 && random.nextBoolean()) {
       longitude = -longitude;
     }
 

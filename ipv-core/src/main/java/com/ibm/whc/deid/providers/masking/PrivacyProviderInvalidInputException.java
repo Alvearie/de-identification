@@ -5,10 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.shared.exception.Keyed;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.Messages;
 
-public class PrivacyProviderInvalidInputException extends RuntimeException {
+public class PrivacyProviderInvalidInputException extends IllegalArgumentException
+    implements Keyed {
 
   private static final long serialVersionUID = 3703087254325803213L;
 
@@ -16,5 +18,10 @@ public class PrivacyProviderInvalidInputException extends RuntimeException {
 
   public PrivacyProviderInvalidInputException(String input, String ruleName) {
     super(Messages.getMessage(MESSAGE_ID, input, ruleName));
+  }
+
+  @Override
+  public String getMessageKey() {
+    return MESSAGE_ID;
   }
 }
