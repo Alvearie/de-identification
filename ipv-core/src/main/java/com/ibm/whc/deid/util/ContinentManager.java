@@ -126,14 +126,16 @@ public class ContinentManager extends LocalizedResourceManager<Continent> {
    */
   public Continent getClosestContinent(Continent continent, int k) {
     Continent selected = null;
-    LatLonDistance<Continent> distanceCalc = new LatLonDistance<>(getValues());
-    List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
-    if (neighbors != null && !neighbors.isEmpty()) {
-      int count = neighbors.size();
-      if (count == 1) {
-        selected = neighbors.get(0);
-      } else {
-        selected = neighbors.get(random.nextInt(count));
+    if (continent != null && continent.getLocation() != null) {
+      LatLonDistance<Continent> distanceCalc = new LatLonDistance<>(getValues());
+      List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
+      if (neighbors != null && !neighbors.isEmpty()) {
+        int count = neighbors.size();
+        if (count == 1) {
+          selected = neighbors.get(0);
+        } else {
+          selected = neighbors.get(random.nextInt(count));
+        }
       }
     }
     return selected;

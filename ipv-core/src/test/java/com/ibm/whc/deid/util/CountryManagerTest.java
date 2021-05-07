@@ -49,13 +49,34 @@ public class CountryManagerTest implements MaskingProviderTest {
 
   @Test
   public void testLoadRecord() {
-    String[] record =
-        new String[] {"Canada", "CA", "CAN", "home", "north america", "23.3", "-78.3"};
     CountryManager manager = new CountryManager();
     String locale = "en";
 
+    String[] record = new String[] {"France", null, "  ", "", "Unknown", null, ""};
     CountryManager.loadRecord(locale, manager, record);
-    Country country = manager.getValue("canada");
+    Country country = manager.getValue("france");
+    assertNotNull(country);
+    assertEquals("France", country.getName());
+    assertNull(country.getName(CountryNameSpecification.ISO2));
+    assertNull(country.getName(CountryNameSpecification.ISO3));
+    assertNull(country.getContinent());
+    assertNull(country.getLocation());
+    assertEquals(CountryNameSpecification.NAME, country.getCountryNameSpecification());
+
+    record = new String[] {"Germany", " ", null, null, " ", "", null};
+    CountryManager.loadRecord(locale, manager, record);
+    country = manager.getValue("germany");
+    assertNotNull(country);
+    assertEquals("Germany", country.getName());
+    assertNull(country.getName(CountryNameSpecification.ISO2));
+    assertNull(country.getName(CountryNameSpecification.ISO3));
+    assertNull(country.getContinent());
+    assertNull(country.getLocation());
+    assertEquals(CountryNameSpecification.NAME, country.getCountryNameSpecification());
+
+    record = new String[] {"Canada", "CA", "CAN", "home", "north america", "23.3", "-78.3"};
+    CountryManager.loadRecord(locale, manager, record);
+    country = manager.getValue("canada");
     assertNotNull(country);
     assertEquals("Canada", country.getName());
     assertEquals("CA", country.getName(CountryNameSpecification.ISO2));
@@ -65,10 +86,43 @@ public class CountryManagerTest implements MaskingProviderTest {
     assertNotNull(location);
     assertEquals(23.3, location.getLatitude(), 0);
     assertEquals(-78.3, location.getLongitude(), 0);
+    assertEquals(CountryNameSpecification.NAME, country.getCountryNameSpecification());
 
-    assertEquals("Canada", manager.getValue("CA").getName());
-    assertEquals("Canada", manager.getValue("can").getName());
-    assertEquals("Canada", manager.getValue("HOme").getName());
+    country = manager.getValue("ca");
+    assertNotNull(country);
+    assertEquals("Canada", country.getName());
+    assertEquals("CA", country.getName(CountryNameSpecification.ISO2));
+    assertEquals("CAN", country.getName(CountryNameSpecification.ISO3));
+    assertEquals("north america", country.getContinent());
+    location = country.getLocation();
+    assertNotNull(location);
+    assertEquals(23.3, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+    assertEquals(CountryNameSpecification.ISO2, country.getCountryNameSpecification());
+
+    country = manager.getValue("can");
+    assertNotNull(country);
+    assertEquals("Canada", country.getName());
+    assertEquals("CA", country.getName(CountryNameSpecification.ISO2));
+    assertEquals("CAN", country.getName(CountryNameSpecification.ISO3));
+    assertEquals("north america", country.getContinent());
+    location = country.getLocation();
+    assertNotNull(location);
+    assertEquals(23.3, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+    assertEquals(CountryNameSpecification.ISO3, country.getCountryNameSpecification());
+
+    country = manager.getValue("HOME");
+    assertNotNull(country);
+    assertEquals("Canada", country.getName());
+    assertEquals("CA", country.getName(CountryNameSpecification.ISO2));
+    assertEquals("CAN", country.getName(CountryNameSpecification.ISO3));
+    assertEquals("north america", country.getContinent());
+    location = country.getLocation();
+    assertNotNull(location);
+    assertEquals(23.3, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+    assertEquals(CountryNameSpecification.NAME, country.getCountryNameSpecification());
 
     // bad name
     String temp = record[0];
@@ -90,21 +144,14 @@ public class CountryManagerTest implements MaskingProviderTest {
 
     // bad ISO2
     temp = record[1];
-    record[1] = null;
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country iso2code"));
-    }
-    record[1] = "  ";
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country iso2code"));
-    }
     record[1] = "AXE";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso2code"));
+    }
+    record[1] = " X";
     try {
       CountryManager.loadRecord(locale, manager, record);
       fail("expected exception");
@@ -115,21 +162,21 @@ public class CountryManagerTest implements MaskingProviderTest {
 
     // bad ISO3
     temp = record[2];
-    record[2] = null;
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country iso3code"));
-    }
-    record[2] = "   ";
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country iso3code"));
-    }
     record[2] = "AX";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso3code"));
+    }
+    record[2] = "AX ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country iso3code"));
+    }
+    record[2] = "POOL";
     try {
       CountryManager.loadRecord(locale, manager, record);
       fail("expected exception");
@@ -138,40 +185,8 @@ public class CountryManagerTest implements MaskingProviderTest {
     }
     record[2] = temp;
 
-    // bad continent
-    temp = record[4];
-    record[4] = "  ";
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country continent"));
-    }
-    record[4] = null;
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("country continent"));
-    }
-    record[4] = temp;
-
     // bad latitude
     temp = record[5];
-    record[5] = null;
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("latitude"));
-    }
-    record[5] = "   ";
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
     record[5] = "AX";
     try {
       CountryManager.loadRecord(locale, manager, record);
@@ -197,20 +212,6 @@ public class CountryManagerTest implements MaskingProviderTest {
 
     // bad longitude
     temp = record[6];
-    record[6] = null;
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
-    record[6] = "   ";
-    try {
-      CountryManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
     record[6] = "AX";
     try {
       CountryManager.loadRecord(locale, manager, record);
@@ -234,25 +235,37 @@ public class CountryManagerTest implements MaskingProviderTest {
     }
     record[6] = temp;
 
-    // missing continent not loaded
-    String[] record2 = new String[] {"United States of America", "US", "USA", "United States",
-        "Unknown", "23.3", "-78.3"};
-    CountryManager.loadRecord(locale, manager, record2);
-    assertNull(manager.getValue("United States of America"));
-    assertEquals(2, manager.countryNames.getKeys().size());
+    // bad locale
+    temp = locale;
+    locale = null;
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country locale"));
+      assertTrue(e.getMessage().contains("null"));
+    }
+    locale = " ";
+    try {
+      CountryManager.loadRecord(locale, manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("country locale"));
+    }
+    locale = temp;
 
     // friendly name not loaded when null or missing
-
+    int count = manager.countryNames.getKeys().size();
     String[] record3 =
         new String[] {"country3", "c3", "cc3", null, "north america", "23.3", "-78.3"};
     CountryManager.loadRecord(locale, manager, record3);
     assertNotNull(manager.getValue("c3"));
-    assertEquals(3, manager.countryNames.getKeys().size());
+    assertEquals(count + 1, manager.countryNames.getKeys().size());
     String[] record4 =
         new String[] {"country4", "c4", "cc4", "  ", "north america", "23.3", "-78.3"};
     CountryManager.loadRecord(locale, manager, record4);
     assertNotNull(manager.getValue("cc4"));
-    assertEquals(4, manager.countryNames.getKeys().size());
+    assertEquals(count + 2, manager.countryNames.getKeys().size());
   }
 
   @Test
@@ -338,12 +351,12 @@ public class CountryManagerTest implements MaskingProviderTest {
     String originalCountry = "Greece";
     HashSet<String> neighbors =
         new HashSet<>(Arrays.asList("CYPRUS", "MALTA", "TURKEY", "SERBIA", "BOSNIA AND HERZEGOVINA",
-            "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE", "HUNGARY"));
-    for (int i = 0; i < 30; i++) {
+            "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE", "HUNGARY",
+            "MACEDONIA (THE FORMER YUGOSLAV REPUBLIC OF)"));
+    for (int i = 0; i < 40; i++) {
       String randomCountry = countryManager.getClosestCountry(originalCountry, 10);
       assertNotNull(randomCountry);
-      // System.out.println(randomCountry);
-      assertTrue(neighbors.contains(randomCountry.toUpperCase()));
+      assertTrue(randomCountry, neighbors.contains(randomCountry.toUpperCase()));
       Country country = countryManager.getValue(randomCountry);
       assertNotNull(country);
       assertEquals(CountryNameSpecification.NAME, country.getCountryNameSpecification());
@@ -351,10 +364,9 @@ public class CountryManagerTest implements MaskingProviderTest {
 
     originalCountry = "Gr";
     neighbors = new HashSet<>(
-        Arrays.asList("CY", "MT", "TR", "RS", "BA", "RO", "ME", "BG", "AL", "GR", "HU"));
-    for (int i = 0; i < 30; i++) {
+        Arrays.asList("CY", "MT", "TR", "RS", "BA", "RO", "ME", "BG", "AL", "GR", "HU", "MK"));
+    for (int i = 0; i < 40; i++) {
       String randomCountry = countryManager.getClosestCountry(originalCountry, 10);
-      // System.out.println(randomCountry);
       assertTrue(neighbors.contains(randomCountry.toUpperCase()));
       Country country = countryManager.getValue(randomCountry);
       assertNotNull(country);
@@ -363,10 +375,10 @@ public class CountryManagerTest implements MaskingProviderTest {
 
     originalCountry = "GrC";
     neighbors = new HashSet<>(
-        Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR", "ALB", "GRC", "HUN"));
-    for (int i = 0; i < 30; i++) {
+        Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR", "ALB", "GRC", "HUN",
+            "MKD"));
+    for (int i = 0; i < 40; i++) {
       String randomCountry = countryManager.getClosestCountry(originalCountry, 10);
-      // System.out.println(randomCountry);
       assertTrue(neighbors.contains(randomCountry.toUpperCase()));
       Country country = countryManager.getValue(randomCountry);
       assertNotNull(country);

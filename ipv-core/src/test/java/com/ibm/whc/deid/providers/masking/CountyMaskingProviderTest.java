@@ -5,20 +5,20 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
-
+import com.ibm.whc.deid.models.County;
 import com.ibm.whc.deid.providers.identifiers.CountyIdentifier;
-import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
+import com.ibm.whc.deid.util.CountyManager;
 
 public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+
   /*
    * Test for pseudorandom boolean option (true and false).
    */
@@ -31,42 +31,44 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     MaskingProvider maskingProvider =
         new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
-    String originalCity = "Italy";
-    String maskedCity = maskingProvider.mask(originalCity);
+    String original = "NotFoundXXXX";
+    String masked = maskingProvider.mask(original);
+    String firstMask = masked;
+    for (int i = 0; i < 10; i++) {
+      masked = maskingProvider.mask(original);
+      assertEquals(firstMask, masked);
+    }
 
-    String firstMask = maskedCity;
-
-    for (int i = 0; i < 100; i++) {
-      maskedCity = maskingProvider.mask(originalCity);
-      // System.out.println(maskedCity);
-      assertEquals(firstMask, maskedCity);
+    original = "Olmsted";
+    masked = maskingProvider.mask(original);
+    firstMask = masked;
+    for (int i = 0; i < 10; i++) {
+      masked = maskingProvider.mask(original);
+      assertEquals(firstMask, masked);
     }
   }
 
   @Test
   public void testMask() {
-    // county.mask.pseudorandom by default is off
-    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
+    // maskPseudorandom by default is off
+    CountyIdentifier identifier = new CountyIdentifier(tenantId, localizationProperty);
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
     assertEquals(MaskingProviderType.COUNTY, configuration.getType());
 
-    MaskingProvider maskingProvider =
+    CountyMaskingProvider maskingProvider =
         new CountyMaskingProvider(configuration, tenantId, localizationProperty);
 
     String originalValue = "Pendleton County";
     assertTrue(identifier.isOfThisType(originalValue));
 
     int randomizationOK = 0;
-
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(originalValue);
-      assertTrue(identifier.isOfThisType(maskedValue));
-
+      assertTrue(maskedValue, identifier.isOfThisType(maskedValue));
       if (!maskedValue.equals(originalValue)) {
         randomizationOK++;
       }
     }
-
     assertTrue(randomizationOK > 0);
 
     // try short name
@@ -74,105 +76,58 @@ public class CountyMaskingProviderTest extends TestLogSetUp implements MaskingPr
     assertTrue(identifier.isOfThisType(originalValue));
 
     randomizationOK = 0;
-
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(originalValue);
       assertTrue(identifier.isOfThisType(maskedValue));
-
       if (!maskedValue.equals(originalValue)) {
         randomizationOK++;
       }
     }
-
     assertTrue(randomizationOK > 0);
   }
 
   @Test
-  public void testMaskNullCountyInputReturnNull() throws Exception {
+  public void testMask_FullOrShort() {
     CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
+    assertEquals(MaskingProviderType.COUNTY, configuration.getType());
 
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
+    // Use the Test localization file for this test because the list of counties has no collisions
+    // between full and short names, whereas the production file does
 
-    String invalidCounty = null;
-    String maskedCounty = maskingProvider.mask(invalidCounty);
+    CountyMaskingProvider maskingProvider =
+        new CountyMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
+    CountyManager countyManager = maskingProvider.getCountyManager();
 
-    assertEquals(null, maskedCounty);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    // full name
+    String originalValue = "County 3";
+
+    int randomizationOK = 0;
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(originalValue);
+      if (!maskedValue.equals(originalValue)) {
+        randomizationOK++;
+      }
+      County county = countyManager.getValue(maskedValue);
+      assertNotNull(county);
+      assertTrue(county.getKey(), county.isUseFullNameAsKey());
+    }
+    assertTrue(randomizationOK > 0);
+
+    // short name
+    originalValue = "County2";
+
+    randomizationOK = 0;
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(originalValue);
+      if (!maskedValue.equals(originalValue)) {
+        randomizationOK++;
+      }
+      County county = countyManager.getValue(maskedValue);
+      assertNotNull(county);
+      assertFalse(county.isUseFullNameAsKey());
+    }
+    assertTrue(randomizationOK > 0);
+
+    assertSame(countyManager, maskingProvider.getCountyManager());
   }
-
-  @Test
-  public void testMaskInvalidCountyInputValidHandlingReturnNull() throws Exception {
-    CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidCounty = "Invalid County";
-    String maskedCounty = maskingProvider.mask(invalidCounty);
-
-    assertEquals(null, maskedCounty);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidCountyInputValidHandlingReturnRandom() throws Exception {
-    CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new CountyIdentifier(tenantId, localizationProperty);
-
-    String invalidCounty = "Invalid County";
-    String maskedCounty = maskingProvider.mask(invalidCounty);
-
-    assertFalse(maskedCounty.equals(invalidCounty));
-    assertTrue(identifier.isOfThisType(maskedCounty));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidCountyInputValidHandlingReturnDefaultCustomValue() throws Exception {
-    CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidCounty = "Invalid County";
-    String maskedCounty = maskingProvider.mask(invalidCounty);
-
-    assertEquals("OTHER", maskedCounty);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidCountyInputValidHandlingReturnNonDefaultCustomValue()
-      throws Exception {
-    CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test County");
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidCounty = "Invalid County";
-    String maskedCounty = maskingProvider.mask(invalidCounty);
-
-    assertEquals("Test County", maskedCounty);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidCountyInputInvalidHandlingReturnNull() throws Exception {
-    CountyMaskingProviderConfig configuration = new CountyMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new CountyMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidCounty = "Invalid County";
-    String maskedCounty = maskingProvider.mask(invalidCounty);
-
-    assertEquals(null, maskedCounty);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
 }

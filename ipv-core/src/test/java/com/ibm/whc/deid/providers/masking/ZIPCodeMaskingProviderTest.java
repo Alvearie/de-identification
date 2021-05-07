@@ -10,14 +10,12 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.ZIPCodeIdentifier;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -98,6 +96,40 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
     }
 
     assertTrue(randomOK > 0);
+  }
+
+  @Test
+  public void testSuffixReplaceWithRandomValid_noneFound_useMessage() {
+    ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
+    configuration.setMaskPrefixLength(3);
+    configuration.setMaskSuffixTruncate(false);
+    configuration.setMaskSuffixReplaceWithRandom(true);
+    configuration.setMaskSuffixReplaceWithValidOnly(true);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    MaskingProvider maskingProvider =
+        new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
+
+    String zipcode = "00101"; // not found
+    String maskedZipCode = maskingProvider.mask(zipcode);
+    assertEquals("OTHER", maskedZipCode);
+  }
+
+  @Test
+  public void testSuffixReplaceWithRandomValid_noneFound_useRandom() {
+    ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
+    configuration.setMaskPrefixLength(3);
+    configuration.setMaskSuffixTruncate(false);
+    configuration.setMaskSuffixReplaceWithRandom(true);
+    configuration.setMaskSuffixReplaceWithValidOnly(true);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    ZIPCodeMaskingProvider maskingProvider =
+        new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
+
+    String zipcode = "00101"; // not found
+    for (int i = 0; i < 10; ++i) {
+      String maskedZipCode = maskingProvider.mask(zipcode);
+      assertTrue(maskedZipCode, maskingProvider.getZIPCodeManager().isValidKey(maskedZipCode));
+    }
   }
 
   @Test
@@ -222,7 +254,7 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
     assertTrue(randomOK > 0);
 
     //
-    // Update replaceWithNeighborNearestCount to 0
+    // Update replaceWithNeighborNearestCount to 0 - note, not valid config
     //
     configuration.setMaskReplaceWithNeighborNearestCount(0);
     maskingProvider = new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
@@ -261,7 +293,7 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskValidZIPCodeInputInvalidLengthValidHandlingReturnNull() throws Exception {
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -275,7 +307,7 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskInvalidZIPCodeInputValidHandlingReturnRandom() throws Exception {
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new ZIPCodeIdentifier(tenantId, localizationProperty);
@@ -291,7 +323,7 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskInvalidZIPCodeInputValidHandlingReturnDefaultCustomValue() throws Exception {
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -306,8 +338,9 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskInvalidZIPCodeInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("00000");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("00000");
+    configuration.setUnspecifiedValueReturnMessage("xxxxx");
     MaskingProvider maskingProvider =
         new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -317,19 +350,4 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
     assertEquals("00000", maskedZIPCode);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
-
-  @Test
-  public void testMaskInvalidZIPCodeInputInvalidHandlingReturnNull() throws Exception {
-    ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidZIPCode = "8512";
-    String maskedZIPCode = maskingProvider.mask(invalidZIPCode);
-
-    assertEquals(null, maskedZIPCode);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
 }

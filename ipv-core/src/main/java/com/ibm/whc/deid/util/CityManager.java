@@ -88,7 +88,7 @@ public class CityManager extends LocalizedResourceManager<City> {
   protected static void loadCSVRecord(String fileName, String locale, CityManager manager,
       CSVRecord record) {
     try {
-      loadRecord(locale, manager, record.get(0), record.get(1), record.get(2), record.get(3));
+      loadRecord(locale, manager, record.get(0), record.get(1), record.get(2));
 
     } catch (RuntimeException e) {
       // CSVRecord has a very descriptive toString() implementation
@@ -111,8 +111,7 @@ public class CityManager extends LocalizedResourceManager<City> {
     String name = record[0];
     String latitude = record[1];
     String longitude = record[2];
-    String countryCode = record[3];
-    City city = new City(name, latitude, longitude, countryCode, locale);
+    City city = new City(name, latitude, longitude, locale);
     manager.add(city);
     manager.add(locale, city);
   }
@@ -127,14 +126,16 @@ public class CityManager extends LocalizedResourceManager<City> {
    */
   public City getClosestCity(City city, int k) {
     City selected = null;
-    LatLonDistance<City> distanceCalc = new LatLonDistance<>(getValues());
-    List<City> neighbors = distanceCalc.findNearestK(city, k);
-    if (neighbors != null && !neighbors.isEmpty()) {
-      int count = neighbors.size();
-      if (count == 1) {
-        selected = neighbors.get(0);
-      } else {
-        selected = neighbors.get(random.nextInt(count));
+    if (city != null && city.getLocation() != null) {
+      LatLonDistance<City> distanceCalc = new LatLonDistance<>(getValues());
+      List<City> neighbors = distanceCalc.findNearestK(city, k);
+      if (neighbors != null && !neighbors.isEmpty()) {
+        int count = neighbors.size();
+        if (count == 1) {
+          selected = neighbors.get(0);
+        } else {
+          selected = neighbors.get(random.nextInt(count));
+        }
       }
     }
     return selected;

@@ -26,29 +26,6 @@ public class LatitudeLongitude implements Serializable {
   /**
    * Instantiates a new object with the DECIMAL string representation format.
    *
-   * @param latitude the latitude in string format, -90.0 <= latitude <= 90.0
-   * @param longitude the longitude in string format, -180.0 < longitude < 180.0
-   * 
-   * @throws IllegalArgumentException if the latitude or longitude cannot be converted into a double
-   *         value or is out of range
-   */
-  public LatitudeLongitude(String latitude, String longitude) {
-    this(convertToDouble(latitude, "latitude"), convertToDouble(longitude, "longitude"),
-        LatitudeLongitudeFormat.DECIMAL);
-  }
-
-  private static double convertToDouble(String value, String component) {
-    try {
-      return Double.parseDouble(value);
-    } catch (RuntimeException e) {
-      throw new IllegalArgumentException(
-          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(value), component));
-    }
-  }
-
-  /**
-   * Instantiates a new object with the DECIMAL string representation format.
-   *
    * @param latitude the latitude, -90.0 <= latitude <= 90.0
    * @param longitude the longitude, -180.0 < longitude < 180.0
    * 
@@ -82,6 +59,39 @@ public class LatitudeLongitude implements Serializable {
     // use east in all cases to simplify equals() and hashCode()
     this.longitude = longitude == -180.0 ? 180.0 : longitude;
     this.format = format == null ? LatitudeLongitudeFormat.DECIMAL : format;
+  }
+
+  /**
+   * Returns a new LatitudeLongitude with the DECIMAL string representation format or <i>null</i> if
+   * either of the given latitude or longitude is null or all whitespace.
+   *
+   * @param latitude the latitude in string format, -90.0 <= latitude <= 90.0
+   * @param longitude the longitude in string format, -180.0 < longitude < 180.0
+   * 
+   * @throws IllegalArgumentException if the latitude or longitude cannot be converted into a double
+   *         value or is out of range
+   */
+  public static LatitudeLongitude buildLatitudeLongitude(String latitude, String longitude) {
+    LatitudeLongitude value = null;
+    if (latitude != null && longitude != null && !latitude.trim().isEmpty()
+        && !longitude.trim().isEmpty()) {
+      double lat;
+      double lon;
+      try {
+        lat = Double.parseDouble(latitude);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, latitude, "latitude"));
+      }
+      try {
+        lon = Double.parseDouble(longitude);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, longitude, "longitude"));
+      }
+      value = new LatitudeLongitude(lat, lon, LatitudeLongitudeFormat.DECIMAL);
+    }
+    return value;
   }
 
   /**
@@ -157,7 +167,7 @@ public class LatitudeLongitude implements Serializable {
     Double ewSeconds = (longitude - ewDegrees - ewMinutes / 60.0) * 3600;
 
     if (format == LatitudeLongitudeFormat.COMPASS) {
-      return String.format("%s%02d.%02d.%02d %s%02d.%02d.%02d", ns, nsDegrees, nsMinutes,
+      return String.format("%s%02d.%02d.%02d %s%03d.%02d.%02d", ns, nsDegrees, nsMinutes,
           nsSeconds.intValue(), ew, ewDegrees, ewMinutes, ewSeconds.intValue());
     }
 

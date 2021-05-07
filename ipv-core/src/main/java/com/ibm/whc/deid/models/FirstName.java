@@ -7,6 +7,8 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class FirstName implements LocalizedEntity, ManagedResource, Serializable {
 
@@ -24,6 +26,18 @@ public class FirstName implements LocalizedEntity, ManagedResource, Serializable
    * @param gender the gender
    */
   public FirstName(String name, String nameCountryCode, Gender gender) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "first name"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(nameCountryCode), "first name locale"));
+    }
+    if (gender == null) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(gender), "first name gender"));
+    }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
     this.gender = gender;
@@ -59,6 +73,6 @@ public class FirstName implements LocalizedEntity, ManagedResource, Serializable
 
   @Override
   public String getKey() {
-    return name;
+    return name.toUpperCase();
   }
 }

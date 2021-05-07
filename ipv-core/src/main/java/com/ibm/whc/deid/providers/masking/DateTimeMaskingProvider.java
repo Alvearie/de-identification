@@ -96,11 +96,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final int dateYearDeleteNDaysValue;
   private final boolean dateYearDeleteNInterval;
   private final String dateYearDeleteComparedValue;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
   private final DateTimeFormatter fixedDateFormat;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
+    super(configuration);
+
     String fixedDateFormatString = configuration.getFormatFixed();
     this.fixedDateFormat =
         (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())
@@ -169,13 +169,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.dateYearDeleteNDaysValue = configuration.getYearDeleteNdaysValue();
     this.dateYearDeleteNInterval = configuration.isYearDeleteNinterval();
     this.dateYearDeleteComparedValue = configuration.getYearDeleteNointervalComparedateValue();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig,
       String compareDateValue) {
+    super(dateDependencyConfig);
 
     // Set some default values needed for date dependency
     this.dateYearDelete = false;
@@ -249,9 +247,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.overrideMask = configuration.isOverrideMask();
     this.overrideYearsPassed = configuration.getOverrideYearsPassed();
     this.overrideValue = configuration.getOverrideValue();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   /*
@@ -291,14 +286,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     if (fixedDateFormat == null) {
       Tuple<DateTimeFormatter, Date> tuple = dateTimeIdentifier.parse(identifier);
       if (tuple == null) {
-        warnFaultyInput("tuple");
-        if (unspecifiedValueHandling == 2) {
-          return RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC));
-        } else if (unspecifiedValueHandling == 3) {
-          return unspecifiedValueReturnMessage;
-        } else {
-          return null;
-        }
+        return applyUnexpectedValueHandling(identifier,
+            () -> RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
       }
 
       f = tuple.getFirst();
@@ -522,13 +511,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
           }
           comparedDate = LocalDateTime.ofInstant(compareInstant, ZoneId.systemDefault());
         } catch (Exception e) {
-          if (unspecifiedValueHandling == 2) {
-            return RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC));
-          } else if (unspecifiedValueHandling == 3) {
-            return unspecifiedValueReturnMessage;
-          } else {
-            return null;
-          }
+          return applyUnexpectedValueHandling(identifier, () -> RandomGenerators
+              .generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
         }
         long daysBetween = Math.abs(ChronoUnit.DAYS.between(givenDate, comparedDate));
         if (daysBetween <= dateYearDeleteNDaysValue) {

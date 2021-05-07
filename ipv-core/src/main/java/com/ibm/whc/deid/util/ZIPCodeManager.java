@@ -16,12 +16,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.ZIPCode;
 import com.ibm.whc.deid.resources.LocalizedResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class ZIPCodeManager extends LocalizedResourceManager<ZIPCode> {
 
@@ -57,38 +59,73 @@ public class ZIPCodeManager extends LocalizedResourceManager<ZIPCode> {
   public static ZIPCodeManager buildZIPCodeManager(String localizationProperty) {
     ZIPCodeManager manager = new ZIPCodeManager();
 
-    Collection<ResourceEntry> resourceEntries =
-        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
-    for (ResourceEntry entry : resourceEntries) {
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (InputStream inputStream = entry.createStream()) {
-        String countryCode = entry.getCountryCode();
+        try (InputStream inputStream = entry.createStream()) {
+          String countryCode = entry.getCountryCode();
+          String fileName = entry.getFilename();
 
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
-            String code = line.get(0);
-            if (!code.trim().isEmpty()) {
-              String populationString = line.get(1);
-              try {
-                int population = Integer.parseInt(populationString);
-                ZIPCode zipCode = new ZIPCode(code, population);
-                manager.add(zipCode);
-                manager.add(countryCode, zipCode);
-              } catch (NumberFormatException e) {
-                logger.logWarn(LogCodes.WPH1014W, populationString, resourceType + ".population");
-              }
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, countryCode, manager, line);
             }
           }
         }
-
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
     populateCountryProperties(manager, localizationProperty);
 
     return manager;
+  }
+
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param countryCode the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, String countryCode, ZIPCodeManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(countryCode, manager, record.get(0), record.get(1));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param countryCode the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(String countryCode, ZIPCodeManager manager, String... record) {
+    String code = record[0];
+    String populationString = record[1];
+    ZIPCode zipCode = new ZIPCode(code, populationString);
+    manager.add(zipCode);
+    manager.add(countryCode, zipCode);
   }
 
   protected static void populateCountryProperties(ZIPCodeManager manager,

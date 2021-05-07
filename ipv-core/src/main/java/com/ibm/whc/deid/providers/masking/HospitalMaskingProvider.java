@@ -17,17 +17,13 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
   private static final long serialVersionUID = 7964959969532210677L;
 
   protected final boolean preserveCountry;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   protected transient volatile HospitalManager hospitalResourceManager = null;
 
   public HospitalMaskingProvider(HospitalMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.preserveCountry = configuration.isMaskPreserveCountry();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -40,24 +36,21 @@ public class HospitalMaskingProvider extends AbstractMaskingProvider {
     HospitalManager hospitalManager = getHospitalManager();
 
     if (!this.preserveCountry) {
-      return hospitalManager.getRandomKey();
+      return getRandomHospitalName(hospitalManager);
     }
 
+    // preserveCountry was specified
     Hospital hospital = hospitalManager.getValue(identifier);
-
     if (hospital == null) {
-      // TODO: verify is hospital is an essential field
-      warnFaultyInput("hospital");
-      if (unspecifiedValueHandling == 2) {
-        return hospitalManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier, () -> getRandomHospitalName(hospitalManager));
     }
+    Hospital randomHospital = hospitalManager.getRandomValue(hospital.getNameCountryCode());
+    return randomHospital == null ? null : randomHospital.getName();
+  }
 
-    return hospitalManager.getRandomKey(hospital.getNameCountryCode());
+  protected String getRandomHospitalName(HospitalManager hospitalManager) {
+    Hospital hospital = hospitalManager.getRandomValue();
+    return hospital == null ? null : hospital.getName();
   }
 
   protected HospitalManager getHospitalManager() {

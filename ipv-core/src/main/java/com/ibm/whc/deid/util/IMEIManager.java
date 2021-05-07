@@ -12,12 +12,14 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.resources.ResourceManager;
 import com.ibm.whc.deid.resources.StringResource;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class IMEIManager extends ResourceManager<StringResource> {
 
@@ -48,14 +50,11 @@ public class IMEIManager extends ResourceManager<StringResource> {
       for (ResourceEntry entry : resourceEntries) {
 
         try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
 
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
             for (CSVRecord line : reader) {
-
-              String tac = line.get(0);
-              if (!tac.trim().isEmpty()) {
-                manager.add(new StringResource(tac));
-              }
+              loadCSVRecord(fileName, manager, line);
             }
           }
         }
@@ -66,5 +65,43 @@ public class IMEIManager extends ResourceManager<StringResource> {
     }
 
     return manager;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, IMEIManager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(IMEIManager manager, String... record) {
+    String tac = record[0];
+    if (!tac.trim().isEmpty()) {
+      manager.add(new StringResource(tac));
+    }
   }
 }

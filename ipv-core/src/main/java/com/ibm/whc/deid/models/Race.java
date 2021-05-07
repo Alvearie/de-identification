@@ -7,7 +7,12 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
+/**
+ * A resource that represents a race or ethnicity.
+ */
 public class Race implements LocalizedEntity, ManagedResource, Serializable {
 
   private static final long serialVersionUID = -7426090366511879997L;
@@ -18,10 +23,20 @@ public class Race implements LocalizedEntity, ManagedResource, Serializable {
   /**
    * Instantiates a new Race.
    *
-   * @param name the name
-   * @param nameCountryCode the name country code
+   * @param name the identifier of the race or ethnicity
+   * @param nameCountryCode a code for the containing country or locale for this resource
+   * 
+   * @throws IllegalArgumentException if any of the input is null, empty, or otherwise invalid
    */
   public Race(String name, String nameCountryCode) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "race"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(nameCountryCode), "race locale"));
+    }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
   }

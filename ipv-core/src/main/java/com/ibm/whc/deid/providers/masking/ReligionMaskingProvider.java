@@ -18,16 +18,11 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = 4551913201853798655L;
 
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
-
   protected transient volatile ReligionManager religionResourceManager = null;
 
   public ReligionMaskingProvider(ReligionMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
   }
 
   @Override
@@ -37,22 +32,8 @@ public class ReligionMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    ReligionManager religionManager = getReligionManager();
-
-    Religion religion = religionManager.getValue(identifier);
-
-    if (religion == null) {
-      debugFaultyInput("religion");
-      if (unspecifiedValueHandling == 2) {
-        return religionManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
-    return religionManager.getRandomKey(religion.getNameCountryCode());
+    Religion religion = getReligionManager().getRandomValue();
+    return religion == null ? null : religion.getName();
   }
 
   protected ReligionManager getReligionManager() {

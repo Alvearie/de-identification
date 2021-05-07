@@ -19,6 +19,7 @@ import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
 import com.ibm.whc.deid.providers.identifiers.URLIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.URLMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class URLMaskingProviderTest extends TestLogSetUp {
@@ -359,7 +360,7 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidURLInputValidHandlingReturnDefaultCustomValue() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
         deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 

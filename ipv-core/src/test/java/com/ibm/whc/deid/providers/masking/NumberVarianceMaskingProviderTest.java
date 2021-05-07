@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,8 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
 import com.ibm.whc.deid.shared.pojo.config.masking.NumberVarianceMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import org.junit.Test;
 
 public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
@@ -21,6 +22,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
    * limitDown is zero, and 3) when both limit up and down are zero (considered invalid and
    * exception thrown)
    */
+
   @Test
   public void testMask() {
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider();
@@ -300,6 +302,9 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithNoPrecisionInvalidRange() {
+
+    // this should not occur as validation should have prevented the provider from being called
+
     Double originalValue = new Double(50);
     String value = originalValue.toString();
     int lowerBound = 2;
@@ -312,18 +317,24 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     configuration.setResultWithPrecision(false);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(value);
-      assertNull(maskedValue);
+    try {
+      maskingProvider.mask(value);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      String message = e.getMessage();
+      assertTrue(message, message.contains("2.0 2.0 false"));
     }
   }
 
   @Test
   public void testAugmentWithPrecisionInvalidRange() {
+
+    // this should not occur as validation should have prevented the provider from being called
+
     Double originalValue = new Double(50);
     String value = originalValue.toString();
-    int lowerBound = 4;
-    int upperBound = 2;
+    int lowerBound = 44;
+    int upperBound = 22;
 
     NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
     configuration.setAugmentMask(true);
@@ -332,9 +343,12 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     configuration.setResultWithPrecision(true);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    for (int i = 0; i < 100; i++) {
-      String maskedValue = maskingProvider.mask(value);
-      assertNull(maskedValue);
+    try {
+      maskingProvider.mask(value);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      String message = e.getMessage();
+      assertTrue(message, message.contains("44.0 22.0 true"));
     }
   }
 
@@ -381,7 +395,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidNumberVarianceInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
     String invalidNumberVariance = "Invalid NumberVariance";

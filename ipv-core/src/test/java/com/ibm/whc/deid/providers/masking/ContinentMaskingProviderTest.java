@@ -5,10 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.util.Arrays;
@@ -20,7 +19,10 @@ import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.ContinentMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
-public class ContinentMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class ContinentMaskingProviderTest implements MaskingProviderTest {
+
+  public static final HashSet<String> TEST_CONTINENTS =
+      new HashSet<>(Arrays.asList("xAS", "Europe", "xAF", "xNA", "xSA", "xAU", "xAN"));
 
   @Test
   public void testMaskClosest() throws Exception {
@@ -36,7 +38,39 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
 
     for (int i = 0; i < 100; i++) {
       String maskedContinent = maskingProvider.mask(originalContinent);
-      assertTrue(validNeighbors.contains(maskedContinent));
+      assertTrue(maskedContinent, validNeighbors.contains(maskedContinent));
+    }
+  }
+
+  @Test
+  public void testMaskClosest_noLocation() throws Exception {
+    ContinentMaskingProviderConfig configuration = new ContinentMaskingProviderConfig();
+    configuration.setMaskClosest(true);
+    configuration.setMaskClosestK(99);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    MaskingProvider maskingProvider =
+        new ContinentMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
+
+    String originalContinent = "Europe";
+    for (int i = 0; i < 100; i++) {
+      String maskedContinent = maskingProvider.mask(originalContinent);
+      assertFalse(originalContinent.equalsIgnoreCase(maskedContinent));
+      assertFalse("xNA".equalsIgnoreCase(maskedContinent)); // no location for this one
+      assertTrue(TEST_CONTINENTS.contains(maskedContinent));
+    }
+
+    originalContinent = "xNA"; // no location for this one
+    String maskedContinent = maskingProvider.mask(originalContinent);
+    assertEquals("OTHER", maskedContinent);
+
+    configuration = new ContinentMaskingProviderConfig();
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    maskingProvider =
+        new ContinentMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
+
+    for (int i = 0; i < 100; i++) {
+      maskedContinent = maskingProvider.mask(originalContinent);
+      assertTrue(TEST_CONTINENTS.contains(maskedContinent));
     }
   }
 
@@ -78,7 +112,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
     assertEquals(null, maskedContinent);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -93,7 +126,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
     assertEquals(null, maskedContinent);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -110,7 +142,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
 
     assertNotNull(maskedContinent);
     assertTrue(identifier.isOfThisType(maskedContinent));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -126,7 +157,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
     assertEquals("OTHER", maskedContinent);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -143,7 +173,6 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
     String maskedContinent = maskingProvider.mask(invalidContinent);
 
     assertEquals("Test Continent", maskedContinent);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -196,5 +225,4 @@ public class ContinentMaskingProviderTest extends TestLogSetUp implements Maskin
       assertTrue(diff < 10000);
     }
   }
-
 }

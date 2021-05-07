@@ -21,16 +21,12 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
 
   private final boolean preserveIssuer;
   private final int preservedDigits;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   protected transient volatile CreditCardTypeManager creditCardTypeManager = null;
 
   public CreditCardMaskingProvider(CreditCardMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
     this.preserveIssuer = configuration.isIssuerPreserve();
     this.preservedDigits = this.preserveIssuer ? 6 : 0;
   }
@@ -66,14 +62,8 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     }
 
     if (digitsEncountered != 16) {
-      debugFaultyInput("digitsEncountered");
-      if (unspecifiedValueHandling == 2) {
-        return RandomGenerators.generateRandomCreditCard(getCreditCardTypeManager());
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier,
+          () -> RandomGenerators.generateRandomCreditCard(getCreditCardTypeManager()));
     }
     digitsEncountered = 0;
 
