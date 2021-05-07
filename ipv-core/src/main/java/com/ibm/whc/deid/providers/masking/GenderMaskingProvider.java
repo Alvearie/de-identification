@@ -16,16 +16,11 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -5037078935103051994L;
 
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
-
   protected transient volatile GenderManager genderResourceManager = null;
 
   public GenderMaskingProvider(GenderMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
   }
 
   @Override
@@ -35,21 +30,8 @@ public class GenderMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    GenderManager genderManager = getGenderManager();
-
-    Sex sex = genderManager.getValue(identifier);
-    if (sex == null) {
-      debugFaultyInput("sex");
-      if (unspecifiedValueHandling == 2) {
-        return genderManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
-    return genderManager.getRandomKey(sex.getNameCountryCode());
+    Sex sex = getGenderManager().getRandomValue();
+    return sex == null ? null : sex.getName();
   }
 
   protected GenderManager getGenderManager() {

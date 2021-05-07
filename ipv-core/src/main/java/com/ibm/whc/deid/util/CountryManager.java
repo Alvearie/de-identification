@@ -147,12 +147,11 @@ public class CountryManager implements Manager {
     String friendlyName = record[3];
     String continent = record[4];
     /* TODO: temp fix until data is finished */
-    if (continent != null && continent.equals("Unknown")) {
-      return;
+    if ("Unknown".equals(continent)) {
+      continent = null;
     }
     String latitude = record[5];
     String longitude = record[6];
-
     manager.add(countryName, iso2Letter, iso3Letter, continent, latitude, longitude, locale,
         friendlyName);
   }
@@ -163,20 +162,27 @@ public class CountryManager implements Manager {
         longitude, countryCode, CountryNameSpecification.NAME);
     countryNames.add(country);
     countryNames.add(countryCode, country);
+
     if (friendlyName != null && !friendlyName.trim().isEmpty()) {
       country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
           countryCode, CountryNameSpecification.NAME, friendlyName);
       countryNames.add(country);
       countryNames.add(countryCode, country);
     }
-    country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
-        countryCode, CountryNameSpecification.ISO2);
-    countryISO2Codes.add(country);
-    countryISO2Codes.add(countryCode, country);
-    country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
-        countryCode, CountryNameSpecification.ISO3);
-    countryISO3Codes.add(country);
-    countryISO3Codes.add(countryCode, country);
+
+    if (iso2Letter != null && !iso2Letter.trim().isEmpty()) {
+      country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
+          countryCode, CountryNameSpecification.ISO2);
+      countryISO2Codes.add(country);
+      countryISO2Codes.add(countryCode, country);
+    }
+
+    if (iso3Letter != null && !iso3Letter.trim().isEmpty()) {
+      country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
+          countryCode, CountryNameSpecification.ISO3);
+      countryISO3Codes.add(country);
+      countryISO3Codes.add(countryCode, country);
+    }
   }
 
   public String getPseudorandom(String identifier) {
@@ -213,7 +219,7 @@ public class CountryManager implements Manager {
   public String getClosestCountry(String identifier, int k) {
     String selected = null;
     Country country = getValue(identifier);
-    if (country != null) {
+    if (country != null && country.getLocation() != null) {
       CountryNameSpecification spec = country.getCountryNameSpecification();
       CountrySpecificationResourceManager manager = countryNames;
       if (spec == CountryNameSpecification.ISO2) {

@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.BinningMaskingProviderConfig;
-import com.ibm.whc.deid.shared.pojo.config.masking.ConfigConstant;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 
 public class BinningMaskingProviderTest extends TestLogSetUp {
   @Test
@@ -61,7 +61,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     maskingProvider = new BinningMaskingProvider(config);
 
     maskedValue = maskingProvider.mask(originalValue);
-    assertEquals(ConfigConstant.UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER, maskedValue);
+    assertEquals(MaskingProviderConfig.UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER, maskedValue);
 
     config = new BinningMaskingProviderConfig();
     config.setUnspecifiedValueHandling(3);

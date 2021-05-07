@@ -41,7 +41,11 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   private String name = "";
 
   public AbstractMaskingProvider() {
-    this(null, null);
+    this(null, null, null);
+  }
+
+  public AbstractMaskingProvider(MaskingProviderConfig config) {
+    this(null, null, config);
   }
 
   public AbstractMaskingProvider(String tenantId, String localizationProperty) {
@@ -163,9 +167,9 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
           response = null;
       }
     } else {
-      if (unspecifiedValueHandling == 2) {
+      if (unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_RANDOM) {
         response = randomGenerator == null ? null : randomGenerator.get();
-      } else if (unspecifiedValueHandling == 3) {
+      } else if (unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_MESSAGE) {
         response = unspecifiedValueReturnMessage;
       } else {
         response = null;
@@ -177,7 +181,8 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
 
   protected boolean isUnexpectedValueHandlingRandom() {
     // unexpectedInputHandler has priority
-    return unexpectedInputHandler == null ? unspecifiedValueHandling == 2
+    return unexpectedInputHandler == null
+        ? unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_RANDOM
         : unexpectedInputHandler == UnexpectedMaskingInputHandler.RANDOM;
   }
 }

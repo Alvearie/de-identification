@@ -28,21 +28,17 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
   private final boolean maskQuery;
   private final int preserveDomains;
   private final MaskingProviderFactory maskingProviderFactory;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
   private final DeidMaskingConfig deidMaskingConfig;
 
   public URLMaskingProvider(URLMaskingProviderConfig configuration, String tenantId,
       DeidMaskingConfig deidMaskingConfig, String localizationProperty, MaskingProviderFactory maskingProviderFactory) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.random = new SecureRandom();
     this.maskUsernamePassword = configuration.isMaskUsernamePassword();
     this.randomizePort = configuration.isMaskPort();
     this.preserveDomains = configuration.getPreserveDomains();
     this.removeQuery = configuration.isMaskRemoveQuery();
     this.maskQuery = configuration.isMaskMaskQuery();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.deidMaskingConfig = deidMaskingConfig;
     this.maskingProviderFactory = maskingProviderFactory;
   }
@@ -185,13 +181,11 @@ public class URLMaskingProvider extends AbstractMaskingProvider {
     }
 
     URL url = null;
-
     try {
       url = new URL(identifier);
     } catch (MalformedURLException e) {
       // For this provider, we do not return random URL
-      debugFaultyInput("url");
-      return unspecifiedValueHandling == 3 ? unspecifiedValueReturnMessage : null;
+      return applyUnexpectedValueHandling(identifier, null);
     }
 
     return maskURL(url);

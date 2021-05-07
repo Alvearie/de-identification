@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,7 +12,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.SSNUKMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
 
 public class SSNUKMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -5292579407685862344L;
 
   /*
@@ -24,13 +24,12 @@ public class SSNUKMaskingProvider extends AbstractMaskingProvider {
    * time.[7][8] The suffix letter is either A, B, C, or D.[5] (although F, M, and P have been used
    * for temporary numbers in the past)
    */
-  private static final SSNUKIdentifier identifier = new SSNUKIdentifier();
+  private static final SSNUKIdentifier ssnukIdentifier = new SSNUKIdentifier();
   private static final char[] allowedFirstLetters = "ABCEGHJKLMNOPRSTWXYZ".toCharArray();
   private static final char[] allowedSecondLetters = "ABCEGHJKLMNPRSTWXYZ".toCharArray();
   private static final char[] allowedSuffixLetters = "ABCD".toCharArray();
+
   private final boolean preservePrefix;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   /** Instantiates a new Ssnuk masking provider. */
   public SSNUKMaskingProvider() {
@@ -38,10 +37,9 @@ public class SSNUKMaskingProvider extends AbstractMaskingProvider {
   }
 
   public SSNUKMaskingProvider(SSNUKMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.preservePrefix = configuration.isMaskPreservePrefix();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -51,35 +49,34 @@ public class SSNUKMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    String prefix;
+    String prefix = null;
 
-    if (!SSNUKMaskingProvider.identifier.isOfThisType(identifier)) {
-      debugFaultyInput("SSNUKMaskingProvider");
-      if (unspecifiedValueHandling == 2) {
-        prefix = "" + allowedFirstLetters[random.nextInt(allowedFirstLetters.length)];
-        prefix += allowedSecondLetters[random.nextInt(allowedSecondLetters.length)];
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    } else {
-      if (!this.preservePrefix) {
-        prefix = "" + allowedFirstLetters[random.nextInt(allowedFirstLetters.length)];
-        prefix += allowedSecondLetters[random.nextInt(allowedSecondLetters.length)];
-      } else {
+    if (preservePrefix) {
+      if (SSNUKMaskingProvider.ssnukIdentifier.isOfThisType(identifier)) {
         prefix = identifier.substring(0, 2);
+      } else {
+        if (isUnexpectedValueHandlingRandom()) {
+          // add the debug message, but keep going to get a random value
+          debugFaultyInput(identifier);
+        } else {
+          return applyUnexpectedValueHandling(identifier, null);
+        }
       }
     }
 
+    if (prefix == null) {
+      prefix = "" + allowedFirstLetters[random.nextInt(allowedFirstLetters.length)];
+      prefix += allowedSecondLetters[random.nextInt(allowedSecondLetters.length)];
+    }
+
     StringBuilder builder = new StringBuilder(prefix);
+
     for (int i = 0; i < 6; i++) {
       char randomDigit = RandomGenerators.randomDigit();
       builder.append(randomDigit);
     }
 
     char suffix = allowedSuffixLetters[random.nextInt(allowedSuffixLetters.length)];
-
     builder.append(suffix);
 
     return builder.toString();

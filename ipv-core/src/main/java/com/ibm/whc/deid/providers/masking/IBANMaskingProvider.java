@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -18,8 +18,6 @@ public class IBANMaskingProvider extends AbstractMaskingProvider {
   private static final IBANIdentifier ibanIdentifier = new IBANIdentifier();
 
   private final boolean preserveCountry;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   /** Instantiates a new Iban masking provider. */
   public IBANMaskingProvider() {
@@ -33,10 +31,9 @@ public class IBANMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public IBANMaskingProvider(IBANMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.preserveCountry = configuration.isMaskPreserveCountry();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -46,18 +43,10 @@ public class IBANMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    if (!ibanIdentifier.isOfThisType(identifier)) {
-      debugFaultyInput("ibanIdentifier");
-      if (unspecifiedValueHandling == 2) {
-        return Iban.random().toString();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
-    }
-
     if (this.preserveCountry) {
+      if (!ibanIdentifier.isOfThisType(identifier)) {
+        return applyUnexpectedValueHandling(identifier, () -> Iban.random().toString());
+      }
       return Iban.random(CountryCode.valueOf(identifier.substring(0, 2))).toString();
     }
 

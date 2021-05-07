@@ -69,13 +69,40 @@ public class ContinentManagerTest implements MaskingProviderTest {
 
   @Test
   public void testLoadRecord() {
-    String[] record =
-        new String[] {"Asia", "23.3", "-78.3"};
     ContinentManager manager = new ContinentManager();
     String locale = "en";
 
+    String[] record = new String[] {"C1", null, null};
     ContinentManager.loadRecord(locale, manager, record);
-    Continent continent = manager.getValue("asia");
+    Continent continent = manager.getValue("c1");
+    assertNotNull(continent);
+    assertEquals("C1", continent.getName());
+    assertEquals(locale, continent.getNameCountryCode());
+    assertNull(continent.getLocation());
+    assertSame(continent, manager.getValue(locale, "c1"));
+
+    record = new String[] {"c2", " ", "100.0"};
+    ContinentManager.loadRecord(locale, manager, record);
+    continent = manager.getValue("C2");
+    assertNotNull(continent);
+    assertEquals("c2", continent.getName());
+    assertEquals(locale, continent.getNameCountryCode());
+    assertNull(continent.getLocation());
+    assertSame(continent, manager.getValue(locale, "c2"));
+
+    record = new String[] {"c3", "0.1", " "};
+    ContinentManager.loadRecord(locale, manager, record);
+    continent = manager.getValue("C3");
+    assertNotNull(continent);
+    assertEquals("c3", continent.getName());
+    assertEquals(locale, continent.getNameCountryCode());
+    assertNull(continent.getLocation());
+    assertSame(continent, manager.getValue(locale, "c3"));
+
+    record = new String[] {"Asia", "23.3", "-78.3"};
+
+    ContinentManager.loadRecord(locale, manager, record);
+    continent = manager.getValue("asia");
     assertNotNull(continent);
     assertEquals("Asia", continent.getName());
     assertEquals(locale, continent.getNameCountryCode());
@@ -105,20 +132,6 @@ public class ContinentManagerTest implements MaskingProviderTest {
 
     // bad latitude
     temp = record[1];
-    record[1] = null;
-    try {
-      ContinentManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("latitude"));
-    }
-    record[1] = "   ";
-    try {
-      ContinentManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
     record[1] = "AX";
     try {
       ContinentManager.loadRecord(locale, manager, record);
@@ -144,20 +157,6 @@ public class ContinentManagerTest implements MaskingProviderTest {
 
     // bad longitude
     temp = record[2];
-    record[2] = null;
-    try {
-      ContinentManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
-    record[2] = "   ";
-    try {
-      ContinentManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
     record[2] = "AX";
     try {
       ContinentManager.loadRecord(locale, manager, record);

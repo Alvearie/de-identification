@@ -30,7 +30,7 @@ public class LatitudeLongitudeIdentifier extends AbstractRegexBasedIdentifier {
   private static final Pattern compassPattern = Pattern.compile(
       "^(?<ns>[NS])(((?<nsDegrees>[0-8][0-9])\\.(?<nsMinutes>[0-5]\\d)\\.(?<nsSeconds>[0-5]\\d))|((?<nsDegrees2>90)(?<nsMinutes2>\\.00)(?<nsSeconds2>\\.00)))[ |,](?<ew>[EW])(((?<ewDegrees>(0\\d\\d|1[0-7]\\d))\\.(?<ewMinutes>[0-5]\\d)\\.(?<ewSeconds>[0-5]\\d))|((?<ewDegrees2>180)\\.(?<ewMinutes2>00)\\.(?<ewSeconds2>00)))$");
   private static final Pattern dmsCoordinatePattern = Pattern.compile(
-      "(?<nsDegrees>[0-9]{1,2})[:|°](?<nsMinutes>[0-9]{1,2})[:|'](?<nsSeconds>(?:\\b[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+\\b))\"?(?<ns>[N|S])[ |,](?<ewDegrees>[0-9]{1,2})[:|°](?<ewMinutes>[0-9]{1,2})[:|'](?<ewSeconds>(?:\\b[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+\\b))\"?(?<ew>[E|W])",
+      "(?<nsDegrees>[0-9]{1,2})[:|°](?<nsMinutes>[0-9]{1,2})[:|'](?<nsSeconds>(?:\\b[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+\\b))\"?(?<ns>[N|S])[ |,](?<ewDegrees>(1[0-7]\\d|0?[0-9]{1,2}))[:|°](?<ewMinutes>[0-9]{1,2})[:|'](?<ewSeconds>(?:\\b[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+\\b))\"?(?<ew>[E|W])",
       Pattern.UNICODE_CASE);
 
   private Collection<Pattern> coordinatePatterns =

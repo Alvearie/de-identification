@@ -12,11 +12,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.resources.ResourceManager;
 import com.ibm.whc.deid.resources.StringResource;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class ATCManager extends ResourceManager<StringResource> {
 
@@ -44,14 +46,11 @@ public class ATCManager extends ResourceManager<StringResource> {
           LocalizationManager.getInstance(localizationProperty).getResources(Resource.ATC_CODES);
       for (ResourceEntry entry : resourceEntries) {
         try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
 
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
             for (CSVRecord line : reader) {
-              String code = line.get(0);
-              if (!code.isEmpty()) {
-                StringResource resource = new StringResource(code);
-                atcManager.add(resource);
-              }
+              loadCSVRecord(fileName, atcManager, line);
             }
           }
         }
@@ -62,5 +61,44 @@ public class ATCManager extends ResourceManager<StringResource> {
     }
 
     return atcManager;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, ATCManager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(ATCManager manager, String... record) {
+    String code = record[0];
+    if (!code.trim().isEmpty()) {
+      StringResource resource = new StringResource(code);
+      manager.add(resource);
+    }
   }
 }

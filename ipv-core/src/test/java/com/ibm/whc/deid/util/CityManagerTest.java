@@ -46,9 +46,42 @@ public class CityManagerTest implements MaskingProviderTest {
     assertNotNull(location);
     assertEquals(23.3, location.getLatitude(), 0);
     assertEquals(-78.3, location.getLongitude(), 0);
-    assertEquals("Canada", city.getCountryCode());
     assertEquals("EN", city.getNameCountryCode());
     assertEquals(city, manager.getValue("eN", "ROCHESTER"));
+
+    record = new String[] {"Byron", null, "-78.3", "Canada"};
+    CityManager.loadRecord(locale, manager, record);
+    city = manager.getValue("byron");
+    assertEquals("Byron", city.getName());
+    assertNull(city.getLocation());
+    assertEquals("EN", city.getNameCountryCode());
+    assertEquals(city, manager.getValue("eN", "BYRON"));
+
+    record = new String[] {"Kasson", "", "-78.3", "Canada"};
+    CityManager.loadRecord(locale, manager, record);
+    city = manager.getValue("kasson");
+    assertEquals("Kasson", city.getName());
+    assertNull(city.getLocation());
+    assertEquals("EN", city.getNameCountryCode());
+    assertEquals(city, manager.getValue("eN", "KASSON"));
+
+    record = new String[] {"Pine Island", "54.19", null, "Canada"};
+    CityManager.loadRecord(locale, manager, record);
+    city = manager.getValue("pine island");
+    assertEquals("Pine Island", city.getName());
+    assertNull(city.getLocation());
+    assertEquals("EN", city.getNameCountryCode());
+    assertEquals(city, manager.getValue("eN", "PINE ISLAND"));
+
+    record = new String[] {"Zumbrota", "54.19", " ", "Canada"};
+    CityManager.loadRecord(locale, manager, record);
+    city = manager.getValue("zumbrota");
+    assertEquals("Zumbrota", city.getName());
+    assertNull(city.getLocation());
+    assertEquals("EN", city.getNameCountryCode());
+    assertEquals(city, manager.getValue("eN", "ZUMBROTA"));
+
+    record = new String[] {"Rochester", "23.3", "-78.3"};
 
     // bad name
     String temp = record[0];
@@ -70,20 +103,6 @@ public class CityManagerTest implements MaskingProviderTest {
 
     // bad latitude
     temp = record[1];
-    record[1] = null;
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
-    record[1] = "   ";
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
     record[1] = "AX";
     try {
       CityManager.loadRecord(locale, manager, record);
@@ -109,20 +128,6 @@ public class CityManagerTest implements MaskingProviderTest {
 
     // bad longitude
     temp = record[2];
-    record[2] = null;
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
-    record[2] = "   ";
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
     record[2] = "AX";
     try {
       CityManager.loadRecord(locale, manager, record);
@@ -145,24 +150,6 @@ public class CityManagerTest implements MaskingProviderTest {
       assertTrue(e.getMessage().contains("longitude"));
     }
     record[2] = temp;
-
-    // bad country code
-    temp = record[3];
-    record[3] = null;
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("city country"));
-    }
-    record[3] = " ";
-    try {
-      CityManager.loadRecord(locale, manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("city country"));
-    }
-    record[3] = temp;
 
     // bad locale
     temp = locale;

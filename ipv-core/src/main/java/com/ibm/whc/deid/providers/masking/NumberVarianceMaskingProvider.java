@@ -20,14 +20,13 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
   private final double augmentUpperBound;
   private final boolean resultWithPrecision;
   private final int precisionDigits;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   public NumberVarianceMaskingProvider() {
     this(new NumberVarianceMaskingProviderConfig());
   }
 
   public NumberVarianceMaskingProvider(NumberVarianceMaskingProviderConfig configuration) {
+    super(configuration);
     this.limitDown = configuration.getMaskLimitDown();
     this.limitUp = configuration.getMaskLimitUp();
     this.augmentMask = configuration.isAugmentMask();
@@ -35,8 +34,6 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
     this.augmentUpperBound = configuration.getAugmentUpperBound();
     this.resultWithPrecision = configuration.isResultWithPrecision();
     this.precisionDigits = configuration.getPrecisionDigits();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -52,26 +49,18 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
       number = Double.parseDouble(identifier);
     } catch (NumberFormatException e) {
       // For this provider, we do not return random value
-      debugFaultyInput("number");
-      return unspecifiedValueHandling == 3 ? unspecifiedValueReturnMessage : null;
+      return applyUnexpectedValueHandling(identifier, null);
     }
 
     String numberAsString;
 
     if (augmentMask) {
-      // Ensure proper range boundaries. Null return value indicates
-      // masking failure.
-      if ((augmentLowerBound > augmentUpperBound) || // results
-      // java.lang.IllegalArgumentException:
-      // bound must be
-      // positive
-          (augmentLowerBound == augmentUpperBound && !resultWithPrecision)) // results
-        // in
-        // interval=0
-        // and
-        // unmasked
-        // identifier
-        return null;
+      // Ensure proper range boundaries
+      if ((augmentLowerBound > augmentUpperBound)
+          || (augmentLowerBound == augmentUpperBound && !resultWithPrecision)) {
+        throw new IllegalArgumentException(Double.toString(augmentLowerBound) + " "
+            + Double.toString(augmentUpperBound) + " " + Boolean.toString(resultWithPrecision));
+      }
 
       if (resultWithPrecision) {
         if (number == (int) number) {

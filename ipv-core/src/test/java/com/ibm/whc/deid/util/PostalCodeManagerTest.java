@@ -38,114 +38,115 @@ public class PostalCodeManagerTest implements MaskingProviderTest {
 
   @Test
   public void testLoadRecord() {
-    String[] record =
-        new String[] {"55901", "23.3", "-78.3"};
     PostalCodeManager manager = new PostalCodeManager();
 
+    String[] record = new String[] {null, "58046", null, null};
+
     PostalCodeManager.loadRecord(manager, record);
-    PostalCode postal = manager.getValue("55901");
+    PostalCode postal = manager.getValue("58046");
+    assertNotNull(postal);
+    assertEquals("58046", postal.getName());
+    assertNull(postal.getLocation());
+    List<PostalCode> nearest = manager.getClosestPostalCodes(postal.getName(), 5);
+    assertNotNull(nearest);
+    assertEquals(0, nearest.size());
+
+    record = new String[] {"", "55902", "23.4", "-78.3"};
+
+    PostalCodeManager.loadRecord(manager, record);
+    postal = manager.getValue("55902");
+    assertNotNull(postal);
+    assertEquals("55902", postal.getName());
+    LatitudeLongitude location = postal.getLocation();
+    assertNotNull(location);
+    assertEquals(23.4, location.getLatitude(), 0);
+    assertEquals(-78.3, location.getLongitude(), 0);
+    nearest = manager.getClosestPostalCodes(postal.getName(), 5);
+    assertNotNull(nearest);
+    assertEquals(0, nearest.size());
+
+    record = new String[] {"x", "55901", "23.3", "-78.3"};
+
+    PostalCodeManager.loadRecord(manager, record);
+    postal = manager.getValue("55901");
     assertNotNull(postal);
     assertEquals("55901", postal.getName());
-    LatitudeLongitude location = postal.getLocation();
+    location = postal.getLocation();
     assertNotNull(location);
     assertEquals(23.3, location.getLatitude(), 0);
     assertEquals(-78.3, location.getLongitude(), 0);
+    nearest = manager.getClosestPostalCodes(postal.getName(), 5);
+    assertNotNull(nearest);
+    assertEquals(1, nearest.size());
+    assertEquals("55902", nearest.get(0).getName());
 
     // bad name
-    String temp = record[0];
-    record[0] = null;
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("postal code"));
-    }
-    record[0] = " ";
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("postal code"));
-    }
-    record[0] = temp;
-
-    // bad latitude
-    temp = record[1];
+    String temp = record[1];
     record[1] = null;
     try {
       PostalCodeManager.loadRecord(manager, record);
       fail("expected exception");
     } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
+      assertTrue(e.getMessage().contains("postal code"));
     }
-    record[1] = "   ";
+    record[1] = " ";
     try {
       PostalCodeManager.loadRecord(manager, record);
       fail("expected exception");
     } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
-    record[1] = "AX";
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
-    record[1] = "-91.4";
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
-    }
-    record[1] = "91.4";
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("latitude"));
+      assertTrue(e.getMessage().contains("postal code"));
     }
     record[1] = temp;
 
-    // bad longitude
+    // bad latitude
     temp = record[2];
-    record[2] = null;
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
-    record[2] = "   ";
-    try {
-      PostalCodeManager.loadRecord(manager, record);
-      fail("expected exception");
-    } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
-    }
     record[2] = "AX";
     try {
       PostalCodeManager.loadRecord(manager, record);
       fail("expected exception");
     } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
+      assertTrue(e.getMessage().contains("latitude"));
     }
-    record[2] = "-181.4";
+    record[2] = "-91.4";
     try {
       PostalCodeManager.loadRecord(manager, record);
       fail("expected exception");
     } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
+      assertTrue(e.getMessage().contains("latitude"));
     }
-    record[2] = "191.4";
+    record[2] = "91.4";
     try {
       PostalCodeManager.loadRecord(manager, record);
       fail("expected exception");
     } catch (RuntimeException e) {
-      assertTrue(e.getMessage().contains("longitude"));
+      assertTrue(e.getMessage().contains("latitude"));
     }
     record[2] = temp;
+
+    // bad longitude
+    temp = record[3];
+    record[3] = "AX";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[3] = "-181.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[3] = "191.4";
+    try {
+      PostalCodeManager.loadRecord(manager, record);
+      fail("expected exception");
+    } catch (RuntimeException e) {
+      assertTrue(e.getMessage().contains("longitude"));
+    }
+    record[3] = temp;
   }
 
   @Test

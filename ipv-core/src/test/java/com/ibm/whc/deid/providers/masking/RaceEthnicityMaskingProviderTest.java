@@ -5,23 +5,15 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.RaceEthnicityIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.RaceEthnicityMaskingProviderConfig;
 
-public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class RaceEthnicityMaskingProviderTest implements MaskingProviderTest {
   /*
-   * Race masking provider has no options. It tests for random masking of race value. It also tests
-   * for localization masking of race value.
+   * Race masking provider has no options. It tests for random masking of race value.
    */
 
   @Test
@@ -32,106 +24,23 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
     RaceEthnicityIdentifier identifier =
         new RaceEthnicityIdentifier(tenantId, localizationProperty);
 
-    String originalRace = "white";
-
+    String originalRace = "native hawaiian";
     int randomizationOK = 0;
-
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       String maskedRace = maskingProvider.mask(originalRace);
       assertTrue(identifier.isOfThisType(maskedRace));
-      if (!maskedRace.equals(originalRace)) {
+      if (!maskedRace.equalsIgnoreCase(originalRace)) {
         randomizationOK++;
       }
     }
     assertTrue(randomizationOK > 0);
-  }
 
-
-  @Test
-  public void testMaskNullRaceEthnicityInputReturnNull() throws Exception {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = null;
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertEquals(null, maskedRaceEthnicity);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidRaceEthnicityInputValidHandlingReturnNull() throws Exception {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = "Invalid RaceEthnicity";
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertEquals(null, maskedRaceEthnicity);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidRaceEthnicityInputValidHandlingReturnRandom() throws Exception {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new RaceEthnicityIdentifier(tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = "Invalid RaceEthnicity";
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertFalse(maskedRaceEthnicity.equals(invalidRaceEthnicity));
-    assertTrue(identifier.isOfThisType(maskedRaceEthnicity));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidRaceEthnicityInputValidHandlingReturnDefaultCustomValue()
-      throws Exception {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = "Invalid RaceEthnicity";
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertEquals("OTHER", maskedRaceEthnicity);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidRaceEthnicityInputValidHandlingReturnNonDefaultCustomValue() {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test RaceEthnicity");
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = "Invalid RaceEthnicity";
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertEquals("Test RaceEthnicity", maskedRaceEthnicity);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidRaceEthnicityInputInvalidHandlingReturnNull() throws Exception {
-    RaceEthnicityMaskingProviderConfig configuration = new RaceEthnicityMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new RaceEthnicityMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidRaceEthnicity = "Invalid RaceEthnicity";
-    String maskedRaceEthnicity = maskingProvider.mask(invalidRaceEthnicity);
-
-    assertEquals(null, maskedRaceEthnicity);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    // input data need not be recognized as a loaded resource
+    originalRace = "xxxx";
+    for (int i = 0; i < 20; i++) {
+      String maskedRace = maskingProvider.mask(originalRace);
+      assertTrue(identifier.isOfThisType(maskedRace));
+    }
   }
 
   @Test
@@ -165,5 +74,4 @@ public class RaceEthnicityMaskingProviderTest extends TestLogSetUp implements Ma
       }
     }
   }
-
 }

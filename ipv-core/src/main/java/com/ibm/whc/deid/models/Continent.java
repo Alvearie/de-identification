@@ -23,8 +23,11 @@ public class Continent implements Location, LocalizedEntity, Serializable, Manag
    *
    * @param name the name
    * @param nameCountryCode the locale code of the source data set
-   * @param latitude the latitude in decimal format as a string
-   * @param longitude the longitude in decimal format as a string
+   * @param latitude the latitude in decimal format as a string - optional
+   * @param longitude the longitude in decimal format as a string - optional
+   * 
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
    */
   public Continent(String name, String nameCountryCode, String latitude, String longitude) {
     if (name == null || name.trim().isEmpty()) {
@@ -37,7 +40,7 @@ public class Continent implements Location, LocalizedEntity, Serializable, Manag
     }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
-    this.latitudeLongitude = new LatitudeLongitude(latitude, longitude);
+    this.latitudeLongitude = LatitudeLongitude.buildLatitudeLongitude(latitude, longitude);
   }
 
   /**

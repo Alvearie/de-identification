@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,14 +13,11 @@ import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IPAddressMaskingProviderConfig;
 
 public class IPAddressMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 6044504090581893891L;
 
   private static final IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
   private final int preservedPrefixes;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
-
 
   /**
    * Instantiates a new Ip address masking provider.
@@ -32,10 +29,9 @@ public class IPAddressMaskingProvider extends AbstractMaskingProvider {
   }
 
   public IPAddressMaskingProvider(IPAddressMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.preservedPrefixes = configuration.getSubnetsPreserve();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   private String randomSubnet() {
@@ -94,15 +90,8 @@ public class IPAddressMaskingProvider extends AbstractMaskingProvider {
     } else if (ipAddressIdentifier.isIPv6(identifier)) {
       return directMask(identifier, false);
     } else {
-      debugFaultyInput("ipAddressIdentifier");
-      if (unspecifiedValueHandling == 2) {
-        return String.format("%d.%d.%d.%d", random.nextInt(255), random.nextInt(255),
-            random.nextInt(255), random.nextInt(255));
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier, () -> String.format("%d.%d.%d.%d",
+          random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255)));
     }
   }
 }

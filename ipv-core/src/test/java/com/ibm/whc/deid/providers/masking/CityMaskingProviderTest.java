@@ -233,7 +233,7 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     CityMaskingProviderConfig maskingConfiguration = new CityMaskingProviderConfig();
     maskingConfiguration.setMaskClosest(true);
     maskingConfiguration.setMaskClosestK(4);
-    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
 
     CityMaskingProvider maskingProvider =
         (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
@@ -250,9 +250,18 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
       assertTrue(maskedCity, neighbors.contains(maskedCity));
       selected.add(maskedCity);
     }
-    System.out.println(selected);
+    // System.out.println(selected);
+
+    // not recognized - apply unexpected value handling
+    originalCity = "DublinXXX";
+    String value = maskingProvider.mask(originalCity);
+    assertEquals("OTHER", value);
+    assertFalse(maskingProvider.getCityManager().isValidKey(originalCity));
     
-    String value = maskingProvider.mask("DublinXXX");
-    assertNull(value);
+    // no location available - apply unexpected value handling
+    originalCity = "Pittsburg";
+    value = maskingProvider.mask(originalCity);
+    assertEquals("OTHER", value);
+    assertTrue(maskingProvider.getCityManager().isValidKey(originalCity));
   }
 }

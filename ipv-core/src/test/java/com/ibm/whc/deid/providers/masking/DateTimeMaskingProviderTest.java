@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class DateTimeMaskingProviderTest extends TestLogSetUp {
   private static final String DATE_TIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
@@ -374,7 +375,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals(null, maskedDateTime);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -391,20 +392,20 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     assertFalse(maskedDateTime.equals(invalidDateTime));
     assertTrue(identifier.isOfThisType(maskedDateTime));
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
   public void testMaskInvalidDateTimeInputValidHandlingReturnDefaultCustomValue() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     String invalidDateTime = "Invalid Date Time";
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals("OTHER", maskedDateTime);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -419,7 +420,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals("Test Date Time", maskedDateTime);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -432,7 +433,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals(null, maskedDateTime);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 
   @Test

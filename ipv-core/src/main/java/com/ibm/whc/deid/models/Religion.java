@@ -7,6 +7,8 @@ package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
 import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class Religion implements LocalizedEntity, ManagedResource, Serializable {
 
@@ -19,9 +21,19 @@ public class Religion implements LocalizedEntity, ManagedResource, Serializable 
    * Instantiates a new Religion.
    *
    * @param name the name
-   * @param nameCountryCode the name country code
+   * @param nameCountryCode a code for the containing country or locale for this resource
+   * 
+   * @throws IllegalArgumentException if any of the input is null, empty, or otherwise invalid
    */
   public Religion(String name, String nameCountryCode) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "religion"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(nameCountryCode), "religion locale"));
+    }
     this.name = name;
     this.nameCountryCode = nameCountryCode;
   }

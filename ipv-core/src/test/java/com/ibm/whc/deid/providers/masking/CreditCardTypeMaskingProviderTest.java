@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.CreditCardTypeIdentifier;
 
-public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class CreditCardTypeMaskingProviderTest implements MaskingProviderTest {
   
   @Test
   public void testMask() {
@@ -18,17 +18,21 @@ public class CreditCardTypeMaskingProviderTest extends TestLogSetUp implements M
     CreditCardTypeIdentifier identifier =
         new CreditCardTypeIdentifier(tenantId, localizationProperty);
 
-    String originalValue = "VISA";
-
+    String originalValue = "visa";
     int nonMatches = 0;
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(originalValue);
       assertTrue(identifier.isOfThisType(maskedValue));
-      if (!maskedValue.equals(originalValue)) {
+      if (!maskedValue.equalsIgnoreCase(originalValue)) {
         nonMatches++;
       }
     }
-
     assertTrue(nonMatches > 0);
+
+    originalValue = "not-recognized";
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(originalValue);
+      assertTrue(identifier.isOfThisType(maskedValue));
+    }
   }
 }

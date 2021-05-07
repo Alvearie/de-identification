@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -16,15 +17,14 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IPAddressMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class IPAddressMaskingProviderTest extends TestLogSetUp {
+
   /*
    * Tests for randomization of the IP address, masked address format, and IPV4 and IPV6 addresses
    * and formats. It also tests preservation of ipv4 andipv6 subnets.
    */
-
-  @BeforeClass
-  public static void setupClass() {}
 
   @Test
   public void testIPv4Mask() throws Exception {
@@ -149,14 +149,16 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidIPAddressInputValidHandlingReturnRandom() throws Exception {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+    configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
     Identifier identifier = new IPAddressIdentifier();
 
     String invalidIPAddress = "Invalid IP Address";
     String maskedIPAddress = maskingProvider.mask(invalidIPAddress);
 
-    assertFalse(maskedIPAddress.equals(invalidIPAddress));
+    assertNotEquals(invalidIPAddress, maskedIPAddress);
+    assertNotEquals("OTHER", maskedIPAddress);
     assertTrue(identifier.isOfThisType(maskedIPAddress));
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
@@ -179,8 +181,10 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidIPAddressInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test IP Address");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test IP Address");
+    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnspecifiedValueReturnMessage("XTest IP Address");
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
 
     String invalidIPAddress = "Invalid IP Address";

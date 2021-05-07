@@ -31,15 +31,13 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
   private final boolean suffixTruncate;
   private final boolean suffixReplaceWithRandom;
   private final boolean suffixReplaceWithValidOnly;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   protected transient volatile ZIPCodeManager zipCodeResourceManager = null;
   protected transient volatile PostalCodeManager postalCodeResourceManager = null;
 
   public ZIPCodeMaskingProvider(ZIPCodeMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.countryCode = configuration.getMaskCountryCode();
     this.replaceWithNeighbor = configuration.isMaskReplaceWithNeighbor();
     this.replaceWithNeighborNearestCount = configuration.getMaskReplaceWithNeighborNearestCount();
@@ -51,9 +49,6 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     this.suffixTruncate = configuration.isMaskSuffixTruncate();
     this.suffixReplaceWithRandom = configuration.isMaskSuffixReplaceWithRandom();
     this.suffixReplaceWithValidOnly = configuration.isMaskSuffixReplaceWithValidOnly();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
-
     this.random = new SecureRandom();
   }
 
@@ -67,15 +62,10 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
     ZIPCodeManager zipCodeManager = getZIPCodeManager();
 
     if (identifier.length() != zipCodeManager.getZipCodeLength(countryCode)) {
-      debugFaultyInput("identifier");
-      if (unspecifiedValueHandling == 2) {
+      return applyUnexpectedValueHandling(identifier, () -> {
         String key = zipCodeManager.getRandomKey(countryCode);
         return key == null ? zipCodeManager.getRandomKey() : key;
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      });
     }
 
     // Check if ZIP code should be randomly replaced by a neighboring
@@ -138,6 +128,11 @@ public class ZIPCodeMaskingProvider extends AbstractMaskingProvider {
           String randomZip = zipCodeManager.getRandomZipCodeByPrefix(countryCode, prefix);
           if (randomZip != null) {
             identifier = randomZip;
+          } else {
+            return applyUnexpectedValueHandling(identifier, () -> {
+              String key = zipCodeManager.getRandomKey(countryCode);
+              return key == null ? zipCodeManager.getRandomKey() : key;
+            });
           }
         } else {
           identifier = prefix + RandomGenerators.randomReplacement(suffix);

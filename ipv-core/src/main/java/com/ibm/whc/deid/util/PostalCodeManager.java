@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.resources.ResourceManager;
 import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
@@ -29,8 +28,6 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
   private static LogManager logger = LogManager.getInstance();
 
   protected static final Resources resourceType = Resource.POSTAL_CODES;
-
-  protected LatLonDistance<PostalCode> latLonTree = null;
 
   protected PostalCodeManager() {
     super(44000);
@@ -55,8 +52,6 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
       for (ResourceEntry entry : resourceEntries) {
 
         try (InputStream inputStream = entry.createStream()) {
-          // TODO: take advantage of locale
-          // String locale = entry.getCountryCode();
           String fileName = entry.getFilename();
 
           try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
@@ -70,8 +65,6 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
       logger.logError(LogCodes.WPH1013E, e);
       throw new RuntimeException(e);
     }
-
-    manager.latLonTree = new LatLonDistance<>(manager.getValues());
 
     return manager;
   }
@@ -90,8 +83,7 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
   protected static void loadCSVRecord(String fileName, PostalCodeManager manager,
       CSVRecord record) {
     try {
-      // column 0 skipped
-      loadRecord(manager, record.get(1), record.get(2), record.get(3));
+      loadRecord(manager, record.get(0), record.get(1), record.get(2), record.get(3));
 
     } catch (RuntimeException e) {
       // CSVRecord has a very descriptive toString() implementation
@@ -110,9 +102,10 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
    * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
    */
   protected static void loadRecord(PostalCodeManager manager, String... record) {
-    String code = record[0];
-    String latitude = record[1];
-    String longitude = record[2];
+    // TODO: take advantage of country code in column 0, which is currently unused
+    String code = record[1];
+    String latitude = record[2];
+    String longitude = record[3];
     PostalCode postalCode = new PostalCode(code, latitude, longitude);
     manager.add(postalCode);
   }
@@ -120,19 +113,17 @@ public class PostalCodeManager extends ResourceManager<PostalCode> {
   /**
    * Gets closest postal codes.
    *
-   * @param postalCode the postal code
-   * @param k the k
-   * @return the closest postal codes
+   * @param postalCode the postal code identifier
+   * @param k the maximum number of the closest postal codes to return
+   * @return the non-null, possibly-empty list of up to the given number of closest known postal
+   *         codes
    */
   public List<PostalCode> getClosestPostalCodes(String postalCode, int k) {
     PostalCode lookup = getValue(postalCode);
-
-    if (lookup == null) {
+    if (lookup == null || lookup.getLocation() == null) {
       return new ArrayList<>();
     }
-
-    LatitudeLongitude latlon = lookup.getLocation();
-
-    return this.latLonTree.findNearestK(latlon.getLatitude(), latlon.getLongitude(), k);
+    LatLonDistance<PostalCode> calc = new LatLonDistance<>(getValues());
+    return calc.findNearestK(lookup.getLocation(), k);
   }
 }
