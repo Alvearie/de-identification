@@ -62,7 +62,7 @@ options and their default values.
 
 | **Option name**             | **Type** | **Description**                                     | **Default value** |
 |-----------------------------|----------|-----------------------------------------------------|-------------------|
-| postalCodeNearest           | Boolean  | Select nearest postal code                          | false             |
+| postalCodeNearest           | Boolean  | Select among nearest postal codes (approximate geographic distance)    | false             |
 | roadTypeMask                | Boolean  | Mask road type (for example, street, avenue)        | true              |
 | postalCodeNearestK          | Integer  | Number of closest postal codes from which to select | 10                |
 | countryMask                 | Boolean  | Mask country                                        | true              |
@@ -97,12 +97,12 @@ options and their default values.
 
 #### CITY
 
->   Masks a city with a randomly-selected city, or based on one of its
->   neighboring cities (geographical distance).
+>   Masks a city with a randomly selected city, optionally from among its nearest 
+>   neighboring cities (approximate geographical distance).
 
 | **Option name**        | **Type** | **Description**                         | **Default value** |
 |------------------------|----------|-----------------------------------------|-------------------|
-| maskClosest            | Boolean  | Select one of the near cities.          | false             |
+| maskClosest            | Boolean  | Select one of the nearby cities.        | false             |
 | maskClosestK           | Integer  | Number of closest cities to select from | 10                |
 | maskPseudorandom       | Boolean  | Mask based on pseudorandom function     | false             |
 
@@ -132,9 +132,7 @@ options and their default values.
           "name": "CONDITIONAL_RULE",
           "maskingProviders": [
             {
-              "type": "CONDITIONAL",
-              "unspecifiedValueHandling": 0,
-              "unspecifiedValueReturnMessage": "OTHER",
+              "type": "CONDITIONAL"
               "maskRuleSet": [
                 {
                   "condition": {
@@ -226,8 +224,6 @@ options and their default values.
 >   Finally, the contained_in operator checks if the value of the condition field is
 >   contained in the user specified-value.
 
->   For information about the unspecifiedValueHandling and unspecifiedValueReturnMessage
->   properties, see “Handling unrecognized input values and exceptions raised by privacy providers” below.
 
    **Example 2: Conditional masking of a FHIR data element, based on another FHIR data element value in an array node**
 
@@ -285,9 +281,9 @@ options and their default values.
 
 #### CONTINENT
 
->   Masks a continent by replacing it either with a randomly-selected continent, or
->   with the closest continent. The distance computation is based on an approximate
->   centroid of the continent's bounding box.
+>   Masks a continent by replacing it with a randomly selected continent, optionally 
+>   from among its nearest neighboring continents (approximate geographic distance from the approximate
+>   centroid of each continent's bounding box).
 
 | **Option name**         | **Type** | **Description**                            | **Default value** |
 |-------------------------|----------|--------------------------------------------|-------------------|
@@ -296,8 +292,8 @@ options and their default values.
 
 #### COUNTRY
 
->   Replaces a country either with a randomly-chosen country, or with its nearest
->   country. The latter is calculated based on geographic distance.
+>   Replaces a country with a randomly selected country, optionally from among its nearest neighboring 
+>   countries (approximate geographic distance).
 
 | **Option name**           | **Type** | **Description**                                     | **Default value** |
 |---------------------------|----------|-----------------------------------------------------|-------------------|
@@ -330,8 +326,8 @@ options and their default values.
 >   Within the input message, the value to compare to the masked value must be present in the same parent JSON object 
 >   as the masked value.  In other words, the path to the comparison value must be the same as the path to the masked value
 >   except for the final element name.  If the comparison value is not found, no masking occurs.  If the comparison value is 
->   found, but cannot be parsed, the masked value is protected according to the unspecified value handling configuration as 
->   described in "Handling of null and unrecognized input data values" below.
+>   found, but cannot be parsed, the masked value is protected according to the unexpected value handling configuration as 
+>   described in "Handling unexpected input values" below.
 
 This privacy provider supports these options:
 
@@ -736,7 +732,7 @@ The values in the examples are for demonstration purposes only.
 >   offset must be greater or equal to zero (0, first position in the data value)
 >   and less than the end offset, when an end offset is specified. The value
 >   outside the start and end offsets can be either maintained or deleted. To
->   specify the behavior of the algorithm in the case of invalid offsets, use
+>   specify the behaviour of the algorithm in the case of invalid offsets, use
 >   the configuration options.
 
 | **Option name**                   | **Type** | **Description**                                                                                                                                                                                          | **Default value** |
@@ -873,9 +869,9 @@ The values in the examples are for demonstration purposes only.
 
 #### OCCUPATION
 
->   By default, this replaces an occupation with a randomly-selected occupation.
->   However, if the option **occupation.mask.generalize** is set to **true**, this
->   generalizes an occupation to its respective category. The categories
+>   By default, this provider replaces an occupation with a randomly-selected occupation.
+>   However, if the option **maskGeneralize** is set to **true**, this provider
+>   generalizes an occupation to one of its associated occupational categories. The categories
 >   of occupations are based on the 2010 Standard Occupational Classification (SOC).
 
 | **Option name**            | **Type** | **Description**                   | **Default value** |
@@ -1220,7 +1216,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >     postal code
 >   - Zeroing out of the postal code prefix
 >   - Postal code replacement with a random postal code that has the same prefix,
->     or with a random neighboring postal code, to maintain spatial proximity
+>     or with a random neighboring postal code to maintain spatial proximity
 >   - Postal code processing as per HIPAA Safe Harbor, where the geographical unit
 >     formed by combining postal codes with the same first three digits as the
 >     original postal code is checked against the current, publicly available data
@@ -1231,7 +1227,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >   If multiple options are set to **True** in the postal code masking algorithm, the
 >   operations are performed in this order:
 
-> 1.  Replace the postal code with a neighboring postal code.
+> 1.  Replace the postal code with a neighboring postal code (approximate geographic distance)
 
 > 2.  Zero out the postal code's three-digit prefix if the total population in the
     geographical unit, formulated by combining all postal codes with the same
@@ -1440,7 +1436,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
    - The first rule is applied to the original value of the data element.
    - Each subsequent rule is applied to the transformed value produced for this element by the previous
-   rule. This is similar to the behavior of a UNIX pipe command.
+   rule. This is similar to the behaviour of a UNIX pipe command.
 
 The next example shows a valid rule set for processing data elements of an
 array with multiple privacy providers.
@@ -1475,99 +1471,72 @@ the first member of the _given_ array in all members of the _name_ array.
 error for multiple rules to be assigned to data elements not identified by an array index.
 
 
-## Handling unrecognized input values and exceptions raised by privacy providers
+## Handling unexpected input values
 
-   Next, this topic describes the operation of the various privacy providers
-   that are offered by the Data De-Identification Service in the case of either null
-   or unrecognized input data values. It also describes the case of runtime
-   exceptions.
+   When an input value to a privacy provider is *null*, the privacy providers
+   retain the *null* value and do no further processing for that input.
 
-#### Handling of null and unrecognized input data values
-
-   The Data De-Identification Service takes special care in handling null and
-   unrecognized input data values of FHIR data elements.
-
-   With data elements that have a null value, the privacy providers
-   that process them maintain the null value of the elements. As a result,
-   they do not proceed to falsify the data.
-
-   If the input value to a privacy provider is not recognized by the privacy
-   provider and it does not appear to be an accurate input value, the Data
-   De-Identification Service operates as specified by these configuration 
-   parameters.
+   If a privacy provider is presented an input value that is not *null*, but which it still cannot process, 
+   the provider proceeds based on the values of the configuration parameters described in the table below.  
+   
+   These parameters can be included in the configuration of every privacy provider.     
 
 | **Option name**               | **Type** | **Description**                                                                                                | **Default value** |
-|-------------------------------|----------|----------------------------------------------------------------------------------------------------------------|-------------------|
-| unspecifiedValueHandling      | Integer  | Handling options are **1**: return null **2**: return fictionalized value  **3**: return a configured value    | 1                 |
-| unspecifiedValueReturnMessage | String   | Value to be returned when `unspecifiedValueHandling` is set to **3**                                     | **OTHER**         |
+|-------------------------------|----------|---------------------------------------------------------------------------------|-------------------|
+| unexpectedInputHandler        | String   | One of the handling strategies described in the table below.                    | NULL              |
+| unexpectedInputReturnMessage  | String   | Value to be returned when `unexpectedInputHandler` has the value MESSAGE.  | OTHER             |
 
-For providers that operate using regular expressions, for example, PHONE NUMBER,
+ 
+ 
+| **Handler name**        | **Description**                                                                                                    |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------|
+| NULL                    | Set the field to *null*.                                                                                           | 
+| RANDOM                  | Set the field to a random value generated by the privacy provider.  Not all privacy providers support this option. |
+| MESSAGE                 | Set the field to the value provided in the `unexpectedInputReturnMessage` parameter.                        |
+| ERROR_EXIT              | Returns an error message and stops the privacy protection operation.                                         |
+
+
+For privacy providers that operate using regular expressions, for example, PHONE NUMBER,
 SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
-an unrecognized value is a value that does not conform to the
+an input value that cannot be processed is one that does not conform to the
 specified regular expression.
 
-Similarly, for providers that operate using lookup tables, for example, NAME,
-CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
-that is not part of the corresponding lookup table that is used by the
-privacy provider.
+For privacy providers that operate using lookup tables, for example, NAME,
+CITY, COUNTRY, OCCUPATION, and HOSPITAL, an input that cannot be processed is one that 
+does not appear in the table used by that provider.  
 
-When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
-**3**), any privacy provider that takes as input an unrecognized data value
-returns a null value.
-
-When `unspecifiedValueHandling` is set to **2**, any privacy provider that
-takes as input an unrecognized data value returns a randomly-generated,
-fictionalized value that is valid for the corresponding provider.
-
-Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
-as input an unrecognized data value, stores to this value the message
-that is specified in `unspecifiedValueReturnMessage`.  By default, this
-message is set to **OTHER**.
+Note that based on its current configuration, a privacy provider might be able to proceed
+normally even if it does not recognize the input value.  In those cases, normally processing
+occurs instead of the unexpected input processing.
 
 **Exceptions**
 
-These privacy providers ignore the `unspecifiedValueHandling` option:
+These privacy providers ignore the `unexpectedInputHandler` parameter as they do not require input to be in any particular format:
 * CONDITIONAL
+* COUNTY
+* GENDER
 * GENERALIZE
 * GUID
 * HASH
 * MAINTAIN
+* MARITAL
 * NULL
 * PSEUDONYM
+* RACE
 * RANDOM
 * REDACT
+* RELIGION
 * REPLACE
+* STATE_US
    
-These privacy providers treat option 2 of `unspecifiedValueHandling` the same as option 1:
+These privacy providers cannot generate random values and so treat the `unexpectedInputHandler` value **RANDOM** the same as **NULL**:
 * ATC
 * BINNING
 * NUMBERVARIANCE   
 * URL
 
-#### Exception handling
+## Runtime exception handling
 
-   The data protection methods have to deal with
-   the case of runtime exceptions that may be raised during their operation in
-   the Data De-Identification Service. If a data protection method encounters
-   an exception while attempting to privacy-protect an input data value, it
-   catches the exception, logs a WPH2002E error message to the application
-   log, and returns an empty (null) String as the value of the
-   corresponding data element. 
+If a data protection method encounters an exception while attempting to privacy-protect an input data value, it logs the exception and stops the privacy protection process.  The service attempts to find problems in input data before privacy protection begins.  However, problems such as a sudden loss of communication with external services or databases can occur after privacy protection begins.
 
-   Here is the structure for the error messages that are produced:
-
-| **Message ID** | **Message Text**                                                                                                                                         | **Replacement Variables**                                                                                         |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| WPH2002E       | {0}.{1} – {2} – The data protection method encountered an exception while attempting to transform an input value. The original value has been nullified. | {0}: Provider class name {1}: Provider method name {2}: Exception name,                                           |
-|                |                                                                                                                                                          | resource type, resource ID, and field name                                                                        |
-
-   Here is an example of a produced log message:
-
->   17/07/17 17:00:57 - 100.10.100.10 - WPHDeid - ipv-core - whc-lsf-tenant -
->   ERROR -
->   com.ibm.research.drl.prima.providers.masking.DateTimeMaskingProvider.mask -
->   java.lang.NullPointerException processing field
->   Patient(id=’exampleId123’)/birthDate - The data protection method
->   encountered an exception while attempting to transform an input value. The
->   original value has been nullified.
 

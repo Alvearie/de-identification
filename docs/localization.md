@@ -51,10 +51,13 @@ List of the files included:
 │   ├── continents.csv
 │   ├── country_list.csv
 │   ├── credit_card_types.csv
+│   ├── days.csv
+│   ├── dependent.csv
 │   ├── genders.csv
 │   ├── icd_list.csv
 │   ├── icd_v10.csv
 │   ├── marital_status.csv
+│   ├── medicines.csv
 │   ├── months.csv
 │   ├── occupations.csv
 │   ├── phone_country_calling_codes.csv
@@ -73,6 +76,7 @@ List of the files included:
 │   ├── last_names.csv
 │   ├── male_names.csv
 │   ├── marital_status.csv
+│   ├── medicines.csv
 │   ├── occupations.csv
 │   ├── races.csv
 │   └── religions.csv
@@ -96,6 +100,7 @@ The following describes the different types of CSV files and their respective sc
 
 ### atc_codes
 File name: atc.csv
+
 Contains a list of Anatomical Therapeutic Chemical codes.
 
 Mandatory column:  ATC code
@@ -108,60 +113,64 @@ A01AA03
 ```
 
 ### city
-File name:  city_list.csv
+File name: city_list.csv
+
 Contains a list of cities and related information.
 
 Mandatory column: name
 
 Optional columns: latitude, longitude, country code, population
 
-If latitude and longitude are not provided, the Data De-Identification service cannot mask cities with their closest neighboring cities.
-
-If country code is not provided, the Data De-Identification service cannot mask cities with the same country.
+If latitude and longitude are not provided, the Data De-Identification service cannot mask those cities with their closest neighboring cities.  If such a city is provided as input and the mask closest option is configured, the configured handling of unexpected input is applied.  Also, such cities are not considered when finding the closest neighbors of cities for which latitude and longitude have been provided.
 
 Example of a CSV file:
 ```
 A Coruña,43.37135,-8.396,ES,246056
-Aachen,50.77664,6.08342,DE,265208
+Aachen,,,,
 Aba,5.10658,7.36667,NG,897560
 ```
 
 ### continent
 File name: continents.csv
+
 Contains a list of continents and related information.
 
 Mandatory column: name
 
 Optional columns: latitude, longitude
 
-If latitude and longitude are not provided, the Data De-Identification service cannot mask continents with their closest neighboring continents.
+If latitude and longitude are not provided, the Data De-Identification service cannot mask those continents with their closest neighboring continents.  If such a continents is provided as input and the mask closest option is configured, the configured handling of unexpected input is applied.  Also, such continents are not considered when finding the closest neighbors of continents for which latitude and longitude have been provided.
+
 
 Example of a CSV file:
 ```
 Asia,38.5208512,97.5929063
 Europe,49.3613555,13.7208743
-South America,-14.4793678,-57.8555657
+South America,,
 ```
 
 ### country
 File name: country_list.csv
+
 Contains a list of countries and related information.
 
 Mandatory column: name
 
 Optional columns: ISO 2-Letter code, ISO 3-Letter code, alias, continent, latitude, longitude
 
-If latitude, and longitude are not provided, the Data De-Identification service cannot mask countries with their closest neighboring countries.
+If latitude and longitude are not provided, the Data De-Identification service cannot mask those countries with their closest neighboring countries.  If such a country is provided as input and the mask closest option is configured, the configured handling of unexpected input is applied.  Also, such countries are not considered when finding the closest neighbors of countries for which latitude and longitude have been provided.
 
 Example of a CSV file:
 ```
 Afghanistan,AF,AFG,,Asia,34.533,69.133
-Albania,AL,ALB,,Europe,41.333,19.800
+Albania,,,,,,
 Algeria,DZ,DZA,,Africa,28,2
+United States of America,US,USA,United States,North America,38.883,-77.017
 ```
 
 ### county
 File name: counties.csv
+
 Contains a list of US counties and related information.
 
 Mandatory columns: name, short name
@@ -170,13 +179,28 @@ Optional columns: state, population
 
 Example of a CSV file:
 ```
-Autauga County,Autauga,Alabama,55246
-Baldwin County,Baldwin,Alabama,195540
+Autauga County,Autauga,,55246
+Baldwin County,Baldwin,Alabama,
 Snyder County,Snyder,Pennsylvania,39865
+```
+
+### first_name_female
+File name: female_names.csv
+
+Contains a list of female names.
+
+Mandatory column: name
+
+Example of a CSV file:
+```
+Alecia
+Trisha
+Veronica
 ```
 
 ### first_name_male
 File name: male_names.csv
+
 Contains a list of male names.
 
 Mandatory column: name
@@ -190,6 +214,7 @@ Zachery
 
 ### gender
 File name: genders.csv
+
 Contains a list of genders.
 
 Mandatory column: name
@@ -202,19 +227,21 @@ Female
 
 ### hospital_names
 File name: hospital_names.csv
-Contains a list of hospital names.
 
-Mandatory column: name
+Contains a list of hospital names and the country in which the hospital resides.
+
+Mandatory column: name, country code
 
 Example of a CSV file:
 ```
-Bryce Hospital
-Shoals Hospital
-Eastern Health System
+Bryce Hospital,US
+Shoals Hospital,US
+Eastern Health System,US
 ```
 
 ### icdv10
 File name: icd_v10.csv
+
 Contains a list of Internal Classification of Diseases (ICD) version 10 codes.
 
 Mandatory columns: code, full name, category code, catgory name, chapter code, chapter name
@@ -228,6 +255,7 @@ O92.20,Unspecified disorder of breast associated with pregnancy and the puerperi
 
 ### icdv9
 File name: icd_list.csv
+
 Contains a list of ICD version 9 codes.
 
 Mandatory columns: code, short name, full name, chapter code, chapter name, category code, category name
@@ -241,6 +269,7 @@ V89.04;Sus Fetal Growth Not Fnd;Suspected Problem With Fetal Growth Not Found;V8
 
 ### last_name
 File name: last_names.csv
+
 Contains a list of last names.
 
 Mandatory column: name
@@ -249,13 +278,14 @@ Optional column: number of people with the last name
 
 Example of a CSV file:
 ```
-THIBOUTOT,79312
+THIBOUTOT,
 CARPEN,12566
-ARAVJO,2188
+ARAVJO,
 ```
 
 ### marital_status
 File name: marital_status.csv
+
 Contains a list of marital statuses.
 
 Mandatory column: status
@@ -269,32 +299,38 @@ Divorced
 
 ### occupation
 File name: occupations.csv
-Contains a list of occupations and their categories.
+
+Contains a list of occupations and a category of occupations to which that occupation belongs.  If an occupation is in more than one category, an additional record for that occupation with each additional category can be entered.
 
 Mandatory columns: occupation name, occupation category
 
 Example of a CSV file:
 ```
 "Accountant, certified",Chartered and certified accountants
+"Accountant, certified","Book-keepers, payroll managers and wages clerks"
 "Engineer, MWD",Civil engineers
 "Technician, limb, artificial",Medical and dental technicians
 ```
 
 ### phone_area_codes
 File name: phone_area_codes.csv
+
 Contains a list of area codes and their countries.
 
 Mandatory columns: country code, area code
 
+Optional columns: state
+
 Example of a CSV file:
 ```
-USA,205
-USA,601
-USA,213
+USA,205,
+USA,601,
+USA,701,North Dakota
 ```
 
 ### phone_calling_codes
 File name: phone_country_calling_codes
+
 Contains a list of country codes.
 
 Mandatory columns: country code, country name
@@ -308,6 +344,7 @@ Example of a CSV file:
 
 ### phone_num_digits
 File name: phone_number_digits.csv
+
 Contains a list of country codes and the number of telephone number digits.
 
 Mandatory columns: country code, phone number digits
@@ -334,48 +371,39 @@ Example of a CSV file:
 
 ### postal_codes
 File name: postal_codes.csv
+
 Contains a list of country code, postal code, latitude, and longitude.
 
 Mandatory columns: country code, postal code
+
 Optional columns: latitude, longitude
 
-If latitude and longitude are not provided, the Data De-Identification service cannot mask postal codes with the closest postal (ZIP) code.
+If latitude and longitude are not provided, the Data De-Identification service cannot mask those postal codes with their closest neighboring postal codes.  If such a postal code is provided as input and the mask closest option is configured, the configured handling of unexpected input is applied.  Also, such postal codes are not considered when finding the closest neighbors of postal codes for which latitude and longitude have been provided.
 
 Example of a CSV file:
 ```
 US,44871,41.4918,-82.6478
-US,26348,39.4693,-80.5258
-US,82637,42.7803,-105.8719
+US,26348, ,-80.5258
+US,82637,42.7803,
 ```
 
 ### race_ethnicity
 File name: races.csv
+
 Contains a list of races or ethnicities.
 
-Mandatory columns: race or ethnicities
+Mandatory columns: race or ethnicity
 
 Example of a CSV file:
 ```
-Asian
-Caucasian
-Hispanic
-```
-
-### street_names
-File name: street_names.csv
-Contains a list of street names.
-
-Mandatory columns: street names
-
-Example of a CSV file:
-```
-Main Street East
-Valley View
-Woodland
+Alaska Native
+Black
+African American
 ```
 
 ### religion
 File name: religions.csv
+
 Contains a list of religions.
 
 Mandatory columns: religion
@@ -389,19 +417,35 @@ Hindu
 
 ### states
 File name: states_us.csv
+
 Contains a list of US states.
 
-Mandatory columns: name, abbreviation, population
+Mandatory columns: name, abbreviation
 
 Example of a CSV file:
 ```
-Alabama,AL,4833722
-Alaska,AK,735132
-Arizona,AZ,6626624
+Alabama,AL
+Alaska,AK
+Arizona,AZ
+```
+
+### street_names
+File name: street_names.csv
+
+Contains a list of street names.
+
+Mandatory columns: street name
+
+Example of a CSV file:
+```
+Main Street East
+Valley View
+Woodland
 ```
 
 ### swift
 File name: swift_codes.csv
+
 Contains a list of SWIFT codes.
 
 Mandatory columns: code
@@ -415,6 +459,7 @@ ACBLINBB
 
 ### world_manufacturers_identifier
 File name: vin_wmi.csv
+
 Contains a list of World Manufacturer Identifier (WMI) numbers and manufacturers.
 
 Mandatory columns: WMI, manufacturer
@@ -428,13 +473,10 @@ Example of a CSV file:
 
 ### zipcode
 File name: zcta.csv
+
 Contains a list of postal (ZIP) codes and their respective populations.
 
-Mandatory column: zip code
-
-Optional column: population
-
-If population is not provided, the Data De-Identification service cannot mask postal (ZIP) codes based on population.
+Mandatory column: zip code, population
 
 Example of a CSV file:
 ```
