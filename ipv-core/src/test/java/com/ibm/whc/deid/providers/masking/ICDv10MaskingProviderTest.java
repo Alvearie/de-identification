@@ -172,6 +172,19 @@ public class ICDv10MaskingProviderTest implements MaskingProviderTest {
   }
 
   @Test
+  public void testMaskConvertToRandomEmpty() throws Exception {
+    ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
+    configuration.setGeneralizeToCategory(false);
+    configuration.setGeneralizeToChapter(false);
+    ICDv10MaskingProvider maskingProvider =
+        new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
+
+    String originalICD = TEST_ICDV10_DB_CODES.iterator().next();
+    assertNull(maskingProvider.mask(originalICD));
+  }
+
+  @Test
   public void testMaskInvalidICDv10InputValidHandlingReturnNull() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
@@ -199,6 +212,7 @@ public class ICDv10MaskingProviderTest implements MaskingProviderTest {
   @Test
   public void testMaskInvalidICDv10InputValidHandlingReturnRandomEmpty() throws Exception {
     ICDv10MaskingProviderConfig configuration = new ICDv10MaskingProviderConfig();
+    configuration.setGeneralizeToCategory(true);
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     ICDv10MaskingProvider maskingProvider =
         new ICDv10MaskingProvider(configuration, tenantId, localizationProperty);
