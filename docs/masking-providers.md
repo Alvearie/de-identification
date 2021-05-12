@@ -766,20 +766,26 @@ The values in the examples are for demonstration purposes only.
 >   Masks ICD-9 diagnosis codes. Codes can also be generalized to their
 >   respective chapters or categories.
 
-| **Option name**        | **Type** | **Description**               | **Default value** |
-|------------------------|----------|-------------------------------|-------------------|
-| randomizeChapter       | Boolean  | Randomize by chapter          | false             |
-| randomizeCategory      | Boolean  | Randomize by three-digit code | true              |
+| **Option name**        | **Type** | **Description**                                       | **Default value** |
+|------------------------|----------|-------------------------------------------------------|-------------------|
+| generalizeToCategory   | Boolean  | Return the category associated with the input code    | true              |
+| generalizeToChapter    | Boolean  | Return the chapter associated with the input code     | false             |
 
 #### ICDV10
 
 >   Masks ICD-10 diagnosis codes. Codes can also be generalized to their
 >   respective chapters or categories.
 
-| **Option name**        | **Type** | **Description**               | **Default value** |
-|------------------------|----------|-------------------------------|-------------------|
-| randomizeChapter       | Boolean  | Randomize by chapter          | false             |
-| randomizeCategory      | Boolean  | Randomize by three-digit code | true              |
+>   By default, no actual version 10 ICD codes are provided with the service.  To use this provider, it will
+>   be necessary to load ICD v10 codes into the service.  For more information about loading custom codes, 
+>   see [Localization](localization.md).
+>   Note that there might be licensing considerations for use of ICD v10 codes in some circumstances.
+
+
+| **Option name**        | **Type** | **Description**                                       | **Default value** |
+|------------------------|----------|-------------------------------------------------------|-------------------|
+| generalizeToCategory   | Boolean  | Return the category associated with the input code    | true              |
+| generalizeToChapter    | Boolean  | Return the chapter associated with the input code     | false             |
 
 #### IMEI
 
