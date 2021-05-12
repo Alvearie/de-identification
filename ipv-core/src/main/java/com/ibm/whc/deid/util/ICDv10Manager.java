@@ -143,7 +143,7 @@ public class ICDv10Manager implements Manager {
     int count = this.icdList.size();
     if (count == 1) {
       icd = this.icdList.get(0);
-    } else {
+    } else if (count > 1) {
       icd = this.icdList.get(random.nextInt(count));
     }
     if (icd != null) {
@@ -159,16 +159,18 @@ public class ICDv10Manager implements Manager {
    * @return the corresponding ICD code or <i>null</i> if no such code is loaded.
    */
   public ICD lookupICD(String codeOrName) {
-    String key = codeOrName.toUpperCase();
+    if (codeOrName != null) {
+      String key = codeOrName.toUpperCase();
 
-    ICDWithoutFormat icd = this.icdByCodeMap.get(key);
-    if (icd != null) {
-      return new ICD(icd, ICDFormat.CODE);
-    }
+      ICDWithoutFormat icd = this.icdByCodeMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.CODE);
+      }
 
-    icd = this.icdByNameMap.get(key);
-    if (icd != null) {
-      return new ICD(icd, ICDFormat.NAME);
+      icd = this.icdByNameMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.NAME);
+      }
     }
 
     return null;
@@ -177,5 +179,14 @@ public class ICDv10Manager implements Manager {
   @Override
   public boolean isValidKey(String codeOrName) {
     return lookupICD(codeOrName) != null;
+  }
+
+  /**
+   * 
+   * @return <i>True</i> if this manager currently has any resources loaded and <i>False</i> if no
+   *         resources are loaded
+   */
+  public boolean hasValues() {
+    return !icdList.isEmpty();
   }
 }

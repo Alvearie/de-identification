@@ -6,7 +6,9 @@
 package com.ibm.whc.deid.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -185,5 +187,22 @@ public class ICDv9ManagerTest implements MaskingProviderTest {
       assertTrue(e.getMessage().contains("ICD category name"));
     }
     record[6] = temp;
+  }
+
+  @Test
+  public void testManagerEmpty() {
+    ICDv9Manager manager = new ICDv9Manager();
+
+    assertNull(manager.getRandomValue(null));
+    assertNull(manager.getRandomValue(ICDFormat.CODE));
+    assertNull(manager.getRandomValue(ICDFormat.NAME));
+
+    assertNull(manager.lookupICD(null));
+    assertNull(manager.lookupICD(""));
+    assertNull(manager.lookupICD("code1"));
+
+    assertFalse(manager.isValidKey(null));
+    assertFalse(manager.isValidKey(""));
+    assertFalse(manager.isValidKey("code1"));
   }
 }

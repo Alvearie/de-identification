@@ -147,7 +147,7 @@ public class ICDv9Manager implements Manager {
     int count = this.icdList.size();
     if (count == 1) {
       icd = this.icdList.get(0);
-    } else {
+    } else if (count > 1) {
       icd = this.icdList.get(random.nextInt(count));
     }
     if (icd != null) {
@@ -163,23 +163,24 @@ public class ICDv9Manager implements Manager {
    * @return the corresponding ICD code or <i>null</i> if no such code is loaded.
    */
   public ICD lookupICD(String codeOrName) {
-    String key = codeOrName.toUpperCase();
+    if (codeOrName != null) {
+      String key = codeOrName.toUpperCase();
 
-    ICDWithoutFormat icd = this.icdByCodeMap.get(key);
-    if (icd != null) {
-      return new ICD(icd, ICDFormat.CODE);
+      ICDWithoutFormat icd = this.icdByCodeMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.CODE);
+      }
+
+      icd = this.icdByNameMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.NAME);
+      }
+
+      icd = this.icdByShortMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.NAME);
+      }
     }
-
-    icd = this.icdByNameMap.get(key);
-    if (icd != null) {
-      return new ICD(icd, ICDFormat.NAME);
-    }
-
-    icd = this.icdByShortMap.get(key);
-    if (icd != null) {
-      return new ICD(icd, ICDFormat.NAME);
-    }
-
     return null;
   }
 

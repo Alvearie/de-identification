@@ -5,7 +5,11 @@
  */
 package com.ibm.whc.deid.models;
 
+import java.util.regex.Pattern;
+
 public class ICD extends ICDWithoutFormat {
+
+  public static final Pattern ICDV10_PATTERN = Pattern.compile("[A-Z][0-9]{2}\\.[0-9]{1,3}[A-Z]?");
 
   private final ICDFormat format;
 
