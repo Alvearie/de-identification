@@ -246,11 +246,11 @@ Contains a list of Internal Classification of Diseases (ICD) version 10 codes.
 
 Mandatory columns: code, full name, category code, catgory name, chapter code, chapter name
 
-Example of a CSV file:
+Example of a CSV file (contrived sample data):
 ```
-A00.0,"Cholera due to Vibrio cholerae 01, biovar cholerae",A00-A09,Intestinal infectious diseases,A00-B99,Certain infectious and parasitic diseases
-O88.3,Obstetric pyemic and septic embolism,O85-O92,Complications predominantly related to the puerperium,O00-O9A,"Pregnancy, childbirth and the puerperium"
-O92.20,Unspecified disorder of breast associated with pregnancy and the puerperium,O85-O92,Complications predominantly related to the puerperium,O00-O9A,"Pregnancy, childbirth and the puerperium"
+A09.3,Meaning of A09.3,A00-A09,A condition,A00-B99,Certain conditions
+A09.4,"Meaning of A09.4, which might include a comma",A00-A09,Another condition,A00-B99,Certain other conditions
+A09.5,"Meaning of A09.5, which is a contrived code, used as an example",A00-A09,condition category name,A00-B99,condition chapter name
 ```
 
 ### icdv9
@@ -450,11 +450,11 @@ Contains a list of SWIFT codes.
 
 Mandatory columns: code
 
-Example of a CSV file:
+Example of a CSV file (contrived sample data):
 ```
-AASVIND1
-ABBLINBB
-ACBLINBB
+AAAAUSAA
+BBBBUSBB
+CCCCUSCC
 ```
 
 ### world_manufacturers_identifier
