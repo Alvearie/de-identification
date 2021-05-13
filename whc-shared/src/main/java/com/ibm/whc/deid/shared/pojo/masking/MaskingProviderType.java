@@ -22,6 +22,7 @@ public enum MaskingProviderType implements MaskingProviderTypes {
   CREDIT_CARD(Constants.CREDIT_CARD_VALUE, MaskingProviderCategory.CategoryI),
   DATEDEPENDENCY(Constants.DATEDEPENDENCY_VALUE, MaskingProviderCategory.CategoryI),
   DATETIME(Constants.DATETIME_VALUE, MaskingProviderCategory.CategoryI),
+  DATETIME_CONSISTENT_SHIFT(Constants.DATETIME_CONSISTENT_SHIFT_VALUE, MaskingProviderCategory.CategoryI),
   EMAIL(Constants.EMAIL_VALUE, MaskingProviderCategory.CategoryI),
   GENDER(Constants.GENDER_VALUE, MaskingProviderCategory.CategoryI),
   GEN(Constants.GEN_VALUE, MaskingProviderCategory.CategoryII),
@@ -112,6 +113,7 @@ public enum MaskingProviderType implements MaskingProviderTypes {
     public static final String CONTINENT_VALUE = "CONTINENT";
     public static final String CREDIT_CARD_VALUE = "CREDIT_CARD";
     public static final String DATETIME_VALUE = "DATETIME";
+    public static final String DATETIME_CONSISTENT_SHIFT_VALUE = "DATETIME_CONSISTENT_SHIFT";
     public static final String DATEDEPENDENCY_VALUE = "DATEDEPENDENCY";
     public static final String EMAIL_VALUE = "EMAIL";
     public static final String FHIR_VALUE = "FHIR";

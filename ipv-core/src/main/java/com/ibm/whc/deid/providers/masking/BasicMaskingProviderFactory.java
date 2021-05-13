@@ -19,6 +19,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.CountryMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.CreditCardMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.EmailMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GUIDMaskingProviderConfig;
@@ -123,6 +124,10 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case DATETIME:
         provider = new DateTimeMaskingProvider((DateTimeMaskingProviderConfig) config);
+        break;
+      case DATETIME_CONSISTENT_SHIFT:
+        provider = new DateTimeConsistentShiftMaskingProvider(
+            (DateTimeConsistentShiftMaskingProviderConfig) config);
         break;
       case EMAIL:
         provider = new EmailMaskingProvider((EmailMaskingProviderConfig) config);
