@@ -127,7 +127,7 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case DATETIME_CONSISTENT_SHIFT:
         provider = new DateTimeConsistentShiftMaskingProvider(
-            (DateTimeConsistentShiftMaskingProviderConfig) config);
+            (DateTimeConsistentShiftMaskingProviderConfig) config, deidMaskingConfig);
         break;
       case EMAIL:
         provider = new EmailMaskingProvider((EmailMaskingProviderConfig) config);
