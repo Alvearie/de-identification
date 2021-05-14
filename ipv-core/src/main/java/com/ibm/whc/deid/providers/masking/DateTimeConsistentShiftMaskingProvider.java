@@ -107,14 +107,11 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     }
 
     String patientId = getPatientIdentifier(maskingActionInputIdentifier);
-    if (patientId != null) {
-      patientId = patientId.trim();
-    }
-    if (patientId == null || patientId.isEmpty()) {
+    if (patientId == null || patientId.trim().isEmpty()) {
       return applyUnexpectedValueHandling(originalValue, null);
     }
 
-    int offsetDays = generateOffset(patientId);
+    int offsetDays = generateShiftNumberOfDays(patientId);
 
     return applyOffsetAndReformat(originalValue, offsetDays);
   }
@@ -127,41 +124,68 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     return patientId;
   }
 
-  protected int generateOffset(String seed) {
+  /**
+   * Generates the number of days, which might be positive or negative depending on configuration,
+   * dates should be shifted for the given patient identifier. The same number is returned every
+   * time the same patient identifier is presented, unless the configured ranges for possible
+   * offsets are changed.
+   * 
+   * @param patientId the non-null patient identifier
+   * 
+   * @return the number of days to shift target dates
+   */
+  protected int generateShiftNumberOfDays(String patientId) {
+    // Remove any wrapping whitespace and convert to a common case so that
+    // minor differences in how the patient identifier is written will not change the offset.
+    // For example, "patient", "patient ", "Patient" all generate the same offset.
+    String seed = patientId.trim().toUpperCase();
+
+    // determine the total number of eligible numbers of days based on the configuration
     int rangeLength = this.dateShiftMaximumDays - this.dateShiftMinimumDays + 1;
-    int possibleOffsets = rangeLength;
+    int numberOfPossibleShiftValues = rangeLength;
     if (this.dateShiftDirection == DateShiftDirection.beforeOrAfter) {
-      possibleOffsets *= 2;
+      numberOfPossibleShiftValues *= 2;
       if (this.dateShiftMinimumDays == 0) {
-        possibleOffsets--; // don't add 0 twice
+        numberOfPossibleShiftValues--; // don't add 0 twice
       }
     }
 
+    // use the patient identifier to generate an index into the possible values
     long seedLong = generateLongFromString(seed);
-    int offsetIndex = (int) (seedLong % possibleOffsets);
+    int possiblesIndex = (int) (seedLong % numberOfPossibleShiftValues);
 
-    int offset = -1;
+    // get the value at the index into the total possible values
+    int shfitNumberOfDays = -1;
     switch (this.dateShiftDirection) {
       case before:
-        offset = -this.dateShiftMaximumDays + offsetIndex;
+        shfitNumberOfDays = -this.dateShiftMaximumDays + possiblesIndex;
         break;
       case after:
-        offset = this.dateShiftMinimumDays + offsetIndex;
+        shfitNumberOfDays = this.dateShiftMinimumDays + possiblesIndex;
         break;
       default:
-        if (offsetIndex < rangeLength) {
-          offset = -this.dateShiftMaximumDays + offsetIndex;
+        if (possiblesIndex < rangeLength) {
+          shfitNumberOfDays = -this.dateShiftMaximumDays + possiblesIndex;
         } else {
-          offsetIndex -= rangeLength;
-          offset = this.dateShiftMinimumDays + offsetIndex;
+          possiblesIndex -= rangeLength;
+          if (this.dateShiftMinimumDays == 0) {
+            // skip 0 because it would have been counted already as part of the "before" range
+            possiblesIndex++;
+          }
+          shfitNumberOfDays = this.dateShiftMinimumDays + possiblesIndex;
         }
     }
 
-    return offset;
+    return shfitNumberOfDays;
   }
 
   protected long generateLongFromString(String seed) {
-    return HashUtils.longFromHash(seed);
+    long generatedLong = HashUtils.longFromHash(seed);
+    // NOTE - Math.abs(long) returns negative number if given long is MIN_VALUE
+    if (generatedLong == Long.MIN_VALUE) {
+      generatedLong++;
+    }
+    return Math.abs(generatedLong);
   }
 
   protected String applyOffsetAndReformat(String originalValue, int offsetDays) {
