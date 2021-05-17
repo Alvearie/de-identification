@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -33,6 +33,7 @@ public class DateTimeIdentifier extends AbstractIdentifier {
 
   private static final String[] appropriateNames =
       {"Datetime", "Timestamp", "Birthday", "Birth date", "Date", "BirthDate", "Date of birth"};
+
   private static final String[] patterns = {"dd-MM-yyyy", "dd-MMM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy",
       "yyyy/MM/dd", "dd-MM-yyyy[ HH:mm:ss]", "yyyy-MM-dd[ HH:mm:ss]", "dd/MM/yyyy[ HH:mm:ss]",
       "yyyy/MM/dd[ HH:mm:ss]"};
@@ -46,9 +47,7 @@ public class DateTimeIdentifier extends AbstractIdentifier {
           Pattern.compile("^\\d{2}/\\d{2}/\\d{4}( \\d{2}:\\d{2}:\\d{2})?$"),
           Pattern.compile("^\\d{4}/\\d{2}/\\d{2}( \\d{2}:\\d{2}:\\d{2})?$")};
 
-  // Making dateFormats static since DateTimeFormatter is not serializable.
-  // They should not be changing.
-  private static DateTimeFormatter dateFormats[] = new DateTimeFormatter[patterns.length + 1];
+  private static final DateTimeFormatter dateFormats[] = new DateTimeFormatter[patterns.length + 1];
 
   private static final LogManager log = LogManager.getInstance();
 
