@@ -22,6 +22,9 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
+    config.validate(null);
+
+    config.setPatientIdentifierPath(null);
     try {
       config.validate(null);
       fail("expected exception");

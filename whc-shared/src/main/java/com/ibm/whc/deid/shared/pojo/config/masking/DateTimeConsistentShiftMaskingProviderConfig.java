@@ -48,7 +48,7 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
   private int dateShiftMinimumDays = 1;
   private int dateShiftMaximumDays = 365;
   private DateShiftDirection dateShiftDirection = DEFAULT_DATE_SHIFT_DIRECTION;
-  private String patientIdentifierPath = null;
+  private String patientIdentifierPath = "/patient/reference";
 
   public DateTimeConsistentShiftMaskingProviderConfig() {
     type = MaskingProviderType.DATETIME_CONSISTENT_SHIFT;
