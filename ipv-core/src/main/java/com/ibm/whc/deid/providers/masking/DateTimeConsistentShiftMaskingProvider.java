@@ -26,17 +26,47 @@ import org.apache.commons.lang.WordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.JSONPath;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
+import com.ibm.whc.deid.shared.exception.Keyed;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.util.HashUtils;
-import com.ibm.whc.deid.util.Tuple;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -5672151364906956472L;
+
+  protected static class BadFormatterException extends IllegalArgumentException implements Keyed {
+
+    private static final long serialVersionUID = -3126006723662661670L;
+
+    public static final String MESSAGE_ID = LogCodes.WPH1025E;
+
+    public BadFormatterException(String pattern) {
+      super(Messages.getMessage(MESSAGE_ID, pattern));
+    }
+
+    @Override
+    public String getMessageKey() {
+      return MESSAGE_ID;
+    }
+  }
+
+  protected class ParseResponse {
+
+    public DateTimeFormatter formatter;
+    public String format;
+    public TemporalAccessor temporal;
+
+    protected ParseResponse(DateTimeFormatter formatter, String format, TemporalAccessor temporal) {
+      this.formatter = formatter;
+      this.format = format;
+      this.temporal = temporal;
+    }
+  }
 
   // used to "test" input for suitability for a formatter before attempting to
   // parse with that formatter - reduces the expense of creating exceptions related
@@ -70,7 +100,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
   private final int dateShiftMinimumDays;
   private final int dateShiftMaximumDays;
   private final DateShiftDirection dateShiftDirection;
-  private final List<DateTimeFormatter> customFormatters;
+  private final List<String> customFormats;
   private final JSONPath compiledPathExp;
 
   public DateTimeConsistentShiftMaskingProvider(
@@ -86,16 +116,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     this.dateShiftMinimumDays = configuration.getDateShiftMinimumDays();
     this.dateShiftMaximumDays = configuration.getDateShiftMaximumDays();
     this.dateShiftDirection = configuration.getDateShiftDirection();
-
-    List<DateTimeFormatter> formatters = null;
-    List<String> formats = configuration.getCustomFormats();
-    if (formats != null) {
-      formatters = new ArrayList<>(formats.size());
-      for (String format : formats) {
-        formatters.add(new DateTimeFormatterBuilder().appendPattern(format).toFormatter());
-      }
-    }
-    this.customFormatters = formatters;
+    this.customFormats = configuration.getCustomFormats();
 
     // path must start with '/' as required for JsonPointer
     String path = configuration.getPatientIdentifierPath().trim();
@@ -112,21 +133,42 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
   @Override
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
+    // DateTimeFormatter is not Serializable, so build instances as method variables
+    List<DateTimeFormatter> customFormatters = buildCustomFormatters();
+
     for (MaskingActionInputIdentifier maskingActionInputIdentifier : identifiers) {
-      String replacementValue = generateReplacement(maskingActionInputIdentifier);
+      String replacementValue = generateReplacement(maskingActionInputIdentifier, customFormatters);
       // set the replacement value into the record
       putField(maskingActionInputIdentifier, replacementValue);
     }
   }
   
   /**
+   * Builds date time formatting objects from the configured custom format patterns, if any.
+   * 
+   * @return a possibly-null, non-empty list of custom date time formatters
+   */
+  protected List<DateTimeFormatter> buildCustomFormatters() {
+    List<DateTimeFormatter> customFormatters = null;
+    if (this.customFormats != null && !this.customFormats.isEmpty()) {
+      customFormatters = new ArrayList<>(this.customFormats.size());
+      for (String format : this.customFormats) {
+        customFormatters.add(new DateTimeFormatterBuilder().appendPattern(format).toFormatter());
+      }
+    }
+    return customFormatters;
+  }
+
+  /**
    * Perform privacy protection operation on the given masking input
    * 
    * @param maskingActionInputIdentifier the masking input
+   * @param customFormatters the customer-provided formatters - used before builtin formatters
    * 
    * @return the value resulting from applying the privacy protection operation
    */
-  protected String generateReplacement(MaskingActionInputIdentifier maskingActionInputIdentifier) {
+  protected String generateReplacement(MaskingActionInputIdentifier maskingActionInputIdentifier,
+      List<DateTimeFormatter> customFormatters) {
     String originalValue = maskingActionInputIdentifier.getNode().asText();
     if (originalValue == null || originalValue.trim().isEmpty()) {
       return applyUnexpectedValueHandling(String.valueOf(originalValue), null);
@@ -139,7 +181,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
     int offsetDays = generateShiftNumberOfDays(patientId);
 
-    return applyOffsetAndReformat(originalValue, offsetDays);
+    return applyOffsetAndReformat(originalValue, offsetDays, customFormatters);
   }
   
   /**
@@ -170,7 +212,6 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    * @return the number of days to shift target dates
    */
   protected int generateShiftNumberOfDays(String patientId) {
-
     // determine the total number of eligible numbers of days based on the configuration
     int rangeLength = this.dateShiftMaximumDays - this.dateShiftMinimumDays + 1;
     int numberOfPossibleShiftValues = rangeLength;
@@ -251,19 +292,25 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    * 
    * @param offsetDays the number of days the temporal value should be shifted, which might be
    *        positive, negative, or zero.
+   *        
+   * @param customFormatters the customer-provided formatters - used before builtin formatters
    * 
    * @return the shifted temporal value in the same string format as the given value
    */
-  protected String applyOffsetAndReformat(String originalValue, int offsetDays) {
+  protected String applyOffsetAndReformat(String originalValue, int offsetDays, List<DateTimeFormatter> customFormatters) {
 
-    Tuple<DateTimeFormatter, TemporalAccessor> parseResponse = parse(originalValue);
+    ParseResponse parseResponse = parse(originalValue, customFormatters);
     if (parseResponse == null) {
       return applyUnexpectedValueHandling(originalValue, null);
     }
-    DateTimeFormatter formatter = parseResponse.getFirst();
-    TemporalAccessor parsedOriginal = parseResponse.getSecond();
+    DateTimeFormatter formatter = parseResponse.formatter;
+    TemporalAccessor parsedOriginal = parseResponse.temporal;
 
     Temporal adjustedTemporal = adjust(parsedOriginal, offsetDays);
+    if (adjustedTemporal == null) {
+      // should only happen for custom formatters
+      throw new BadFormatterException(parseResponse.format);
+    }
 
     String replacement = formatter.format(adjustedTemporal);
     return replacement;
@@ -274,38 +321,42 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    * along with the formatter that recognized and converted it.
    * 
    * @param originalValue a date or date and time value in string form
+   * @param customFormatters the customer-provided formatters - used before builtin formatters
    * 
-   * @return a "tuple" object containing the formatter that recognized the form of the string value
-   *         (first member) and the temporal object creatd by parsing the string (second member) or
-   *         <i>null</i> if the given string was not recognized as a supported format
+   * @return a simple container holding the formatter that recognized the form of the string value,
+   *         the pattern string (null if a builtin formatter recognized the value), and the temporal
+   *         object created by parsing the string
    */
-  protected Tuple<DateTimeFormatter, TemporalAccessor> parse(String originalValue) {
-    Tuple<DateTimeFormatter, TemporalAccessor> tuple = null;
+  protected ParseResponse parse(String originalValue,
+      List<DateTimeFormatter> customFormatters) {
+    ParseResponse parseResponse = null;
 
-    if (this.customFormatters != null) {
-      for (DateTimeFormatter formatter : this.customFormatters) {
+    if (customFormatters != null) {
+      int index = 0;
+      for (DateTimeFormatter formatter : customFormatters) {
         try {
           TemporalAccessor accessor = formatter.parse(originalValue);
-          tuple = new Tuple<>(formatter, accessor);
+          parseResponse = new ParseResponse(formatter, this.customFormats.get(index), accessor);
           break;
         } catch (Exception e) {
           // continue processing
         }
+        index++;
       }
     }
 
-    if (tuple == null) {
+    if (parseResponse == null) {
       // try the ISO date-time with offset format first
       try {
         TemporalAccessor accessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(originalValue);
-        tuple = new Tuple<>(DateTimeFormatter.ISO_OFFSET_DATE_TIME, accessor);
+        parseResponse = new ParseResponse(DateTimeFormatter.ISO_OFFSET_DATE_TIME, null, accessor);
       } catch (Exception e) {
         // continue processing
       }
     }
 
     // try the builtin formats that do not include time zones next
-    if (tuple == null) {
+    if (parseResponse == null) {
       // if using alphabetics, camelcase the month, otherwise it will not be recognized
       String capitalizedValue = originalValue.matches(".*[a-zA-Z].*")
           ? WordUtils.capitalizeFully(originalValue, new char[] {'-'})
@@ -316,7 +367,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
           try {
             DateTimeFormatter f = dateFormaters[i];
             TemporalAccessor d = f.parse(capitalizedValue);
-            tuple = new Tuple<>(f, d);
+            parseResponse = new ParseResponse(f, null, d);
             break;
           } catch (Exception e2) {
             log.logError(LogCodes.WPH1013E, e2);
@@ -325,7 +376,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
       }
     }
 
-    return tuple;
+    return parseResponse;
   }
 
   /**
@@ -337,12 +388,13 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    * @param offsetDays the number of days to change the value, which might be positive, negative, or
    *        zero
    * 
-   * @return the adjusted temporal object
+   * @return the adjusted temporal object or <i>null</i> if the original object does not have
+   *         sufficient information to provide a date that can be adjusted
    */
   protected Temporal adjust(TemporalAccessor original, int offsetDays) {
-    Temporal adjusted;
+    Temporal adjusted = null;
     ZoneId originalZoneId = original.query(TemporalQueries.zone());
-    if (originalZoneId != null) {
+    if (originalZoneId != null && original.isSupported(ChronoField.INSTANT_SECONDS)) {
       // If the given value has offset from UTC information, use a Calendar to manipulate
       // the number of days in case the offset information also includes daylight savings
       // time rules. This is important in case the time, which is normally not changed,
@@ -359,14 +411,16 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
       cal.add(Calendar.DAY_OF_MONTH, offsetDays);
       // adjusted = OffsetDateTime.ofInstant(cal.toInstant(), originalZoneId);
       adjusted = ZonedDateTime.ofInstant(cal.toInstant(), originalZoneId);
-    } else if (original.isSupported(ChronoField.SECOND_OF_DAY)) {
+    } else if (original.isSupported(ChronoField.EPOCH_DAY)
+        && original.isSupported(ChronoField.NANO_OF_DAY)) {
       // No time zone offset information is available, but a time portion is provided
       LocalDateTime originalAsTemporal = LocalDateTime.from(original);
       adjusted = originalAsTemporal.plusDays(offsetDays);
     } else {
-      // The given value contains only a date
-      LocalDate originalAsTemporal = LocalDate.from(original);
-      adjusted = originalAsTemporal.plusDays(offsetDays);
+      LocalDate originalAsTemporal = original.query(TemporalQueries.localDate());
+      if (originalAsTemporal != null) {
+        adjusted = originalAsTemporal.plusDays(offsetDays);
+      }
     }
     return adjusted;
   }
