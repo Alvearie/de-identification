@@ -166,7 +166,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     config.setUnexpectedInputReturnMessage("Bad");
     config.setCustomFormats(
-        Arrays.asList("", null, "\t", "yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'", "MM-dd-yy", "yyDDD",
+        Arrays.asList("yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'", "MM-dd-yy", "yyDDD",
             "yyyy-MM-dd'T'HH:mm:ss z"));
     DateTimeConsistentShiftMaskingProvider provider =
         new DateTimeConsistentShiftMaskingProvider(config, null);

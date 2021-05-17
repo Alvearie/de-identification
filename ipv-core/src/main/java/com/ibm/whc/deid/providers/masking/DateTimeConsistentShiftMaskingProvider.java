@@ -92,9 +92,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     if (formats != null) {
       formatters = new ArrayList<>(formats.size());
       for (String format : formats) {
-        if (format != null && !format.trim().isEmpty()) {
-          formatters.add(new DateTimeFormatterBuilder().appendPattern(format).toFormatter());
-        }
+        formatters.add(new DateTimeFormatterBuilder().appendPattern(format).toFormatter());
       }
     }
     this.customFormatters = formatters;
@@ -121,6 +119,13 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     }
   }
   
+  /**
+   * Perform privacy protection operation on the given masking input
+   * 
+   * @param maskingActionInputIdentifier the masking input
+   * 
+   * @return the value resulting from applying the privacy protection operation
+   */
   protected String generateReplacement(MaskingActionInputIdentifier maskingActionInputIdentifier) {
     String originalValue = maskingActionInputIdentifier.getNode().asText();
     if (originalValue == null || originalValue.trim().isEmpty()) {

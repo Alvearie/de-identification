@@ -5,7 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -44,9 +44,9 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
   public static final DateShiftDirection DEFAULT_DATE_SHIFT_DIRECTION =
       DateShiftDirection.beforeOrAfter;
 
-  private ArrayList<String> customFormats = null;
+  private List<String> customFormats = null;
   private int dateShiftMinimumDays = 1;
-  private int dateShiftMaximumDays = 366;
+  private int dateShiftMaximumDays = 365;
   private DateShiftDirection dateShiftDirection = DEFAULT_DATE_SHIFT_DIRECTION;
   private String patientIdentifierPath = null;
 
@@ -92,7 +92,7 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
   }
 
   public void setCustomFormats(List<String> customFormats) {
-    this.customFormats = customFormats == null ? null : new ArrayList<>(customFormats);
+    this.customFormats = customFormats;
   }
 
   @Override
@@ -105,23 +105,30 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
     }
     if (dateShiftMaximumDays < dateShiftMinimumDays) {
       throw new InvalidMaskingConfigurationException(
-          "`dateShiftMinimumDays` must be >= `dateShiftMinimumDays`");
+          "`dateShiftMaximumDays` must be greater than or equal to `dateShiftMinimumDays`");
     }
     if (patientIdentifierPath == null || patientIdentifierPath.trim().isEmpty()) {
       throw new InvalidMaskingConfigurationException("`patientIdentifierPath` is missing");
     }
     if (customFormats != null) {
-      // TODO: complete validation
-      // try {
-      // new DateTimeFormatterBuilder().appendPattern(formatFixed);
-      // } catch (IllegalArgumentException e) {
-      // throw new InvalidMaskingConfigurationException(
-      // "`formatFixed` is not valid: " + e.getMessage(), e);
-      // }
+      int offset = 0;
+      for (String format : customFormats) {
+        if (format == null || format.trim().isEmpty()) {
+          throw new InvalidMaskingConfigurationException(
+              "format at offset " + offset + " in `customFormats` is missing");
+        }
+        try {
+          new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
+        } catch (IllegalArgumentException e) {
+          throw new InvalidMaskingConfigurationException(
+              "format at offset " + offset + " in `customFormats` is not valid: " + e.getMessage(),
+              e);
+        }
+        offset++;
+      }
     }
   }
 
-  // TODO: verify List handled appropriately
   @Override
   public int hashCode() {
     final int prime = 31;
