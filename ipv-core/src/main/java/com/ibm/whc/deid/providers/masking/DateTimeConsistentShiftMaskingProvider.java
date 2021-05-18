@@ -57,14 +57,26 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
   protected class ParseResponse {
 
-    public DateTimeFormatter formatter;
-    public String format;
-    public TemporalAccessor temporal;
+    private DateTimeFormatter formatter;
+    private String format;
+    private TemporalAccessor temporal;
 
     protected ParseResponse(DateTimeFormatter formatter, String format, TemporalAccessor temporal) {
       this.formatter = formatter;
       this.format = format;
       this.temporal = temporal;
+    }
+
+    public DateTimeFormatter getFormatter() {
+      return formatter;
+    }
+
+    public String getFormat() {
+      return format;
+    }
+
+    public TemporalAccessor getTemporalAccessor() {
+      return temporal;
     }
   }
 
@@ -303,13 +315,13 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     if (parseResponse == null) {
       return applyUnexpectedValueHandling(originalValue, null);
     }
-    DateTimeFormatter formatter = parseResponse.formatter;
-    TemporalAccessor parsedOriginal = parseResponse.temporal;
+    DateTimeFormatter formatter = parseResponse.getFormatter();
+    TemporalAccessor parsedOriginal = parseResponse.getTemporalAccessor();
 
     Temporal adjustedTemporal = adjust(parsedOriginal, offsetDays);
     if (adjustedTemporal == null) {
       // should only happen for custom formatters
-      throw new BadFormatterException(parseResponse.format);
+      throw new BadFormatterException(parseResponse.getFormat());
     }
 
     String replacement = formatter.format(adjustedTemporal);
