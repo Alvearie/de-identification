@@ -138,11 +138,11 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
   public void testSetters() {
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
-    assertEquals(DateShiftDirection.beforeOrAfter, config.getDateShiftDirection());
-    config.setDateShiftDirection(DateShiftDirection.after);
-    assertEquals(DateShiftDirection.after, config.getDateShiftDirection());
+    assertEquals(DateShiftDirection.BEFORE_OR_AFTER, config.getDateShiftDirection());
+    config.setDateShiftDirection(DateShiftDirection.AFTER);
+    assertEquals(DateShiftDirection.AFTER, config.getDateShiftDirection());
     config.setDateShiftDirection(null);
-    assertEquals(DateShiftDirection.beforeOrAfter, config.getDateShiftDirection());
+    assertEquals(DateShiftDirection.BEFORE_OR_AFTER, config.getDateShiftDirection());
   }
 
   @Test
@@ -178,11 +178,11 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setDateShiftDirection(DateShiftDirection.before);
+    config.setDateShiftDirection(DateShiftDirection.BEFORE);
     assertFalse(config.equals(other));
-    other.setDateShiftDirection(DateShiftDirection.after);
+    other.setDateShiftDirection(DateShiftDirection.AFTER);
     assertFalse(config.equals(other));
-    other.setDateShiftDirection(DateShiftDirection.before);
+    other.setDateShiftDirection(DateShiftDirection.BEFORE);
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 

@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
+import com.ibm.whc.deid.providers.masking.DateTimeConsistentShiftMaskingProvider.BadFormatterException;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
@@ -72,94 +73,97 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
   private void verifyStandardReplacements(DateTimeConsistentShiftMaskingProvider provider,
       String badInputValue) {
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("value-abc", 24));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("", 24));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("13", 24));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("value-abc", 24, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("", 24, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("13", 24, null));
 
     assertEquals("2020-02-29T01:02:03+10:30",
-        provider.applyOffsetAndReformat("2021-03-01T01:02:03+10:30", -366));
+        provider.applyOffsetAndReformat("2021-03-01T01:02:03+10:30", -366, null));
     assertEquals("2020-02-29T14:16:18+10:30",
-        provider.applyOffsetAndReformat("2019-02-28T14:16:18+10:30", 366));
+        provider.applyOffsetAndReformat("2019-02-28T14:16:18+10:30", 366, null));
     assertEquals("2020-02-29T01:02:03Z",
-        provider.applyOffsetAndReformat("2020-03-01T01:02:03Z", -1));
+        provider.applyOffsetAndReformat("2020-03-01T01:02:03Z", -1, null));
     assertEquals("2020-10-31T15:16:17-05:00",
-        provider.applyOffsetAndReformat("2020-11-01T15:16:17-05:00", -1));
+        provider.applyOffsetAndReformat("2020-11-01T15:16:17-05:00", -1, null));
     assertEquals("2020-10-31T02:04:06-05:00",
-        provider.applyOffsetAndReformat("2020-11-01T02:04:06-05:00", -1));
+        provider.applyOffsetAndReformat("2020-11-01T02:04:06-05:00", -1, null));
     assertEquals("2020-10-31T01:03:05-05:00",
-        provider.applyOffsetAndReformat("2020-11-01T01:03:05-05:00", -1));
+        provider.applyOffsetAndReformat("2020-11-01T01:03:05-05:00", -1, null));
     assertEquals("2020-03-08T01:10:20-05:00",
-        provider.applyOffsetAndReformat("2020-03-09T01:10:20-05:00", -1));
+        provider.applyOffsetAndReformat("2020-03-09T01:10:20-05:00", -1, null));
     assertEquals("2020-03-08T02:10:20-05:00",
-        provider.applyOffsetAndReformat("2020-03-09T02:10:20-05:00", -1));
+        provider.applyOffsetAndReformat("2020-03-09T02:10:20-05:00", -1, null));
     assertEquals("2020-03-08T03:10:20-05:00",
-        provider.applyOffsetAndReformat("2020-03-11T03:10:20-05:00", -3));
+        provider.applyOffsetAndReformat("2020-03-11T03:10:20-05:00", -3, null));
     assertEquals("2020-03-08T02:03:04-05:00",
-        provider.applyOffsetAndReformat("2020-03-09T02:03:04-05:00", -1));
+        provider.applyOffsetAndReformat("2020-03-09T02:03:04-05:00", -1, null));
     assertEquals("2020-02-29T01:02:03-01:00",
-        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1));
+        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1, null));
     assertEquals("2020-02-29T01:02:03-01:00",
-        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1));
+        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1, null));
     assertEquals("2020-02-29T01:02:03-01:00",
-        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1));
+        provider.applyOffsetAndReformat("2020-03-01T01:02:03-01:00", -1, null));
     assertEquals("2020-02-29T01:02:00-01:00",
-        provider.applyOffsetAndReformat("2020-03-01T01:02-01:00", -1));
+        provider.applyOffsetAndReformat("2020-03-01T01:02-01:00", -1, null));
     assertEquals("2019-12-29T01:02:03+03:00",
-        provider.applyOffsetAndReformat("2020-03-01T01:02:03+03:00", -63));
+        provider.applyOffsetAndReformat("2020-03-01T01:02:03+03:00", -63, null));
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01-01:00", -1));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01:-01:00", -1));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01-01:00", -1, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01:-01:00", -1, null));
 
     // offset is not optional in builtin ISO pattern
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01:02:03", -1));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01T01:02:03", -1, null));
 
-    assertEquals("2020-02-29", provider.applyOffsetAndReformat("2020-03-01", -1));
-    assertEquals("2020-01-03", provider.applyOffsetAndReformat("2020-01-03", 0));
-    assertEquals("2019-12-24", provider.applyOffsetAndReformat("2020-01-03", -10));
-    assertEquals("2019-12-31", provider.applyOffsetAndReformat("2020-03-01", -61));
-    assertEquals("2020-01-03", provider.applyOffsetAndReformat("2019-12-24", 10));
-    assertEquals("2020-03-01", provider.applyOffsetAndReformat("2019-12-31", 61));
+    assertEquals("2020-02-29", provider.applyOffsetAndReformat("2020-03-01", -1, null));
+    assertEquals("2020-01-03", provider.applyOffsetAndReformat("2020-01-03", 0, null));
+    assertEquals("2019-12-24", provider.applyOffsetAndReformat("2020-01-03", -10, null));
+    assertEquals("2019-12-31", provider.applyOffsetAndReformat("2020-03-01", -61, null));
+    assertEquals("2020-01-03", provider.applyOffsetAndReformat("2019-12-24", 10, null));
+    assertEquals("2020-03-01", provider.applyOffsetAndReformat("2019-12-31", 61, null));
 
-    assertEquals("2020/02/29", provider.applyOffsetAndReformat("2020/03/01", -1));
-    assertEquals("2020/01/03", provider.applyOffsetAndReformat("2020/01/03", 0));
-    assertEquals("2019/12/24", provider.applyOffsetAndReformat("2020/01/03", -10));
-    assertEquals("2019/12/31", provider.applyOffsetAndReformat("2020/03/01", -61));
-    assertEquals("2020/01/03", provider.applyOffsetAndReformat("2019/12/24", 10));
-    assertEquals("2020/03/01", provider.applyOffsetAndReformat("2019/12/31", 61));
+    assertEquals("2020/02/29", provider.applyOffsetAndReformat("2020/03/01", -1, null));
+    assertEquals("2020/01/03", provider.applyOffsetAndReformat("2020/01/03", 0, null));
+    assertEquals("2019/12/24", provider.applyOffsetAndReformat("2020/01/03", -10, null));
+    assertEquals("2019/12/31", provider.applyOffsetAndReformat("2020/03/01", -61, null));
+    assertEquals("2020/01/03", provider.applyOffsetAndReformat("2019/12/24", 10, null));
+    assertEquals("2020/03/01", provider.applyOffsetAndReformat("2019/12/31", 61, null));
 
-    assertEquals("2020-02-29 13:14:15", provider.applyOffsetAndReformat("2020-03-02 13:14:15", -2));
-    assertEquals("2020-02-29 13:14:15", provider.applyOffsetAndReformat("2020-03-01 13:14:15", -1));
-    assertEquals("2020-02-29 13:14:15", provider.applyOffsetAndReformat("2019-12-31 13:14:15", 60));
+    assertEquals("2020-02-29 13:14:15",
+        provider.applyOffsetAndReformat("2020-03-02 13:14:15", -2, null));
+    assertEquals("2020-02-29 13:14:15",
+        provider.applyOffsetAndReformat("2020-03-01 13:14:15", -1, null));
+    assertEquals("2020-02-29 13:14:15",
+        provider.applyOffsetAndReformat("2019-12-31 13:14:15", 60, null));
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01 3:4:5", -1));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020-03-01 3:4:5", -1, null));
 
-    assertEquals("2020/02/29 13:14:15", provider.applyOffsetAndReformat("2020/02/19 13:14:15", 10));
     assertEquals("2020/02/29 13:14:15",
-        provider.applyOffsetAndReformat("2020/03/10 13:14:15", -10));
+        provider.applyOffsetAndReformat("2020/02/19 13:14:15", 10, null));
+    assertEquals("2020/02/29 13:14:15",
+        provider.applyOffsetAndReformat("2020/03/10 13:14:15", -10, null));
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020/03/01 3:4:5", -1));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("2020/03/01 3:4:5", -1, null));
 
-    assertEquals("16/04/1967", provider.applyOffsetAndReformat("16/04/1965", 730));
-    assertEquals("16-04-1967", provider.applyOffsetAndReformat("16-04-1968", -366));
+    assertEquals("16/04/1967", provider.applyOffsetAndReformat("16/04/1965", 730, null));
+    assertEquals("16-04-1967", provider.applyOffsetAndReformat("16-04-1968", -366, null));
     assertEquals("16/04/1967 13:14:15",
-        provider.applyOffsetAndReformat("16/04/1965 13:14:15", 730));
+        provider.applyOffsetAndReformat("16/04/1965 13:14:15", 730, null));
     assertEquals("16-04-1967 02:04:06",
-        provider.applyOffsetAndReformat("16-04-1968 02:04:06", -366));
+        provider.applyOffsetAndReformat("16-04-1968 02:04:06", -366, null));
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("04-16-1967", 1));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("16-04-1967 14:16", 1));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("04/16/1967", 1));
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("16/04/1967 14", 1));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("04-16-1967", 1, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("16-04-1967 14:16", 1, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("04/16/1967", 1, null));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("16/04/1967 14", 1, null));
 
-    assertEquals("01-May-1967", provider.applyOffsetAndReformat("29-apr-1967", 2));
-    assertEquals("01-Jun-1967", provider.applyOffsetAndReformat("29-APR-1967", 33));
+    assertEquals("01-May-1967", provider.applyOffsetAndReformat("29-apr-1967", 2, null));
+    assertEquals("01-Jun-1967", provider.applyOffsetAndReformat("29-APR-1967", 33, null));
 
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("29-apx-1967", 33));
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("29-apx-1967", 33, null));
   }
 
   @Test
   public void testApplyOffsetAndReformat_custom() {
-    System.out.println(DateTimeFormatter.ISO_ZONED_DATE_TIME.toString());
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
@@ -173,41 +177,75 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
 
     verifyStandardReplacements(provider, "Bad");
 
+    List<DateTimeFormatter> customFormatters = provider.buildCustomFormatters();
+
     // ---------------------------------------------------------------------------
     // 08 MAR 2020 is start of daylight savings time in America/Chicago (CST/CDT)
     // 01 NOV 2020 is end of daylight savings time in America/Chicago (CST/CDT)
     // ---------------------------------------------------------------------------
 
     // input offset overridden by zone id when both supplied
-    assertEquals("2020-10-31T05:06:07-05:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-11-01T05:06:07+10:00[America/Chicago]", -1));
+    assertEquals("2020-10-31T05:06:07-05:00[America/Chicago]", provider.applyOffsetAndReformat(
+        "2020-11-01T05:06:07+10:00[America/Chicago]", -1, customFormatters));
     assertEquals("2020-11-01T01:06:07-06:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-11-04T01:06:07-08:00[America/Chicago]", -3));
+        provider.applyOffsetAndReformat("2020-11-04T01:06:07-08:00[America/Chicago]", -3,
+            customFormatters));
     assertEquals("2020-11-01T01:06:07-05:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-10-27T01:06:07-08:00[America/Chicago]", 5));
+        provider.applyOffsetAndReformat("2020-10-27T01:06:07-08:00[America/Chicago]", 5,
+            customFormatters));
     assertEquals("2020-11-01T02:06:07-06:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-10-27T02:06:07-08:00[America/Chicago]", 5));
+        provider.applyOffsetAndReformat("2020-10-27T02:06:07-08:00[America/Chicago]", 5,
+            customFormatters));
     assertEquals("2020-05-01T13:14:15-05:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-04-01T13:14:15-05:00[America/Chicago]", 30));
+        provider.applyOffsetAndReformat("2020-04-01T13:14:15-05:00[America/Chicago]", 30,
+            customFormatters));
 
     assertEquals("2020-10-31T05:06:07 CDT",
-        provider.applyOffsetAndReformat("2020-11-01T05:06:07 CDT", -1));
+        provider.applyOffsetAndReformat("2020-11-01T05:06:07 CDT", -1, customFormatters));
     // pattern is for short zone name
     assertEquals("2020-11-03T05:06:07 CST",
-        provider.applyOffsetAndReformat("2020-11-01T05:06:07 America/Chicago", 2));
+        provider.applyOffsetAndReformat("2020-11-01T05:06:07 America/Chicago", 2,
+            customFormatters));
     // target day is 23 hours
     assertEquals("2020-03-08T03:03:04 CDT",
-        provider.applyOffsetAndReformat("2020-03-11T02:03:04 CDT", -3));
+        provider.applyOffsetAndReformat("2020-03-11T02:03:04 CDT", -3, customFormatters));
     // target day is 23 hours
     assertEquals("2020-03-08T01:03:04 CST",
-        provider.applyOffsetAndReformat("2020-03-01T02:03:04 America/Chicago", 7));
+        provider.applyOffsetAndReformat("2020-03-01T02:03:04 America/Chicago", 7,
+            customFormatters));
     // target day is 23 hours, but target hour exists
     assertEquals("2020-03-08T14:03:04 CDT",
-        provider.applyOffsetAndReformat("2020-03-01T14:03:04 America/Chicago", 7));
+        provider.applyOffsetAndReformat("2020-03-01T14:03:04 America/Chicago", 7,
+            customFormatters));
 
-    assertEquals("99355", provider.applyOffsetAndReformat("99365", -10));
-    assertEquals("98365", provider.applyOffsetAndReformat("99365", -365));
-    assertEquals("00001", provider.applyOffsetAndReformat("99365", 1));
+    assertEquals("99355", provider.applyOffsetAndReformat("99365", -10, customFormatters));
+    assertEquals("98365", provider.applyOffsetAndReformat("99365", -365, customFormatters));
+    assertEquals("00001", provider.applyOffsetAndReformat("99365", 1, customFormatters));
+  }
+
+  @Test
+  public void testApplyOffsetAndReformat_customError() {
+    DateTimeConsistentShiftMaskingProviderConfig config =
+        new DateTimeConsistentShiftMaskingProviderConfig();
+    config.setPatientIdentifierPath("/id");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("Bad");
+    config.setCustomFormats(
+        Arrays.asList("yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'", "MM-dd-yy", "yyyy-MM-dd'T'HH:mm:ss z", "MMDDD"));
+    DateTimeConsistentShiftMaskingProvider provider =
+        new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    verifyStandardReplacements(provider, "Bad");
+
+    List<DateTimeFormatter> customFormatters = provider.buildCustomFormatters();
+
+    try {
+      provider.applyOffsetAndReformat("10333", -1, customFormatters);
+      fail("expected exception");
+    } catch (BadFormatterException e) {
+      assertEquals("Insufficient date information from date format pattern `MMDDD`",
+          e.getMessage());
+    }
   }
 
   @Test
@@ -215,7 +253,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.before);
+    config.setDateShiftDirection(DateShiftDirection.BEFORE);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -260,7 +298,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.after);
+    config.setDateShiftDirection(DateShiftDirection.AFTER);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -305,7 +343,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.beforeOrAfter);
+    config.setDateShiftDirection(DateShiftDirection.BEFORE_OR_AFTER);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -366,11 +404,13 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     verifyRepeatable(provider, null);
     verifyRepeatable(provider, "");
     verifyRepeatable(provider, "   ");
-    long value1 = verifyRepeatable(provider, "patient1");
-    assertEquals(value1, verifyRepeatable(provider, " PATIENT1 "));
+    
+    // should be same result on any computer, any time    
+    assertEquals(8001756538252770565L, verifyRepeatable(provider, "patient1"));
+    assertEquals(8001756538252770565L, verifyRepeatable(provider, " PATIENT1 "));
     String input = " now is the time to check special chars !@#$%^&*()-_+=/\\ ";
-    long value2 = verifyRepeatable(provider, input);
-    assertEquals(value2, verifyRepeatable(provider, input.trim().toUpperCase()));
+    assertEquals(7539049058547281928L, verifyRepeatable(provider, input));
+    assertEquals(7539049058547281928L, verifyRepeatable(provider, input.trim().toUpperCase()));
   }
 
   private long verifyRepeatable(DateTimeConsistentShiftMaskingProvider provider, String input) {
@@ -455,7 +495,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
         new MaskingActionInputIdentifier(provider, target, parent, "three", "type", "id", root);
 
     try {
-      provider.generateReplacement(identifier);
+      provider.generateReplacement(identifier, null);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-XX"));
@@ -471,7 +511,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
         new MaskingActionInputIdentifier(provider, target, parent, "three", "type", "id", root);
 
     try {
-      provider.generateReplacement(identifier);
+      provider.generateReplacement(identifier, null);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-X2"));
@@ -482,7 +522,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     identifier =
         new MaskingActionInputIdentifier(provider, target, parent, "three", "type", "id", root);
     try {
-      provider.generateReplacement(identifier);
+      provider.generateReplacement(identifier, null);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-X2"));
@@ -496,7 +536,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
     config.setPatientIdentifierPath("/a");
-    config.setDateShiftDirection(DateShiftDirection.after);
+    config.setDateShiftDirection(DateShiftDirection.AFTER);
     config.setDateShiftMinimumDays(2);
     config.setDateShiftMaximumDays(5);
     DateTimeConsistentShiftMaskingProvider provider =
