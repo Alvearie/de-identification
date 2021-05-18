@@ -253,7 +253,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.before);
+    config.setDateShiftDirection(DateShiftDirection.BEFORE);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -298,7 +298,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.after);
+    config.setDateShiftDirection(DateShiftDirection.AFTER);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -343,7 +343,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
-    config.setDateShiftDirection(DateShiftDirection.beforeOrAfter);
+    config.setDateShiftDirection(DateShiftDirection.BEFORE_OR_AFTER);
     config.setDateShiftMinimumDays(1);
     config.setDateShiftMaximumDays(10);
     TestDateTimeConsistentShiftMaskingProvider provider =
@@ -536,7 +536,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
     config.setPatientIdentifierPath("/a");
-    config.setDateShiftDirection(DateShiftDirection.after);
+    config.setDateShiftDirection(DateShiftDirection.AFTER);
     config.setDateShiftMinimumDays(2);
     config.setDateShiftMaximumDays(5);
     DateTimeConsistentShiftMaskingProvider provider =

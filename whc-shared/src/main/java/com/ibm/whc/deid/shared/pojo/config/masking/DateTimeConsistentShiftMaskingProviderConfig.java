@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
@@ -28,21 +29,32 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
     /**
      * The shifted value is before the original value.
      */
-    before,
+    BEFORE("before"),
 
     /**
      * The shifted value can be before or after the original value.
      */
-    beforeOrAfter,
+    BEFORE_OR_AFTER("beforeOrAfter"),
 
     /**
      * The shifted value is after the original value.
      */
-    after
+    AFTER("after");
+
+    private String value;
+
+    private DateShiftDirection(String val) {
+      this.value = val;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
   }
 
   public static final DateShiftDirection DEFAULT_DATE_SHIFT_DIRECTION =
-      DateShiftDirection.beforeOrAfter;
+      DateShiftDirection.BEFORE_OR_AFTER;
 
   private List<String> customFormats = null;
   private int dateShiftMinimumDays = 1;

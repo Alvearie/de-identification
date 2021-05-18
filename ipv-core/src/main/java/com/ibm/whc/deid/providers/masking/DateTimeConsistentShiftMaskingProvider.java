@@ -215,7 +215,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     // determine the total number of eligible numbers of days based on the configuration
     int rangeLength = this.dateShiftMaximumDays - this.dateShiftMinimumDays + 1;
     int numberOfPossibleShiftValues = rangeLength;
-    if (this.dateShiftDirection == DateShiftDirection.beforeOrAfter) {
+    if (this.dateShiftDirection == DateShiftDirection.BEFORE_OR_AFTER) {
       numberOfPossibleShiftValues *= 2;
       if (this.dateShiftMinimumDays == 0) {
         numberOfPossibleShiftValues--; // don't add 0 twice
@@ -229,10 +229,10 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     // get the value at the index into the total possible values
     int shfitNumberOfDays = -1;
     switch (this.dateShiftDirection) {
-      case before:
+      case BEFORE:
         shfitNumberOfDays = -this.dateShiftMaximumDays + possiblesIndex;
         break;
-      case after:
+      case AFTER:
         shfitNumberOfDays = this.dateShiftMinimumDays + possiblesIndex;
         break;
       default:
