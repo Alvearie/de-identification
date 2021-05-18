@@ -16,7 +16,7 @@ import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import java.io.Serializable;
 
 /*
- * Abstract class that all masking provider config classes should inherit from
+ * Abstract superclass for all masking provider configuration classes.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type",
     visible = true)
@@ -41,6 +41,8 @@ import java.io.Serializable;
         name = MaskingProviderType.Constants.DATEDEPENDENCY_VALUE),
     @Type(value = DateTimeMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.DATETIME_VALUE),
+    @Type(value = DateTimeConsistentShiftMaskingProviderConfig.class,
+        name = MaskingProviderType.Constants.DATETIME_CONSISTENT_SHIFT_VALUE),
     @Type(value = EmailMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.EMAIL_VALUE),
     @Type(value = GenderMaskingProviderConfig.class,
@@ -241,6 +243,8 @@ public abstract class MaskingProviderConfig implements Serializable {
         return new DateDependencyMaskingProviderConfig();
       case DATETIME:
         return new DateTimeMaskingProviderConfig();
+      case DATETIME_CONSISTENT_SHIFT:
+        return new DateTimeConsistentShiftMaskingProviderConfig();
       case EMAIL:
         return new EmailMaskingProviderConfig();
       case GENDER:
