@@ -14,6 +14,7 @@ To preserve utility in the data being de-identified, the IBM Data De-Identificat
 * [CREDIT_CARD](#credit_card)
 * [DATEDEPENDENCY](#datedependency)
 * [DATETIME](#datetime)
+* [DATETIME_CONSISTENT_SHIFT](#datetime_consistent_shift)
 * [EMAIL](#email)
 * [GENDER](#gender)
 * [GENERALIZE](#generalize)
@@ -547,6 +548,175 @@ This privacy provider supports these options:
 | yearDeleteNinterval                               | Boolean  | Remove the year and return only the day and month, if the date and time is within the given number of days from a given date and time                                                                                                                                                                                                                       | false             |
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
 | yearDeleteNointervalComparedateValue              | String   | The date and time to compare to the value being masked                                                                                                                                                                                                                               | null              |
+
+#### DATETIME_CONSISTENT_SHIFT
+
+>   Masks a date or date and time value by shifting the date a number of days.  The number of days to shift the date is chosen
+>   from a configured range.  However, the same number of days is used for each date related to the same principle or patient.
+>   A field that identifies the principle to whom the target value relates must be present at the same location in each document
+>   containing a value to be masked with this privacy provider.  
+
+| **Option name**        | **Type** | **Description**                                                                                                                | **Default value**  |
+|------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| patientIdentifierPath  | String   | A path using JSON Pointer specification syntax to the field in the source document containing the principle                    | /patient/reference |
+| dateShiftMinimumDays   | Integer  | The minimum number of days (inclusive) to shift the date, must be >= 0                                                         | 1                  |
+| dateShiftMaximumDays   | Integer  | The maximum number of days (inclusive) to shift the date, must be >= `dateShiftMinimumDays`                               | 365                |
+| dateShiftDirection     | String   | The direction the date should be shifted in relation to the original date.  Supported values are described in the table below. | beforeOrAfter      |
+| salt                   | String   | An optional, arbitrary set of characters used as part of the calculation of the number of days to shift the date.  Supplying a value prevents the principle value from being the only input to that calculation.  Null and values consisting of all whitespace characters are ignored. | null   |
+| customFormats          | String Array   | Optional additional input formats to recognize when parsing date values.  More details below.                            | null               |
+
+If more than one masking rule definition is used to mask date values related to the same principle, the values 
+of the `dateShiftMinimumDays`, `dateShiftMaximumDays`, `dateShiftDirection`, and `salt` parameters 
+should be the same in all of those masking rules.  Changing any of those values can cause the number of days for 
+the date shift to be different even if the value at the `patientIdentifierPath` field remains the same.
+
+If the input document does not contain a text field at the path supplied in the `patientIdentifierPath` 
+parameter or if the value of the field is null or consists of only whitespace characters, the configured 
+handling of unexpected input values is applied.  See the **Handling unexpected input values** section below.
+
+**Supported values for `dateShiftDirection`**
+
+| **Value**        | **Description**                                                |
+|------------------|----------------------------------------------------------------|
+| before           | Shift the date before the original date                        |
+| beforeOrAfter    | Shift the date either before or after the original date        |
+| after            | Shift the date after the original date                         |
+
+**Supported and custom input formats**
+
+The provider supports input values in any of these formats.
+
+|**Format**                                | **Examples**                            |
+|------------------------------------------|-----------------------------------------|
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+hh:mm      | 2008-09-14T15:53:02.123456789+02:00     |
+| yyyy-MM-ddTHH:mm:ss+hh:mm                | 2008-09-14T15:53:02-05:00               |
+| yyyy-MM-ddTHH:mm+hh:mm                   | 2008-09-14T15:53-06:00                  |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ           | 2008-09-14T15:53:02.123456789Z          |
+| yyyy-MM-ddTHH:mm:ssZ                     | 2008-09-14T15:53:02Z                    |
+| yyyy-MM-ddTHH:mmZ                        | 2008-09-14T15:53Z                       |
+| dd-MMM-yyyy                              | 24-DEC-2018                             |
+| yyyy-MM-dd                               | 2018-12-24                              |
+| yyyy/MM/dd                               | 2018/12/24                              |
+| yyyy-MM-dd HH:mm:ss                      | 2018-12-24 12:01:12                     |
+| yyyy/MM/dd HH:mm:ss                      | 2018/12/24 12:01:12                     |
+| dd-MM-yyyy                               | 16-04-1967                              |
+| dd/MM/yyyy                               | 16/04/1967                              |
+| dd-MM-yyyy HH:mm:ss                      | 16-04-1967 13:14:15                     |
+| dd/MM/yyyy HH:mm:ss                      | 16/04/1967 13:14:15                     |
+
+The provider formats the shifted date using the same pattern that matched the original input value.  
+Minor changes to precision and formatting between the original value and the shifted value can occur, however.
+
+If the input contains values to be protected that do not match any of these patterns, additional formats 
+can be added using the `customFormats` configuration parameter.  Input is matched to custom formats 
+in the order the custom formats appear in the configuration parameter and before it is matched to any of 
+the built-in formats.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for 
+information about the syntax used to specify custom formats.  Time components and time zone name or offset 
+components are optional.  The format must capture enough information about the date, however, for the 
+provider to be able to calculate a year, month, and day.  For example, _yyDDD_ (Julian date, year and 
+day of year) is a valid pattern because the provider can calculate the information it needs.  However, 
+_MMdd_ (month and day) or _HHmm_ (hour and minute) are not adequate as the year, month, and day cannot 
+be calculated.
+
+If an input value does not match any of the available formats or is matched to a custom format that does not 
+capture sufficient date information, the configured handling of unexpected input values is applied.  See the 
+**Handling unexpected input values** section below.
+
+**Principle identifier fields and ordering of rule assignments**
+
+This provider does not apply any privacy protection to the field indicated by the `patientIdentifierPath` 
+parameter, but privacy protection for that field might also be desired and privacy protection rules can be 
+applied to it in other sections of the complete privacy protection configuration.  In that case, it is 
+important to be aware of the order in which the privacy rules are applied.  In some cases it might be desirable 
+to base the consistent date shifting on the original value of the principle field.  In others, it might be 
+desirable to base the consistent date shifting on the principle field after that field has already been masked 
+by other privacy protection rules.
+
+The order in which the privacy providers are applied is controlled by the order of the members of the 
+`config.json.maskingRules` array in the complete masking configuration.  The service examines each input 
+document to determine its message type and then applies the rule assignments for that message type in the order 
+they appear in the array.  For example, consider the following masking configuration:
+
+````
+{
+    "rules": [
+        {
+            "name": "ConsistentShiftRule",
+            "maskingProviders": [
+                {
+                    "type": "DATETIME_CONSISTENT_SHIFT",
+                    "patientIdentifierPath": "/patient/reference",
+                    "dateShiftMinimumDays": "10",
+                    "dateShiftMaximumDays": "31",
+                    "dateShiftDirection": "before",
+                    "unexpectedInputHandling": "NULL",
+                    "customFormats": [
+                        "yyyy-MM-dd'T'HH:mm:ss z",
+                        "yyDDD"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "HashRule",
+            "maskingProviders": [
+                {
+                    "type": "HASH",
+                    "algorithmDefault": "SHA-256"
+                }
+            ]
+        }        
+    ],
+    "json": {
+        "schemaType": "FHIR",
+        "messageTypes": [
+            "MedicationOrder"
+        ],
+        "messageTypeKey": "resourceType",       
+        "maskingRules": [
+            {
+                "rule": "ConsistentShiftRule",
+                "jsonPath": "/fhir/MedicationOrder/dateWritten"
+            },
+            {
+                "rule": "HashRule",
+                "jsonPath": "/fhir/MedicationOrder/patient/reference"
+            }
+        ]
+    }
+}
+````
+
+This configuration processes JSON input documents that have the value *MedicationOrder* at the path */resourceType*.  
+Input documents that do not have this value at this path are ignored.  In the *rules* section, it contains a rule 
+named *ConsistentShiftRule* that uses the DATETIME_CONSISTENT_SHIFT provider to move dates from 10 to 31 days after 
+the original date.  The actual number of days is chosen by performing calculations based on the value found at the 
+*/patient/reference* path.  It contains another rule named *HashRule* that uses the HASH provider to hash fields 
+using the SHA-256 algorithm.  In the *maskingRules* section, the first assignment applies *ConsistentShiftRule* to 
+the value at the path */dateWritten* and the second applies *HashRule* to the value at the path */patient/reference*.  
+
+Since the assignment of the *ConsistentShiftRule* to the */dateWritten* path appears before the assignment of the 
+*HashRule* to the */patient/reference* path, the value at */patient/reference* will have its original value when 
+used for the consistent date shifting.
+
+If the *maskingRules* section was written like this instead:
+
+````
+        "maskingRules": [
+            {
+                "rule": "HashRule",
+                "jsonPath": "/fhir/MedicationOrder/patient/reference"
+            },
+            {
+                "rule": "ConsistentShiftRule",
+                "jsonPath": "/fhir/MedicationOrder/dateWritten"
+            }            
+        ]
+````
+
+the HASH would be applied to the value at */patient/reference* first and the DATETIME_CONSISTENT_SHIFT provider 
+would use the hashed version of the value at */patient/reference* to calculate the number of days to shift the 
+date at */dateWritten*.
 
 #### EMAIL
 
@@ -1418,7 +1588,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 1.  **Category I – PII-specific providers:** These providers mask a specific
     type of PII / PHI / SPI. The Category I providers are:
     ADDRESS, ATC, CITY, CONTINENT, COUNTRY, COUNTY, CREDIT_CARD, DATEDEPENDENCY, 
-    DATETIME, EMAIL, GENDER, HOSPITAL, IBAN, ICDV10, ICDV9, IMEI, IP_ADDRESS,
+    DATETIME, DATETIME_CONSISTENT_SHIFT, EMAIL, GENDER, HOSPITAL, IBAN, ICDV10, ICDV9, IMEI, IP_ADDRESS,
     LATITUDE_LONGITUDE, MAC_ADDRESS, MARITAL, NAME, OCCUPATION, PHONE, RACE, 
     RELIGION, SSN_UK, SSN_US, STATE_US, SWIFT, URL, VIN, ZIPCODE.
 
@@ -1503,7 +1673,7 @@ error for multiple rules to be assigned to data elements not identified by an ar
 
 
 For privacy providers that operate using regular expressions, for example, PHONE NUMBER,
-SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
+SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, DATETIME_CONSISTENT_SHIFT, IP\_ADDRESS, and EMAIL,
 an input value that cannot be processed is one that does not conform to the
 specified regular expression.
 
@@ -1538,6 +1708,7 @@ These privacy providers ignore the `unexpectedInputHandler` parameter as they do
 These privacy providers cannot generate random values and so treat the `unexpectedInputHandler` value **RANDOM** the same as **NULL**:
 * ATC
 * BINNING
+* DATETIME_CONSISTENT_SHIFT
 * NUMBERVARIANCE   
 * URL
 

@@ -26,34 +26,19 @@ import org.apache.commons.lang.WordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.JSONPath;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
-import com.ibm.whc.deid.shared.exception.Keyed;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.utils.log.LogCodes;
-import com.ibm.whc.deid.utils.log.Messages;
+import com.ibm.whc.deid.utils.log.LogManager;
 
 public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvider {
 
-  private static final long serialVersionUID = -5672151364906956472L;
+  private static final long serialVersionUID = -1754981791730429377L;
 
-  protected static class BadFormatterException extends IllegalArgumentException implements Keyed {
-
-    private static final long serialVersionUID = -3126006723662661670L;
-
-    public static final String MESSAGE_ID = LogCodes.WPH1025E;
-
-    public BadFormatterException(String pattern) {
-      super(Messages.getMessage(MESSAGE_ID, pattern));
-    }
-
-    @Override
-    public String getMessageKey() {
-      return MESSAGE_ID;
-    }
-  }
+  protected static final LogManager logger = LogManager.getInstance();
 
   protected class ParseResponse {
 
@@ -112,6 +97,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
   private final int dateShiftMinimumDays;
   private final int dateShiftMaximumDays;
   private final DateShiftDirection dateShiftDirection;
+  private final String salt;
   private final List<String> customFormats;
   private final JSONPath compiledPathExp;
 
@@ -128,6 +114,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     this.dateShiftMinimumDays = configuration.getDateShiftMinimumDays();
     this.dateShiftMaximumDays = configuration.getDateShiftMaximumDays();
     this.dateShiftDirection = configuration.getDateShiftDirection();
+    this.salt = configuration.getSalt();
     this.customFormats = configuration.getCustomFormats();
 
     // path must start with '/' as required for JsonPointer
@@ -264,8 +251,8 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
   }
 
   /**
-   * Generate a repeatable long value from a given string. Each time the same string is presented,
-   * the same long is returned.
+   * Generate a non-negative, consistent long value from a given string. Each time the same string
+   * is presented, the same long is returned.
    * 
    * <p>
    * Note that there is no guarantee that the same long is not returned for various different
@@ -275,7 +262,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    * adversely impact results. For example, the same long is generated for the input values
    * "patient1", "patient1 ", "Patient1".
    * 
-   * @param seed the string from which a long numeric values is to be generated
+   * @param seed the string from which a long numeric value is to be generated
    * 
    * @return the generated numeric value
    */
@@ -287,7 +274,13 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
       seed = seed.trim().toUpperCase();
     }
 
-    long generatedLong = HashUtils.longFromHash(seed);
+    long generatedLong = HashUtils.longFromHash(seed) * 31L;
+    
+    // if the salt parameter is not null or all whitespace, use it modify the generated long
+    if (this.salt != null && !this.salt.trim().isEmpty()) {
+      long saltLong = HashUtils.longFromHash(this.salt);
+      generatedLong += saltLong;
+    }
 
     // NOTE - Math.abs(long) returns negative number if given long is MIN_VALUE
     if (generatedLong == Long.MIN_VALUE) {
@@ -321,7 +314,9 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     Temporal adjustedTemporal = adjust(parsedOriginal, offsetDays);
     if (adjustedTemporal == null) {
       // should only happen for custom formatters
-      throw new BadFormatterException(parseResponse.getFormat());
+      // log the format that matched the input, but didn't yield date information
+      logger.logWarn(LogCodes.WPH1025W, parseResponse.getFormat());
+      return applyUnexpectedValueHandling(originalValue, null);
     }
 
     String replacement = formatter.format(adjustedTemporal);

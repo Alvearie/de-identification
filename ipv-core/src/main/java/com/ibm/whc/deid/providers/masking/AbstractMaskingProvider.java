@@ -147,7 +147,8 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   }
 
   protected String applyUnexpectedValueHandling(String input, Supplier<String> randomGenerator) {
-    debugFaultyInput(getName());
+    // do not put the actual input value into the log - it could contain PHI
+    debugFaultyInput("input");
     String response;
 
     if (unexpectedInputHandler != null) {
