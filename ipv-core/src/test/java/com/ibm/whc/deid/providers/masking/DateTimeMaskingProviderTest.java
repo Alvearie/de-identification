@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -108,16 +109,136 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskFixedFormat() {
+  public void testMaskFixedFormat() throws Exception {
 
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
-    config.setFormatFixed("dd-MM-yyyy");
+    config.setFormatFixed("MM-dd-yyyy");
+    config.setYearMask(false);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(true);
+    config.setMonthRangeDown(0);
+    config.setMonthRangeUp(2);
+
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
 
-    String originalDateTime = "08-12-1981 00:00:00";
+    String originalDateTime = "08-22-1981";// 00:00:00";
+    boolean changed = false;
+    for (int i = 0; i < 10; i++) {
+      String maskedDateTime = maskingProvider.mask(originalDateTime);
+      assertNotNull(maskedDateTime);
+      assertTrue(maskedDateTime.equals("08-22-1981") || maskedDateTime.equals("09-22-1981")
+          || maskedDateTime.equals("10-22-1981"));
+      if (!maskedDateTime.equals(originalDateTime)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+  }
+
+  @Test
+  public void testMaskFixedFormat_badInput() throws Exception {
+
+    DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.setFormatFixed("MM-dd-yyyy");
+    config.setYearMask(false);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(true);
+    config.setMonthRangeDown(0);
+    config.setMonthRangeUp(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
+
+    String originalDateTime = "08-22-1981 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDateTime);
-    System.out.println(maskedDateTime);
-    assertFalse(originalDateTime.equals(maskedDateTime));
+    assertEquals("OTHER", maskedDateTime);
+  }
+
+  @Test
+  public void testMaskFixedFormat_badInput_random() throws Exception {
+
+    // The input does not match the fixed datetime pattern.
+    // Apply unexpected input handling.
+    // Configured option is random.
+    // Since pattern was valid, generate a random value using that pattern.
+    // Since pattern is MM-dd-yyyy, the random value must start with a month number
+
+    DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.setFormatFixed("MM-dd-yyyy");
+    config.setYearMask(false);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(true);
+    config.setMonthRangeDown(0);
+    config.setMonthRangeUp(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
+
+    String originalDateTime = "18-22-1981";
+    for (int i = 0; i < 100; i++) {
+      String maskedDateTime = maskingProvider.mask(originalDateTime);
+      assertNotNull(maskedDateTime);
+      int month = Integer.parseInt(maskedDateTime.substring(0, 2));
+      assertTrue(Integer.toString(month), month >= 1 && month <= 12);
+      assertEquals("-", maskedDateTime.substring(2, 3));
+    }
+  }
+
+  @Test
+  public void testMaskFixedFormat_badPattern() throws Exception {
+
+    DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.setFormatFixed("TTT");
+    config.setYearMask(false);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(true);
+    config.setMonthRangeDown(0);
+    config.setMonthRangeUp(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("badPattern");
+
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
+
+    String originalDateTime = "18-22-1981";
+    String maskedDateTime = maskingProvider.mask(originalDateTime);
+    assertEquals("badPattern", maskedDateTime);
+  }
+
+  @Test
+  public void testMaskFixedFormat_badPattern_random() throws Exception {
+
+    DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.setFormatFixed("TTT");
+    config.setYearMask(false);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(true);
+    config.setMonthRangeDown(0);
+    config.setMonthRangeUp(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
+
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
+
+    String originalDateTime = "18-22-1981";
+    Pattern pattern = Pattern.compile("\\d{2}/\\d{2}/\\d{4}$");
+    for (int i = 0; i < 100; i++) {
+      String maskedDateTime = maskingProvider.mask(originalDateTime);
+      assertTrue(maskedDateTime, pattern.matcher(maskedDateTime).matches());
+    }
   }
 
   @Test
@@ -146,8 +267,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
     String originalDateTime = "08-12-1981 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDateTime);
-    System.out.println(maskedDateTime);
-    assertTrue(originalDateTime.equals(maskedDateTime));
+    assertEquals(originalDateTime, maskedDateTime);
   }
 
   @Test
