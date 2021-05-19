@@ -135,7 +135,7 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
   }
 
   @Test
-  public void testSetters() {
+  public void testSetDateShiftDirection() {
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     assertEquals(DateShiftDirection.BEFORE_OR_AFTER, config.getDateShiftDirection());
@@ -145,6 +145,7 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
     assertEquals(DateShiftDirection.BEFORE_OR_AFTER, config.getDateShiftDirection());
   }
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void testEqualsHashcode() {
     DateTimeConsistentShiftMaskingProviderConfig config =
@@ -183,6 +184,16 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
     other.setDateShiftDirection(DateShiftDirection.AFTER);
     assertFalse(config.equals(other));
     other.setDateShiftDirection(DateShiftDirection.BEFORE);
+    assertTrue(config.equals(other));
+    assertEquals(config.hashCode(), other.hashCode());
+
+    config.setSalt("salt1");
+    assertFalse(config.equals(other));
+    other.setSalt("Salt1");
+    assertFalse(config.equals(other));
+    other.setSalt(" salt1 ");
+    assertFalse(config.equals(other));
+    other.setSalt("salt1");
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 

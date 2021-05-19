@@ -18,7 +18,7 @@ import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 @JsonInclude(Include.NON_NULL)
 public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProviderConfig {
 
-  private static final long serialVersionUID = 5266193758403530535L;
+  private static final long serialVersionUID = -4316466219154105211L;
 
   /**
    * Determines where the shifted datetime value is ordered in relation to the original datetime
@@ -61,6 +61,7 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
   private int dateShiftMaximumDays = 365;
   private DateShiftDirection dateShiftDirection = DEFAULT_DATE_SHIFT_DIRECTION;
   private String patientIdentifierPath = "/patient/reference";
+  private String salt = null;
 
   public DateTimeConsistentShiftMaskingProviderConfig() {
     type = MaskingProviderType.DATETIME_CONSISTENT_SHIFT;
@@ -107,6 +108,14 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
     this.customFormats = customFormats;
   }
 
+  public String getSalt() {
+    return salt;
+  }
+
+  public void setSalt(String salt) {
+    this.salt = salt;
+  }
+
   @Override
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
@@ -146,7 +155,7 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + Objects.hash(customFormats, dateShiftDirection, dateShiftMaximumDays,
-        dateShiftMinimumDays, patientIdentifierPath);
+        dateShiftMinimumDays, patientIdentifierPath, salt);
     return result;
   }
 
@@ -167,6 +176,7 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
         && dateShiftDirection == other.dateShiftDirection
         && dateShiftMaximumDays == other.dateShiftMaximumDays
         && dateShiftMinimumDays == other.dateShiftMinimumDays
-        && Objects.equals(patientIdentifierPath, other.patientIdentifierPath);
+        && Objects.equals(patientIdentifierPath, other.patientIdentifierPath)
+        && Objects.equals(salt, other.salt);
   }
 }

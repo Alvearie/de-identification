@@ -15,7 +15,6 @@ import java.util.List;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.providers.masking.DateTimeConsistentShiftMaskingProvider.BadFormatterException;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
@@ -225,26 +224,32 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
 
   @Test
   public void testApplyOffsetAndReformat_customError() {
+    String badInputValue = "Bad Pattern";
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
-    config.setUnexpectedInputReturnMessage("Bad");
+    config.setUnexpectedInputReturnMessage(badInputValue);
     config.setCustomFormats(
         Arrays.asList("yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'", "MM-dd-yy", "yyyy-MM-dd'T'HH:mm:ss z", "MMDDD"));
     DateTimeConsistentShiftMaskingProvider provider =
         new DateTimeConsistentShiftMaskingProvider(config, null);
 
-    verifyStandardReplacements(provider, "Bad");
+    verifyStandardReplacements(provider, badInputValue);
 
     List<DateTimeFormatter> customFormatters = provider.buildCustomFormatters();
+    assertEquals(badInputValue, provider.applyOffsetAndReformat("10333", -1, customFormatters));
+
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+    provider.setName("rule2");
 
     try {
       provider.applyOffsetAndReformat("10333", -1, customFormatters);
       fail("expected exception");
-    } catch (BadFormatterException e) {
-      assertEquals("Insufficient date information from date format pattern `MMDDD`",
-          e.getMessage());
+    } catch (PrivacyProviderInvalidInputException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("10333"));
+      assertTrue(e.getMessage(), e.getMessage().contains("rule2"));
     }
   }
 
@@ -398,19 +403,53 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     DateTimeConsistentShiftMaskingProviderConfig config =
         new DateTimeConsistentShiftMaskingProviderConfig();
     config.setPatientIdentifierPath("/id");
+    config.setSalt(null);
     DateTimeConsistentShiftMaskingProvider provider =
         new DateTimeConsistentShiftMaskingProvider(config, null);
 
-    verifyRepeatable(provider, null);
-    verifyRepeatable(provider, "");
-    verifyRepeatable(provider, "   ");
+    // all values generated should always be the same at any time on
+    // any system for the consistent input used in this test
+
+    assertEquals(5794991048039723396L, verifyRepeatable(provider, null));
+
+    config.setSalt("");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    assertEquals(5794991048039723396L, verifyRepeatable(provider, ""));
+
+    config.setSalt("    ");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    assertEquals(5794991048039723396L, verifyRepeatable(provider, "   "));
+
+    config.setSalt("THIS is a random value");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
     
-    // should be same result on any computer, any time    
-    assertEquals(8001756538252770565L, verifyRepeatable(provider, "patient1"));
-    assertEquals(8001756538252770565L, verifyRepeatable(provider, " PATIENT1 "));
+    assertEquals(2592115912263418881L, verifyRepeatable(provider, "   "));
+
+
+    config.setSalt("");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    assertEquals(8246779727611716507L, verifyRepeatable(provider, "patient1"));
+    assertEquals(8246779727611716507L, verifyRepeatable(provider, " PATIENT1 "));
+
+    config.setSalt("THIS is a random value");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    assertEquals(1812857385794692832L, verifyRepeatable(provider, " PATIENT1 "));
+
+    config.setSalt("THIS is a random value ");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
+    assertEquals(1705215707037854198L, verifyRepeatable(provider, " PATIENT1 "));
+
+    config.setSalt("");
+    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
+
     String input = " now is the time to check special chars !@#$%^&*()-_+=/\\ ";
-    assertEquals(7539049058547281928L, verifyRepeatable(provider, input));
-    assertEquals(7539049058547281928L, verifyRepeatable(provider, input.trim().toUpperCase()));
+    assertEquals(6097152143258431240L, verifyRepeatable(provider, input));
+    assertEquals(6097152143258431240L, verifyRepeatable(provider, input.trim().toUpperCase()));
   }
 
   private long verifyRepeatable(DateTimeConsistentShiftMaskingProvider provider, String input) {
