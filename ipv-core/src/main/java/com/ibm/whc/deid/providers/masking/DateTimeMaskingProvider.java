@@ -96,19 +96,12 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final int dateYearDeleteNDaysValue;
   private final boolean dateYearDeleteNInterval;
   private final String dateYearDeleteComparedValue;
-  private final DateTimeFormatter fixedDateFormat;
+  private final String fixedFormatString;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
     super(configuration);
 
-    String fixedDateFormatString = configuration.getFormatFixed();
-    this.fixedDateFormat =
-        (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())
-            ? new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter()
-            : null;
+    this.fixedFormatString = configuration.getFormatFixed();
 
     this.shiftDate = configuration.isMaskShiftDate();
     this.shiftSeconds = configuration.getMaskShiftSeconds();
@@ -191,14 +184,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
 
-    String fixedDateFormatString = configuration.getFormatFixed();
-    this.fixedDateFormat =
-        (fixedDateFormatString != null && !fixedDateFormatString.trim().isEmpty())
-            ? new DateTimeFormatterBuilder().appendPattern(fixedDateFormatString)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter()
-            : null;
+    this.fixedFormatString = configuration.getFormatFixed();
 
     this.shiftDate = configuration.isMaskShiftDate();
     this.shiftSeconds = configuration.getMaskShiftSeconds();
@@ -283,23 +269,35 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     DateTimeFormatter f = null;
     Date d = null;
 
-    if (fixedDateFormat == null) {
+    if (this.fixedFormatString != null && !this.fixedFormatString.trim().isEmpty()) {
+      try {
+        final DateTimeFormatter fixedFormatter =
+            new DateTimeFormatterBuilder().appendPattern(this.fixedFormatString)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+        try {
+          TemporalAccessor t = fixedFormatter.withZone(ZoneId.systemDefault()).parse(identifier);
+          d = Date.from(Instant.from(t));
+          f = fixedFormatter;
+        } catch (DateTimeParseException e) {
+          return applyUnexpectedValueHandling(identifier,
+              () -> RandomGenerators.generateRandomDate(fixedFormatter.withZone(ZoneOffset.UTC)));
+        }
+      } catch (IllegalArgumentException e) {
+        // thrown if the pattern is not a valid datetime pattern
+        return applyUnexpectedValueHandling(identifier,
+            () -> RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
+      }
+
+    } else {
       Tuple<DateTimeFormatter, Date> tuple = dateTimeIdentifier.parse(identifier);
       if (tuple == null) {
         return applyUnexpectedValueHandling(identifier,
             () -> RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
       }
-
       f = tuple.getFirst();
       d = tuple.getSecond();
-    } else {
-      try {
-        f = fixedDateFormat;
-        TemporalAccessor t = f.withZone(ZoneId.systemDefault()).parse(identifier);
-        d = Date.from(Instant.from(t));
-      } catch (DateTimeParseException e) {
-        return RandomGenerators.generateRandomDate(f.withZone(ZoneOffset.UTC));
-      }
     }
 
     Calendar cal = Calendar.getInstance();
