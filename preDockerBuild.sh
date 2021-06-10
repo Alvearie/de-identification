@@ -57,14 +57,14 @@ if [ "$taskname" == "civalidate" ]; then
   # need to build the jar files without any test in
   # the pre docker build. The sonarqube task will run tests
 
-  mvn -B clean install deploy -DskipTests=true -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+  mvn --no-transfer-progress clean install deploy -DskipTests=true -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
   exit 0
 fi
 
 #########################################################
 # Main build                                            #
 #########################################################
-mvn -B clean install 
+mvn --no-transfer-progress clean install 
 
 rc=$((rc || $? ))
 
