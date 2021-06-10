@@ -33,6 +33,9 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
+# In CIVALIDATE we need the settings.xml in same directory
+curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./settings.xml
+
 # Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
 # If the branch is not master, include branch name in the version
 RELEASE_VERSION=1.0.1
@@ -44,6 +47,18 @@ else
 fi
 echo "revision:"
 cat .mvn/maven.config
+
+# If we are running ci validate toolchain, just build the jar files and exit
+# There is no need to build UI or deploy jar files
+echo "Taskname $taskname"
+if [ "$taskname" == "civalidate" ]; then
+  # If we are running the CI validate toolchain, then we only
+  # need to build the jar files without any test in
+  # the pre docker build. The sonarqube task will run tests
+
+  mvn -B clean install deploy -DskipTests=true -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+  exit 0
+fi
 
 #########################################################
 # Main build                                            #
