@@ -31,6 +31,9 @@ if [ ! -f ${HOME}/.m2/settings.xml ]; then
     mkdir ${HOME}/.m2
 fi
 
+# This is the branch name for de-id-devops
+DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
+
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
 # In CIVALIDATE we need the settings.xml in same directory
