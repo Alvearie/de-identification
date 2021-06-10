@@ -38,7 +38,6 @@ curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devop
 
 # In CIVALIDATE we need the settings.xml in same directory
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./settings.xml
-cat ./settings.xml
 
 # Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
 # If the branch is not master, include branch name in the version
