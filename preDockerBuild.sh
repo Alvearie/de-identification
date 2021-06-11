@@ -49,7 +49,6 @@ echo "revision:"
 cat .mvn/maven.config
 
 # If we are running ci validate toolchain, just build the jar files and exit
-# There is no need to build UI or deploy jar files
 echo "Taskname $taskname"
 if [ "$taskname" == "civalidate" ]; then
   # If we are running the CI validate toolchain, then we only
@@ -66,6 +65,7 @@ if [ "$taskname" == "civalidate" ]; then
 
   # Run the sonarqube scan.  This scan is going to fail as there is not sonarqube pod running yet.
   # The purpose is for maven to download the correct dependencies for sonarqube
+  echo "Running sonarqube to get dependencies.  This is expected to fail"
   mvn sonar:sonar -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dmaven.repo.local=./m2/repository
   exit 0
 fi
