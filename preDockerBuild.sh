@@ -62,7 +62,7 @@ if [ "$taskname" == "civalidate" ]; then
   mkdir -p ./m2/repository
   curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
 
-  mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install deploy  -Dmaven.repo.local=./m2/repository
+  mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install -Dmaven.repo.local=./m2/repository
 
   # Run the sonarqube scan.  This scan is going to fail as there is not sonarqube pod running yet.
   # The purpose is for maven to download the correct dependencies for sonarqube
