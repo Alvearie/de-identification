@@ -36,9 +36,6 @@ DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-# In CIVALIDATE we need the settings.xml in same directory
-curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./settings.xml
-
 # Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
 # If the branch is not master, include branch name in the version
 RELEASE_VERSION=1.0.1
@@ -59,7 +56,11 @@ if [ "$taskname" == "civalidate" ]; then
   # need to build the jar files without any test in
   # the pre docker build. The sonarqube task will run tests
 
-  mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install deploy -DskipTests=true -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+  # In CIVALIDATE we need the settings.xml in same directory
+  mkdir -p ./m2/repository
+  curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
+
+  mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install deploy -DskipTests=true -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local -Dmaven.repo.local=./m2/repository
   exit 0
 fi
 
