@@ -61,6 +61,8 @@ if [ "$taskname" == "civalidate" ]; then
   curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
 
   mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install deploy -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local -Dmaven.repo.local=./m2/repository
+
+  mvn sonar:sonar -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local -Dmaven.repo.local=./m2/repository
   exit 0
 fi
 
