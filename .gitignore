@@ -7,3 +7,5 @@ bin
 pom.xml.versionsBackup
 .mvn/maven.config
 /.flattened-pom.xml
+common.properties
+createToolchain.sh
