@@ -51,10 +51,6 @@ cat .mvn/maven.config
 # If we are running ci validate toolchain, just build the jar files and exit
 echo "Taskname $taskname"
 if [ "$taskname" == "civalidate" ]; then
-  # If we are running the CI validate toolchain, then we only
-  # need to build the jar files without any test in
-  # the pre docker build. The sonarqube task will run tests
-
   # In CIVALIDATE we need the settings.xml in same directory
   # and a maven repository.  The jar file dependencies are download in this step
   # so that later in sonarqube stages, the jar files are available.
