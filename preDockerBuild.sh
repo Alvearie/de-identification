@@ -31,6 +31,9 @@ if [ ! -f ${HOME}/.m2/settings.xml ]; then
     mkdir ${HOME}/.m2
 fi
 
+# This is the branch name for de-id-devops
+DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
+
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
 # Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
@@ -45,10 +48,28 @@ fi
 echo "revision:"
 cat .mvn/maven.config
 
+# If we are running ci validate toolchain, just build the jar files and exit
+echo "Taskname $taskname"
+if [ "$taskname" == "civalidate" ]; then
+  # In CIVALIDATE we need the settings.xml in same directory
+  # and a maven repository.  The jar file dependencies are download in this step
+  # so that later in sonarqube stages, the jar files are available.
+  mkdir -p ./m2/repository
+  curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
+
+  mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install -Dmaven.repo.local=./m2/repository
+
+  # Run the sonarqube scan.  This scan is going to fail as there is not sonarqube pod running yet.
+  # The purpose is for maven to download the correct dependencies for sonarqube
+  echo "Running sonarqube to get dependencies.  This is expected to fail"
+  mvn sonar:sonar -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dmaven.repo.local=./m2/repository
+  exit 0
+fi
+
 #########################################################
 # Main build                                            #
 #########################################################
-mvn -B clean install 
+mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install 
 
 rc=$((rc || $? ))
 
