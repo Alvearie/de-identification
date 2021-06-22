@@ -11,19 +11,22 @@ set -ex
 # DEVELOPER_BRANCH        # name of the GIT branch used for de-id-devops, if empty or null defaults to master
 # DEVELOPER_ID            # name used to specify namespace/umbrella repo
 
-export TOOLCHAIN_BRANCH="stable-3.3.1"
+export TOOLCHAIN_BRANCH="stable-3.4.1"
 export WHC_COMMONS_BRANCH=${TOOLCHAIN_BRANCH}
 export INPUT_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` # get the current branch
 export gitrepourl="https://github.com/Alvearie/de-identification" # CI git repo url
 
-# If DEVELOPER_ID is set, use it as part of the toolchain name 
-if ! [ -z "$DEVELOPER_ID" ]; then
-  export TOOLCHAIN_NAME=${DEVELOPER_ID}-alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+if [[ ${INPUT_GIT_BRANCH} == *"release"* ]];then
+    # for release branch, set the toolchain name the relaase branch
+    export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
 else
-  export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+# If DEVELOPER_ID is set, use it as part of the toolchain name 
+  if ! [ -z "$DEVELOPER_ID" ]; then
+    export TOOLCHAIN_NAME=${DEVELOPER_ID}-alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+  else
+    export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
+  fi
 fi
-
-export TOOLCHAIN_TEMPLATE_BRANCH=stable-oc-3.3.1
 
 # if DEVELOPER_BRANCH env variable is not set or null, use master branch
 export DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
@@ -41,4 +44,4 @@ chmod 755 createToolchain.sh
 curl -sSL -u "${GIT_USER}:${GIT_API_KEY}" "https://raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/common.properties" > common.properties
 source common.properties
 
-./createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH}  -v ${INPUT_GIT_UMBRELLA_BRANCH} -b ${TOOLCHAIN_TEMPLATE_BRANCH}
+./createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH}  -v ${INPUT_GIT_UMBRELLA_BRANCH}
