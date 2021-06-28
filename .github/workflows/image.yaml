@@ -15,12 +15,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    #- name: Build with Maven
-    #  run: mvn -B package --file pom.xml
-    #- name: Sanity Test
-    #  run: cd de-identification-app/scripts && ./sanity_test.sh
-    #- name: back to app directory
-    #  run: cd ..
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Sanity Test
+      run: cd de-identification-app/scripts && ./sanity_test.sh
+    - name: back to app directory
+      run: cd ..
 
     #- name: Get Release Version
       #run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
