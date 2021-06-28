@@ -7,88 +7,128 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
-import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.models.SWIFTCode;
+import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class SWIFTCodeManager extends ResourceBasedManager<SWIFTCode> {
+/**
+ * Class that provides access to information about the SWIFT codes known by the De-Identification
+ * service.
+ * 
+ * <p>
+ * Instances of this class are thread-safe.
+ */
+public class SWIFTCodeManager extends ResourceManager<SWIFTCode> {
 
-  private static final long serialVersionUID = 8621077436877031606L;
+  private static final LogManager logger = LogManager.getInstance();
 
-  protected CountryManager countryManager;
-  protected Map<String, List<SWIFTCode>> codeByCountryMap;
+  /**
+   * SWIFT codes contain a two-character country code. Map each country code represented in the
+   * resources to the list of codes for that country.
+   * 
+   * <p>
+   * Note - this Map is only modified during construction of the instance
+   */
+  protected final Map<String, List<SWIFTCode>> codeByCountryMap = new HashMap<>();
 
-  protected final SecureRandom random = new SecureRandom();
-
-  public SWIFTCodeManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.SWIFT, localizationProperty);
+  protected SWIFTCodeManager() {
+    // nothing required here
   }
 
-  @Override
-  protected void init() {
-    this.codeByCountryMap = new HashMap<>();
-    this.countryManager = (CountryManager) ManagerFactory.getInstance().getManager(tenantId,
-        Resource.COUNTRY, null, localizationProperty);
-  }
+  /**
+   * Creates a new SWIFTCodeManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a SWIFTCodeManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static SWIFTCodeManager buildSWIFTCodeManager(String localizationProperty) {
+    SWIFTCodeManager swiftCodeManager = new SWIFTCodeManager();
 
-  @Override
-  protected Collection<ResourceEntry> getResources() {
-    return LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
-  }
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(Resource.SWIFT);
+      for (ResourceEntry entry : resourceEntries) {
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
 
-  @Override
-  protected Map<String, Map<String, SWIFTCode>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, SWIFTCode>> swiftCodeMap = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      try (InputStream inputStream = entry.createStream()) {
-        try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-          for (CSVRecord line : reader) {
-            String code = line.get(0);
-            String countryCode = code.substring(4, 6);
-
-            Country country = countryManager.lookupCountry(countryCode, "en");
-            if (country == null) {
-              continue;
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, swiftCodeManager, line);
             }
-
-            SWIFTCode swiftCode = new SWIFTCode(code, country);
-
-            addToMapByLocale(swiftCodeMap, getAllCountriesName(), code.toUpperCase(), swiftCode);
-
-            String ccKey = countryCode.toUpperCase();
-            if (!codeByCountryMap.containsKey(ccKey)) {
-              codeByCountryMap.put(ccKey, new ArrayList<SWIFTCode>());
-            }
-
-            codeByCountryMap.get(ccKey).add(swiftCode);
           }
         }
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
-    return swiftCodeMap;
+    return swiftCodeManager;
   }
 
-  @Override
-  public Collection<SWIFTCode> getItemList() {
-    return getValues();
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, SWIFTCodeManager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(SWIFTCodeManager manager, String... record) {
+    SWIFTCode swiftCode = new SWIFTCode(record[0]);
+    manager.addSWIFTCode(swiftCode);
+  }
+
+  protected void addSWIFTCode(SWIFTCode swiftCode) {
+    add(swiftCode);
+
+    String ccKey = swiftCode.getCountry();
+    List<SWIFTCode> countryList = codeByCountryMap.get(ccKey);
+    if (countryList == null) {
+      countryList = new ArrayList<>();
+      codeByCountryMap.put(ccKey, countryList);
+    }
+    countryList.add(swiftCode);
   }
 
   /**

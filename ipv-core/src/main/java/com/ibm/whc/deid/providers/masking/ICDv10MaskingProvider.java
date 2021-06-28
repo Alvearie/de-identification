@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,80 +12,68 @@ import com.ibm.whc.deid.shared.pojo.config.masking.ICDv10MaskingProviderConfig;
 import com.ibm.whc.deid.util.ICDv10Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
-
 /**
- * The type Ic dv 10 masking provider.
+ * The type ICDv10 masking provider.
  *
  */
 public class ICDv10MaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -8704305813210528438L;
 
-  protected ICDv10Manager icdv10Manager;
-  protected final boolean randomizeToCategory;
-  protected final boolean randomizeToRange;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
+  protected final boolean generalizeToCategory;
+  protected final boolean generalizeToChapter;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile ICDv10Manager icdv10ResourceManager = null;
 
   public ICDv10MaskingProvider(ICDv10MaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.randomizeToCategory = configuration.isRandomizeCategory();
-    this.randomizeToRange = configuration.isRandomizeChapter();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
+    this.generalizeToCategory = configuration.isGeneralizeToCategory();
+    this.generalizeToChapter = configuration.isGeneralizeToChapter();
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
+    ICDv10Manager icdv10Manager = getManager();
+
     ICD icd = icdv10Manager.lookupICD(identifier);
 
-    if (icd == null) {
-      // TODO: check is icd is required
-      debugFaultyInput("icd");
-      if (unspecifiedValueHandling == 2) {
-        return icdv10Manager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+    if (generalizeToChapter || generalizeToCategory) {
+      if (icd == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> icdv10Manager.getRandomValue(ICDFormat.CODE));
       }
-    }
+      ICDFormat format = icd.getFormat();
 
-    ICDFormat format = icd.getFormat();
-
-    if (this.randomizeToRange) {
-      if (format == ICDFormat.CODE) {
-        return icd.getChapterCode();
-      } else {
+      if (this.generalizeToChapter) {
+        if (format == ICDFormat.CODE) {
+          return icd.getChapterCode();
+        }
         return icd.getChapterName();
       }
-    } else if (this.randomizeToCategory) {
-      if (format == ICDFormat.CODE) {
-        return icd.getCategoryCode();
-      } else {
+
+      if (this.generalizeToCategory) {
+        if (format == ICDFormat.CODE) {
+          return icd.getCategoryCode();
+        }
         return icd.getCategoryName();
       }
     }
 
-    return icdv10Manager.getRandomKey();
+    ICDFormat targetFormat = icd == null ? ICDFormat.CODE : icd.getFormat();
+    return icdv10Manager.getRandomValue(targetFormat);
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      icdv10Manager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId,
+  protected ICDv10Manager getManager() {
+    if (icdv10ResourceManager == null) {
+      icdv10ResourceManager = (ICDv10Manager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.ICDV10, null, localizationProperty);
-      initialized = true;
     }
+    return icdv10ResourceManager;
   }
-
 }

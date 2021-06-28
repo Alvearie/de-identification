@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,23 +13,21 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 
 public class ComplexMaskingProviderFactory {
   /**
-   * This is the entry point to parsing the masking configuration. Once the masking configuration is
-   * obtained, it reads the schemaType and determines whether its FHIR/GEN/TEXT masking provider CSV
-   * support to be added back soon
+   * This is the entry point to parsing the masking configuration.
    */
-  public synchronized MaskingProvider get(ConfigSchemaTypes configSchemaType,
+  public MaskingProvider get(ConfigSchemaTypes configSchemaType,
       DeidMaskingConfig deidMaskingConfig, BasicMaskingProviderFactory maskingProviderFactory,
       String tenantId) {
 
     switch ((ConfigSchemaType) configSchemaType) {
       case FHIR:
-        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+        if (deidMaskingConfig.getJson() == null || deidMaskingConfig.getJson().getSchemaType() == null) {
           // return null if the masking config did not specify json schema
           return null;
         }
         return new FHIRMaskingProvider(deidMaskingConfig, maskingProviderFactory, tenantId);
       case GEN:
-        if (deidMaskingConfig.getJson().getSchemaType() == null) {
+        if (deidMaskingConfig.getJson() == null || deidMaskingConfig.getJson().getSchemaType() == null) {
           // return null if the masking config did not specify json schema
           return null;
         }

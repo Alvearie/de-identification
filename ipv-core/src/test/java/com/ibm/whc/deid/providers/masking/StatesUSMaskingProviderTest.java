@@ -5,6 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -25,29 +28,58 @@ public class StatesUSMaskingProviderTest extends TestLogSetUp implements Masking
     String value = "Alabama";
     int randomizationOK = 0;
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 40; i++) {
       String maskedValue = maskingProvider.mask(value);
       assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
-
       if (!maskedValue.equals(value)) {
         randomizationOK++;
       }
+      // should return full name since input was a recognized full name
+      assertNotEquals(2, maskedValue.length());
     }
-
     assertTrue(randomizationOK > 0);
+
+    value = "AL";
+    randomizationOK = 0;
+
+    for (int i = 0; i < 40; i++) {
+      String maskedValue = maskingProvider.mask(value);
+      assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
+      if (!maskedValue.equals(value)) {
+        randomizationOK++;
+      }
+      // should return abbreviation since input was a recognized abbreviation
+      assertEquals(2, maskedValue.length());
+    }
+    assertTrue(randomizationOK > 0);
+
+    value = "unknown";
+    String maskedValue = maskingProvider.mask(value);
+    assertNotNull(maskedValue);
+    assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
   }
 
   @Test
-  public void testMaskEmptyValue() {
+  public void testMaskUnknownValue() {
     Identifier statesUSIdentifier = new StatesUSIdentifier(tenantId, localizationProperty);
     StatesUSMaskingProviderConfig maskingConfiguration = new StatesUSMaskingProviderConfig();
     MaskingProvider maskingProvider =
         new StatesUSMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String value = "";
+    for (int i = 0; i < 40; i++) {
+      String maskedValue = maskingProvider.mask(value);
+      assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
+      // should return full name
+      assertNotEquals(2, maskedValue.length());
+    }
 
-    String maskedValue = maskingProvider.mask(value);
-    assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
+    value = "XXX";
+    for (int i = 0; i < 40; i++) {
+      String maskedValue = maskingProvider.mask(value);
+      assertTrue(statesUSIdentifier.isOfThisType(maskedValue));
+      // should return full name
+      assertNotEquals(2, maskedValue.length());
+    }
   }
-
 }

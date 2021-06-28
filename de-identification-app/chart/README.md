@@ -13,11 +13,10 @@ This [Helm](https://github.com/kubernetes/helm) chart installs an instance of th
 
 ### Checkout the Code
 
-Git clone this repository and `cd` into this directory.
+Git clone this repository.
 
 ```bash
-git clone https://github.com/Alvearie/health-patterns.git
-cd de-identificaiton-app/chart
+git clone https://github.com/Alvearie/de-identification.git
 ```
 
 ### Install the Chart
@@ -25,12 +24,20 @@ cd de-identificaiton-app/chart
 Install the helm chart with a desired release name, such as `deid` and follow the resulting instructions:
 
 ```bash
+cd de-identification/de-identification-app/chart
 helm install deid .
 ```
 
 ### Using the Chart
 
-Access your FHIR server at: `http://<external-ip>:8080/api/v1/health`
+Access your deid server at: `http://<external-ip>:8080/api/v1/deidentification` or port-forward to the deid service.
+
+## Test your server
+
+```bash
+kubectl port-forward service/deid 8888:8080&
+curl -k -v POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ "config":"{\"rules\":[{\"name\":\"HASH\",\"maskingProviders\":[{\"type\":\"HASH\"}]},{\"name\":\"PHONE\",\"maskingProviders\":[{\"type\":\"PHONE\"}]},{\"name\":\"NAME\",\"maskingProviders\":[{\"type\":\"NAME\"}]},{\"name\":\"MaskBirthDay\",\"maskingProviders\":[{\"type\":\"DATETIME\",\"generalizeYear\":true}]}],\"json\":{\"schemaType\":\"FHIR\",\"messageTypeKey\":\"resourceType\",\"messageTypes\":[\"Patient\"],\"maskingRules\":[{\"jsonPath\":\"/fhir/Patient/name/given\",\"rule\":\"HASH\"},{\"jsonPath\":\"/fhir/Patient/name/family\",\"rule\":\"NAME\"},{\"jsonPath\":\"/fhir/Patient/telecom/value\",\"rule\":\"PHONE\"},{\"jsonPath\":\"/fhir/Patient/birthDate\",\"rule\":\"MaskBirthDay\"}]}}" , "data": [  "{\"resourceType\":\"Patient\",\"id\":\"example\",\"name\":[{\"use\":\"official\",\"family\":\"Chalmers\",\"given\":[\"Peter\",\"James\"]},{\"use\":\"usual\",\"given\":[\"Jim\"]}],\"telecom\":[{\"system\":\"phone\",\"value\":\"+1-3471234567\",\"use\":\"work\",\"rank\":1}],\"birthDate\":\"1974-12-25\"}"  ], "schemaType": "FHIR" }' 'http://localhost:8888/api/v1/deidentification'
+```
 
 ## Uninstallation
 

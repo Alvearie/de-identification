@@ -19,36 +19,33 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = 3798105506081000286L;
 
-  protected NamesManager.NameManager names;
-  private final boolean allowUnisex;
-  private final boolean genderPreserve;
   private static final String[] initials = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+  
+  private final boolean allowUnisex;
+  private final boolean genderPreserve;
   private final boolean getPseudorandom;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile NamesManager namesResourceManager = null;
 
   public NameMaskingProvider(NameMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.random = new SecureRandom();
     this.allowUnisex = configuration.isMaskingAllowUnisex();
     this.genderPreserve = configuration.isMaskGenderPreserve();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
+    NamesManager names = getNamesManager();
+    
     StringBuilder builder = new StringBuilder();
 
     for (String token : identifier.split("\\b")) {
@@ -92,20 +89,25 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
               maskedToken = names.getRandomLastName(lookupLastName.getNameCountryCode());
             }
           } else {
-            debugFaultyInput("lookupLastName");
-            if (unspecifiedValueHandling == 2) {
+            return applyUnexpectedValueHandling(identifier, () -> {
+              String randomName;
               if (getPseudorandom) {
-                return builder.append(names.getPseudoRandomFirstName(token)).append(' ')
-                    .append(names.getPseudoRandomLastName(token)).toString().trim();
+                // For other privacy providers, requesting pseudorandom masking means
+                // unexpected value handling does not apply, since the input does not
+                // need to be recognized to apply pseudorandom masking. Therefore,
+                // those providers do not look at any pseudorandom configuration option
+                // when generating random values during unexpected value handling. It
+                // is consistent to look at the pseudorandom setting here, though, since
+                // this is generating a complete replacement for the name and had it been
+                // known that complete replacement of the name was required, pseudorandom
+                // would have been used to do that if it had been configured.
+                randomName = names.getPseudoRandomFirstName(identifier) + " "
+                    + names.getPseudoRandomLastName(identifier);
               } else {
-                return builder.append(names.getRandomFirstName()).append(' ')
-                    .append(names.getRandomLastName()).toString().trim();
+                randomName = names.getRandomFirstName() + " " + names.getRandomLastName();
               }
-            } else if (unspecifiedValueHandling == 3) {
-              return unspecifiedValueReturnMessage;
-            } else {
-              return null;
-            }
+              return randomName;
+            });
           }
         }
       }
@@ -117,10 +119,10 @@ public class NameMaskingProvider extends AbstractMaskingProvider {
     return builder.toString().trim();
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      names = new NamesManager.NameManager(tenantId, localizationProperty);
-      initialized = true;
+  protected NamesManager getNamesManager() {
+    if (namesResourceManager == null) {
+      namesResourceManager = NamesManager.buildNamesManager(tenantId,  localizationProperty);
     }
+    return namesResourceManager;
   }
 }

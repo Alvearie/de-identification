@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,56 +7,51 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
-import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
 import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.ZIPCodeManager;
 
 public class ZIPCodeIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
-	private static final long serialVersionUID = 4597599832229998583L;
 
-	private ZIPCodeManager zipCodeManager;
-	private static final String[] appropriateNames = { "ZIP code", "ZIP", "ZIPCODE" };
+  private static final long serialVersionUID = 4597599832229998583L;
 
-	protected volatile boolean initialized = false;
+  private static final String[] appropriateNames = {"ZIP code", "ZIP", "ZIPCODE"};
 
-	public ZIPCodeIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  protected transient volatile ZIPCodeManager zipCodeResourceManager = null;
 
-	@Override
-	public ProviderType getType() {
-		return ProviderType.ZIPCODE;
-	}
+  public ZIPCodeIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
-	@Override
-	public String getDescription() {
-		return "ZIP code identification.";
-	}
+  @Override
+  public ProviderType getType() {
+    return ProviderType.ZIPCODE;
+  }
 
-	@Override
-	public ValueClass getValueClass() {
-		return ValueClass.TEXT;
-	}
+  @Override
+  public String getDescription() {
+    return "ZIP code identification.";
+  }
 
-	@Override
-	protected Manager getManager() {
-		if (!initialized) {
-			zipCodeManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId, Resource.ZIPCODE,
-                ZIPCodeMaskingProviderConfig.MASK_PREFIX_LENGTH_DEFAULT, localizationProperty);
+  @Override
+  public ValueClass getValueClass() {
+    return ValueClass.TEXT;
+  }
 
-			initialized = true;
-		}
-		return zipCodeManager;
-	}
+  @Override
+  protected Manager getManager() {
+    if (zipCodeResourceManager == null) {
+      zipCodeResourceManager = (ZIPCodeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.ZIPCODE, null, localizationProperty);
+    }
+    return zipCodeResourceManager;
+  }
 
-	@Override
-	protected Collection<String> getAppropriateNames() {
-		return Arrays.asList(appropriateNames);
-	}
+  @Override
+  protected Collection<String> getAppropriateNames() {
+    return Arrays.asList(appropriateNames);
+  }
 }

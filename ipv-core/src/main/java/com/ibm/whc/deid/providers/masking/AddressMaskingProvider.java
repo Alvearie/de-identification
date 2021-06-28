@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,6 +11,7 @@ import com.ibm.whc.deid.models.Address;
 import com.ibm.whc.deid.models.PostalCode;
 import com.ibm.whc.deid.models.RoadTypes;
 import com.ibm.whc.deid.providers.identifiers.AddressIdentifier;
+import com.ibm.whc.deid.resources.StringResource;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
@@ -24,14 +25,10 @@ import com.ibm.whc.deid.util.StreetNameManager;
  *
  */
 public class AddressMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -7633320767310691175L;
 
-  private static final AddressIdentifier addressIdentifier = new AddressIdentifier();
-  protected PostalCodeManager postalCodeManager;
-  protected StreetNameManager streetNameManager;
-  protected CountryMaskingProvider countryMaskingProvider;
-  protected CityMaskingProvider cityMaskingProvider;
+  private final AddressIdentifier addressIdentifier = new AddressIdentifier();
   private final boolean randomizeCountry;
   private final boolean randomizeNumber;
   private final boolean randomizeRoadType;
@@ -41,19 +38,18 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   private final boolean randomizeCity;
   private final boolean randomizeName;
   private final boolean getPseudorandom;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
 
   protected final AddressMaskingProviderConfig configuration;
-
   protected final MaskingProviderFactory maskingProviderFactory;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile PostalCodeManager postalCodeManager = null;
+  protected transient volatile StreetNameManager streetNameManager = null;
+  protected transient volatile CountryMaskingProvider countryMaskingProvider = null;
+  protected transient volatile CityMaskingProvider cityMaskingProvider = null;
 
   public AddressMaskingProvider(AddressMaskingProviderConfig configuration, String tenantId,
       MaskingProviderFactory maskingProviderFactory, String localizationProperty) {
-
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
 
     this.maskingProviderFactory = maskingProviderFactory;
 
@@ -73,9 +69,6 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
     this.nearestPostalCodeK = configuration.getPostalCodeNearestK();
     this.randomizeCity = configuration.isCityMask();
     this.randomizeName = configuration.isStreetNameMask();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
   @Override
@@ -86,22 +79,16 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    Address randomAddress;
-
     Address address = addressIdentifier.parseAddress(identifier);
     if (address == null) {
-      debugFaultyInput("address");
-      if (unspecifiedValueHandling == 2) {
+      if (isUnexpectedValueHandlingRandom()) {
         address = new Address("", "", "", "", "", "");
-        randomAddress = new Address();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
       } else {
-        return null;
+        return applyUnexpectedValueHandling(identifier, null);
       }
-    } else {
-      randomAddress = new Address(address);
     }
+
+    Address randomAddress = new Address(address);
 
     if (address.isPOBox()) {
       randomAddress.setPoBox(true);
@@ -142,7 +129,8 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
         String sname = randomAddress.getName();
         randomAddress.setName(streetNameManager.getPseudorandom(sname));
       } else {
-        randomAddress.setName(streetNameManager.getRandomKey());
+        StringResource streetName = streetNameManager.getRandomValue();
+        randomAddress.setName(streetName == null ? null : streetName.getValue());
       }
     }
 
@@ -187,24 +175,26 @@ public class AddressMaskingProvider extends AbstractMaskingProvider {
   }
 
   protected void initialize() {
-    if (!initialized) {
-      // Initialize all the masking providers/managers needed.
+    if (streetNameManager == null) {
       streetNameManager = (StreetNameManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.STREET_NAMES, null, localizationProperty);
+    }
 
+    if (countryMaskingProvider == null) {
       countryMaskingProvider = (CountryMaskingProvider) maskingProviderFactory.getProviderFromType(
           MaskingProviderType.COUNTRY, null, configuration.getCountryMaskingConfig(), tenantId,
           localizationProperty);
-      countryMaskingProvider.initialize();
+    }
 
+    if (cityMaskingProvider == null) {
       cityMaskingProvider =
           (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
               null, configuration.getCityMaskingConfig(), tenantId, localizationProperty);
+    }
 
-
+    if (postalCodeManager == null) {
       postalCodeManager = (PostalCodeManager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.POSTAL_CODES, null, localizationProperty);
-      initialized = true;
     }
   }
 }

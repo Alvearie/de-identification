@@ -1,41 +1,75 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
-import java.util.List;
+import com.ibm.whc.deid.resources.ManagedResource;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class City implements Location, LocalizedEntity, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2457375277958856977L;
-	private String name;
-  private String nameCountryCode;
-  private String countryCode;
-  private LatitudeLongitude latitudeLongitude;
-  private List<City> neighbors;
+public class City implements Location, LocalizedEntity, Serializable, ManagedResource {
+
+  private static final long serialVersionUID = 2457375277958856977L;
+
+  private final String name;
+  private final String key;
+  private final String nameCountryCode;
+  private final LatitudeLongitude latitudeLongitude;
 
   /**
    * Instantiates a new City.
    *
-   * @param name the name
+   * @param name the city name
+   * @param latitude the latitude in string form - optional
+   * @param longitude the longitude in string form - optional
+   * @param nameCountryCode the name country code
+   * 
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
+   */
+  public City(String name, String latitude, String longitude, String nameCountryCode) {
+    this.name = name;
+    this.nameCountryCode = nameCountryCode;
+    init();
+
+    this.latitudeLongitude = LatitudeLongitude.buildLatitudeLongitude(latitude, longitude);
+    
+    this.key = name.toUpperCase();
+  }
+
+  /**
+   * Instantiates a new City.
+   *
+   * @param name the city name
    * @param latitude the latitude
    * @param longitude the longitude
-   * @param countryCode the country code
    * @param nameCountryCode the name country code
+   * 
+   * @throws IllegalArgumentException if any of the input values is null, whitespace, or invalid.
    */
-  public City(String name, Double latitude, Double longitude, String countryCode,
-      String nameCountryCode) {
+  public City(String name, double latitude, double longitude, String nameCountryCode) {
     this.name = name;
-    this.countryCode = countryCode;
     this.nameCountryCode = nameCountryCode;
+    init();
 
     this.latitudeLongitude =
         new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
+
+    this.key = name.toUpperCase();
+  }
+
+  private void init() {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "city name"));
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(nameCountryCode), "city locale"));
+    }
   }
 
   /**
@@ -44,30 +78,12 @@ public class City implements Location, LocalizedEntity, Serializable {
    * @return the name country code
    */
   @Override
-public String getNameCountryCode() {
+  public String getNameCountryCode() {
     return this.nameCountryCode;
   }
 
-  /**
-   * Gets neighbors.
-   *
-   * @return the neighbors
-   */
-  public List<City> getNeighbors() {
-    return neighbors;
-  }
-
-  /**
-   * Sets neighbors.
-   *
-   * @param neighbors the neighbors
-   */
-  public void setNeighbors(List<City> neighbors) {
-    this.neighbors = neighbors;
-  }
-
   @Override
-public LatitudeLongitude getLocation() {
+  public LatitudeLongitude getLocation() {
     return this.latitudeLongitude;
   }
 
@@ -80,12 +96,8 @@ public LatitudeLongitude getLocation() {
     return this.name;
   }
 
-  /**
-   * Gets country code.
-   *
-   * @return the country code
-   */
-  public String getCountryCode() {
-    return this.countryCode;
+  @Override
+  public String getKey() {
+    return key;
   }
 }

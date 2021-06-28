@@ -33,6 +33,11 @@ public interface LogCodes {
   public static final String WPH1018E = "WPH1018E";
   public static final String WPH1019D = "WPH1019D";
   public static final String WPH1020I = "WPH1020I";
+  public static final String WPH1021W = "WPH1021W";
+  public static final String WPH1022W = "WPH1022W";
+  public static final String WPH1023E = "WPH1023E";
+  public static final String WPH1024E = "WPH1024E";
+  public static final String WPH1025W = "WPH1025W";
   public static final String WPH1100E = "WPH1100E";
   public static final String WPH2000I = "WPH2000I";
   public static final String WPH2001W = "WPH2001W";

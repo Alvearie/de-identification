@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-import java.util.regex.Pattern;
 import com.ibm.whc.deid.models.SWIFTCode;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.SWIFTMaskingProviderConfig;
@@ -17,15 +16,9 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -6934133173548691359L;
 
-  // country code is offsets 4 and 5
-  public static final Pattern SWIFTCODE_PATTERN =
-      Pattern.compile("[A-Z0-9]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?");
-
-  protected transient volatile SWIFTCodeManager swiftCodeManager = null;
+  protected transient volatile SWIFTCodeManager swiftCodeResourceManager = null;
 
   protected final boolean preserveCountry;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   /**
    * Instantiates a new SWIFT masking provider.
@@ -36,41 +29,36 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
    */
   public SWIFTCodeMaskingProvider(SWIFTMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.preserveCountry = configuration.isPreserveCountry();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.random = new SecureRandom();
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
+    if (identifier == null) {
+      debugFaultyInput("identifier");
+      return null;
+    }
+
+    SWIFTCodeManager swiftCodeManager = getSWIFTCodeManager();
 
     String code = null;
     String countryCode = null;
 
     if (this.preserveCountry) {
       // need a valid input code from which to extract the country
-      if (identifier != null) {
-        identifier = identifier.toUpperCase();
-        if (SWIFTCODE_PATTERN.matcher(identifier).matches()) {
-          // input follows SWIFT code pattern
-          countryCode = identifier.substring(4, 6);
-        }
-      }
-
-      if (countryCode != null) {
+      try { 
+        SWIFTCode inputSwiftCode = new SWIFTCode(identifier);
+        countryCode = inputSwiftCode.getCountry();
         code = swiftCodeManager.getRandomValueFromCountry(countryCode);
 
-      } else {
-        // not a valid SWIFT code and a valid code (at least the country portion) is required
-        if (unspecifiedValueHandling == 3) {
-          return unspecifiedValueReturnMessage;
-        } else if (unspecifiedValueHandling != 2) {
-          return null;
+      } catch (IllegalArgumentException e) {
+        // not a valid format SWIFT code
+        if (!isUnexpectedValueHandlingRandom()) {
+          // if random, fall through to generate a random code
+          return applyUnexpectedValueHandling(identifier, null);
         }
-        // note - if unspecifiedValueHandling = 2, falls through to generate a random code
       }
     }
 
@@ -123,14 +111,11 @@ public class SWIFTCodeMaskingProvider extends AbstractMaskingProvider {
     return ch;
   }
 
-  protected void initialize() {
-    if (swiftCodeManager == null) {
-      synchronized (this) {
-        if (swiftCodeManager == null) {
-          swiftCodeManager = (SWIFTCodeManager) ManagerFactory.getInstance().getManager(tenantId,
-              Resource.SWIFT, null, localizationProperty);
-        }
-      }
+  protected SWIFTCodeManager getSWIFTCodeManager() {
+    if (swiftCodeResourceManager == null) {
+      swiftCodeResourceManager = (SWIFTCodeManager) ManagerFactory.getInstance()
+          .getManager(tenantId, Resource.SWIFT, null, localizationProperty);
     }
+    return swiftCodeResourceManager;
   }
 }

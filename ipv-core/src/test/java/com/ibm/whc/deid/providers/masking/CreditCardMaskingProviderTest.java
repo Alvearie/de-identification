@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.providers.identifiers.CreditCardIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CreditCardMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -127,7 +128,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
   @Test
   public void testMaskInvalidCreditCardInputValidHandlingReturnRandom() throws Exception {
     CreditCardMaskingProviderConfig maskingConfiguration = new CreditCardMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(2);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new CreditCardMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new CreditCardIdentifier();

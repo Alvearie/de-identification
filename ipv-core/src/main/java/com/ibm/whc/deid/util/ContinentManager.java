@@ -7,124 +7,137 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.Continent;
-import com.ibm.whc.deid.models.Location;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class ContinentManager extends ResourceBasedManager<Continent> {
+/**
+ * Class that provides access to information about the continents known by the De-Identification
+ * service.
+ * 
+ * <p>
+ * Instances of this class are thread-safe.
+ */
+public class ContinentManager extends LocalizedResourceManager<Continent> {
 
-  private static final long serialVersionUID = -610638379564157663L;
-
-  protected Map<String, List<Location>> continentListMap;
-
-  private transient volatile ConcurrentHashMap<String, LatLonDistance<Continent>> distanceCalcMap =
-      null;
-
-  protected final SecureRandom random = new SecureRandom();
-
-  public ContinentManager(String tenantId, String localizationProperty) {
-    super(tenantId, Resource.CONTINENT, localizationProperty);
+  private static final LogManager logger = LogManager.getInstance();
+  
+  protected ContinentManager() {
+    // nothing required here
   }
+  
+  /**
+   * Creates a new ContinentManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a ContinentManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static ContinentManager buildContinentManager(String localizationProperty) {
+    ContinentManager continentManager = new ContinentManager();
 
-  @Override
-  public void init() {
-    continentListMap = new HashMap<>();
-  }
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
+      for (ResourceEntry entry : resourceEntries) {
 
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.CONTINENT);
-  }
+        try (InputStream inputStream = entry.createStream()) {
+          String countryCode = entry.getCountryCode();
+          String fileName = entry.getFilename();
 
-  @Override
-  public Map<String, Map<String, Continent>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, Continent>> continentsPerLocale = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String entryCountryCode = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String name = line.get(0);
-          Double latitude = FileUtils.parseDouble(line.get(1));
-          Double longitude = FileUtils.parseDouble(line.get(2));
-          Continent continent = new Continent(name, entryCountryCode, latitude, longitude);
-
-          addToContinentList(continent, entryCountryCode);
-
-          addToMapByLocale(continentsPerLocale, entryCountryCode, name.toUpperCase(), continent);
-          addToMapByLocale(continentsPerLocale, getAllCountriesName(), name.toUpperCase(),
-              continent);
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, countryCode, continentManager, line);
+            }
+          }
         }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
-    return continentsPerLocale;
-  }
-
-  @Override
-  public Collection<Continent> getItemList() {
-    return getValues();
-  }
-
-  protected void addToContinentList(Continent continent, String countryCode) {
-    List<Location> list = continentListMap.get(countryCode);
-    if (list == null) {
-      list = new ArrayList<>();
-      continentListMap.put(countryCode, list);
-    }
-    list.add(continent);
+    return continentManager;
   }
 
   /**
-   * Gets closest continent.
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
    *
-   * @param the non-null source continent
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
    * 
-   * @param k the number of nearby continents from which to select
-   * 
-   * @return a randomly selected continent from the nearby list
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
    */
-  public Continent getClosestContinent(Continent continent, int k) {
-    LatLonDistance<Continent> distanceCalc = getDistanceCalculator(continent.getNameCountryCode());
-    List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
-    if (neighbors == null || neighbors.isEmpty()) {
-      return getRandomValue();
+  protected static void loadCSVRecord(String fileName, String locale, ContinentManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(locale, manager, record.get(0), record.get(1), record.get(2));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
     }
-    return neighbors.get(random.nextInt(neighbors.size()));
   }
 
-  private LatLonDistance<Continent> getDistanceCalculator(String countryCode) {
-    // OK if in a race condition multiple threads re-create this
-    ConcurrentHashMap<String, LatLonDistance<Continent>> map = distanceCalcMap;
-    if (map == null) {
-      map = new ConcurrentHashMap<>();
-      distanceCalcMap = map;
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(String locale, ContinentManager manager, String... record) {
+    String name = record[0];
+    String latitude = record[1];
+    String longitude = record[2];
+    Continent continent = new Continent(name, locale, latitude, longitude);
+    manager.add(continent);
+    manager.add(locale, continent);
+  }
+
+  /**
+   * Returns a random continent among the given number of continents closest to the given continent.
+   *
+   * @param continent the starting continent
+   * @param k the number of closest continent to use as candidates for selection
+   * 
+   * @return the selected continent or <i>null</i> if no continent can be selected
+   */
+  public Continent getClosestContinent(Continent continent, int k) {
+    Continent selected = null;
+    if (continent != null && continent.getLocation() != null) {
+      LatLonDistance<Continent> distanceCalc = new LatLonDistance<>(getValues());
+      List<Continent> neighbors = distanceCalc.findNearestK(continent, k);
+      if (neighbors != null && !neighbors.isEmpty()) {
+        int count = neighbors.size();
+        if (count == 1) {
+          selected = neighbors.get(0);
+        } else {
+          selected = neighbors.get(random.nextInt(count));
+        }
+      }
     }
-    LatLonDistance<Continent> dist = map.get(countryCode);
-    if (dist == null) {
-      dist = new LatLonDistance<>(getValues(countryCode));
-      map.put(countryCode, dist);
-    }
-    return dist;
+    return selected;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,256 +7,241 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.ZIPCode;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class ZIPCodeManager extends ResourceBasedManager<ZIPCode> implements Serializable {
-  /** */
-  private static final long serialVersionUID = 4163065702734228622L;
+public class ZIPCodeManager extends LocalizedResourceManager<ZIPCode> {
 
-  /** */
-  // Map of country to <Map of prefix to <<Map of zip code to ZIPCODE>>
-  private Map<String, Map<String, MapWithRandomPick<String, ZIPCode>>> countryCodeMap;
-  private final int prefixLength;
+  private static LogManager logger = LogManager.getInstance();
+
+  protected static final Resources resourceType = Resource.ZIPCODE;
 
   /**
-   * Instantiates a ZIP code manager.
-   *
-   * @param prefixLength the prefix length of ZIP codes
- * @param tenantId tenant id
- * @paramlocalizationProperty location of the localization property file
+   * Maps country codes (key) to the length of a zip code (value) in that country/locale.
    */
-  public ZIPCodeManager(int prefixLength, String tenantId, String localizationProperty) {
-    super(tenantId, Resource.ZIPCODE, localizationProperty);
-    this.prefixLength = prefixLength;
-    buildPrefixMap(getResources());
-  }
+  private Map<String, Integer> lengthsMap = new HashMap<>();
 
-  public int getPrefixLength() {
-    return prefixLength;
-  }
+  /**
+   * Maps country codes (key) to the replacement prefix (value) to use when a zip code does not meet
+   * requirements.
+   */
+  private Map<String, String> replacementsMap = new HashMap<>();
 
-  @Override
-  public void init() {
-    countryCodeMap = new HashMap<>();
-  }
-
-  @Override
-  public Collection<ResourceEntry> getResources() {
-		return LocalizationManager.getInstance(localizationProperty).getResources(Resource.ZIPCODE);
+  protected ZIPCodeManager() {
+    super(34000, 34000);
   }
 
   /**
-   * Adds ZIP code information to the map.
-   *
-   * @param zipCode the zip code
-   * @param countryCode the country code
-   * @param population the population of this ZIP code
+   * Creates a new ZIPCodeManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a ZIPCodeManager instance
+   * 
+   * @see LocalizationManager
    */
-  private void addToPrefixMap(String zipCode, String countryCode, Integer population) {
-    Map<String, MapWithRandomPick<String, ZIPCode>> prefixMap = countryCodeMap.get(countryCode);
-    if (prefixMap == null) {
-      prefixMap = new HashMap<>();
-      countryCodeMap.put(countryCode, prefixMap);
-    }
+  public static ZIPCodeManager buildZIPCodeManager(String localizationProperty) {
+    ZIPCodeManager manager = new ZIPCodeManager();
 
-    String prefix = zipCode.toUpperCase();
-    if (prefix.length() > prefixLength) {
-      prefix = prefix.substring(0, prefixLength);
-    }
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-    MapWithRandomPick<String, ZIPCode> zipCodeMap = prefixMap.get(prefix);
-    if (zipCodeMap == null) {
-      zipCodeMap = new MapWithRandomPick<>(new HashMap<String, ZIPCode>());
-      prefixMap.put(prefix, zipCodeMap);
-    }
+        try (InputStream inputStream = entry.createStream()) {
+          String countryCode = entry.getCountryCode();
+          String fileName = entry.getFilename();
 
-    zipCodeMap.getMap().put(zipCode, new ZIPCode(zipCode, population));
-    zipCodeMap.setKeyList();
-  }
-
-  /**
-   * Builds a map of all prefixes and populations given the masking prefix length
-   *
-   * @param entries The list of resources, each a country from the resources
-   */
-  private void buildPrefixMap(Collection<ResourceEntry> entries) {
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String code = line.get(0);
-          String populationString = line.get(1);
-          Integer population = Integer.valueOf(populationString);
-          addToPrefixMap(code, countryCode, population);
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, countryCode, manager, line);
+            }
+          }
         }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
+      }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
+    }
+
+    populateCountryProperties(manager, localizationProperty);
+
+    return manager;
+  }
+
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param countryCode the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, String countryCode, ZIPCodeManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(countryCode, manager, record.get(0), record.get(1));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param countryCode the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(String countryCode, ZIPCodeManager manager, String... record) {
+    String code = record[0];
+    String populationString = record[1];
+    ZIPCode zipCode = new ZIPCode(code, populationString);
+    manager.add(zipCode);
+    manager.add(countryCode, zipCode);
+  }
+
+  protected static void populateCountryProperties(ZIPCodeManager manager,
+      String localizationProperty) {
+    Collection<ResourceEntry> resourceEntries =
+        LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+
+    for (ResourceEntry entry : resourceEntries) {
+      String countryCode = entry.getCountryCode();
+      if (countryCode != null && !countryCode.trim().isEmpty()) {
+        countryCode = countryCode.toLowerCase();
+
+        Properties localeProp =
+            LocalizationManager.getInstance(localizationProperty).getLocaleProperties(countryCode);
+        String zipcodeLengthString = localeProp.getProperty("zipcode.length");
+        if (zipcodeLengthString != null) {
+          Integer length = null;
+          try {
+            length = Integer.valueOf(zipcodeLengthString);
+            manager.lengthsMap.put(countryCode, length);
+          } catch (NumberFormatException e) {
+            logger.logWarn(LogCodes.WPH1014W, zipcodeLengthString, "zipcode.length");
+          }
+        }
+
+        String zipcodeReplacement = localeProp.getProperty("zipcode.underPopulated");
+        if (zipcodeReplacement != null) {
+          manager.replacementsMap.put(countryCode, zipcodeReplacement);
+        }
       }
     }
-  }
-
-  @Override
-  public Map<String, Map<String, ZIPCode>> readResourcesFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, Map<String, ZIPCode>> codes = new HashMap<>();
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      String countryCode = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          String code = line.get(0);
-          String populationString = line.get(1);
-
-          Integer population = Integer.valueOf(populationString);
-          ZIPCode zipCode = new ZIPCode(code, population);
-
-          String key = code.toUpperCase();
-          addToMapByLocale(codes, countryCode, key, zipCode);
-          addToMapByLocale(codes, getAllCountriesName(), key, zipCode);
-        }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
-      }
-    }
-
-    return codes;
-  }
-
-  /**
-   * Gets the population of the specified ZIP code.
-   *
-   * @param countryCode the country code
-   * @param zipCode the ZIP code
-   * @return the population
-   */
-  public Integer getPopulation(String countryCode, String zipCode) {
-    ZIPCode zipCodeObj = getKey(countryCode, zipCode);
-    if (zipCodeObj == null) {
-      return 0;
-    }
-
-    return zipCodeObj.getPopulation();
   }
 
   /**
    * Returns the length of zip codes in the current region
    *
    * @param countryCode The 2 digit ISO country code of the given country
-   * @return An Integer value representing the total number of digits required to represent a zip in
-   *         the given country.
+   * @return the total number of digits required to represent a zip code in the given country or
+   *         <b>-1</b> if the number of digits is unknown.
    */
-  public Integer getZipCodeLength(String countryCode) {
-		Properties locProp = LocalizationManager.getInstance(localizationProperty).getLocaleProperties(countryCode);
-    if (locProp.size() != 0) {
-      String zipcodeLengthString = locProp.getProperty("zipcode.length");
-      if (null != zipcodeLengthString) {
-        return Integer.parseInt(zipcodeLengthString);
-      }
+  public int getZipCodeLength(String countryCode) {
+    Integer length = null;
+    if (countryCode != null) {
+      length = lengthsMap.get(countryCode.toLowerCase());
     }
-    return 0;
+    return length == null ? -1 : length.intValue();
   }
 
   /**
    * Get the country-specific zip code replacement pattern for zips that do not meet the criteria
    * for masking via prefix.
    *
-   * @param countryCode The ISO 2 character country code to get the replacement string for
-   * @return
+   * @param countryCode The ISO 2 character country code for the target country
+   * 
+   * @return the replacement zip code prefix or an empty string if no replacement has been loaded
+   *         for the given country
    */
   public String getZipCodeReplacement(String countryCode) {
-    // Get the localization properties for this country
-		Properties locProp = LocalizationManager.getInstance(localizationProperty).getLocaleProperties(countryCode);
-    if (locProp.size() != 0) {
-      // If the localization properties exist, use the appropriate key
-      String zipcodeReplacement = locProp.getProperty("zipcode.underPopulated");
-      if (null != zipcodeReplacement) {
-        return zipcodeReplacement;
+    String replacement = null;
+    if (countryCode != null) {
+      replacement = replacementsMap.get(countryCode.toLowerCase());
+    }
+    return replacement == null ? "" : replacement;
+  }
+
+  /**
+   * Gets the total population of ZIP codes for the given country with the given ZIP code prefix.
+   *
+   * @param countryCode the country code
+   * @param zipCodePrefix the ZIP code prefix
+   * 
+   * @return the total population of all known ZIP codes that begin with the given prefix or
+   *         <i>null</i> if any of the input is <i>null</i>.
+   */
+  public Integer getPopulationByPrefix(String countryCode, String zipCodePrefix) {
+    Integer populationI = null;
+    if (countryCode != null && zipCodePrefix != null) {
+      int population = 0;
+      for (ZIPCode code : getValues(countryCode.toLowerCase())) {
+        if (code.getCode().startsWith(zipCodePrefix)) {
+          population += code.getPopulation();
+        }
+      }
+      populationI = Integer.valueOf(population);
+    }
+    return populationI;
+  }
+
+  /**
+   * Gets a random ZIP code in the given country with the given ZIP code prefix.
+   *
+   * @param countryCode the country code
+   * @param zipCodePrefix the ZIP code prefix
+   * 
+   * @return a random ZIP code from the given country with the given prefix or <i>null</i> if no
+   *         such ZIP codes have been loaded
+   */
+  public String getRandomZipCodeByPrefix(String countryCode, String zipCodePrefix) {
+    String code = null;
+    if (countryCode != null && zipCodePrefix != null) {
+
+      ArrayList<ZIPCode> candidates = new ArrayList<>(100);
+      for (ZIPCode zcode : getValues(countryCode)) {
+        if (zcode.getCode().startsWith(zipCodePrefix)) {
+          candidates.add(zcode);
+        }
+      }
+
+      int count = candidates.size();
+      if (count == 1) {
+        code = candidates.get(0).getCode();
+      } else if (count > 1) {
+        code = candidates.get(random.nextInt(count)).getCode();
       }
     }
-    // Otherwise, return an empty string by default
-    return "";
-  }
 
-  /**
-   * Gets the total population of ZIP codes with same prefix as the specified ZIP code.
-   *
-   * @param countryCode the country code
-   * @param zipCode the ZIP code
-   * @return the list of ZIP codes
-   */
-  public Integer getPopulationByPrefix(String countryCode, String zipCode) {
-    if (zipCode.length() < this.prefixLength) {
-      return 0;
-    }
-
-    Map<String, MapWithRandomPick<String, ZIPCode>> prefixMap =
-        countryCodeMap.get(countryCode.toLowerCase());
-    if (prefixMap == null) {
-      return 0;
-    }
-
-    String prefix = zipCode.substring(0, this.prefixLength);
-    MapWithRandomPick<String, ZIPCode> zipCodeMap = prefixMap.get(prefix);
-    if (zipCodeMap == null) {
-      return 0;
-    }
-
-    int totalPopulation = 0;
-    for (ZIPCode zipCode1 : zipCodeMap.getMap().values()) {
-      totalPopulation += zipCode1.getPopulation();
-    }
-
-    return totalPopulation;
-  }
-
-  /**
-   * Gets a random ZIP code with same prefix as the specified ZIP code.
-   *
-   * @param countryCode the country code
-   * @param zipCode the ZIP code
-   * @return a random ZIP code with the same prefix, or null
-   */
-  public String getRandomZipCodeByPrefix(String countryCode, String zipCode) {
-    if (zipCode.length() < this.prefixLength) {
-      return null;
-    }
-
-    Map<String, MapWithRandomPick<String, ZIPCode>> prefixMap =
-        countryCodeMap.get(countryCode.toLowerCase());
-    if (prefixMap == null) {
-      return null;
-    }
-
-    String prefix = zipCode.substring(0, this.prefixLength);
-    MapWithRandomPick<String, ZIPCode> zipCodeMap = prefixMap.get(prefix);
-    if (zipCodeMap == null || zipCodeMap.getMap().isEmpty()) {
-      return null;
-    }
-
-    return zipCodeMap.getRandomKey();
-  }
-
-  @Override
-  public Collection<ZIPCode> getItemList() {
-    return getValues();
+    return code;
   }
 }

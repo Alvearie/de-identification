@@ -11,15 +11,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
+import com.ibm.whc.deid.models.SWIFTCode;
 
 public class SWIFTCodeMaskingProviderTestSetup extends TestLogSetUp implements MaskingProviderTest {
 
-  protected static final String TEST_LOCALIZATION_PROPERTIES =
-      "/localization/test.swift.localization.properties";
-
   // values from the TEST_LOCALIZATION_PROPERTIES file
   protected static final String[] REPLACEMENTS = {"AAAACA11", "BBBBCABB", "CCCCCACC", "DDDDCADD004",
-      "EEEEUS55XX5", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH"};
+      "EEEEUS55XX5", "FFFFUSFF", "GGGGUSGG", "HHHHUSHH", "IIIIXXII"};
   protected static final String[] CA_REPLACEMENTS =
       {"AAAACA11", "BBBBCABB", "CCCCCACC", "DDDDCADD004"};
   protected static final String[] US_REPLACEMENTS =
@@ -38,8 +36,8 @@ public class SWIFTCodeMaskingProviderTestSetup extends TestLogSetUp implements M
       String value = provider.mask(original);
       assertNotNull(value);
       assertTrue(
-          value + " fails to match pattern " + SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.pattern(),
-          SWIFTCodeMaskingProvider.SWIFTCODE_PATTERN.matcher(value).matches());
+          value + " fails to match pattern " + SWIFTCode.SWIFTCODE_PATTERN.pattern(),
+          SWIFTCode.SWIFTCODE_PATTERN.matcher(value).matches());
       assertNotEquals(original, value);
       if (countryCode != null) {
         assertEquals(countryCode, value.substring(4, 6));

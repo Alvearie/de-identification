@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -14,84 +14,73 @@ import com.ibm.whc.deid.util.ManagerFactory;
 
 
 /**
- * The type Ic dv 9 masking provider.
- *
+ * Privacy provider for ICDv9 codes.
  */
 public class ICDv9MaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -5706336758492457693L;
 
-  protected ICDv9Manager icdV9Manager;
-  private final boolean randomizeToCategory;
-  private final boolean randomizeToRange;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
+  private final boolean generalizeToCategory;
+  private final boolean generalizeToChapter;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile ICDv9Manager icdV9ResourceManager = null;
 
   /**
-   * Instantiates a new Ic dv 9 masking provider.
+   * Instantiates a new masking provider.
    *
-   * @param configuration the configuration
-   * @param tenantId tenant id
-   * @paramlocalizationProperty location of the localization property file
-   * @param random the random
+   * @param configuration the provider configuration
+   * @param tenantId tenant associated with the current request
+   * @param localizationProperty location of the localization property file
    */
   public ICDv9MaskingProvider(ICDv9MaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.randomizeToCategory = configuration.isRandomizeCategory();
-    this.randomizeToRange = configuration.isRandomizeChapter();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
+    this.generalizeToCategory = configuration.isGeneralizeToCategory();
+    this.generalizeToChapter = configuration.isGeneralizeToChapter();
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
 
+    ICDv9Manager icdV9Manager = getManager();
+
     ICD icd = icdV9Manager.lookupICD(identifier);
-    if (icd == null) {
-      // TODO: check if ICD is required
-      debugFaultyInput("icd");
-      if (unspecifiedValueHandling == 2) {
-        return icdV9Manager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+
+    if (generalizeToChapter || generalizeToCategory) {
+      if (icd == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> icdV9Manager.getRandomValue(ICDFormat.CODE));
       }
-    }
+      ICDFormat format = icd.getFormat();
 
-    ICDFormat format = icd.getFormat();
-
-    if (this.randomizeToRange) {
-      if (format == ICDFormat.CODE) {
-        return icd.getChapterCode();
-      } else {
+      if (this.generalizeToChapter) {
+        if (format == ICDFormat.CODE) {
+          return icd.getChapterCode();
+        }
         return icd.getChapterName();
       }
-    } else if (this.randomizeToCategory) {
-      if (format == ICDFormat.CODE) {
-        return icd.getCategoryCode();
-      } else {
+
+      if (this.generalizeToCategory) {
+        if (format == ICDFormat.CODE) {
+          return icd.getCategoryCode();
+        }
         return icd.getCategoryName();
       }
     }
 
-    return icdV9Manager.getRandomKey();
+    ICDFormat targetFormat = icd == null ? ICDFormat.CODE : icd.getFormat();
+    return icdV9Manager.getRandomValue(targetFormat);
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      icdV9Manager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId,
+  protected ICDv9Manager getManager() {
+    if (icdV9ResourceManager == null) {
+      icdV9ResourceManager = (ICDv9Manager) ManagerFactory.getInstance().getManager(tenantId,
           Resource.ICDV9, null, localizationProperty);
-      initialized = true;
     }
+    return icdV9ResourceManager;
   }
 }

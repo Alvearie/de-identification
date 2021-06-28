@@ -5,7 +5,9 @@
  */
 package com.ibm.whc.deid.providers.identifiers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.ibm.whc.deid.models.LatitudeLongitude;
@@ -49,24 +51,24 @@ public class LatitudeLongitudeIdentifierTest {
 
     LatitudeLongitude latitudeLongitude = identifier.parseCompassFormat(coords);
     assertTrue(latitudeLongitude != null);
-    assertTrue(
-        latitudeLongitude.getLatitude().equals(-GeoUtils.degreesToDecimal(12.0, 30.0, 23.256547)));
-    assertTrue(
-        latitudeLongitude.getLongitude().equals(GeoUtils.degreesToDecimal(12.0, 30.0, 23.256547)));
+    assertEquals(latitudeLongitude.getLatitude(),
+        -GeoUtils.degreesToDecimal(12.0, 30.0, 23.256547), 0.0);
+    assertEquals(latitudeLongitude.getLongitude(),
+        GeoUtils.degreesToDecimal(12.0, 30.0, 23.256547), 0.0);
 
     coords = "S34.59.33 W179.59.59";
     latitudeLongitude = identifier.parseCompassFormat(coords);
     assertTrue(latitudeLongitude != null);
-    assertTrue(
-        latitudeLongitude.getLatitude().equals(-GeoUtils.degreesToDecimal(34.0, 59.0, 33.0)));
-    assertTrue(
-        latitudeLongitude.getLongitude().equals(-GeoUtils.degreesToDecimal(179.0, 59.0, 59.0)));
+    assertEquals(latitudeLongitude.getLatitude(), -GeoUtils.degreesToDecimal(34.0, 59.0, 33.0),
+        0.0);
+    assertEquals(latitudeLongitude.getLongitude(), -GeoUtils.degreesToDecimal(179.0, 59.0, 59.0),
+        0.0);
 
     coords = "S90.00.00 W179.59.59";
     latitudeLongitude = identifier.parseCompassFormat(coords);
-    assertTrue(latitudeLongitude != null);
-    assertTrue(latitudeLongitude.getLatitude().equals(-GeoUtils.degreesToDecimal(90.0, 0.0, 0.0)));
-    assertTrue(
-        latitudeLongitude.getLongitude().equals(-GeoUtils.degreesToDecimal(179.0, 59.0, 59.0)));
+    assertNotNull(latitudeLongitude);
+    assertEquals(latitudeLongitude.getLatitude(), -GeoUtils.degreesToDecimal(90.0, 0.0, 0.0), 0.0);
+    assertEquals(latitudeLongitude.getLongitude(), -GeoUtils.degreesToDecimal(179.0, 59.0, 59.0),
+        0.0);
   }
 }

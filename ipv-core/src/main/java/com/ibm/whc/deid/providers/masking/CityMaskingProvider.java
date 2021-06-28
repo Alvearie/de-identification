@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,66 +17,58 @@ import com.ibm.whc.deid.util.ManagerFactory;
  *
  */
 public class CityMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 2388319621060552438L;
 
-  protected CityManager cityManager;
   protected final boolean getClosest;
   protected final int closestK;
   protected final boolean getPseudorandom;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
-  protected volatile boolean initialized = false;
+  protected transient volatile CityManager cityResourceManager = null;
 
   public CityMaskingProvider(CityMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.getClosest = configuration.isMaskClosest();
     this.closestK = configuration.getMaskClosestK();
     this.getPseudorandom = configuration.isMaskPseudorandom();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY,
-          null, localizationProperty);
-
-      initialized = true;
+  protected CityManager getCityManager() {
+    if (cityResourceManager == null) {
+      cityResourceManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CITY, null, localizationProperty);
     }
+    return cityResourceManager;
   }
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
     }
+
+    CityManager cityManager = getCityManager();
 
     if (getPseudorandom) {
       return cityManager.getPseudorandom(identifier);
     }
 
     if (getClosest) {
-      return cityManager.getClosestCity(identifier, this.closestK);
-    }
-
-    City city = cityManager.getKey(identifier);
-
-    if (city == null) {
-      debugFaultyInput("city");
-      if (unspecifiedValueHandling == 2) {
-        return cityManager.getRandomKey();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+      City inputCity = cityManager.getValue(identifier);
+      if (inputCity == null || inputCity.getLocation() == null) {
+        return applyUnexpectedValueHandling(identifier, () -> getRandomCityName(cityManager));
       }
+      City selected = cityManager.getClosestCity(inputCity, closestK);
+      return selected == null ? null : selected.getName();
     }
 
-    return cityManager.getRandomKey(city.getNameCountryCode());
+    return getRandomCityName(cityManager);
+  }
+
+  protected String getRandomCityName(CityManager manager) {
+    City city = manager.getRandomValue();
+    return city == null ? null : city.getName();
   }
 }

@@ -14,6 +14,7 @@ To preserve utility in the data being de-identified, the IBM Data De-Identificat
 * [CREDIT_CARD](#credit_card)
 * [DATEDEPENDENCY](#datedependency)
 * [DATETIME](#datetime)
+* [DATETIME_CONSISTENT_SHIFT](#datetime_consistent_shift)
 * [EMAIL](#email)
 * [GENDER](#gender)
 * [GENERALIZE](#generalize)
@@ -62,7 +63,7 @@ options and their default values.
 
 | **Option name**             | **Type** | **Description**                                     | **Default value** |
 |-----------------------------|----------|-----------------------------------------------------|-------------------|
-| postalCodeNearest           | Boolean  | Select nearest postal code                          | false             |
+| postalCodeNearest           | Boolean  | Select among nearest postal codes (approximate geographic distance)    | false             |
 | roadTypeMask                | Boolean  | Mask road type (for example, street, avenue)        | true              |
 | postalCodeNearestK          | Integer  | Number of closest postal codes from which to select | 10                |
 | countryMask                 | Boolean  | Mask country                                        | true              |
@@ -97,12 +98,12 @@ options and their default values.
 
 #### CITY
 
->   Masks a city with a randomly-selected city, or based on one of its
->   neighboring cities (geographical distance).
+>   Masks a city with a randomly selected city, optionally from among its nearest 
+>   neighboring cities (approximate geographical distance).
 
 | **Option name**        | **Type** | **Description**                         | **Default value** |
 |------------------------|----------|-----------------------------------------|-------------------|
-| maskClosest            | Boolean  | Select one of the near cities.          | false             |
+| maskClosest            | Boolean  | Select one of the nearby cities.        | false             |
 | maskClosestK           | Integer  | Number of closest cities to select from | 10                |
 | maskPseudorandom       | Boolean  | Mask based on pseudorandom function     | false             |
 
@@ -132,9 +133,7 @@ options and their default values.
           "name": "CONDITIONAL_RULE",
           "maskingProviders": [
             {
-              "type": "CONDITIONAL",
-              "unspecifiedValueHandling": 0,
-              "unspecifiedValueReturnMessage": "OTHER",
+              "type": "CONDITIONAL"
               "maskRuleSet": [
                 {
                   "condition": {
@@ -226,8 +225,6 @@ options and their default values.
 >   Finally, the contained_in operator checks if the value of the condition field is
 >   contained in the user specified-value.
 
->   For information about the unspecifiedValueHandling and unspecifiedValueReturnMessage
->   properties, see “Handling unrecognized input values and exceptions raised by privacy providers” below.
 
    **Example 2: Conditional masking of a FHIR data element, based on another FHIR data element value in an array node**
 
@@ -285,9 +282,9 @@ options and their default values.
 
 #### CONTINENT
 
->   Masks a continent by replacing it either with a randomly-selected continent, or
->   with the closest continent. The distance computation is based on an approximate
->   centroid of the continent's bounding box.
+>   Masks a continent by replacing it with a randomly selected continent, optionally 
+>   from among its nearest neighboring continents (approximate geographic distance from the approximate
+>   centroid of each continent's bounding box).
 
 | **Option name**         | **Type** | **Description**                            | **Default value** |
 |-------------------------|----------|--------------------------------------------|-------------------|
@@ -296,8 +293,8 @@ options and their default values.
 
 #### COUNTRY
 
->   Replaces a country either with a randomly-chosen country, or with its nearest
->   country. The latter is calculated based on geographic distance.
+>   Replaces a country with a randomly selected country, optionally from among its nearest neighboring 
+>   countries (approximate geographic distance).
 
 | **Option name**           | **Type** | **Description**                                     | **Default value** |
 |---------------------------|----------|-----------------------------------------------------|-------------------|
@@ -330,8 +327,8 @@ options and their default values.
 >   Within the input message, the value to compare to the masked value must be present in the same parent JSON object 
 >   as the masked value.  In other words, the path to the comparison value must be the same as the path to the masked value
 >   except for the final element name.  If the comparison value is not found, no masking occurs.  If the comparison value is 
->   found, but cannot be parsed, the masked value is protected according to the unspecified value handling configuration as 
->   described in "Handling of null and unrecognized input data values" below.
+>   found, but cannot be parsed, the masked value is protected according to the unexpected value handling configuration as 
+>   described in "Handling unexpected input values" below.
 
 This privacy provider supports these options:
 
@@ -552,6 +549,175 @@ This privacy provider supports these options:
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
 | yearDeleteNointervalComparedateValue              | String   | The date and time to compare to the value being masked                                                                                                                                                                                                                               | null              |
 
+#### DATETIME_CONSISTENT_SHIFT
+
+>   Masks a date or date and time value by shifting the date a number of days.  The number of days to shift the date is chosen
+>   from a configured range.  However, the same number of days is used for each date related to the same principle or patient.
+>   A field that identifies the principle to whom the target value relates must be present at the same location in each document
+>   containing a value to be masked with this privacy provider.  
+
+| **Option name**        | **Type** | **Description**                                                                                                                | **Default value**  |
+|------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| patientIdentifierPath  | String   | A path using JSON Pointer specification syntax to the field in the source document containing the principle                    | /patient/reference |
+| dateShiftMinimumDays   | Integer  | The minimum number of days (inclusive) to shift the date, must be >= 0                                                         | 1                  |
+| dateShiftMaximumDays   | Integer  | The maximum number of days (inclusive) to shift the date, must be >= `dateShiftMinimumDays`                               | 365                |
+| dateShiftDirection     | String   | The direction the date should be shifted in relation to the original date.  Supported values are described in the table below. | beforeOrAfter      |
+| salt                   | String   | An optional, arbitrary set of characters used as part of the calculation of the number of days to shift the date.  Supplying a value prevents the principle value from being the only input to that calculation.  Null and values consisting of all whitespace characters are ignored. | null   |
+| customFormats          | String Array   | Optional additional input formats to recognize when parsing date values.  More details below.                            | null               |
+
+If more than one masking rule definition is used to mask date values related to the same principle, the values 
+of the `dateShiftMinimumDays`, `dateShiftMaximumDays`, `dateShiftDirection`, and `salt` parameters 
+should be the same in all of those masking rules.  Changing any of those values can cause the number of days for 
+the date shift to be different even if the value at the `patientIdentifierPath` field remains the same.
+
+If the input document does not contain a text field at the path supplied in the `patientIdentifierPath` 
+parameter or if the value of the field is null or consists of only whitespace characters, the configured 
+handling of unexpected input values is applied.  See the **Handling unexpected input values** section below.
+
+**Supported values for `dateShiftDirection`**
+
+| **Value**        | **Description**                                                |
+|------------------|----------------------------------------------------------------|
+| before           | Shift the date before the original date                        |
+| beforeOrAfter    | Shift the date either before or after the original date        |
+| after            | Shift the date after the original date                         |
+
+**Supported and custom input formats**
+
+The provider supports input values in any of these formats.
+
+|**Format**                                | **Examples**                            |
+|------------------------------------------|-----------------------------------------|
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+hh:mm      | 2008-09-14T15:53:02.123456789+02:00     |
+| yyyy-MM-ddTHH:mm:ss+hh:mm                | 2008-09-14T15:53:02-05:00               |
+| yyyy-MM-ddTHH:mm+hh:mm                   | 2008-09-14T15:53-06:00                  |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ           | 2008-09-14T15:53:02.123456789Z          |
+| yyyy-MM-ddTHH:mm:ssZ                     | 2008-09-14T15:53:02Z                    |
+| yyyy-MM-ddTHH:mmZ                        | 2008-09-14T15:53Z                       |
+| dd-MMM-yyyy                              | 24-DEC-2018                             |
+| yyyy-MM-dd                               | 2018-12-24                              |
+| yyyy/MM/dd                               | 2018/12/24                              |
+| yyyy-MM-dd HH:mm:ss                      | 2018-12-24 12:01:12                     |
+| yyyy/MM/dd HH:mm:ss                      | 2018/12/24 12:01:12                     |
+| dd-MM-yyyy                               | 16-04-1967                              |
+| dd/MM/yyyy                               | 16/04/1967                              |
+| dd-MM-yyyy HH:mm:ss                      | 16-04-1967 13:14:15                     |
+| dd/MM/yyyy HH:mm:ss                      | 16/04/1967 13:14:15                     |
+
+The provider formats the shifted date using the same pattern that matched the original input value.  
+Minor changes to precision and formatting between the original value and the shifted value can occur, however.
+
+If the input contains values to be protected that do not match any of these patterns, additional formats 
+can be added using the `customFormats` configuration parameter.  Input is matched to custom formats 
+in the order the custom formats appear in the configuration parameter and before it is matched to any of 
+the built-in formats.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for 
+information about the syntax used to specify custom formats.  Time components and time zone name or offset 
+components are optional.  The format must capture enough information about the date, however, for the 
+provider to be able to calculate a year, month, and day.  For example, _yyDDD_ (Julian date, year and 
+day of year) is a valid pattern because the provider can calculate the information it needs.  However, 
+_MMdd_ (month and day) or _HHmm_ (hour and minute) are not adequate as the year, month, and day cannot 
+be calculated.
+
+If an input value does not match any of the available formats or is matched to a custom format that does not 
+capture sufficient date information, the configured handling of unexpected input values is applied.  See the 
+**Handling unexpected input values** section below.
+
+**Principle identifier fields and ordering of rule assignments**
+
+This provider does not apply any privacy protection to the field indicated by the `patientIdentifierPath` 
+parameter, but privacy protection for that field might also be desired and privacy protection rules can be 
+applied to it in other sections of the complete privacy protection configuration.  In that case, it is 
+important to be aware of the order in which the privacy rules are applied.  In some cases it might be desirable 
+to base the consistent date shifting on the original value of the principle field.  In others, it might be 
+desirable to base the consistent date shifting on the principle field after that field has already been masked 
+by other privacy protection rules.
+
+The order in which the privacy providers are applied is controlled by the order of the members of the 
+`config.json.maskingRules` array in the complete masking configuration.  The service examines each input 
+document to determine its message type and then applies the rule assignments for that message type in the order 
+they appear in the array.  For example, consider the following masking configuration:
+
+````
+{
+    "rules": [
+        {
+            "name": "ConsistentShiftRule",
+            "maskingProviders": [
+                {
+                    "type": "DATETIME_CONSISTENT_SHIFT",
+                    "patientIdentifierPath": "/patient/reference",
+                    "dateShiftMinimumDays": "10",
+                    "dateShiftMaximumDays": "31",
+                    "dateShiftDirection": "before",
+                    "unexpectedInputHandling": "NULL",
+                    "customFormats": [
+                        "yyyy-MM-dd'T'HH:mm:ss z",
+                        "yyDDD"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "HashRule",
+            "maskingProviders": [
+                {
+                    "type": "HASH",
+                    "algorithmDefault": "SHA-256"
+                }
+            ]
+        }        
+    ],
+    "json": {
+        "schemaType": "FHIR",
+        "messageTypes": [
+            "MedicationOrder"
+        ],
+        "messageTypeKey": "resourceType",       
+        "maskingRules": [
+            {
+                "rule": "ConsistentShiftRule",
+                "jsonPath": "/fhir/MedicationOrder/dateWritten"
+            },
+            {
+                "rule": "HashRule",
+                "jsonPath": "/fhir/MedicationOrder/patient/reference"
+            }
+        ]
+    }
+}
+````
+
+This configuration processes JSON input documents that have the value *MedicationOrder* at the path */resourceType*.  
+Input documents that do not have this value at this path are ignored.  In the *rules* section, it contains a rule 
+named *ConsistentShiftRule* that uses the DATETIME_CONSISTENT_SHIFT provider to move dates from 10 to 31 days after 
+the original date.  The actual number of days is chosen by performing calculations based on the value found at the 
+*/patient/reference* path.  It contains another rule named *HashRule* that uses the HASH provider to hash fields 
+using the SHA-256 algorithm.  In the *maskingRules* section, the first assignment applies *ConsistentShiftRule* to 
+the value at the path */dateWritten* and the second applies *HashRule* to the value at the path */patient/reference*.  
+
+Since the assignment of the *ConsistentShiftRule* to the */dateWritten* path appears before the assignment of the 
+*HashRule* to the */patient/reference* path, the value at */patient/reference* will have its original value when 
+used for the consistent date shifting.
+
+If the *maskingRules* section was written like this instead:
+
+````
+        "maskingRules": [
+            {
+                "rule": "HashRule",
+                "jsonPath": "/fhir/MedicationOrder/patient/reference"
+            },
+            {
+                "rule": "ConsistentShiftRule",
+                "jsonPath": "/fhir/MedicationOrder/dateWritten"
+            }            
+        ]
+````
+
+the HASH would be applied to the value at */patient/reference* first and the DATETIME_CONSISTENT_SHIFT provider 
+would use the hashed version of the value at */patient/reference* to calculate the number of days to shift the 
+date at */dateWritten*.
+
 #### EMAIL
 
 >   Masks e-mail addresses with the option to preserve certain levels of the
@@ -736,7 +902,7 @@ The values in the examples are for demonstration purposes only.
 >   offset must be greater or equal to zero (0, first position in the data value)
 >   and less than the end offset, when an end offset is specified. The value
 >   outside the start and end offsets can be either maintained or deleted. To
->   specify the behavior of the algorithm in the case of invalid offsets, use
+>   specify the behaviour of the algorithm in the case of invalid offsets, use
 >   the configuration options.
 
 | **Option name**                   | **Type** | **Description**                                                                                                                                                                                          | **Default value** |
@@ -770,20 +936,26 @@ The values in the examples are for demonstration purposes only.
 >   Masks ICD-9 diagnosis codes. Codes can also be generalized to their
 >   respective chapters or categories.
 
-| **Option name**        | **Type** | **Description**               | **Default value** |
-|------------------------|----------|-------------------------------|-------------------|
-| randomizeChapter       | Boolean  | Randomize by chapter          | false             |
-| randomizeCategory      | Boolean  | Randomize by three-digit code | true              |
+| **Option name**        | **Type** | **Description**                                       | **Default value** |
+|------------------------|----------|-------------------------------------------------------|-------------------|
+| generalizeToCategory   | Boolean  | Return the category associated with the input code    | true              |
+| generalizeToChapter    | Boolean  | Return the chapter associated with the input code     | false             |
 
 #### ICDV10
 
 >   Masks ICD-10 diagnosis codes. Codes can also be generalized to their
 >   respective chapters or categories.
 
-| **Option name**        | **Type** | **Description**               | **Default value** |
-|------------------------|----------|-------------------------------|-------------------|
-| randomizeChapter       | Boolean  | Randomize by chapter          | false             |
-| randomizeCategory      | Boolean  | Randomize by three-digit code | true              |
+>   By default, no actual version 10 ICD codes are provided with the service.  To use this provider, it will
+>   be necessary to load ICD v10 codes into the service.  For more information about loading custom codes, 
+>   see [Localization](localization.md).
+>   Note that there might be licensing considerations for use of ICD v10 codes in some circumstances.
+
+
+| **Option name**        | **Type** | **Description**                                       | **Default value** |
+|------------------------|----------|-------------------------------------------------------|-------------------|
+| generalizeToCategory   | Boolean  | Return the category associated with the input code    | true              |
+| generalizeToChapter    | Boolean  | Return the chapter associated with the input code     | false             |
 
 #### IMEI
 
@@ -873,9 +1045,9 @@ The values in the examples are for demonstration purposes only.
 
 #### OCCUPATION
 
->   By default, this replaces an occupation with a randomly-selected occupation.
->   However, if the option **occupation.mask.generalize** is set to **true**, this
->   generalizes an occupation to its respective category. The categories
+>   By default, this provider replaces an occupation with a randomly-selected occupation.
+>   However, if the option **maskGeneralize** is set to **true**, this provider
+>   generalizes an occupation to one of its associated occupational categories. The categories
 >   of occupations are based on the 2010 Standard Occupational Classification (SOC).
 
 | **Option name**            | **Type** | **Description**                   | **Default value** |
@@ -1220,7 +1392,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >     postal code
 >   - Zeroing out of the postal code prefix
 >   - Postal code replacement with a random postal code that has the same prefix,
->     or with a random neighboring postal code, to maintain spatial proximity
+>     or with a random neighboring postal code to maintain spatial proximity
 >   - Postal code processing as per HIPAA Safe Harbor, where the geographical unit
 >     formed by combining postal codes with the same first three digits as the
 >     original postal code is checked against the current, publicly available data
@@ -1231,7 +1403,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >   If multiple options are set to **True** in the postal code masking algorithm, the
 >   operations are performed in this order:
 
-> 1.  Replace the postal code with a neighboring postal code.
+> 1.  Replace the postal code with a neighboring postal code (approximate geographic distance)
 
 > 2.  Zero out the postal code's three-digit prefix if the total population in the
     geographical unit, formulated by combining all postal codes with the same
@@ -1416,7 +1588,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 1.  **Category I – PII-specific providers:** These providers mask a specific
     type of PII / PHI / SPI. The Category I providers are:
     ADDRESS, ATC, CITY, CONTINENT, COUNTRY, COUNTY, CREDIT_CARD, DATEDEPENDENCY, 
-    DATETIME, EMAIL, GENDER, HOSPITAL, IBAN, ICDV10, ICDV9, IMEI, IP_ADDRESS,
+    DATETIME, DATETIME_CONSISTENT_SHIFT, EMAIL, GENDER, HOSPITAL, IBAN, ICDV10, ICDV9, IMEI, IP_ADDRESS,
     LATITUDE_LONGITUDE, MAC_ADDRESS, MARITAL, NAME, OCCUPATION, PHONE, RACE, 
     RELIGION, SSN_UK, SSN_US, STATE_US, SWIFT, URL, VIN, ZIPCODE.
 
@@ -1440,7 +1612,7 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
    - The first rule is applied to the original value of the data element.
    - Each subsequent rule is applied to the transformed value produced for this element by the previous
-   rule. This is similar to the behavior of a UNIX pipe command.
+   rule. This is similar to the behaviour of a UNIX pipe command.
 
 The next example shows a valid rule set for processing data elements of an
 array with multiple privacy providers.
@@ -1475,99 +1647,73 @@ the first member of the _given_ array in all members of the _name_ array.
 error for multiple rules to be assigned to data elements not identified by an array index.
 
 
-## Handling unrecognized input values and exceptions raised by privacy providers
+## Handling unexpected input values
 
-   Next, this topic describes the operation of the various privacy providers
-   that are offered by the Data De-Identification Service in the case of either null
-   or unrecognized input data values. It also describes the case of runtime
-   exceptions.
+   When an input value to a privacy provider is *null*, the privacy providers
+   retain the *null* value and do no further processing for that input.
 
-#### Handling of null and unrecognized input data values
-
-   The Data De-Identification Service takes special care in handling null and
-   unrecognized input data values of FHIR data elements.
-
-   With data elements that have a null value, the privacy providers
-   that process them maintain the null value of the elements. As a result,
-   they do not proceed to falsify the data.
-
-   If the input value to a privacy provider is not recognized by the privacy
-   provider and it does not appear to be an accurate input value, the Data
-   De-Identification Service operates as specified by these configuration 
-   parameters.
+   If a privacy provider is presented an input value that is not *null*, but which it still cannot process, 
+   the provider proceeds based on the values of the configuration parameters described in the table below.  
+   
+   These parameters can be included in the configuration of every privacy provider.     
 
 | **Option name**               | **Type** | **Description**                                                                                                | **Default value** |
-|-------------------------------|----------|----------------------------------------------------------------------------------------------------------------|-------------------|
-| unspecifiedValueHandling      | Integer  | Handling options are **1**: return null **2**: return fictionalized value  **3**: return a configured value    | 1                 |
-| unspecifiedValueReturnMessage | String   | Value to be returned when `unspecifiedValueHandling` is set to **3**                                     | **OTHER**         |
+|-------------------------------|----------|---------------------------------------------------------------------------------|-------------------|
+| unexpectedInputHandler        | String   | One of the handling strategies described in the table below.                    | NULL              |
+| unexpectedInputReturnMessage  | String   | Value to be returned when `unexpectedInputHandler` has the value MESSAGE.  | OTHER             |
 
-For providers that operate using regular expressions, for example, PHONE NUMBER,
-SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, IP\_ADDRESS, and EMAIL,
-an unrecognized value is a value that does not conform to the
+ 
+ 
+| **Handler name**        | **Description**                                                                                                    |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------|
+| NULL                    | Set the field to *null*.                                                                                           | 
+| RANDOM                  | Set the field to a random value generated by the privacy provider.  Not all privacy providers support this option. |
+| MESSAGE                 | Set the field to the value provided in the `unexpectedInputReturnMessage` parameter.                        |
+| ERROR_EXIT              | Returns an error message and stops the privacy protection operation.                                         |
+
+
+For privacy providers that operate using regular expressions, for example, PHONE NUMBER,
+SSN\_US, SSN\_UK, MAC\_ADDRESS, IBAN, CREDIT\_CARD, DATETIME, DATETIME_CONSISTENT_SHIFT, IP\_ADDRESS, and EMAIL,
+an input value that cannot be processed is one that does not conform to the
 specified regular expression.
 
-Similarly, for providers that operate using lookup tables, for example, NAME,
-CITY, COUNTRY, OCCUPATION, and HOSPITAL, an unrecognized value is a value
-that is not part of the corresponding lookup table that is used by the
-privacy provider.
+For privacy providers that operate using lookup tables, for example, NAME,
+CITY, COUNTRY, OCCUPATION, and HOSPITAL, an input that cannot be processed is one that 
+does not appear in the table used by that provider.  
 
-When `unspecifiedValueHandling` is set to **1** (or to a value other than either **2** or
-**3**), any privacy provider that takes as input an unrecognized data value
-returns a null value.
-
-When `unspecifiedValueHandling` is set to **2**, any privacy provider that
-takes as input an unrecognized data value returns a randomly-generated,
-fictionalized value that is valid for the corresponding provider.
-
-Finally, when `unspecifiedValueHandling` is set to **3**, any provider that takes
-as input an unrecognized data value, stores to this value the message
-that is specified in `unspecifiedValueReturnMessage`.  By default, this
-message is set to **OTHER**.
+Note that based on its current configuration, a privacy provider might be able to proceed
+normally even if it does not recognize the input value.  In those cases, normally processing
+occurs instead of the unexpected input processing.
 
 **Exceptions**
 
-These privacy providers ignore the `unspecifiedValueHandling` option:
+These privacy providers ignore the `unexpectedInputHandler` parameter as they do not require input to be in any particular format:
 * CONDITIONAL
+* COUNTY
+* GENDER
 * GENERALIZE
 * GUID
 * HASH
 * MAINTAIN
+* MARITAL
 * NULL
 * PSEUDONYM
+* RACE
 * RANDOM
 * REDACT
+* RELIGION
 * REPLACE
+* STATE_US
    
-These privacy providers treat option 2 of `unspecifiedValueHandling` the same as option 1:
+These privacy providers cannot generate random values and so treat the `unexpectedInputHandler` value **RANDOM** the same as **NULL**:
 * ATC
 * BINNING
+* DATETIME_CONSISTENT_SHIFT
 * NUMBERVARIANCE   
 * URL
 
-#### Exception handling
+## Runtime exception handling
 
-   The data protection methods have to deal with
-   the case of runtime exceptions that may be raised during their operation in
-   the Data De-Identification Service. If a data protection method encounters
-   an exception while attempting to privacy-protect an input data value, it
-   catches the exception, logs a WPH2002E error message to the application
-   log, and returns an empty (null) String as the value of the
-   corresponding data element. 
+If a data protection method encounters an exception while attempting to privacy-protect an input data value, it logs the exception and stops the privacy protection process.  The service attempts to find problems in input data before privacy protection begins.  However, problems such as a sudden loss of communication with external services or databases can occur after privacy protection begins.
 
-   Here is the structure for the error messages that are produced:
-
-| **Message ID** | **Message Text**                                                                                                                                         | **Replacement Variables**                                                                                         |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| WPH2002E       | {0}.{1} – {2} – The data protection method encountered an exception while attempting to transform an input value. The original value has been nullified. | {0}: Provider class name {1}: Provider method name {2}: Exception name,                                           |
-|                |                                                                                                                                                          | resource type, resource ID, and field name                                                                        |
-
-   Here is an example of a produced log message:
-
->   17/07/17 17:00:57 - 100.10.100.10 - WPHDeid - ipv-core - whc-lsf-tenant -
->   ERROR -
->   com.ibm.research.drl.prima.providers.masking.DateTimeMaskingProvider.mask -
->   java.lang.NullPointerException processing field
->   Patient(id=’exampleId123’)/birthDate - The data protection method
->   encountered an exception while attempting to transform an input value. The
->   original value has been nullified.
 

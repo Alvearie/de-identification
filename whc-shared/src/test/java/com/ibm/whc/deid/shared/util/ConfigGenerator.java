@@ -25,7 +25,6 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
-import com.ibm.whc.deid.shared.pojo.config.masking.ConfigConstant;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 
@@ -97,8 +96,7 @@ public class ConfigGenerator {
         Entry<String, JsonNode> field = jsonFields.next();
         String ruleName = field.getKey();
         String type = null;
-        JsonNode defaultMaskingProvider =
-            field.getValue().get(ConfigConstant.DEFAULT_MASKING_PROVIDER);
+        JsonNode defaultMaskingProvider = field.getValue().get("default.masking.provider");
         if (defaultMaskingProvider != null) {
           type = defaultMaskingProvider.asText();
           MaskingProviderConfig config = MaskingProviderConfig

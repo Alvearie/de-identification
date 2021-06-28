@@ -1,361 +1,277 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import com.ibm.whc.deid.models.Country;
-import com.ibm.whc.deid.models.Location;
+import com.ibm.whc.deid.resources.LocalizedResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-/** The type Country manager. */
-public class CountryManager extends AbstractManager<Country>
-    implements Serializable {
-  /** */
-  private static final long serialVersionUID = -1974159797966269524L;
-  protected final Resources resourceType = Resource.COUNTRY;
-	protected final Collection<ResourceEntry> resourceCountryList;
-  protected final SecureRandom random;
-
-  protected final Map<String, MapWithRandomPick<String, Country>[]> countryMap;
-  protected Map<String, List<Location>> countryListMap;
-  protected String tenantId;
-
-  protected static final String allCountriesName = "__all__";
-  private LatLonDistance<Country> distanceCalc;
-
+/**
+ * Class that manages known countries loaded into the service.
+ */
+public class CountryManager implements Manager {
 
   private static final LogManager logger = LogManager.getInstance();
 
+  protected static class CountrySpecificationResourceManager
+      extends LocalizedResourceManager<Country> {
+
+    public CountrySpecificationResourceManager(int expectedCount) {
+      super(expectedCount);
+    }
+
+    protected SecureRandom getRandom() {
+      return random;
+    }
+
+    @Override
+    protected void add(Country resource) {
+      super.add(resource);
+    }
+
+    @Override
+    protected void add(String localeCode, Country resource) {
+      super.add(localeCode, resource);
+    }
+  }
+
+  protected final Resources resourceType = Resource.COUNTRY;
+
+  protected final CountrySpecificationResourceManager countryNames =
+      new CountrySpecificationResourceManager(400);
+  protected final CountrySpecificationResourceManager countryISO2Codes =
+      new CountrySpecificationResourceManager(400);
+  protected final CountrySpecificationResourceManager countryISO3Codes =
+      new CountrySpecificationResourceManager(400);
+
   /**
-   * Gets all countries name.
-   *
-   * @return the all countries name
+   * Instantiates a new country manager.
    */
-  protected final String getAllCountriesName() {
-    return CountryManager.allCountriesName;
+  protected CountryManager() {
+    // nothing required here
   }
 
-  /** Instantiates a new Country manager. 
- * @paramlocalizationProperty location of the localization property file*/
-  public CountryManager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-    this.random = new SecureRandom();
+  /**
+   * Creates a new CountryManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a CountryManager instance
+   * 
+   * @see LocalizationManager
+   */
+  public static CountryManager buildCountryManager(String localizationProperty) {
+    CountryManager manager = new CountryManager();
 
-    this.countryMap = new HashMap<>();
-    this.countryListMap = new HashMap<>();
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(manager.resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-		resourceCountryList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(resourceType);
+        try (InputStream inputStream = entry.createStream()) {
+          String locale = entry.getCountryCode();
+          String fileName = entry.getFilename();
 
-    readResources(resourceType, tenantId);
-
-    for (String key : countryMap.keySet()) {
-      MapWithRandomPick<String, Country>[] cntMap = countryMap.get(key);
-      for (MapWithRandomPick<?, ?> map : cntMap) {
-        map.setKeyList();
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord record : reader) {
+              loadCSVRecord(fileName, locale, manager, record);
+            }
+          }
+        }
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
-    this.distanceCalc = new LatLonDistance(getItemList());
+    return manager;
   }
 
-  protected void readResources(Resources resourceType, String tenantId) {
-    readCountryListFromFile(resourceCountryList);
-  }
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, String locale, CountryManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(locale, manager, record.get(0), record.get(1), record.get(2), record.get(3),
+          record.get(4), record.get(5), record.get(6));
 
-  private MapWithRandomPick<String, Country>[] initCountryMap() {
-    int specSize = CountryNameSpecification.values().length;
-    @SuppressWarnings("unchecked")
-    MapWithRandomPick<String, Country>[] countryMap = new MapWithRandomPick[specSize];
-
-    for (int i = 0; i < countryMap.length; i++) {
-      countryMap[i] = new MapWithRandomPick<>(new HashMap<String, Country>());
-    }
-
-    return countryMap;
-  }
-
-  protected void addToCountryListMap(Country country, String countryCode) {
-    List<Location> countryList = countryListMap.get(countryCode);
-
-    if (countryList == null) {
-      countryList = new ArrayList<>();
-      countryList.add(country);
-      countryListMap.put(countryCode, countryList);
-    } else {
-      countryList.add(country);
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
     }
   }
 
-  private String getPseudorandomElement(List<Location> keys, String key) {
-    Long hash = Math.abs(HashUtils.longFromHash(key));
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param locale the locale or country code to associate with the resource
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(String locale, CountryManager manager, String... record) {
+    String countryName = record[0];
+    String iso2Letter = record[1];
+    String iso3Letter = record[2];
+    String friendlyName = record[3];
+    String continent = record[4];
+    /* TODO: temp fix until data is finished */
+    if ("Unknown".equals(continent)) {
+      continent = null;
+    }
+    String latitude = record[5];
+    String longitude = record[6];
+    manager.add(countryName, iso2Letter, iso3Letter, continent, latitude, longitude, locale,
+        friendlyName);
+  }
 
-    if (keys == null || keys.size() == 0) {
-      return hash.toString();
+  protected void add(String countryName, String iso2Letter, String iso3Letter, String continent,
+      String latitude, String longitude, String countryCode, String friendlyName) {
+    Country country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude,
+        longitude, countryCode, CountryNameSpecification.NAME);
+    countryNames.add(country);
+    countryNames.add(countryCode, country);
+
+    if (friendlyName != null && !friendlyName.trim().isEmpty()) {
+      country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
+          countryCode, CountryNameSpecification.NAME, friendlyName);
+      countryNames.add(country);
+      countryNames.add(countryCode, country);
     }
 
-    int position = (int) (hash % keys.size());
-    return ((Country) (keys.get(position))).getName();
+    if (iso2Letter != null && !iso2Letter.trim().isEmpty()) {
+      country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
+          countryCode, CountryNameSpecification.ISO2);
+      countryISO2Codes.add(country);
+      countryISO2Codes.add(countryCode, country);
+    }
+
+    if (iso3Letter != null && !iso3Letter.trim().isEmpty()) {
+      country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude, longitude,
+          countryCode, CountryNameSpecification.ISO3);
+      countryISO3Codes.add(country);
+      countryISO3Codes.add(countryCode, country);
+    }
   }
 
   public String getPseudorandom(String identifier) {
-    String key = identifier.toUpperCase();
-    Country country = lookupCountry(identifier);
-
-    if (country == null) {
-      return getPseudorandomElement(this.countryListMap.get(allCountriesName), key);
-    } else {
-      String countryCode = country.getNameCountryCode();
-      return getPseudorandomElement(this.countryListMap.get(countryCode), key);
-    }
-  }
-
-  protected void addToCountryMap(Country country, String key, CountryNameSpecification spec,
-      String locale) {
-    MapWithRandomPick<String, Country>[] maps = countryMap.get(locale);
-
-    if (maps == null) {
-      maps = initCountryMap();
-      maps[spec.ordinal()].getMap().put(key, country);
-      countryMap.put(locale, maps);
-    } else {
-      maps[spec.ordinal()].getMap().put(key, country);
-    }
-  }
-
-  protected void readCountryListFromFile(Collection<ResourceEntry> entries) {
-    for (ResourceEntry entry : entries) {
-      String locale = entry.getCountryCode();
-
-      try (CSVParser reader = Readers.createCSVReaderFromStream(entry.createStream())) {
-        for (CSVRecord record : reader) {
-          String countryName = record.get(0).toUpperCase();
-          String iso2Letter = record.get(1).toUpperCase();
-          String iso3Letter = record.get(2).toUpperCase();
-          String friendlyName = record.get(3).toUpperCase();
-          String continent = record.get(4);
-          Double latitude = FileUtils.parseDouble(record.get(5));
-          Double longitude = FileUtils.parseDouble(record.get(6));
-
-          /* TODO: temp fix until data is finished */
-          if (continent.equals("Unknown")) {
-            continue;
-          }
-
-          Country country = new Country(countryName, iso2Letter, iso3Letter, continent, latitude,
-              longitude, locale);
-
-          addToCountryListMap(country, locale);
-          addToCountryListMap(country, getAllCountriesName());
-
-          addToCountryMap(country, countryName, CountryNameSpecification.NAME, locale);
-          addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2, locale);
-          addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3, locale);
-
-          addToCountryMap(country, countryName, CountryNameSpecification.NAME,
-              getAllCountriesName());
-          addToCountryMap(country, iso2Letter, CountryNameSpecification.ISO2,
-              getAllCountriesName());
-          addToCountryMap(country, iso3Letter, CountryNameSpecification.ISO3,
-              getAllCountriesName());
-
-          if (!friendlyName.equals("")) {
-            addToCountryMap(country, friendlyName, CountryNameSpecification.NAME, locale);
-            addToCountryMap(country, friendlyName, CountryNameSpecification.NAME,
-                getAllCountriesName());
-          }
-        }
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
+    CountrySpecificationResourceManager manager = countryNames;
+    Country country = getValue(identifier);
+    if (country != null) {
+      CountryNameSpecification spec = country.getCountryNameSpecification();
+      if (spec == CountryNameSpecification.ISO2) {
+        manager = countryISO2Codes;
+      } else if (spec == CountryNameSpecification.ISO3) {
+        manager = countryISO3Codes;
       }
     }
+    return manager.getPseudorandom(identifier);
   }
 
-  private CountryNameSpecification getSpecificationFromName(String name) {
-    String key = name.toUpperCase();
-    for (CountryNameSpecification e : CountryNameSpecification.values()) {
-      if (this.countryMap.get(getAllCountriesName())[e.ordinal()].getMap().containsKey(key)) {
-        return e;
+  public String getRandomKey() {
+    return countryNames.getRandomKey();
+  }
+
+  /**
+   * Returns the identifier of a random country among the given number of countries closest to the
+   * country identified by the given identifier. The returned identifier of the selected country
+   * will be the one of the same type as the given identifier.
+   *
+   * @param identifier the identifier of the selected country
+   * @param k the number of closest countries to the given country to use as candidates for
+   *        selection
+   * 
+   * @return the identifier of the selected country or <i>null</i> if no country can be selected
+   *         because the given identifier is not recognized or no candidate countries have been
+   *         loaded.
+   */
+  public String getClosestCountry(String identifier, int k) {
+    String selected = null;
+    Country country = getValue(identifier);
+    if (country != null && country.getLocation() != null) {
+      CountryNameSpecification spec = country.getCountryNameSpecification();
+      CountrySpecificationResourceManager manager = countryNames;
+      if (spec == CountryNameSpecification.ISO2) {
+        manager = countryISO2Codes;
+      } else if (spec == CountryNameSpecification.ISO3) {
+        manager = countryISO3Codes;
+      }
+      LatLonDistance<Country> distanceCalc = new LatLonDistance<>(manager.getValues());
+      List<Country> nearest = distanceCalc.findNearestK(country, k);
+      if (!nearest.isEmpty()) {
+        Country selectedCountry = nearest.get(manager.getRandom().nextInt(nearest.size()));
+        selected = selectedCountry.getName(selectedCountry.getCountryNameSpecification());
       }
     }
-
-    return null;
+    return selected;
   }
 
   @Override
-  public String getRandomKey() {
-    return getRandomKey(CountryNameSpecification.NAME);
+  public boolean isValidKey(String identifier) {
+    return getValue(identifier) != null;
   }
 
-  /**
-   * Gets random key.
-   *
-   * @param spec the spec
-   * @return the random key
-   */
-  public String getRandomKey(CountryNameSpecification spec) {
-    MapWithRandomPick<String, Country> map = getSpecificationMap(spec);
-    return map.getRandomKey();
+  public Country getValue(String identifier) {
+    Country country = countryNames.getValue(identifier);
+    if (country == null) {
+      country = countryISO2Codes.getValue(identifier);
+      if (country == null) {
+        country = countryISO3Codes.getValue(identifier);
+      }
+    }
+    return country;
   }
 
-  /**
-   * Gets random key.
-   *
-   * @param spec the spec
-   * @param locale the locale
-   * @return the random key
-   */
-  public String getRandomKey(CountryNameSpecification spec, String locale) {
-    MapWithRandomPick<String, Country> map = countryMap.get(locale)[spec.ordinal()];
-    return map.getRandomKey();
+  public Country getRandomValue() {
+    return getRandomValue(CountryNameSpecification.NAME);
   }
 
-  /**
-   * Gets random key.
-   *
-   * @param identifier the exception country
-   * @param locale the locale
-   * @return the random key
-   */
-  public String getRandomKey(String identifier, String locale) {
-    CountryNameSpecification spec = getSpecificationFromName(identifier);
+  public Country getRandomValue(CountryNameSpecification spec) {
+    Country random = null;
     if (spec == null) {
       spec = CountryNameSpecification.NAME;
     }
-
-    return getRandomKey(spec, locale);
+    switch (spec) {
+      case ISO2:
+        random = countryISO2Codes.getRandomValue();
+        break;
+      case ISO3:
+        random = countryISO3Codes.getRandomValue();
+        break;
+      default:
+        random = countryNames.getRandomValue();
+    }
+    return random;
   }
-
-  /**
-   * Gets closest country.
-   *
-   * @param originalCountry the original country
-   * @param k the k
-   * @return the closest country
-   */
-  public String getClosestCountry(String originalCountry, int k) {
-
-
-    CountryNameSpecification spec = getSpecificationFromName(originalCountry);
-    if (spec == null) {
-      return getRandomKey(CountryNameSpecification.NAME);
-    }
-
-    MapWithRandomPick<String, Country> lookupMap = getSpecificationMap(spec);
-    if (lookupMap == null) {
-      return getRandomKey(spec);
-    }
-
-    String key = originalCountry.toUpperCase();
-    Country lookupResult = lookupMap.getMap().get(key);
-
-    List<Country> nearest = distanceCalc.findNearestK(lookupResult, k);
-    if (nearest == null) {
-      return getRandomKey(spec);
-    }
-    return (nearest.get(random.nextInt(nearest.size())).getName());
-  }
-
-  private MapWithRandomPick<String, Country> getSpecificationMap(CountryNameSpecification spec) {
-    return countryMap.get(getAllCountriesName())[spec.ordinal()];
-  }
-
-  /**
-   * Is valid country boolean.
-   *
-   * @param countryName the country name
-   * @param domain the domain
-   * @return the boolean
-   */
-  public boolean isValidCountry(String countryName, CountryNameSpecification domain) {
-    String key = countryName.toUpperCase();
-    MapWithRandomPick<?, ?> map = null;
-
-    map = getSpecificationMap(domain);
-    if (map == null) {
-      return false;
-    }
-
-    return map.getMap().containsKey(key);
-  }
-
-  /**
-   * Lookup country country.
-   *
-   * @param country the country
-   * @param locale the locale
-   * @return the country
-   */
-  public Country lookupCountry(String country, String locale) {
-    String key = country.toUpperCase();
-
-    if (locale == null) {
-      locale = getAllCountriesName();
-    }
-
-    MapWithRandomPick<String, Country>[] maps = countryMap.get(locale);
-    if (maps == null) {
-      return null;
-    }
-
-    for (CountryNameSpecification e : CountryNameSpecification.values()) {
-      Country res = maps[e.ordinal()].getMap().get(key);
-      if (res != null) {
-        return res;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Lookup country country.
-   *
-   * @param country the country
-   * @return the country
-   */
-  public Country lookupCountry(String country) {
-    return lookupCountry(country, null);
-  }
-
-  @Override
-  public boolean isValidKey(String country) {
-    String key = country.toUpperCase();
-    for (CountryNameSpecification e : CountryNameSpecification.values()) {
-      if (countryMap.get(getAllCountriesName())[e.ordinal()].getMap().containsKey(key)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @Override
-  public Collection<Country> getItemList() {
-    List<Country> list = new ArrayList<>();
-
-    for (Location location : countryListMap.get(getAllCountriesName())) {
-      list.add((Country) location);
-    }
-
-    return list;
-  }
-
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,112 +7,180 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
 import com.ibm.whc.deid.models.ICD;
 import com.ibm.whc.deid.models.ICDFormat;
+import com.ibm.whc.deid.models.ICDWithoutFormat;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-/** The type Ic dv 9 manager. */
-public class ICDv9Manager implements Manager, Serializable {
-  /** */
-  private static final long serialVersionUID = -5865782878844917863L;
+/**
+ * Class that manages ICD version 9 codes loaded into the service.
+ */
+public class ICDv9Manager implements Manager {
 
-	protected final Collection<ResourceEntry> resourceICDList;
+  private static final LogManager logger = LogManager.getInstance();
 
-  protected final MapWithRandomPick<String, ICD> icdByCodeMap;
-  protected final MapWithRandomPick<String, ICD> icdByNameMap;
+  protected static final Resources resourceType = Resource.ICDV9;
 
-  private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.ICDV9;
+  // The number of codes expected to be loaded from the resource file.
+  // Modify this value if the resource file is modified.
+  private static final int EXPECTED_COUNT = 15000;
 
-  protected final String tenantId;
+  private final SecureRandom random = new SecureRandom();
 
-  	/**
-	 * Instantiates a new Ic dv 9 manager.
-	 *
-	 * @param tenantId
-	 * @paramlocalizationProperty location of the localization property file
-	 */
-	public ICDv9Manager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-		resourceICDList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.ICDV9);
-    this.icdByCodeMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
-    this.icdByNameMap = new MapWithRandomPick<>(new HashMap<String, ICD>());
+  private final ArrayList<ICDWithoutFormat> icdList;
+  private final HashMap<String, ICDWithoutFormat> icdByCodeMap;
+  private final HashMap<String, ICDWithoutFormat> icdByNameMap;
+  private final HashMap<String, ICDWithoutFormat> icdByShortMap;
 
-    readResources(resourceType, tenantId);
-
-    this.icdByCodeMap.setKeyList();
-    this.icdByNameMap.setKeyList();
-  }
-
-  protected void readResources(Resources resourceType, String tenantId) {
-    readICDList(resourceICDList);
-  }
-
-  protected void readICDList(Collection<ResourceEntry> entries) {
-
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-
-      try (CSVParser parser = Readers.createCSVReaderFromStream(inputStream, ';', '"')) {
-        for (CSVRecord record : parser) {
-          String code = record.get(0);
-          String shortName = record.get(1);
-          String fullName = record.get(2);
-          String chapterCode = record.get(3);
-          String chapterName = record.get(4);
-          String categoryCode = record.get(5);
-          String categoryName = record.get(6);
-
-          ICD ICDv9CodeRepr = new ICD(code, shortName, fullName, chapterCode, chapterName,
-              categoryCode, categoryName, ICDFormat.CODE);
-          ICD ICDv9NameRepr = new ICD(code, shortName, fullName, chapterCode, chapterName,
-              categoryCode, categoryName, ICDFormat.NAME);
-
-          this.icdByCodeMap.getMap().put(code, ICDv9CodeRepr);
-          this.icdByNameMap.getMap().put(shortName.toUpperCase(), ICDv9NameRepr);
-          this.icdByNameMap.getMap().put(fullName.toUpperCase(), ICDv9NameRepr);
-        }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
-      }
-    }
-  }
-
-  @Override
-  public String getRandomKey() {
-    return this.icdByCodeMap.getRandomKey();
+  protected ICDv9Manager() {
+    icdList = new ArrayList<>(EXPECTED_COUNT);
+    int hashMapInitialSize = Math.round(EXPECTED_COUNT / 0.75f) + 1;
+    icdByCodeMap = new HashMap<>(hashMapInitialSize, 0.75f);
+    icdByNameMap = new HashMap<>(hashMapInitialSize, 0.75f);
+    icdByShortMap = new HashMap<>(hashMapInitialSize, 0.75f);
   }
 
   /**
-   * Lookup icd icd.
-   *
-   * @param codeOrName the code or name
-   * @return the icd
+   * Creates a new ICDv10Manager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a ICDv10Manager instance
+   * 
+   * @see LocalizationManager
    */
-  public ICD lookupICD(String codeOrName) {
-    String key = codeOrName.toUpperCase();
-    ICD ICDv9;
+  public static ICDv9Manager buildICDv9Manager(String localizationProperty) {
+    ICDv9Manager manager = new ICDv9Manager();
 
-    if ((ICDv9 = this.icdByCodeMap.getMap().get(key)) != null) {
-      return ICDv9;
-    } else if ((ICDv9 = this.icdByNameMap.getMap().get(key)) != null) {
-      return ICDv9;
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
+
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
+
+          try (CSVParser parser = Readers.createCSVReaderFromStream(inputStream, ';', '"')) {
+            for (CSVRecord record : parser) {
+              loadCSVRecord(fileName, manager, record);
+            }
+          }
+        }
+      }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
+    return manager;
+  }
+
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, ICDv9Manager manager, CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1), record.get(2), record.get(3), record.get(4),
+          record.get(5), record.get(6));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(ICDv9Manager manager, String... record) {
+    String code = record[0];
+    String shortName = record[1];
+    String fullName = record[2];
+    String chapterCode = record[3];
+    String chapterName = record[4];
+    String categoryCode = record[5];
+    String categoryName = record[6];
+
+    manager.add(new ICDWithoutFormat(code, shortName, fullName, chapterCode, chapterName,
+        categoryCode, categoryName));
+  }
+
+  protected void add(ICDWithoutFormat icdCode) {
+    icdList.add(icdCode);
+    icdByCodeMap.put(icdCode.getCode().toUpperCase(), icdCode);
+    icdByNameMap.put(icdCode.getFullName().toUpperCase(), icdCode);
+    icdByShortMap.put(icdCode.getShortName().toUpperCase(), icdCode);
+  }
+
+  public String getRandomValue(ICDFormat format) {
+    String value = null;
+    ICDWithoutFormat icd = null;
+    int count = this.icdList.size();
+    if (count == 1) {
+      icd = this.icdList.get(0);
+    } else if (count > 1) {
+      icd = this.icdList.get(random.nextInt(count));
+    }
+    if (icd != null) {
+      value = format == ICDFormat.NAME ? icd.getFullName() : icd.getCode();
+    }
+    return value;
+  }
+
+  /**
+   * Retrieve an ICD code by its code or name.
+   *
+   * @param codeOrName the code or name
+   * @return the corresponding ICD code or <i>null</i> if no such code is loaded.
+   */
+  public ICD lookupICD(String codeOrName) {
+    if (codeOrName != null) {
+      String key = codeOrName.toUpperCase();
+
+      ICDWithoutFormat icd = this.icdByCodeMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.CODE);
+      }
+
+      icd = this.icdByNameMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.NAME);
+      }
+
+      icd = this.icdByShortMap.get(key);
+      if (icd != null) {
+        return new ICD(icd, ICDFormat.NAME);
+      }
+    }
     return null;
   }
 
@@ -120,5 +188,4 @@ public class ICDv9Manager implements Manager, Serializable {
   public boolean isValidKey(String codeOrName) {
     return lookupICD(codeOrName) != null;
   }
-
 }

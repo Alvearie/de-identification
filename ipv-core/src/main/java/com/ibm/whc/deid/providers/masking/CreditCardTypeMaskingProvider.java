@@ -1,55 +1,42 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.util.Map;
-
-import com.ibm.whc.deid.models.CreditCard;
-import com.ibm.whc.deid.models.OriginalMaskedValuePair;
-import com.ibm.whc.deid.schema.FieldRelationship;
-import com.ibm.whc.deid.util.CreditCardManager;
+import com.ibm.whc.deid.models.CreditCardType;
+import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
+import com.ibm.whc.deid.util.ManagerFactory;
 
 public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = 3375383479009603851L;
 
-  private final CreditCardTypeManager ccTypeManager;
-  private final CreditCardManager creditCardManager;
+  protected transient volatile CreditCardTypeManager ccTypeManager = null;
 
   /**
    * Instantiates a new Credit card type masking provider.
    * 
-   * @param tenantId TODO
+   * @param tenantId the tenant associated with the current request
    * @paramlocalizationProperty location of the localization property file
    */
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
     super(tenantId, localizationProperty);
-
-    creditCardManager = new CreditCardManager(localizationProperty);
-    ccTypeManager = new CreditCardTypeManager(tenantId, localizationProperty);
   }
 
-  @Override
-  public String mask(String identifier, String fieldName, FieldRelationship fieldRelationship,
-      Map<String, OriginalMaskedValuePair> values) {
-    try {
-      String ccFieldName = fieldRelationship.getOperands()[0].getName();
-      String maskedCC = values.get(ccFieldName).getMasked();
-      CreditCard creditCard = creditCardManager.lookupInfo(maskedCC);
-
-      return (creditCard == null) ? mask(identifier) : creditCard.getName();
-    } catch (Exception e) {
-      logException(e);
-      return null;
+  protected CreditCardTypeManager getCreditCardTypeManager() {
+    if (ccTypeManager == null) {
+      ccTypeManager = (CreditCardTypeManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CREDIT_CARD_TYPE, null, localizationProperty);
     }
+    return ccTypeManager;
   }
 
   @Override
   public String mask(String identifier) {
-    return ccTypeManager.getRandomKey();
+    CreditCardType ccType = getCreditCardTypeManager().getRandomValue();
+    return ccType == null ? null : ccType.getName();
   }
 }

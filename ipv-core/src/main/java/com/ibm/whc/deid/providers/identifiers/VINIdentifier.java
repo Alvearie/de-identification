@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,12 +26,10 @@ import com.ibm.whc.deid.util.VINManager;
  */
 
 public class VINIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -1445672279609421242L;
 
-	protected volatile boolean initialized = false;
-
-	private VINManager vinManager;
+    protected transient volatile VINManager vinManager = null;
 
 	public VINIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -56,13 +54,11 @@ public class VINIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			vinManager = (VINManager) ManagerFactory.getInstance().getManager(tenantId,
-					Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
-
-			initialized = true;
-		}
-		return vinManager;
+      if (vinManager == null) {
+        vinManager = (VINManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.WORLD_MANUFACTURERS_IDENTIFIER, null, localizationProperty);
+      }
+      return vinManager;
 	}
 
 	@Override

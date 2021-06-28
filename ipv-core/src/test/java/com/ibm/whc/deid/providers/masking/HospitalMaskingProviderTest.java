@@ -1,96 +1,122 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import java.util.Arrays;
+import java.util.HashSet;
 import org.junit.Test;
-
-import com.ibm.whc.deid.models.Hospital;
-import com.ibm.whc.deid.providers.identifiers.HospitalIdentifier;
-import com.ibm.whc.deid.providers.identifiers.Identifier;
-import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.HospitalMaskingProviderConfig;
-import com.ibm.whc.deid.util.HospitalManager;
-import com.ibm.whc.deid.util.ManagerFactory;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
-public class HospitalMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
+public class HospitalMaskingProviderTest implements MaskingProviderTest {
 
-  private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
   /*
-   * Tests for hospital.mask.preserveCountry option and its boolean values (true and false). It also
-   * tests for the localization of the hospital.
+   * Tests for preserveCountry option and its boolean values (true and false). It also tests for the
+   * localization of the hospital.
    */
+
+  public static final HashSet<String> TEST_HOSPITALS_US =
+      new HashSet<>(Arrays.asList("Jarrett Hospital", "Susan Clinic", "Olmsted Clinic"));
+  public static final HashSet<String> TEST_HOSPITALS_CA = new HashSet<>(
+      Arrays.asList("Dumas Urgent Care", "Denis Medical Group", "Chris Community Hospital"));
 
   @Test
   public void testMask() {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setMaskPreserveCountry(false);
-
-    MaskingProvider maskingProvider =
+    HospitalMaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-    String hospitalName = "York Hospital";
-    String maskedValue = maskingProvider.mask(hospitalName);
 
-    assertFalse(hospitalName.equalsIgnoreCase(maskedValue));
+    boolean changed = false;
+    String hospitalName = "Hospital San Francisco";
+    for (int i = 0; i < 20; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertNotNull(maskedValue);
+      assertNotEquals("OTHER", maskedValue);
+      maskingProvider.getHospitalManager().isValidKey(maskedValue);
+      if (!hospitalName.equalsIgnoreCase(maskedValue)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    hospitalName = "XXXXX";
+    for (int i = 0; i < 20; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertNotNull(maskedValue);
+      assertNotEquals("OTHER", maskedValue);
+      maskingProvider.getHospitalManager().isValidKey(maskedValue);
+    }
+  }
+  
+  @Test
+  public void testMask_multiCountry() {
+    HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
+    configuration.setMaskPreserveCountry(false);
+    HospitalMaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
+
+    boolean changed = false;
+    String hospitalName = TEST_HOSPITALS_US.iterator().next();
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertTrue(maskedValue,
+          TEST_HOSPITALS_US.contains(maskedValue) || TEST_HOSPITALS_CA.contains(maskedValue));
+      if (!hospitalName.equals(maskedValue)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+
+    hospitalName = "unknown";
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertTrue(maskedValue,
+          TEST_HOSPITALS_US.contains(maskedValue) || TEST_HOSPITALS_CA.contains(maskedValue));
+    }
   }
 
   @Test
   public void testMaskPreserveCountry() {
-    // the preserve country option by default is true.
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
+    // the preserve country option by default is true.
+    HospitalMaskingProvider maskingProvider =
+        new HospitalMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
-    MaskingProvider maskingProvider =
-        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-    String hospitalName = "York Hospital";
-
-    int randomizationOK = 0;
+    boolean changed = false;
+    String hospitalName = TEST_HOSPITALS_US.iterator().next();
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(hospitalName);
-
-      if (!maskedValue.toUpperCase().equals(hospitalName.toUpperCase())) {
-        randomizationOK++;
+      assertTrue(maskedValue, TEST_HOSPITALS_US.contains(maskedValue));
+      if (!hospitalName.equals(maskedValue)) {
+        changed = true;
       }
-
-      HospitalManager hospitalManager =
-          (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
-              Resource.HOSPITAL_NAMES, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-      Hospital original = hospitalManager.getKey(hospitalName);
-      Hospital masked = hospitalManager.getKey(maskedValue);
-
-      assertTrue(original.getNameCountryCode().equals(masked.getNameCountryCode()));
     }
+    assertTrue(changed);
 
-    assertTrue(randomizationOK > 0);
-  }
-
-
-
-  @Test
-  public void testMaskNullHospitalInputReturnNull() throws Exception {
-    HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    MaskingProvider maskingProvider =
-        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidHospital = null;
-    String maskedHospital = maskingProvider.mask(invalidHospital);
-
-    assertEquals(null, maskedHospital);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    changed = false;
+    hospitalName = TEST_HOSPITALS_CA.iterator().next();
+    for (int i = 0; i < 100; i++) {
+      String maskedValue = maskingProvider.mask(hospitalName);
+      assertTrue(maskedValue, TEST_HOSPITALS_CA.contains(maskedValue));
+      if (!hospitalName.equals(maskedValue)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
   }
 
   @Test
   public void testMaskInvalidHospitalInputValidHandlingReturnNull() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -98,67 +124,61 @@ public class HospitalMaskingProviderTest extends TestLogSetUp implements Masking
     String maskedHospital = maskingProvider.mask(invalidHospital);
 
     assertEquals(null, maskedHospital);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
   }
 
   @Test
   public void testMaskInvalidHospitalInputValidHandlingReturnRandom() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
-        new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
-    Identifier identifier = new HospitalIdentifier(tenantId, localizationProperty);
+        new HospitalMaskingProvider(configuration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
-
-    assertFalse(maskedHospital.equals(invalidHospital));
-    assertTrue(identifier.isOfThisType(maskedHospital));
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertTrue(maskedHospital,
+        TEST_HOSPITALS_US.contains(maskedHospital) || TEST_HOSPITALS_CA.contains(maskedHospital));
   }
 
   @Test
-  public void testMaskInvalidHospitalInputValidHandlingReturnDefaultCustomValue() throws Exception {
+  public void testMaskInvalidHospitalInputValidHandlingReturnCustomValue() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("New Hospital");
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
-
-    assertEquals("OTHER", maskedHospital);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertEquals("New Hospital", maskedHospital);
   }
 
   @Test
-  public void testMaskInvalidHospitalInputValidHandlingReturnNonDefaultCustomValue()
+  public void testMaskInvalidHospitalInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     configuration.setUnspecifiedValueReturnMessage("Test Hospital");
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
-
-    assertEquals("Test Hospital", maskedHospital);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    assertEquals("OTHER", maskedHospital);
   }
 
   @Test
-  public void testMaskInvalidHospitalInputInvalidHandlingReturnNull() throws Exception {
+  public void testMaskInvalidHospitalInputValidHandlingExit() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
+    configuration.setUnspecifiedValueReturnMessage("Test Hospital");
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
-    String maskedHospital = maskingProvider.mask(invalidHospital);
-
-    assertEquals(null, maskedHospital);
-    assertThat(outContent.toString(), containsString("WARN - WPH1011W"));
+    try {
+      maskingProvider.mask(invalidHospital);
+    } catch (PrivacyProviderInvalidInputException e) {
+      assertTrue(e.getMessage().contains(invalidHospital));
+    }
   }
-
 }

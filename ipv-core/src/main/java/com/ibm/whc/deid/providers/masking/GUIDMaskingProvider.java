@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,7 +9,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.GUIDMaskingProviderConfig;
 import java.util.UUID;
 
 public class GUIDMaskingProvider extends AbstractMaskingProvider {
-  /** */
+
   private static final long serialVersionUID = -2402304401477755175L;
 
   /** Instantiates a new Guid masking provider. */
@@ -24,11 +24,6 @@ public class GUIDMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    try {
-      return UUID.randomUUID().toString();
-    } catch (Exception e) {
-      logException(e);
-      return null;
-    }
+    return UUID.randomUUID().toString();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,13 +15,16 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.OccupationManager;
 
+/**
+ * Class to identify the names of occupations based on names loaded into the service.
+ */
 public class OccupationIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = 8852489168068969429L;
 
 	private static final String[] appropriateNames = { "Job", "Occupation" };
-	private OccupationManager occupationManager;
-	protected volatile boolean initialized = false;
+
+    protected transient volatile OccupationManager occupationManager = null;
 
 	public OccupationIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -29,14 +32,11 @@ public class OccupationIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(tenantId,
-					Resource.OCCUPATION,
-					null, localizationProperty);
-
-			initialized = true;
-		}
-		return occupationManager;
+      if (occupationManager == null) {
+        occupationManager = (OccupationManager) ManagerFactory.getInstance().getManager(tenantId,
+            Resource.OCCUPATION, null, localizationProperty);
+      }
+      return occupationManager;
 	}
 
 	@Override

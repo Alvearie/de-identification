@@ -7,130 +7,123 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
-import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.PostalCode;
+import com.ibm.whc.deid.resources.ResourceManager;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class PostalCodeManager implements Manager, Serializable {
-
-  private static final long serialVersionUID = -5126260477789733871L;
-
-	protected final Collection<ResourceEntry> resourceList;
-  protected final MapWithRandomPick<String, PostalCode> postalCodeMap;
-  protected List<PostalCode> postalCodeList;
-  private LatLonDistance<PostalCode> latLonTree = null;
+public class PostalCodeManager extends ResourceManager<PostalCode> {
 
   private static LogManager logger = LogManager.getInstance();
-  protected final Resources resourceType = Resource.POSTAL_CODES;
 
-  protected final String tenantId;
+  protected static final Resources resourceType = Resource.POSTAL_CODES;
 
-  public PostalCodeManager(String tenantId, String localizationProperty) {
-    this.tenantId = tenantId;
-		resourceList = LocalizationManager.getInstance(localizationProperty)
-				.getResources(Resource.POSTAL_CODES);
-    this.postalCodeList = new ArrayList<>();
-
-    this.postalCodeMap = new MapWithRandomPick<>(new HashMap<String, PostalCode>());
-
-    readResources(resourceType, tenantId);
-    this.postalCodeMap.setKeyList();
-
-    try {
-      this.latLonTree = new LatLonDistance<>(postalCodeList);
-    } catch (Exception e) {
-      logger.logError(LogCodes.WPH1013E, e);
-    }
-
-  }
-
-  protected void readResources(Resources resourceType, String tenantId) {
-    this.postalCodeMap.getMap().putAll(readPostalCodeCodeListFromFile(resourceList));
+  protected PostalCodeManager() {
+    super(44000);
   }
 
   /**
-   * Read postal code list from the default CSV file
-   *
-   * @param entries
-   * @return
+   * Creates a new PostalCodeManager instance from the definitions in the given properties file.
+   * 
+   * @param localizationProperty path and file name of a properties file consumed by the
+   *        LocalizationManager to find the resources for this manager instance.
+   * 
+   * @return a PostalCodeManager instance
+   * 
+   * @see LocalizationManager
    */
-  protected Map<? extends String, ? extends PostalCode> readPostalCodeCodeListFromFile(
-      Collection<ResourceEntry> entries) {
-    Map<String, PostalCode> postals = new HashMap<>();
+  public static PostalCodeManager buildPostalCodeManager(String localizationProperty) {
+    PostalCodeManager manager = new PostalCodeManager();
 
-    for (ResourceEntry entry : entries) {
-      InputStream inputStream = entry.createStream();
-      entry.getCountryCode();
+    try {
+      Collection<ResourceEntry> resourceEntries =
+          LocalizationManager.getInstance(localizationProperty).getResources(resourceType);
+      for (ResourceEntry entry : resourceEntries) {
 
-      try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
-        for (CSVRecord line : reader) {
-          line.get(0);
-          String code = line.get(1);
-          Double latitude = FileUtils.parseDouble(line.get(2));
-          Double longitude = FileUtils.parseDouble(line.get(3));
-          /* TODO : replace hardcoded locale */
-          PostalCode postalCode = new PostalCode(code, latitude, longitude);
-          this.postalCodeList.add(postalCode);
-          postals.put(code.toUpperCase(), postalCode);
+        try (InputStream inputStream = entry.createStream()) {
+          String fileName = entry.getFilename();
+
+          try (CSVParser reader = Readers.createCSVReaderFromStream(inputStream)) {
+            for (CSVRecord line : reader) {
+              loadCSVRecord(fileName, manager, line);
+            }
+          }
         }
-        inputStream.close();
-      } catch (IOException | NullPointerException e) {
-        logger.logError(LogCodes.WPH1013E, e);
       }
+    } catch (IOException e) {
+      logger.logError(LogCodes.WPH1013E, e);
+      throw new RuntimeException(e);
     }
 
-    return postals;
+    return manager;
   }
 
-  public String getPseudorandom(String identifier) {
-    int position =
-        (int) (Math.abs(HashUtils.longFromHash(identifier)) % this.postalCodeList.size());
-    return this.postalCodeList.get(position).getName();
+  /**
+   * Retrieves data from the given Comma-Separated Values (CSV) record and loads it into the given
+   * resource manager.
+   *
+   * @param fileName the name of the file from which the CSV data was obtained - used for logging
+   *        and error messages
+   * @param manager the resource manager
+   * @param record a single record read from a source that provides CSV format data
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadCSVRecord(String fileName, PostalCodeManager manager,
+      CSVRecord record) {
+    try {
+      loadRecord(manager, record.get(0), record.get(1), record.get(2), record.get(3));
+
+    } catch (RuntimeException e) {
+      // CSVRecord has a very descriptive toString() implementation
+      String logmsg =
+          Messages.getMessage(LogCodes.WPH1023E, String.valueOf(record), fileName, e.getMessage());
+      throw new KeyedRuntimeException(LogCodes.WPH1023E, logmsg, e);
+    }
+  }
+
+  /**
+   * Retrieves data from the given record and loads it into the given resource manager.
+   *
+   * @param manager the resource manager
+   * @param record the data from an input record to be loaded as resources into the manager
+   * 
+   * @throws RuntimeException if any of the data in the record is invalid for its target purpose.
+   */
+  protected static void loadRecord(PostalCodeManager manager, String... record) {
+    // TODO: take advantage of country code in column 0, which is currently unused
+    String code = record[1];
+    String latitude = record[2];
+    String longitude = record[3];
+    PostalCode postalCode = new PostalCode(code, latitude, longitude);
+    manager.add(postalCode);
   }
 
   /**
    * Gets closest postal codes.
    *
-   * @param postalCode the postal code
-   * @param k the k
-   * @return the closest postal codes
+   * @param postalCode the postal code identifier
+   * @param k the maximum number of the closest postal codes to return
+   * @return the non-null, possibly-empty list of up to the given number of closest known postal
+   *         codes
    */
   public List<PostalCode> getClosestPostalCodes(String postalCode, int k) {
-    String key = postalCode.toUpperCase();
-    PostalCode lookup = this.postalCodeMap.getMap().get(key);
-
-    if (lookup == null) {
+    PostalCode lookup = getValue(postalCode);
+    if (lookup == null || lookup.getLocation() == null) {
       return new ArrayList<>();
     }
-
-    LatitudeLongitude latlon = lookup.getLocation();
-
-    return this.latLonTree.findNearestK(latlon.getLatitude(), latlon.getLongitude(), k);
+    LatLonDistance<PostalCode> calc = new LatLonDistance<>(getValues());
+    return calc.findNearestK(lookup.getLocation(), k);
   }
-
-  @Override
-  public String getRandomKey() {
-    return this.postalCodeMap.getRandomKey();
-  }
-
-  @Override
-  public boolean isValidKey(String postalCode) {
-    return postalCodeMap.getMap().containsKey(postalCode.toUpperCase());
-  }
-
 }

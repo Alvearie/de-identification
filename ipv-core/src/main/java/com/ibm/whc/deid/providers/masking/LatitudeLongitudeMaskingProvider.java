@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -36,15 +36,13 @@ public class LatitudeLongitudeMaskingProvider extends AbstractMaskingProvider {
   private final LatitudeLongitudeIdentifier latitudeLongitudeIdentifier =
       new LatitudeLongitudeIdentifier();
 
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
-
   /**
    * Instantiates a new Latitude longitude masking provider.
    *
    * @param configuration the configuration
    */
   public LatitudeLongitudeMaskingProvider(LatitudeLongitudeMaskingProviderConfig configuration) {
+    super(configuration);
 
     this.randomWithinCircle = configuration.isMaskRandomWithinCircle();
     this.donutMasking = configuration.isMaskDonutMasking();
@@ -52,9 +50,6 @@ public class LatitudeLongitudeMaskingProvider extends AbstractMaskingProvider {
 
     this.minimumOffsetRadius = configuration.getOffsetMinimumRadius();
     this.maximumOffsetRadius = configuration.getOffsetMaximumRadius();
-
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
 
     if (this.maximumOffsetRadius <= LatitudeLongitudeMaskingProviderConfig.MINIMUM_OFFSET) {
       throw new IllegalArgumentException(
@@ -78,18 +73,16 @@ public class LatitudeLongitudeMaskingProvider extends AbstractMaskingProvider {
     if (this.randomWithinCircle) {
       randomLatLon =
           RandomGenerators.generateRandomCoordinate(latitudeLongitude, this.maximumOffsetRadius);
+
     } else if (this.donutMasking) {
       randomLatLon = RandomGenerators.generateRandomCoordinate(latitudeLongitude,
           this.minimumOffsetRadius, this.maximumOffsetRadius);
-    } else if (this.fixedRadiusRandomDirection) {
+
+    } else { // this.fixedRadiusRandomDirection
       randomLatLon = RandomGenerators.generateRandomCoordinateRandomDirection(latitudeLongitude,
           this.maximumOffsetRadius);
-    } else {
-      randomLatLon = RandomGenerators.generateRandomCoordinate();
     }
-    randomLatLon.setFormat(latitudeLongitude.getFormat());
-
-    return randomLatLon.toString();
+    return randomLatLon.toString(latitudeLongitude.getFormat());
   }
 
   @Override
@@ -100,17 +93,17 @@ public class LatitudeLongitudeMaskingProvider extends AbstractMaskingProvider {
     }
 
     LatitudeLongitude latitudeLongitude = latitudeLongitudeIdentifier.parseCoordinate(identifier);
-    if (latitudeLongitude == null) {
-      debugFaultyInput("latitudeLongitude");
-      if (unspecifiedValueHandling == 2) {
-        return RandomGenerators.generateRandomCoordinate().toString();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
+
+    if (this.randomWithinCircle || this.donutMasking || this.fixedRadiusRandomDirection) {
+      if (latitudeLongitude == null) {
+        return applyUnexpectedValueHandling(identifier,
+            () -> RandomGenerators.generateRandomCoordinate().toString());
       }
+      return mask(latitudeLongitude);
     }
 
-    return mask(latitudeLongitude);
+    LatitudeLongitude randomLatLon = RandomGenerators.generateRandomCoordinate();
+    return latitudeLongitude == null ? randomLatLon.toString()
+        : randomLatLon.toString(latitudeLongitude.getFormat());
   }
 }

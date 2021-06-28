@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -19,30 +19,25 @@ import com.ibm.whc.deid.util.RandomGenerators;
  *
  */
 public class PhoneMaskingProvider extends AbstractMaskingProvider {
-  /** */
+  
   private static final long serialVersionUID = -8562773893937629362L;
 
-  protected MSISDNManager msisdnManager;
+  protected transient volatile MSISDNManager msisdnManager = null;
+  
   private final boolean preserveCountryCode;
   private final boolean preserveAreaCode;
   private final String invNdigitsReplaceWith;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
   private final List<String> phoneRegexPatterns;
 
   private final PhoneIdentifier phoneIdentifier;
 
-  protected volatile boolean initialized = false;
-
   public PhoneMaskingProvider(PhoneMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.random = new SecureRandom();
     this.preserveCountryCode = configuration.isCountryCodePreserve();
     this.preserveAreaCode = configuration.isAreaCodePreserve();
     this.invNdigitsReplaceWith = configuration.getInvNdigitsReplaceWith();
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
     this.phoneRegexPatterns = configuration.getPhoneRegexPatterns();
     this.phoneIdentifier =
         new PhoneIdentifier(this.phoneRegexPatterns, tenantId, localizationProperty);
@@ -50,15 +45,11 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   private String generateRandomPhoneNumber(String countryCode) {
     String separator = "-";
-    int countryCodeDigits;
-    if (msisdnManager.isCountryWithValidDigitMap(countryCode)) {
-      countryCodeDigits = msisdnManager.getRandomPhoneNumberDigitsByCountry(countryCode);
-    } else {
-      countryCode = "1";
-      countryCodeDigits = msisdnManager.getRandomPhoneNumberDigitsByCountry("1");
-    }
-    String phoneNumber = RandomGenerators.generateRandomDigitSequence(countryCodeDigits);
-
+    Integer countryCodeDigits = getMSISDNManager().getRandomPhoneNumberDigitsByCountry(countryCode);
+    if (countryCodeDigits == null) {
+      countryCodeDigits = getMSISDNManager().getRandomPhoneNumberDigitsByCountry("1");
+    }    
+    String phoneNumber = RandomGenerators.generateRandomDigitSequence(countryCodeDigits == null ? 10 : countryCodeDigits.intValue());
     return "+" + countryCode + separator + phoneNumber;
   }
 
@@ -73,9 +64,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     if (this.preserveCountryCode || phoneNumber.getCountryCode() == null) {
       countryCode = phoneNumber.getCountryCode();
     } else {
-      countryCode = msisdnManager.getRandomCountryCode();
+      countryCode = getMSISDNManager().getRandomCountryCode();
     }
-
     return countryCode;
   }
 
@@ -142,12 +132,12 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
           sb.append(c);
         }
       }
-    } else {
-      int phoneNumberDigits;
-      if (!msisdnManager.isCountryWithValidDigitMap(countryCode)) {
-        countryCode = "1";
-      }
-      phoneNumberDigits = msisdnManager.getRandomPhoneNumberDigitsByCountry(countryCode);
+    } else {            
+      Integer countryCodeDigits = getMSISDNManager().getRandomPhoneNumberDigitsByCountry(countryCode);
+      if (countryCodeDigits == null) {
+        countryCodeDigits = getMSISDNManager().getRandomPhoneNumberDigitsByCountry("1");
+      }    
+      int phoneNumberDigits = countryCodeDigits == null ? 10 : countryCodeDigits.intValue();
       for (int idx = 0; idx < phoneNumberDigits; idx++) {
         char c = (char) ('0' + random.nextInt(10));
         sb.append(c);
@@ -158,7 +148,6 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
 
   @Override
   public String mask(String identifier) {
-    initialize();
     if (identifier == null) {
       debugFaultyInput("identifier");
       return null;
@@ -167,13 +156,8 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     PhoneNumber phoneNumber = phoneIdentifier.getPhoneNumber(identifier);
     if (phoneNumber == null) {
       debugFaultyInput("phoneNumber");
-      if (unspecifiedValueHandling == 2) {
-        return generateRandomPhoneNumber(invNdigitsReplaceWith);
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier,
+          () -> generateRandomPhoneNumber(invNdigitsReplaceWith));
     }
 
     String maskedCountryCode = maskCountryCode(phoneNumber);
@@ -199,10 +183,10 @@ public class PhoneMaskingProvider extends AbstractMaskingProvider {
     return maskedPhone;
   }
 
-  protected void initialize() {
-    if (!initialized) {
-      msisdnManager = new MSISDNManager(null, localizationProperty);
-      initialized = true;
+  protected MSISDNManager getMSISDNManager() {
+    if (msisdnManager == null) {
+      msisdnManager = MSISDNManager.buildMSISDNManager(tenantId, localizationProperty);
     }
+    return msisdnManager;
   }
 }

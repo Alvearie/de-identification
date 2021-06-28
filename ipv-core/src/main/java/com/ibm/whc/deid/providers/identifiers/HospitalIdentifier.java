@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,14 +16,12 @@ import com.ibm.whc.deid.util.Manager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
 public class HospitalIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
+
 	private static final long serialVersionUID = -4815875246610729706L;
 
 	private final String[] appropriateNames = { "Hospital", "Medical Center" };
 
-	protected volatile boolean initialized = false;
-
-	private HospitalManager hospitalManager;
+    protected transient volatile HospitalManager hospitalResourceManager = null;
 
 	public HospitalIdentifier(String tenantId, String localizationProperty) {
 		super(tenantId, localizationProperty);
@@ -31,14 +29,11 @@ public class HospitalIdentifier extends AbstractManagerBasedIdentifier {
 
 	@Override
 	protected Manager getManager() {
-		if (!initialized) {
-			hospitalManager = (HospitalManager) ManagerFactory.getInstance().getManager(tenantId,
-					Resource.HOSPITAL_NAMES,
-					null, localizationProperty);
-
-			initialized = true;
-		}
-		return hospitalManager;
+      if (hospitalResourceManager == null) {
+        hospitalResourceManager = (HospitalManager) ManagerFactory.getInstance()
+            .getManager(tenantId, Resource.HOSPITAL_NAMES, null, localizationProperty);
+      }
+      return hospitalResourceManager;
 	}
 
 	@Override

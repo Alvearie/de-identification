@@ -1,25 +1,25 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.identifiers;
 
-import com.ibm.whc.deid.models.Address;
-import com.ibm.whc.deid.models.ValueClass;
-import com.ibm.whc.deid.providers.ProviderType;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.ibm.whc.deid.models.Address;
+import com.ibm.whc.deid.models.ValueClass;
+import com.ibm.whc.deid.providers.ProviderType;
 
 /**
  * The type Address identifier.
  *
  */
 public class AddressIdentifier extends AbstractIdentifier {
-  /** */
+
   private static final long serialVersionUID = -7030628863543238721L;
 
   private static final Pattern[] poBoxPatterns =
@@ -27,8 +27,9 @@ public class AddressIdentifier extends AbstractIdentifier {
   private final String[] appropriateNames = {"Address"};
   /** The Road type pattern. */
   Pattern roadTypePattern = Pattern
-      .compile("\\s+(?<roadtype>ST|ST.|STREET|DR|DR.|DRIVE|BOULEVARD|BLVD|BLVD.|COURT|CT|CT.|"
-          + "ROAD|RD.|RD|AVE|AVENUE|AVE.|LANE|LN.)");
+      .compile(
+          "\\s+(?<roadtype>STREET|ST\\.|ST|DRIVE|DR\\.|DR|BOULEVARD|BLVD\\.|BLVD|COURT|CT\\.|CT|"
+              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)");
 
   /** The First part pattern. */
   Pattern firstPartPattern =

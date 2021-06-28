@@ -36,28 +36,28 @@ public class LatLonDistance<K extends Location> {
    * @return the distance
    */
   private Double euclidean(LatitudeLongitude point1, LatitudeLongitude point2) {
-    return Math.sqrt(Math.pow(point1.getLatitude() - point2.getLatitude(), 2)
-        + Math.pow(point1.getLongitude() - point2.getLongitude(), 2));
+    return Double.valueOf(Math.sqrt(Math.pow(point1.getLatitude() - point2.getLatitude(), 2)
+        + Math.pow(point1.getLongitude() - point2.getLongitude(), 2)));
   }
 
   /**
    * Find nearest locations to a given starting location.
    *
-   * @param latitude latitude of starting location
-   * @param longitude longitude of starting location
+   * @param current latitude and longitude of starting location
    * @param k the number of nearby locations to include in the list
    * 
    * @return the non-null list of nearby locations
    */
-  public List<K> findNearestK(double latitude, double longitude, int k) {
-
-    LatitudeLongitude current = new LatitudeLongitude(latitude, longitude);
+  public List<K> findNearestK(LatitudeLongitude current, int k) {
 
     // Find the euclidean distance between this point and others
     List<Tuple2<Double, K>> closest = new ArrayList<>(locations.size());
     for (K l : locations) {
-      Double result = euclidean(l.getLocation(), current);
-      closest.add(new Tuple2<Double, K>(result, l));
+      LatitudeLongitude latlon = l.getLocation();
+      if (latlon != null) {
+        Double result = euclidean(latlon, current);
+        closest.add(new Tuple2<>(result, l));
+      }
     }
 
     // Sort the list
@@ -82,7 +82,8 @@ public class LatLonDistance<K extends Location> {
     return toReturn;
   }
 
-  public List<K> findNearestK(K l, int k) {
-    return findNearestK(l.getLocation().getLatitude(), l.getLocation().getLongitude(), k);
+  public List<K> findNearestK(K location, int k) {
+    LatitudeLongitude latlon = location.getLocation();
+    return latlon == null ? null : findNearestK(latlon, k);
   }
 }

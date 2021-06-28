@@ -1,27 +1,129 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.models;
 
 import java.io.Serializable;
-import java.util.Arrays;
-
+import com.ibm.whc.deid.resources.ManagedResource;
 import com.ibm.whc.deid.util.CountryNameSpecification;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
-public class Country implements Location, LocalizedEntity, Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3519356529649094497L;
-	private String name;
-  private String nameCountryCode;
-  private String iso2code;
-  private String iso3code;
-  private String continent;
-  private LatitudeLongitude latitudeLongitude;
-  private Country[] neighbors;
+public class Country implements Location, LocalizedEntity, ManagedResource, Serializable {
+
+  private static final long serialVersionUID = 3519356529649094497L;
+
+  private final String name;
+  private final String nameCountryCode;
+  private final String iso2code;
+  private final String iso3code;
+  private final String continent;
+  private final CountryNameSpecification specification;
+  private final LatitudeLongitude latitudeLongitude;
+  private final String key;
+
+  /**
+   * Instantiates a new Country.
+   *
+   * @param name the name of the country
+   * @param iso2code the ISO 2-char country code - optional
+   * @param iso3code the ISO 3-code country code - optional
+   * @param continent the continent - optional
+   * @param latitude the latitude in string format - optional
+   * @param longitude the longitude in string format - optional
+   * @param nameCountryCode the locale
+   * @param specification the type of identifier used to find this resource
+   * 
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
+   */
+  public Country(String name, String iso2code, String iso3code, String continent, String latitude,
+      String longitude, String nameCountryCode, CountryNameSpecification specification) {
+    this(name, iso2code, iso3code, continent, latitude, longitude, nameCountryCode, specification,
+        null);
+  }
+
+  /**
+   * Instantiates a new Country.
+   *
+   * @param name the name of the country
+   * @param iso2code the ISO 2-char country code - optional
+   * @param iso3code the ISO 3-code country code - optional
+   * @param continent the continent - optional
+   * @param latitude the latitude in string format - optional
+   * @param longitude the longitude in string format - optional
+   * @param nameCountryCode the locale
+   * @param specification the type of identifier used to find this resource
+   * @param key a unique key used to find this resource - if <i>null</i> the value is generated
+   * 
+   * @throws IllegalArgumentException if any of the required input values is null or whitespace or
+   *         any provided input is invalid.
+   */
+  public Country(String name, String iso2code, String iso3code, String continent, String latitude,
+      String longitude, String nameCountryCode, CountryNameSpecification specification,
+      String key) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(name), "country name"));
+    }
+    if (iso2code != null) {
+      iso2code = iso2code.trim();
+      if (iso2code.isEmpty()) {
+        iso2code = null;
+      } else if (iso2code.length() != 2) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso2code), "country iso2code"));
+      }
+    }
+    if (iso3code != null) {
+      iso3code = iso3code.trim();
+      if (iso3code.isEmpty()) {
+        iso3code = null;
+      } else if (iso3code.length() != 3) {
+        throw new IllegalArgumentException(
+            Messages.getMessage(LogCodes.WPH1010E, String.valueOf(iso3code), "country iso3code"));
+      }
+    }
+    if (continent != null && continent.trim().isEmpty()) {
+      continent = null;
+    }
+    if (nameCountryCode == null || nameCountryCode.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          Messages.getMessage(LogCodes.WPH1010E, String.valueOf(nameCountryCode),
+              "country locale"));
+    }
+    if (specification == null) {
+      throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1010E,
+          String.valueOf(specification), "country identifier specification"));
+    }
+
+    this.name = name;
+    this.iso2code = iso2code == null ? null : iso2code.toUpperCase();
+    this.iso3code = iso3code == null ? null : iso3code.toUpperCase();
+    this.continent = continent;
+    this.nameCountryCode = nameCountryCode;
+    this.specification = specification;
+    this.latitudeLongitude = LatitudeLongitude.buildLatitudeLongitude(latitude, longitude);
+
+    if (key == null || key.trim().isEmpty()) {
+      switch (specification) {
+        case ISO2:
+          key = iso2code;
+          break;
+        case ISO3:
+          key = iso3code;
+          break;
+        case NAME:
+        default:
+          key = name.toUpperCase();
+      }
+    } else {
+      key = key.toUpperCase();
+    }
+    this.key = key;
+  }
 
   /**
    * Gets name country code.
@@ -29,48 +131,8 @@ public class Country implements Location, LocalizedEntity, Serializable {
    * @return the name country code
    */
   @Override
-public String getNameCountryCode() {
+  public String getNameCountryCode() {
     return nameCountryCode;
-  }
-
-  /**
-   * Instantiates a new Country.
-   *
-   * @param name the name
-   * @param iso2code the iso 2 code
-   * @param iso3code the iso 3 code
-   * @param continent the continent
-   * @param latitude the latitude
-   * @param longitude the longitude
-   * @param nameCountryCode the name country code
-   */
-  public Country(String name, String iso2code, String iso3code, String continent, Double latitude,
-      Double longitude, String nameCountryCode) {
-    this.name = name;
-    this.iso2code = iso2code;
-    this.iso3code = iso3code;
-    this.continent = continent;
-    this.nameCountryCode = nameCountryCode;
-    this.latitudeLongitude =
-        new LatitudeLongitude(latitude, longitude, LatitudeLongitudeFormat.DECIMAL);
-  }
-
-  /**
-   * Get neighbors country [ ].
-   *
-   * @return the country [ ]
-   */
-  public Country[] getNeighbors() {
-    return neighbors;
-  }
-
-  /**
-   * Sets neighbors.
-   *
-   * @param neighbors the neighbors
-   */
-  public void setNeighbors(final Country[] neighbors) {
-    this.neighbors = Arrays.copyOf(neighbors, neighbors.length);
   }
 
   /**
@@ -83,7 +145,7 @@ public String getNameCountryCode() {
   }
 
   @Override
-public LatitudeLongitude getLocation() {
+  public LatitudeLongitude getLocation() {
     return this.latitudeLongitude;
   }
 
@@ -112,5 +174,14 @@ public LatitudeLongitude getLocation() {
       default:
         return name;
     }
+  }
+
+  public CountryNameSpecification getCountryNameSpecification() {
+    return specification;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
   }
 }

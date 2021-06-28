@@ -1,11 +1,14 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.pojo.config.masking.CreditCardMaskingProviderConfig;
+import com.ibm.whc.deid.util.CreditCardTypeManager;
+import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.RandomGenerators;
 
 /**
@@ -18,19 +21,22 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
 
   private final boolean preserveIssuer;
   private final int preservedDigits;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
-  private final RandomGenerators randomGenerators;
 
+  protected transient volatile CreditCardTypeManager creditCardTypeManager = null;
 
   public CreditCardMaskingProvider(CreditCardMaskingProviderConfig configuration, String tenantId,
       String localizationProperty) {
-    super(tenantId, localizationProperty);
-    this.unspecifiedValueHandling = configuration.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = configuration.getUnspecifiedValueReturnMessage();
+    super(tenantId, localizationProperty, configuration);
     this.preserveIssuer = configuration.isIssuerPreserve();
     this.preservedDigits = this.preserveIssuer ? 6 : 0;
-    randomGenerators = new RandomGenerators(localizationProperty);
+  }
+
+  protected CreditCardTypeManager getCreditCardTypeManager() {
+    if (creditCardTypeManager == null) {
+      creditCardTypeManager = (CreditCardTypeManager) ManagerFactory.getInstance()
+          .getManager(tenantId, Resource.CREDIT_CARD_TYPE, null, localizationProperty);
+    }
+    return creditCardTypeManager;
   }
 
   @Override
@@ -41,7 +47,7 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     }
 
     if (!preserveIssuer) {
-      return randomGenerators.generateRandomCreditCard();
+      return RandomGenerators.generateRandomCreditCard(getCreditCardTypeManager());
     }
 
     final StringBuilder buffer = new StringBuilder();
@@ -56,14 +62,8 @@ public class CreditCardMaskingProvider extends AbstractMaskingProvider {
     }
 
     if (digitsEncountered != 16) {
-      debugFaultyInput("digitsEncountered");
-      if (unspecifiedValueHandling == 2) {
-        return randomGenerators.generateRandomCreditCard();
-      } else if (unspecifiedValueHandling == 3) {
-        return unspecifiedValueReturnMessage;
-      } else {
-        return null;
-      }
+      return applyUnexpectedValueHandling(identifier,
+          () -> RandomGenerators.generateRandomCreditCard(getCreditCardTypeManager()));
     }
     digitsEncountered = 0;
 

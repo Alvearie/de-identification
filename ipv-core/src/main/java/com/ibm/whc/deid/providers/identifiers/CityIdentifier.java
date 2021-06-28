@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,7 +7,6 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import com.ibm.whc.deid.models.ValueClass;
 import com.ibm.whc.deid.providers.ProviderType;
 import com.ibm.whc.deid.shared.localization.Resource;
@@ -20,46 +19,43 @@ import com.ibm.whc.deid.util.ManagerFactory;
  *
  */
 public class CityIdentifier extends AbstractManagerBasedIdentifier {
-	/** */
-	private static final long serialVersionUID = -153485244376355769L;
 
-	private static final String[] appropriateNames = { "City" };
-	private CityManager cityManager;
+  private static final long serialVersionUID = -153485244376355769L;
 
-	public CityIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  private static final String[] appropriateNames = {"City"};
 
-	protected volatile boolean initialized = false;
+  protected transient volatile CityManager cityManager = null;
 
-	@Override
-	public ProviderType getType() {
-		return ProviderType.CITY;
-	}
+  public CityIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
-	@Override
-	public String getDescription() {
-		return "City identification, supports all major cities in the world with population above 100K";
-	}
+  @Override
+  public ProviderType getType() {
+    return ProviderType.CITY;
+  }
 
-	@Override
-	public ValueClass getValueClass() {
-		return ValueClass.LOCATION;
-	}
+  @Override
+  public String getDescription() {
+    return "City identification, supports all major cities in the world with population above 100K";
+  }
 
-	@Override
-	protected Manager getManager() {
-		if (!initialized) {
-			cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY, null,
-					localizationProperty);
+  @Override
+  public ValueClass getValueClass() {
+    return ValueClass.LOCATION;
+  }
 
-			initialized = true;
-		}
-		return cityManager;
-	}
+  @Override
+  protected Manager getManager() {
+    if (cityManager == null) {
+      cityManager = (CityManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CITY,
+          null, localizationProperty);
+    }
+    return cityManager;
+  }
 
-	@Override
-	protected Collection<String> getAppropriateNames() {
-		return Arrays.asList(appropriateNames);
-	}
+  @Override
+  protected Collection<String> getAppropriateNames() {
+    return Arrays.asList(appropriateNames);
+  }
 }

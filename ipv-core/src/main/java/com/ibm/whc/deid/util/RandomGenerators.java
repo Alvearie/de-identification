@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,10 +9,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
 import org.apache.commons.lang3.StringUtils;
-
-import com.ibm.whc.deid.models.CreditCard;
+import com.ibm.whc.deid.models.CreditCardType;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.LatitudeLongitudeFormat;
 import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
@@ -25,15 +23,14 @@ public class RandomGenerators {
   private static final IPAddressIdentifier ipAddressIdentifier = new IPAddressIdentifier();
   private static final IPAddressMaskingProvider ipAddressMaskingProvider =
       new IPAddressMaskingProvider();
-	private static final TLDManager tldManager = TLDManager.instance();
-	private final CreditCardManager creditCardManager;
+  private static final TLDManager tldManager = TLDManager.instance();
 
   private static final char[] alphaDigitSubset =
       "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
 
-	public RandomGenerators(String localizationProperty) {
-		creditCardManager = new CreditCardManager(localizationProperty);
-	}
+  private RandomGenerators() {
+    // no need to instantiate
+  }
 
   /**
    * Luhn check digit int.
@@ -66,8 +63,8 @@ public class RandomGenerators {
    *
    * @return the string
    */
-	public String generateRandomCreditCard() {
-    CreditCard creditCard = creditCardManager.randomCreditCardInformation();
+  public static String generateRandomCreditCard(CreditCardTypeManager creditCardTypeManager) {
+    CreditCardType creditCard = creditCardTypeManager.getRandomValue();
 
     String[] prefixes = creditCard.getPrefixes();
     String randomCC = prefixes[random.nextInt(prefixes.length)];
@@ -147,10 +144,9 @@ public class RandomGenerators {
     if (useUpRange) {
       return (base + rangeUpMin)
           + (rangeUpMax > rangeUpMin ? random.nextInt(1 + rangeUpMax - rangeUpMin) : 0);
-    } else {
-      return (base - rangeDownMin)
-          - (rangeDownMax > rangeDownMin ? random.nextInt(1 + rangeDownMax - rangeDownMin) : 0);
     }
+    return (base - rangeDownMin)
+        - (rangeDownMax > rangeDownMin ? random.nextInt(1 + rangeDownMax - rangeDownMin) : 0);
   }
 
   /**
@@ -180,11 +176,10 @@ public class RandomGenerators {
     if (useUpRange) {
       return (base + rangeUpMin)
           + (rangeUpMax > rangeUpMin ? (1 + rangeUpMax - rangeUpMin) * random.nextDouble() : 0);
-    } else {
-      return (base - rangeDownMin)
-          - (rangeDownMax > rangeDownMin ? (1 + rangeDownMax - rangeDownMin) * random.nextDouble()
-              : 0);
     }
+    return (base - rangeDownMin)
+        - (rangeDownMax > rangeDownMin ? (1 + rangeDownMax - rangeDownMin) * random.nextDouble()
+            : 0);
   }
 
   /**
@@ -354,13 +349,13 @@ public class RandomGenerators {
         latitudeLongitude.getLongitude(), minimumOffsetRadius, maximumOffsetRadius);
   }
 
-  public static LatitudeLongitude generateRandomCoordinate(Double latitude, Double longitude,
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
       int minimumOffsetRadius, int maximumOffsetRadius) {
 
     while (true) {
       LatitudeLongitude latitudeLongitude =
           generateRandomCoordinate(latitude, longitude, maximumOffsetRadius);
-      Double distance = GeoUtils.latitudeLongitudeDistance(latitude, longitude,
+      double distance = GeoUtils.latitudeLongitudeDistance(latitude, longitude,
           latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude());
 
       if (distance >= minimumOffsetRadius) {
@@ -377,8 +372,23 @@ public class RandomGenerators {
    * @param offsetRadius the offset radius
    * @return the latitude longitude
    */
-  public static LatitudeLongitude generateRandomCoordinate(Double latitude, Double longitude,
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
       int offsetRadius) {
+    return generateRandomCoordinate(latitude, longitude, offsetRadius,
+        LatitudeLongitudeFormat.DECIMAL);
+  }
+
+  /**
+   * Generate random coordinate latitude longitude.
+   *
+   * @param latitude the latitude
+   * @param longitude the longitude
+   * @param offsetRadius the offset radius
+   * @param format the default format to use when writing the latitude-longitude value
+   * @return the latitude longitude
+   */
+  public static LatitudeLongitude generateRandomCoordinate(double latitude, double longitude,
+      int offsetRadius, LatitudeLongitudeFormat format) {
 
     double radiusInDegrees = offsetRadius / 111000f;
 
@@ -405,7 +415,7 @@ public class RandomGenerators {
       foundLongitude = Math.abs(-180 + diff);
     }
 
-    return new LatitudeLongitude(foundLatitude, foundLongitude, LatitudeLongitudeFormat.DECIMAL);
+    return new LatitudeLongitude(foundLatitude, foundLongitude, format);
   }
 
   /**
@@ -418,8 +428,8 @@ public class RandomGenerators {
   public static LatitudeLongitude generateRandomCoordinate(LatitudeLongitude latitudeLongitude,
       int offsetRadius) {
     LatitudeLongitude randomLatitudeLongitude = generateRandomCoordinate(
-        latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude(), offsetRadius);
-    randomLatitudeLongitude.setFormat(latitudeLongitude.getFormat());
+        latitudeLongitude.getLatitude(), latitudeLongitude.getLongitude(), offsetRadius,
+        latitudeLongitude.getFormat());
     return randomLatitudeLongitude;
   }
 
@@ -429,14 +439,14 @@ public class RandomGenerators {
    * @return the latitude longitude
    */
   public static LatitudeLongitude generateRandomCoordinate() {
-    Double latitude = (double) random.nextInt(90);
-    Double longitude = (double) random.nextInt(180);
+    double latitude = random.nextInt(90);
+    double longitude = random.nextInt(180);
 
-    if (random.nextBoolean()) {
+    // don't switch from 0.0 to -0.0
+    if (latitude != 0.0 && random.nextBoolean()) {
       latitude = -latitude;
     }
-
-    if (random.nextBoolean()) {
+    if (longitude != 0.0 && random.nextBoolean()) {
       longitude = -longitude;
     }
 

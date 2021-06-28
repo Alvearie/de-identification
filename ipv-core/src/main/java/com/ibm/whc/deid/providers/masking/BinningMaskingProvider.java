@@ -18,8 +18,6 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
   private final String format;
   private final int startValue;
   private final boolean useStartValue;
-  private final int unspecifiedValueHandling;
-  private final String unspecifiedValueReturnMessage;
   private final int normalizedStartValue;
 
   /**
@@ -28,12 +26,11 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
    * @param config a BinningMaskingProviderConfig instance
    */
   public BinningMaskingProvider(BinningMaskingProviderConfig config) {
+    super(config);
     this.binSize = config.getBinSize();
     this.format = config.getFormat();
     this.startValue = config.getStartValue();
     this.useStartValue = config.isUseStartValue();
-    this.unspecifiedValueHandling = config.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage = config.getUnspecifiedValueReturnMessage();
     this.normalizedStartValue = normalizeStartValue();
   }
 
@@ -64,7 +61,7 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
       value = Double.parseDouble(identifier);
     } catch (NumberFormatException e) {
       // For this provider, we do not return a random value
-      return unspecifiedValueHandling == 3 ? unspecifiedValueReturnMessage : null;
+      return applyUnexpectedValueHandling(identifier, null);
     }
 
     double adjusted = value - this.normalizedStartValue;

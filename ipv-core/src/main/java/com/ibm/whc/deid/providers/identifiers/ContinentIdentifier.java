@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -20,16 +20,16 @@ import com.ibm.whc.deid.util.ManagerFactory;
  *
  */
 public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
-  /** */
+
   private static final long serialVersionUID = -7174497158361912040L;
 
   private static final String[] appropriateNames = {"Continent"};
-	protected volatile boolean initialized = false;
-	private ContinentManager continentManager;
 
-	public ContinentIdentifier(String tenantId, String localizationProperty) {
-		super(tenantId, localizationProperty);
-	}
+  protected transient volatile ContinentManager continentManager = null;
+
+  public ContinentIdentifier(String tenantId, String localizationProperty) {
+    super(tenantId, localizationProperty);
+  }
 
   @Override
   public ProviderType getType() {
@@ -48,12 +48,10 @@ public class ContinentIdentifier extends AbstractManagerBasedIdentifier {
 
   @Override
   protected Manager getManager() {
-		if (!initialized) {
-			continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(tenantId, Resource.CONTINENT,
-					null, localizationProperty);
-
-			initialized = true;
-		}
+    if (continentManager == null) {
+      continentManager = (ContinentManager) ManagerFactory.getInstance().getManager(tenantId,
+          Resource.CONTINENT, null, localizationProperty);
+    }
     return continentManager;
   }
 
