@@ -35,7 +35,11 @@ jobs:
       run: |
         echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
         echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-        echo ::set-output name=SOURCE_TAG::${{ github.event.inputs.branchRef:GITHUB_REF#refs/tags/ }}
+        if [! -z ${{ github.event.inputs.branchRef }} ]; then
+           echo ::set-output name=SOURCE_TAG::${{ github.event.inputs.branchRef }}
+        else
+           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        fi
         echo ::set-output name=MVN_RELEASE_VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
     - name: Print Release Information 
       run: |
