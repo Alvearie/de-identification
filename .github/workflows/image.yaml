@@ -40,7 +40,9 @@ jobs:
         SOURCE_BRANCH: ${{ steps.release_info.outputs.SOURCE_BRANCH }}
         SOURCE_TAG: ${{ steps.release_info.outputs.SOURCE_TAG }}
     - name: Build Image
-      run: docker build -f Dockerfile -t alvearie/de-identification:${{ steps.release_info.outputs.SOURCE_TAG }} .
+      run: |
+        cd de-identification-app
+        docker build -f Dockerfile -t alvearie/de-identification:${{ steps.release_info.outputs.SOURCE_TAG }} .
     - name: List Docker Images
       run: docker images
     - name: Login to Docker Hub
