@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Build the targets
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
@@ -19,22 +20,21 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
-    - name: back to app directory
-      run: cd ..
 
-    #- name: Get Release Version
-      #run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    # Build the image and publish
     - name: Get Release Information
       id: release_info
       run: |
         echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
         echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
         echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        echo ::set-output name=MVN_RELEASE_VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
     - name: Print Release Information 
       run: |
         echo $SOURCE_NAME
         echo $SOURCE_BRANCH
         echo $SOURCE_TAG
+        echo $MVN_RELEASE_VERSION
       env:
         SOURCE_NAME: ${{ steps.release_info.outputs.SOURCE_NAME }}
         SOURCE_BRANCH: ${{ steps.release_info.outputs.SOURCE_BRANCH }}
@@ -42,7 +42,7 @@ jobs:
     - name: Build Image
       run: |
         cd de-identification-app
-        docker build -f Dockerfile -t alvearie/de-identification:${{ steps.release_info.outputs.SOURCE_TAG }} .
+        docker build -f Dockerfile -t alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }} .
     - name: List Docker Images
       run: docker images
     - name: Login to Docker Hub
@@ -54,4 +54,4 @@ jobs:
     - name: Push Docker Images
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
-        docker push alvearie/de-identification:${{ steps.release_info.outputs.SOURCE_TAG }}
+        docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
