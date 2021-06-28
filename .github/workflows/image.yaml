@@ -22,7 +22,7 @@ jobs:
     #- name: back to app directory
     #  run: cd ..
 
-    - name: Get Release Version
+    #- name: Get Release Version
       #run: echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     - name: Get Release Information
       id: release_info
