@@ -15,6 +15,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Setup some useful vars
+    - name: Get Release Information
+      id: release_info
+      run: |
+        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+        if [ ! -z ${{ github.event.inputs.branchRef }} ]; then
+           echo ::set-output name=SOURCE_TAG::${{ github.event.inputs.branchRef }}
+        else
+           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        fi
+    - name: Print Release Information 
+      run: |
+        echo $SOURCE_NAME
+        echo $SOURCE_BRANCH
+        echo $SOURCE_TAG
+      env:
+        SOURCE_NAME: ${{ steps.release_info.outputs.SOURCE_NAME }}
+        SOURCE_BRANCH: ${{ steps.release_info.outputs.SOURCE_BRANCH }}
+        SOURCE_TAG: ${{ steps.release_info.outputs.SOURCE_TAG }}
     # Build Java targets
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -25,33 +45,12 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: |
+        mvn -B package --file pom.xml
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
 
     # Build the image and publish
-    - name: Get Release Information
-      id: release_info
-      run: |
-        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
-        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
-        if [! -z ${{ github.event.inputs.branchRef }} ]; then
-           echo ::set-output name=SOURCE_TAG::${{ github.event.inputs.branchRef }}
-        else
-           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
-        fi
-        echo ::set-output name=MVN_RELEASE_VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-    - name: Print Release Information 
-      run: |
-        echo $SOURCE_NAME
-        echo $SOURCE_BRANCH
-        echo $SOURCE_TAG
-        echo $MVN_RELEASE_VERSION
-      env:
-        SOURCE_NAME: ${{ steps.release_info.outputs.SOURCE_NAME }}
-        SOURCE_BRANCH: ${{ steps.release_info.outputs.SOURCE_BRANCH }}
-        SOURCE_TAG: ${{ steps.release_info.outputs.SOURCE_TAG }}
-        MVN_RELEASE_VERSION: ${{ steps.release_info.outputs.MVN_RELEASE_VERSION }}
     - name: Build Image
       run: |
         cd de-identification-app
