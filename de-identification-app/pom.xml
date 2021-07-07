@@ -110,12 +110,6 @@
     		<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>${scala.version}</version>
-		</dependency>
-
 		<!--Unit testing dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
