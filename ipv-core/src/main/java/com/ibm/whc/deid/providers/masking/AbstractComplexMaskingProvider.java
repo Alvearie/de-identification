@@ -125,7 +125,6 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
    * @param jobId
    * @return
    */
-  @Override
   public List<ReferableData> maskWithBatch(List<ReferableData> batch, String jobId) {
 
     ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
@@ -134,8 +133,6 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
       try {
         return new Tuple2<String, JsonNode>(input.getIdentifier(),
             mapper.readTree(input.getData()));
-      } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
       } catch (IOException e) {
         log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
       }

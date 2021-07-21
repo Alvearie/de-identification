@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
+import com.ibm.whc.deid.providers.masking.ComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
@@ -21,7 +22,8 @@ import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import scala.Tuple2;
 
-public class FHIRMaskingProvider extends AbstractComplexMaskingProvider {
+public class FHIRMaskingProvider extends AbstractComplexMaskingProvider
+    implements ComplexMaskingProvider {
 
   private static final long serialVersionUID = 5945527984023679481L;
 

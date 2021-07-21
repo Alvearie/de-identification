@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
-import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
@@ -99,11 +98,6 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
    */
   void setDebugEnabled(boolean value) {
     debug_enabled = value;
-  }
-
-  @Override
-  public List<ReferableData> maskWithBatch(List<ReferableData> payloadData, String jobId) {
-    return null;
   }
 
   @Override

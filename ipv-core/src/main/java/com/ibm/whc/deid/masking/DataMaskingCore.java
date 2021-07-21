@@ -8,8 +8,8 @@ package com.ibm.whc.deid.masking;
 import java.io.IOException;
 import java.util.List;
 import com.ibm.whc.deid.providers.masking.BasicMaskingProviderFactory;
+import com.ibm.whc.deid.providers.masking.ComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.ComplexMaskingProviderFactoryUtil;
-import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -26,7 +26,7 @@ public class DataMaskingCore {
    * @return
    */
   protected List<ReferableData> protectRecord(List<ReferableData> input,
-      final MaskingProvider maskingProvider) {
+      final ComplexMaskingProvider maskingProvider) {
     return maskingProvider.maskWithBatch(input, "REST");
   }
 
@@ -51,7 +51,7 @@ public class DataMaskingCore {
       throw new DeidException(e.getMessage(), e);
     }
 
-    MaskingProvider complexMaskingProvider =
+    ComplexMaskingProvider complexMaskingProvider =
         ComplexMaskingProviderFactoryUtil.getComplexMaskingProviderFactory().get(schemaType,
             deidMaskingConfig, new BasicMaskingProviderFactory(), null);
 
