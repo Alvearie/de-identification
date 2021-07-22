@@ -15,11 +15,14 @@ import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.ComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
+import com.ibm.whc.deid.shared.exception.KeyedIllegalArgumentException;
+import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 import scala.Tuple2;
 
 public class FHIRMaskingProvider extends AbstractComplexMaskingProvider
@@ -105,7 +108,8 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider
       try {
         node = ObjectMapperFactory.getObjectMapper().readTree(input.getData());
       } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1013E, e);
+        throw new KeyedIllegalArgumentException(LogCodes.WPH1026E,
+            Messages.getMessage(LogCodes.WPH1026E, input.getIdentifier(), e.getMessage()), e);
       }
       return new Tuple2<String, JsonNode>(input.getIdentifier(), node);
     }).collect(Collectors.toList());
@@ -116,7 +120,9 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider
         serializedNode = new ReferableData(input._1(),
             ObjectMapperFactory.getObjectMapper().writeValueAsString(input._2()));
       } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1013E, e);
+        // this is unlikely to occur
+        throw new KeyedRuntimeException(LogCodes.WPH1013E,
+            Messages.getMessage(LogCodes.WPH1013E, e.getMessage()), e);
       }
       return serializedNode;
     }).collect(Collectors.toList());
@@ -125,7 +131,6 @@ public class FHIRMaskingProvider extends AbstractComplexMaskingProvider
 
   @Override
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
-    // TODO Auto-generated method stub
-
+    // no action required here
   }
 }
