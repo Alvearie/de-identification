@@ -373,12 +373,14 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
+    Address originalAddress = identifier.parseAddress(validAddress);
+    assertEquals("ST", originalAddress.getRoadType());
+
     String randomAddress = addressMaskingProvider.mask(validAddress);
+    Address maskedAddress = identifier.parseAddress(randomAddress);
 
     assertNotEquals(validAddress, randomAddress);
 
-    Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
     assertNotNull(originalAddress);
     assertNotNull(maskedAddress);
     assertEquals(originalAddress.getRoadType(), maskedAddress.getRoadType());
