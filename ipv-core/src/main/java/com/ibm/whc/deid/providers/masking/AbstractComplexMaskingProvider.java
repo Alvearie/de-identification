@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,16 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
-import com.ibm.whc.deid.utils.log.LogCodes;
-
 import scala.Tuple2;
 
 public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProvider {
@@ -86,16 +78,16 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
 
     List<MaskingProviderBuilder.MaskingResource> finishedList =
         new ArrayList<>(partitionedList.size());
-    MaskingProviderBuilder maskingProvider;
+    MaskingProviderBuilder maskingProviderBuilder;
     for (String resourceName : resourceTypes) {
       List<MaskingProviderBuilder.MaskingResource> maskingInList =
           partitionedList.stream().filter(input -> {
             return input.getResourceType().equals(resourceName);
           }).collect(Collectors.toList());
-      maskingProvider = maskingProviderMap.get(resourceName);
-      if (maskingProvider != null) {
+      maskingProviderBuilder = maskingProviderMap.get(resourceName);
+      if (maskingProviderBuilder != null) {
         List<MaskingProviderBuilder.MaskingResource> maskingOutList =
-            maskingProvider.orchestrateMasking(maskingInList);
+            maskingProviderBuilder.orchestrateMasking(maskingInList);
         finishedList.addAll(maskingOutList);
       } else {
         finishedList.addAll(maskingInList);
@@ -116,38 +108,6 @@ public abstract class AbstractComplexMaskingProvider extends AbstractMaskingProv
   public List<Tuple2<String, JsonNode>> maskJsonNode(List<Tuple2<String, JsonNode>> resources) {
     List<Tuple2<String, JsonNode>> maskedValue = maskResource(resources);
     return maskedValue.stream().filter(input -> input._2() != null).collect(Collectors.toList());
-  }
-
-  /**
-   * Given a masking configuration, return the masked JSON and audit trail record
-   *
-   * @param line
-   * @param jobId
-   * @return
-   */
-  @Override
-  public List<ReferableData> maskWithBatch(List<ReferableData> batch, String jobId) {
-
-    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-
-    return maskJsonNode(batch.stream().map(input -> {
-      try {
-        return new Tuple2<String, JsonNode>(input.getIdentifier(),
-            mapper.readTree(input.getData()));
-      } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
-      } catch (IOException e) {
-        log.logError(LogCodes.WPH1017E, e, "maskWithBatch", input.getData());
-      }
-      return null;
-    }).collect(Collectors.toList())).stream().map(input -> {
-      try {
-        return new ReferableData(input._1(), mapper.writeValueAsString(input._2()));
-      } catch (JsonProcessingException e) {
-        log.logError(LogCodes.WPH1013E, e);
-      }
-      return null;
-    }).collect(Collectors.toList());
   }
 
   public String getIdentifier() {
