@@ -15,7 +15,7 @@ public class ComplexMaskingProviderFactory {
   /**
    * This is the entry point to parsing the masking configuration.
    */
-  public MaskingProvider get(ConfigSchemaTypes configSchemaType,
+  public ComplexMaskingProvider get(ConfigSchemaTypes configSchemaType,
       DeidMaskingConfig deidMaskingConfig, BasicMaskingProviderFactory maskingProviderFactory,
       String tenantId) {
 

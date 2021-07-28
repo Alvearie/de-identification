@@ -11,7 +11,7 @@ set -ex
 # DEVELOPER_BRANCH        # name of the GIT branch used for de-id-devops, if empty or null defaults to master
 # DEVELOPER_ID            # name used to specify namespace/umbrella repo
 
-export TOOLCHAIN_BRANCH="stable-3.3.1"
+export TOOLCHAIN_BRANCH="stable-3.4.1"
 export WHC_COMMONS_BRANCH=${TOOLCHAIN_BRANCH}
 export INPUT_GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` # get the current branch
 export gitrepourl="https://github.com/Alvearie/de-identification" # CI git repo url
@@ -23,7 +23,7 @@ else
   export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
 fi
 
-export TOOLCHAIN_TEMPLATE_BRANCH=stable-oc-3.3.1
+export TOOLCHAIN_TEMPLATE_BRANCH=stable-oc-3.4.1
 
 # if DEVELOPER_BRANCH env variable is not set or null, use master branch
 export DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"

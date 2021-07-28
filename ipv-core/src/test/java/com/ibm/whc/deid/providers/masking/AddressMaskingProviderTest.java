@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
-import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
 
@@ -350,28 +350,21 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
     String randomAddress = addressMaskingProvider.mask(validAddress);
 
-    // System.out.println("=======> Mask Street Name False: origianl address
-    // ["
-    // + validAddress + "], maskedAddress [" + randomAddress + "]" );
     assertFalse(randomAddress.equals(validAddress));
 
     Address originalAddress = identifier.parseAddress(validAddress);
     Address maskedAddress = identifier.parseAddress(randomAddress);
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getName())
-        && StringUtils.isNotBlank(maskedAddress.getName())) {
-      // System.out.println("=======> Mask Street Name False: origianl
-      // address ["
-      // + maskedAddress.getName() + "], maskedAddress [" +
-      // originalAddress.getName() + "]" );
-      assertTrue(maskedAddress.getName().equals(originalAddress.getName()));
-    }
+    assertNotNull(originalAddress);
+    assertNotNull(maskedAddress);
+    assertEquals(originalAddress.getName(), maskedAddress.getName());
   }
 
   @Test
   public void testMaskRoadTypeFalse() throws Exception {
     AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
     maskingConfiguration.setRoadTypeMask(false);
+    maskingConfiguration.setPostalCodeNearest(false);
+    maskingConfiguration.setMaskPseudorandom(false);
 
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
@@ -380,24 +373,17 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    // System.out.println("=======> Mask Road Type False: origianl address
-    // ["
-    // + validAddress + "], maskedAddress [" + randomAddress + "]" );
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
+    assertEquals("ST", originalAddress.getRoadType());
+
+    String randomAddress = addressMaskingProvider.mask(validAddress);
     Address maskedAddress = identifier.parseAddress(randomAddress);
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getRoadType())
-        && StringUtils.isNotBlank(maskedAddress.getRoadType())) {
-      // System.out.println("=======> Mask Road Type False: origianl
-      // address ["
-      // + maskedAddress.getRoadType() + "], maskedAddress [" +
-      // originalAddress.getRoadType() + "]" );
-      assertTrue(maskedAddress.getRoadType().equals(originalAddress.getRoadType()));
-    }
+
+    assertNotEquals(validAddress, randomAddress);
+
+    assertNotNull(originalAddress);
+    assertNotNull(maskedAddress);
+    assertEquals(originalAddress.getRoadType(), maskedAddress.getRoadType());
   }
 
   @Test

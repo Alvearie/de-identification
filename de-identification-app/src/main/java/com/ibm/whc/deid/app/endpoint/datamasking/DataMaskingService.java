@@ -8,6 +8,7 @@ package com.ibm.whc.deid.app.endpoint.datamasking;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -41,8 +42,9 @@ public class DataMaskingService {
 
     List<String> outputRecords = new ArrayList<>();
     try {
+      AtomicInteger messageOrder = new AtomicInteger();
       outputRecords.addAll(dataMaskingCore.maskData(configuration, list.stream().map(input -> {
-        return new ReferableData(input);
+        return new ReferableData(String.valueOf(messageOrder.getAndIncrement()), input);
       }).collect(Collectors.toList()), schemaType).stream().map(input -> {
         return input.getData();
       }).collect(Collectors.toList()));
