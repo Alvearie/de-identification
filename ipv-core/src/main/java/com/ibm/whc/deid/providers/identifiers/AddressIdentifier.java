@@ -29,7 +29,7 @@ public class AddressIdentifier extends AbstractIdentifier {
   Pattern roadTypePattern = Pattern
       .compile(
           "\\s+(?<roadtype>STREET|ST\\.|ST|DRIVE|DR\\.|DR|BOULEVARD|BLVD\\.|BLVD|COURT|CT\\.|CT|"
-              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)\\s*(,|\\z)");
+              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)(\\s*,|\\s*\\z|\\s+)");
 
   /** The First part pattern. */
   Pattern firstPartPattern =
@@ -91,19 +91,25 @@ public class AddressIdentifier extends AbstractIdentifier {
     int roadtypeMatchOffset = -1;
     int roadtypeMatchEnd = -1;
     String roadType = null;
+    int startRoadTypeSearchIndex = 0;
 
-    while (roadtypeMatch.find()) {
+    while (roadtypeMatch.find(startRoadTypeSearchIndex)) {
       roadtypeMatchOffset = roadtypeMatch.start();
       roadtypeMatchEnd = roadtypeMatch.end();
       roadType = roadtypeMatch.group("roadtype").trim();
-      // The comma was possibly included as the matching end delimiter when the
-      // road type was matched. If so, add it back to the sequence as the "secondPart"
-      // expects to start with a comma. Also, since the comma was encountered, stop
-      // looking for more road type names.
+      // if EOL, stop
+      if (roadtypeMatchEnd == key.length()) {
+        break;
+      }
+      // if ends with comma, backup next match to start at comma and
+      // stop looking for road type names
       if (key.charAt(roadtypeMatchEnd - 1) == ',') {
         roadtypeMatchEnd--;
         break;
       }
+      // otherwise, backup next match one char to start at whitespace
+      roadtypeMatchEnd--;
+      startRoadTypeSearchIndex = roadtypeMatchEnd;
     }
 
     if (roadtypeMatchOffset < 5) {

@@ -101,7 +101,7 @@ public class AddressIdentifierTest {
       assertEquals("USA", address.getCountry());
     }
 
-    suffix = " ";
+    suffix = "    ";
     for (String rd : rdtypes) {
       buffer.setLength(startLen);
       buffer.append(rd).append(suffix);
@@ -130,7 +130,7 @@ public class AddressIdentifierTest {
     }
 
     // suffix that includes a road type name after the comma
-    suffix = ", Drive Happy VA 11220";
+    suffix = "    , Drive Happy VA 11220";
     for (String rd : rdtypes) {
       buffer.setLength(startLen);
       buffer.append(rd).append(suffix);
