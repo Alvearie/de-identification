@@ -391,15 +391,16 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
-    assertNotNull(maskedAddress);
-    assertEquals("city changed: " + randomAddress, originalAddress.getCityOrState(),
-        maskedAddress.getCityOrState());
+
+    for (int i = 0; i < 1000; i++) {
+      String randomAddress = addressMaskingProvider.mask(validAddress);
+      assertFalse(randomAddress.equals(validAddress));
+      Address maskedAddress = identifier.parseAddress(randomAddress);
+      assertNotNull(maskedAddress);
+      assertEquals("city changed: " + randomAddress, originalAddress.getCityOrState(),
+          maskedAddress.getCityOrState());
+    }
   }
 
   @Test
@@ -414,15 +415,16 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
-    assertNotNull(maskedAddress);
-    assertEquals("country changed: " + randomAddress, originalAddress.getCountry(),
-        maskedAddress.getCountry());
+
+    for (int i = 0; i < 1000; i++) {
+      String randomAddress = addressMaskingProvider.mask(validAddress);
+      assertFalse(randomAddress.equals(validAddress));
+      Address maskedAddress = identifier.parseAddress(randomAddress);
+      assertNotNull(maskedAddress);
+      assertEquals("country changed: " + randomAddress, originalAddress.getCountry(),
+          maskedAddress.getCountry());
+    }
   }
 
   @Test
@@ -439,6 +441,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "PO BOX 1234";
+
     String randomAddress = addressMaskingProvider.mask(validAddress);
 
     assertFalse(randomAddress.equals(validAddress));

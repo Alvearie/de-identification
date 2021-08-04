@@ -36,7 +36,8 @@ public class AddressIdentifier extends AbstractIdentifier {
       Pattern.compile("^(?<number>\\d+){0,1}\\s*(?<street>(([\\w|\\d]+)\\s*)+)");
   /** The Second part pattern. */
   Pattern secondPartPattern = Pattern.compile(
-      ",\\s*(?<cityorstate>(([a-zA-Z.’]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}");
+      ",\\s*(?<cityorstate>(([\\p{L}.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}",
+      Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
    * Remove diacritical marks string.
