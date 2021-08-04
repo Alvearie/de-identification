@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.identifiers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -82,16 +83,96 @@ public class AddressIdentifierTest {
     StringBuilder buffer = new StringBuilder(100);
     buffer.append("200 E Main ");
     int startLen = buffer.length();
-    String suffix = ", Phoenix AZ 85123, USA";
     String[] rdtypes = new String[] {"STREET", "ST.", "ST", "DRIVE", "DR.", "DR", "BOULEVARD",
         "BLVD.", "BLVD", "COURT", "CT.", "CT", "ROAD", "RD.", "RD", "AVENUE", "AVE.", "AVE", "LANE",
         "LN.", "LN"};
 
+    String suffix = ", Phoenix AZ 85123, USA";
     for (String rd : rdtypes) {
       buffer.setLength(startLen);
       buffer.append(rd).append(suffix);
       Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
       assertEquals(rd, address.getRoadType());
+      assertEquals("PHOENIX AZ", address.getCityOrState());
+      assertEquals("85123", address.getPostalCode());
+      assertEquals("USA", address.getCountry());
+    }
+
+    suffix = " ";
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
+      assertEquals(rd, address.getRoadType());
+      assertEquals("", address.getCityOrState());
+      assertEquals("", address.getPostalCode());
+      assertEquals("", address.getCountry());
+    }
+
+    suffix = "";
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
+      assertEquals(rd, address.getRoadType());
+      assertEquals("", address.getCityOrState());
+      assertEquals("", address.getPostalCode());
+      assertEquals("", address.getCountry());
+    }
+
+    // suffix that includes a road type name after the comma
+    suffix = ", Drive Happy VA 11220";
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
+      assertEquals(rd, address.getRoadType());
+      assertEquals("DRIVE HAPPY VA", address.getCityOrState());
+      assertEquals("11220", address.getPostalCode());
+      assertEquals("", address.getCountry());
+    }
+
+    // suffix that includes a road type name after the comma but properly delimited with comma
+    suffix = ", Drive , CAN";
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
+      assertEquals(rd, address.getRoadType());
+      assertEquals("DRIVE", address.getCityOrState());
+      assertEquals("", address.getPostalCode());
+      assertEquals("CAN", address.getCountry());
+    }
+
+    // no space after comma and multiple road type names in road type section - i.e. E Main Court St
+    suffix = "  ,Hope ND 58046";
+    for (String rd : rdtypes) {
+      buffer.setLength(startLen);
+      buffer.append("court ");
+      buffer.append(rd).append(suffix);
+      Address address = identifier.parseAddress(buffer.toString());
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN COURT", address.getName());
+      assertEquals(rd, address.getRoadType());
+      assertEquals("HOPE ND", address.getCityOrState());
+      assertEquals("58046", address.getPostalCode());
+      assertEquals("", address.getCountry());
     }
   }
 

@@ -29,14 +29,14 @@ public class AddressIdentifier extends AbstractIdentifier {
   Pattern roadTypePattern = Pattern
       .compile(
           "\\s+(?<roadtype>STREET|ST\\.|ST|DRIVE|DR\\.|DR|BOULEVARD|BLVD\\.|BLVD|COURT|CT\\.|CT|"
-              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)");
+              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)\\s*(,|\\z)");
 
   /** The First part pattern. */
   Pattern firstPartPattern =
       Pattern.compile("^(?<number>\\d+){0,1}\\s*(?<street>(([\\w|\\d]+)\\s*)+)");
   /** The Second part pattern. */
   Pattern secondPartPattern = Pattern.compile(
-      ",\\s+(?<cityorstate>(([a-zA-Z.’]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}");
+      ",\\s*(?<cityorstate>(([a-zA-Z.’]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}");
 
   /**
    * Remove diacritical marks string.
@@ -96,6 +96,14 @@ public class AddressIdentifier extends AbstractIdentifier {
       roadtypeMatchOffset = roadtypeMatch.start();
       roadtypeMatchEnd = roadtypeMatch.end();
       roadType = roadtypeMatch.group("roadtype").trim();
+      // The comma was possibly included as the matching end delimiter when the
+      // road type was matched. If so, add it back to the sequence as the "secondPart"
+      // expects to start with a comma. Also, since the comma was encountered, stop
+      // looking for more road type names.
+      if (key.charAt(roadtypeMatchEnd - 1) == ',') {
+        roadtypeMatchEnd--;
+        break;
+      }
     }
 
     if (roadtypeMatchOffset < 5) {
