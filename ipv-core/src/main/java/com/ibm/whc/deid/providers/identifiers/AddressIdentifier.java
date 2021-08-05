@@ -29,14 +29,15 @@ public class AddressIdentifier extends AbstractIdentifier {
   Pattern roadTypePattern = Pattern
       .compile(
           "\\s+(?<roadtype>STREET|ST\\.|ST|DRIVE|DR\\.|DR|BOULEVARD|BLVD\\.|BLVD|COURT|CT\\.|CT|"
-              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)");
+              + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)(\\s*,|\\s*\\z|\\s+)");
 
   /** The First part pattern. */
   Pattern firstPartPattern =
       Pattern.compile("^(?<number>\\d+){0,1}\\s*(?<street>(([\\w|\\d]+)\\s*)+)");
   /** The Second part pattern. */
   Pattern secondPartPattern = Pattern.compile(
-      ",\\s+(?<cityorstate>(([a-zA-Z.’]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}");
+      ",\\s*(?<cityorstate>(([\\p{L}0-9\\u0327\\u0331.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}",
+      Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
    * Remove diacritical marks string.
@@ -91,11 +92,25 @@ public class AddressIdentifier extends AbstractIdentifier {
     int roadtypeMatchOffset = -1;
     int roadtypeMatchEnd = -1;
     String roadType = null;
+    int startRoadTypeSearchIndex = 0;
 
-    while (roadtypeMatch.find()) {
+    while (roadtypeMatch.find(startRoadTypeSearchIndex)) {
       roadtypeMatchOffset = roadtypeMatch.start();
       roadtypeMatchEnd = roadtypeMatch.end();
       roadType = roadtypeMatch.group("roadtype").trim();
+      // if EOL, stop
+      if (roadtypeMatchEnd == key.length()) {
+        break;
+      }
+      // if ends with comma, backup next match to start at comma and
+      // stop looking for road type names
+      if (key.charAt(roadtypeMatchEnd - 1) == ',') {
+        roadtypeMatchEnd--;
+        break;
+      }
+      // otherwise, backup next match one char to start at whitespace
+      roadtypeMatchEnd--;
+      startRoadTypeSearchIndex = roadtypeMatchEnd;
     }
 
     if (roadtypeMatchOffset < 5) {

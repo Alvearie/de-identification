@@ -12,6 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,12 +67,9 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
       assertFalse(randomAddress.equals(validAddress));
 
       Address maskedAddress = identifier.parseAddress(randomAddress);
-
       if (maskedAddress == null) {
-        System.out.println(randomAddress);
+        fail("could not parse generated address " + randomAddress);
       }
-
-      assertTrue(maskedAddress != null);
 
       if (!originalAddress.getNumber().equals(maskedAddress.getNumber())) {
         randomizationOK++;
@@ -91,7 +89,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     String validAddress = "200 E Main St";
     String randomAddress = addressMaskingProvider.mask(validAddress);
-    assertFalse(randomAddress.equals(validAddress));
+    assertNotEquals(validAddress, randomAddress);
   }
 
   @Test
@@ -154,10 +152,10 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
   public void testMaskPOBox() throws Exception {
     // In order to mitigate the rare chance of the PO Box number matching,
     // the logic is to count the number of times it matched and fail if it
-    // matches more than once
+    // matches more than once.
     // If test case fails consistently with result matching more than once,
     // then the test tolerance has to be increased from >1 to something more
-    // Chances Calculated to 2 failures for 10,000 runs
+    // Chances Calculated to 2 failures for 10,000 runs.
     AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
@@ -318,22 +316,13 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
     String randomAddress = addressMaskingProvider.mask(validAddress);
 
-    // System.out.println("=======> Mask Number False: origianl address [" +
-    // validAddress + "], maskedAddress [" + randomAddress + "]" );
-    assertFalse(randomAddress.equals(validAddress));
+    assertNotEquals(validAddress, randomAddress);
 
     Address originalAddress = identifier.parseAddress(validAddress);
     Address maskedAddress = identifier.parseAddress(randomAddress);
-
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getNumber())
-        && StringUtils.isNotBlank(maskedAddress.getNumber())) {
-      // System.out.println("=======> Mask Number False: origianl address
-      // ["
-      // + maskedAddress.getNumber() + "], maskedAddress [" +
-      // originalAddress.getNumber() + "]" );
-      assertTrue(maskedAddress.getNumber().equals(originalAddress.getNumber()));
-    }
+    assertNotNull(maskedAddress);
+    assertEquals("number changed " + randomAddress, originalAddress.getNumber(),
+        maskedAddress.getNumber());
   }
 
   @Test
@@ -348,15 +337,18 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
-    assertNotNull(originalAddress);
-    assertNotNull(maskedAddress);
-    assertEquals(originalAddress.getName(), maskedAddress.getName());
+
+    for (int i = 0; i < 1000; i++) {
+      String randomAddress = addressMaskingProvider.mask(validAddress);
+
+      assertFalse(randomAddress.equals(validAddress));
+
+      Address maskedAddress = identifier.parseAddress(randomAddress);
+      assertNotNull(maskedAddress);
+      assertEquals("street name changed " + randomAddress, originalAddress.getName(),
+          maskedAddress.getName());
+    }
   }
 
   @Test
@@ -383,7 +375,8 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     assertNotNull(originalAddress);
     assertNotNull(maskedAddress);
-    assertEquals(originalAddress.getRoadType(), maskedAddress.getRoadType());
+    assertEquals("road type changed:" + randomAddress, originalAddress.getRoadType(),
+        maskedAddress.getRoadType());
   }
 
   @Test
@@ -398,21 +391,15 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    // System.out.println("=======> Mask City False: origianl address [" +
-    // validAddress + "], maskedAddress [" + randomAddress + "]" );
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getCityOrState())
-        && StringUtils.isNotBlank(maskedAddress.getCityOrState())) {
-      // System.out.println("=======> Mask City False: origianl address ["
-      // + maskedAddress.getCityOrState() + "], maskedAddress [" +
-      // originalAddress.getCityOrState() + "]" );
-      assertTrue(maskedAddress.getCityOrState().equals(originalAddress.getCityOrState()));
+
+    for (int i = 0; i < 1000; i++) {
+      String randomAddress = addressMaskingProvider.mask(validAddress);
+      assertFalse(randomAddress.equals(validAddress));
+      Address maskedAddress = identifier.parseAddress(randomAddress);
+      assertNotNull(maskedAddress);
+      assertEquals("city changed: " + randomAddress, originalAddress.getCityOrState(),
+          maskedAddress.getCityOrState());
     }
   }
 
@@ -428,22 +415,15 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "200 E Main St, Phoenix AZ 85123, USA";
-    String randomAddress = addressMaskingProvider.mask(validAddress);
-
-    // System.out.println("=======> Mask Country False: origianl address ["
-    // + validAddress + "], maskedAddress [" + randomAddress + "]" );
-    assertFalse(randomAddress.equals(validAddress));
-
     Address originalAddress = identifier.parseAddress(validAddress);
-    Address maskedAddress = identifier.parseAddress(randomAddress);
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getCountry())
-        && StringUtils.isNotBlank(maskedAddress.getCountry())) {
-      // System.out.println("=======> Mask Country False: origianl address
-      // ["
-      // + maskedAddress.getCountry() + "], maskedAddress [" +
-      // originalAddress.getCountry() + "]" );
-      assertTrue(maskedAddress.getCountry().equals(originalAddress.getCountry()));
+
+    for (int i = 0; i < 1000; i++) {
+      String randomAddress = addressMaskingProvider.mask(validAddress);
+      assertFalse(randomAddress.equals(validAddress));
+      Address maskedAddress = identifier.parseAddress(randomAddress);
+      assertNotNull(maskedAddress);
+      assertEquals("country changed: " + randomAddress, originalAddress.getCountry(),
+          maskedAddress.getCountry());
     }
   }
 
@@ -461,20 +441,16 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     AddressIdentifier identifier = new AddressIdentifier();
 
     String validAddress = "PO BOX 1234";
+
     String randomAddress = addressMaskingProvider.mask(validAddress);
 
-    // System.out.println("=======> Mask Postal Code False: origianl address
-    // ["
-    // + validAddress + "], maskedAddress [" + randomAddress + "]" );
     assertFalse(randomAddress.equals(validAddress));
 
     Address originalAddress = identifier.parseAddress(validAddress);
     Address maskedAddress = identifier.parseAddress(randomAddress);
-    if (originalAddress != null && maskedAddress != null
-        && StringUtils.isNotBlank(originalAddress.getPostalCode())
-        && StringUtils.isNotBlank(maskedAddress.getPostalCode())) {
-      assertTrue(maskedAddress.getPostalCode().equals(originalAddress.getPostalCode()));
-    }
+    assertNotNull(maskedAddress);
+    assertEquals("postal code changed: " + randomAddress, originalAddress.getPostalCode(),
+        maskedAddress.getPostalCode());
   }
 
   @Test
@@ -497,24 +473,16 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     for (int i = 0; i < 100; i++) {
       String maskedValue = addressMaskingProvider.mask(originalValue);
-      // System.out.println("=======> PostalCodeNearest: originalValue ["
-      // + originalValue + "], maskedValue [" + maskedValue + "]");
       assertFalse(originalValue.equals(maskedValue));
       Address maskedAddress = identifier.parseAddress(maskedValue);
 
       if (maskedAddress != null && StringUtils.isNotBlank(maskedAddress.getPostalCode())) {
         if (nearestPostalCodeList.contains(maskedAddress.getPostalCode())) {
-          // System.out.println("=======> PostalCodeNearest: masked
-          // postal code ["
-          // + maskedAddress.getPostalCode() + "]");
           maskOK++;
         }
       } else {
         for (String nearestPostalCode : nearestPostalCodeList) {
           if (maskedValue.contains(nearestPostalCode)) {
-            // System.out.println("=======> PostalCodeNearest:
-            // postal code contains ["
-            // + nearestPostalCode + "]");
             maskOK++;
           }
         }
@@ -560,5 +528,4 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
       }
     }
   }
-
 }
