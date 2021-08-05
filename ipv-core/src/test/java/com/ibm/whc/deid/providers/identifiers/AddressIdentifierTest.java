@@ -12,6 +12,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.Address;
+import com.ibm.whc.deid.models.City;
+import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.util.CityManager;
+import com.ibm.whc.deid.util.ManagerFactory;
+import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class AddressIdentifierTest {
   @Test
@@ -75,6 +80,30 @@ public class AddressIdentifierTest {
     address = identifier.parseAddress(addressName);
     assertTrue(address.isPOBox());
     assertTrue(address.getPoBoxNumber().equals("777"));
+  }
+
+  @Test
+  public void testParseCity() {
+    AddressIdentifier identifier = new AddressIdentifier();
+    CityManager cityResourceManager = (CityManager) ManagerFactory.getInstance().getManager("test",
+        Resource.CITY, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+    StringBuilder buffer = new StringBuilder(100);
+
+    for (City city : cityResourceManager.getValues()) {
+      String name = city.getName();
+      buffer.setLength(0);
+      buffer.append("200 E Main St, ").append(name).append(" 85123, USA");
+      String addr = buffer.toString();
+
+      Address address = identifier.parseAddress(addr);
+      assertNotNull(address);
+      assertEquals("200", address.getNumber());
+      assertEquals("E MAIN", address.getName());
+      assertEquals("ST", address.getRoadType());
+      assertEquals(name.toUpperCase(), address.getCityOrState());
+      assertEquals("85123", address.getPostalCode());
+      assertEquals("USA", address.getCountry());
+    }
   }
 
   @Test
