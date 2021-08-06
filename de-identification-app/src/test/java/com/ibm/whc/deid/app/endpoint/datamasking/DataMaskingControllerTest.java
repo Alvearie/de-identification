@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,9 +8,11 @@ package com.ibm.whc.deid.app.endpoint.datamasking;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,8 +91,32 @@ public class DataMaskingControllerTest {
         .andDo(print()).andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.data[0].id").value(containsString("1234")))
         .andExpect(jsonPath("$.data[0].patient.display").value(not("Patient Zero")));
+  }
 
+  @Test
+  public void testMaskData_invalidInputDocument() throws Exception {
+    String dataGood = new String(Files
+        .readAllBytes(Paths.get(getClass().getResource("/masking/data/simple_fhir.json").toURI())));
+    String dataBad =
+        "{\"id\":\"1234\", \"resourceType\": \"Device\", \"patient\":{ \"display\":\"Patient Zero\" \"reference\":\"1234\"}}";
 
+    String config = new String(Files.readAllBytes(
+        Paths.get(getClass().getResource("/config/fhir/masking_config.json").toURI())));
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(dataGood);
+    inputList.add(dataBad);
+
+    DataMaskingModel dataMaskingModel =
+        new DataMaskingModel(config, inputList, ConfigSchemaType.FHIR);
+    ObjectMapper mapper = new ObjectMapper();
+    String request = mapper.writeValueAsString(dataMaskingModel);
+
+    this.mockMvc
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(request))
+        .andDo(print()).andExpect(status().isBadRequest()).andExpect(content().string(startsWith(
+            "Could not create valid JSON structure from input message with identifier `1`")));
   }
 
   @Test
