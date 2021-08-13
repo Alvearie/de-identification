@@ -32,5 +32,9 @@ keywords:
 home: https://github.com/Alvearie/de-identification
 
 maintainers:
-  - name: Susan Crowell
-    email: sfc@us.ibm.com
+  - name: Jarrett Anderson
+    email: jarrett@us.ibm.com
+  - name: Dumas Hwang
+    email: dhwang@ca.ibm.com
+  - name: Denis Ricard
+    email: dricard@ca.ibm.com    
