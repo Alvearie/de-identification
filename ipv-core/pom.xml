@@ -147,6 +147,11 @@
 			<artifactId>ipv-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.privacylogistics</groupId>
+            <artifactId>java-fpe</artifactId>
+            <version>0.8.1-SNAPSHOT</version>
+        </dependency>		
 		<dependency>
 			<groupId>com.ibm.whc.deid</groupId>
 			<artifactId>whc-shared</artifactId>
