@@ -33,6 +33,40 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
+			<!-- Plugin that adds an additional source directory to the project. -->
+			<!-- Default source directory (/src/main/java) is retained.          -->
+			<!-- Used to build the classes in the submodules.                    -->
+	       <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+				        <goals>
+                            <goal>add-source</goal>
+				        </goals>
+				        <configuration>
+                            <sources>
+                                <source>submodules/java-fpe/src/main/java</source>
+                            </sources>
+				        </configuration>
+                    </execution>
+                    <execution>
+				        <id>add-test-source</id>
+				        <phase>generate-test-sources</phase>
+				        <goals>
+                            <goal>add-test-source</goal>
+				        </goals>
+				        <configuration>
+                            <sources>
+                                <source>submodules/java-fpe/src/test/java</source>
+                            </sources>
+				        </configuration>
+                    </execution>
+                </executions>
+            </plugin>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -70,6 +104,7 @@
 			</resource>
 		</resources>
 	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
