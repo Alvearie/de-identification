@@ -25,6 +25,8 @@ DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
 source toolchain_util.sh
 
+git submodule update --init --recursive
+
 #########################################################
 # Setup the artifactory repo settings                   #
 #########################################################
