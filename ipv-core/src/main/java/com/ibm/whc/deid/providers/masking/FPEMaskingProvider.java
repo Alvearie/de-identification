@@ -5,9 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import com.ibm.whc.deid.providers.masking.fpe.EncryptionEngineException;
+import com.ibm.whc.deid.providers.masking.fpe.FPEDriver;
+import com.ibm.whc.deid.providers.masking.fpe.UnsupportedLengthException;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
-import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Radix;
+import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.UsageType;
 
 /**
  * Masks identifiers as per NIST Format-Preserving Encryption FF3-1.
@@ -16,19 +19,10 @@ public class FPEMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = 1L;
 
-  private final Radix radix;
-  private final Pad pad;
-  private final boolean preserveSymbolLocation;
-  private final boolean caseInsensitive;
-
-  protected class UnsupportedLengthException extends Exception {
-
-    private static final long serialVersionUID = 1L;
-
-    public UnsupportedLengthException(int length) {
-      super(Integer.toString(length));
-    }
-  }
+  private final String key;
+  private final String tweak;
+  private final UsageType usageType;
+  private final Pad padding;
 
   /**
    * Instantiates a new FPE masking provider.
@@ -37,10 +31,10 @@ public class FPEMaskingProvider extends AbstractMaskingProvider {
    */
   public FPEMaskingProvider(FPEMaskingProviderConfig config) {
     super(config);
-    this.radix = config.getRadix();
-    this.pad = config.getPad();
-    this.preserveSymbolLocation = config.isPreserveSymbolLocation();
-    this.caseInsensitive = config.isCaseInsensitive();
+    this.key = config.getKey();
+    this.tweak = config.getTweak();
+    this.usageType = config.getInputType();
+    this.padding = config.getPadding();
   }
 
   @Override
@@ -50,48 +44,15 @@ public class FPEMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    // TODO remove symbols
-
-    String in;
     try {
-      in = verifyLength(identifier);
+      return FPEDriver.getFPEDriver(usageType).encrypt(identifier, key, tweak, padding);
+
     } catch (UnsupportedLengthException e) {
-      // TODO: message
+      // TODO: add log message
       return applyUnexpectedValueHandling(identifier, null);
+    } catch (EncryptionEngineException e) {
+      // TODO: add log message
+      throw new RuntimeException(e);
     }
-
-    FF3Cipher cipher = new FF3Cipher("jarrett-key", "jra-tweak", radix.value());
-    
-  }
-
-  protected String verifyLength(String input) throws UnsupportedLengthException {
-    String adjusted = input;
-    int length = input.length();
-    if (length > radix.getMaxStringLength()) {
-      throw new UnsupportedLengthException(length);
-    }
-    int minlen = radix.getMinStringLength();
-    if (length < minlen) {
-      switch (pad) {
-        case NONE:
-          //TODO: message
-          throw new UnsupportedLengthException(length);
-        case FRONT:
-        case BACK:
-          char padchar = radix.getPadChar();
-          StringBuilder buffer = new StringBuilder(radix.getMinStringLength());
-          for (int i = 0; i < minlen - length; i++) {
-            buffer.append(padchar);
-          }
-          if (pad == Pad.FRONT) {
-            buffer.append(input);
-          } else {
-            buffer.insert(0, input);
-          }
-          adjusted = buffer.toString();
-          break;
-      }
-    }
-    return adjusted;
   }
 }

@@ -106,7 +106,8 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
     assertEquals(3, randomCountry.length());
     country = countryMaskingProvider.getCountryManager().getValue(randomCountry);
     assertNotNull(country);
-    assertEquals(CountryNameSpecification.ISO3, country.getCountryNameSpecification());
+    assertEquals(randomCountry, CountryNameSpecification.ISO3,
+        country.getCountryNameSpecification());
   }
 
   @Test

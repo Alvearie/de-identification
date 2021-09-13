@@ -6,6 +6,8 @@
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -20,52 +22,31 @@ public class FPEMaskingProviderConfig extends MaskingProviderConfig {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * The characters that will be encrypted.
-   */
-  public enum Radix {
+  public enum UsageType {
+    //@formatter:off
+    DIGITS(true), 
+    LETTERS_LOWER(true), 
+    LETTERS_UPPER(true), 
+    LETTERS_INSENSITIVE_AS_LOWER(true), 
+    LETTERS_INSENSITIVE_AS_UPPER(true), 
+    LETTERS_INSENSITIVE_AS_ORIGINAL(true), 
+    LETTERS_SENSITIVE(false),
+    DIGITS_LETTERS_LOWER(true),
+    DIGITS_LETTERS_UPPER(true),
+    DIGITS_LETTERS_INSENSITIVE_AS_LOWER(true),
+    DIGITS_LETTERS_INSENSITIVE_AS_UPPER(true),
+    DIGITS_LETTERS_SENSITIVE(false)
+    ;
+    //@formatter:on
 
-    /**
-     * Digits 0-9
-     */
-    DIGITS(10, 6, 56, '0'),
+    private final boolean padding;
 
-    /**
-     * lower case letters a-z
-     */
-    LOWER(26, 5, 40, 'a'),
-
-    /**
-     * Digits 0-9 or lower case letters a-z
-     */
-    DIGITS_LOWER(36, 4, 36, 'a');
-
-    private final int value;
-    private final int minchars;
-    private final int maxchars;
-    private final char padchar;
-
-    private Radix(int val, int min, int max, char pad) {
-      value = val;
-      minchars = min;
-      maxchars = max;
-      padchar = pad;
-    }
-
-    public int value() {
-      return value;
-    }
-
-    public int getMinStringLength() {
-      return minchars;
-    }
-
-    public int getMaxStringLength() {
-      return maxchars;
+    private UsageType(boolean p) {
+      padding = p;
     }
     
-    public char getPadChar() {
-      return padchar;
+    public boolean supportsPadding() {
+      return padding;
     }
   }
 
@@ -87,79 +68,86 @@ public class FPEMaskingProviderConfig extends MaskingProviderConfig {
     BACK
   }
 
-  public static final Radix DEFAULT_RADIX = Radix.DIGITS;
-  public static final Pad DEFAULT_PAD = Pad.NONE;
+  public static final UsageType DEFAULT_USAGE_TYPE = UsageType.DIGITS;
+  public static final Pad DEFAULT_PADDING = Pad.NONE;
+  public static final Pattern MATERIAL_CONTENT_PATTERN = Pattern.compile("[0-9a-f]+");
 
-  private Radix radix;
-  private Pad pad;
-  private boolean preserveSymbolLocation = true;
-  private boolean caseInsensitive = false;
+  private String key;
+  private String tweak;
+  private UsageType inputType;
+  private Pad padding;
 
   public FPEMaskingProviderConfig() {
-    radix = DEFAULT_RADIX;
-    pad = DEFAULT_PAD;
+    inputType = DEFAULT_USAGE_TYPE;
+    padding = DEFAULT_PADDING;
     type = MaskingProviderType.FPE;
   }
 
-  public Radix getRadix() {
-    return radix;
+  public String getKey() {
+    return key;
   }
 
-  public void setRadix(Radix radix) {
-    this.radix = radix == null ? DEFAULT_RADIX : radix;
+  public void setKey(String key) {
+    this.key = key;
   }
 
-  public Pad getPad() {
-    return pad;
+  public String getTweak() {
+    return tweak;
   }
 
-  public void setPad(Pad pad) {
-    this.pad = pad == null ? DEFAULT_PAD : pad;
+  public void setTweak(String tweak) {
+    this.tweak = tweak;
   }
 
-  public boolean isPreserveSymbolLocation() {
-    return preserveSymbolLocation;
+  public UsageType getInputType() {
+    return inputType;
   }
 
-  public void setPreserveSymbolLocation(boolean preserveSymbolLocation) {
-    this.preserveSymbolLocation = preserveSymbolLocation;
+  public void setInputType(UsageType inputType) {
+    this.inputType = inputType == null ? DEFAULT_USAGE_TYPE : inputType;
   }
 
-  public boolean isCaseInsensitive() {
-    return caseInsensitive;
+  public Pad getPadding() {
+    return padding;
   }
 
-  public void setCaseInsensitive(boolean caseInsensitive) {
-    this.caseInsensitive = caseInsensitive;
+  public void setPadding(Pad padding) {
+    this.padding = padding == null ? DEFAULT_PADDING : padding;
   }
+
+  // TODO: add equals() and hashcode()
 
   @Override
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
+
     super.validate(maskingConfig);
-  }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + Objects.hash(caseInsensitive, pad, preserveSymbolLocation, radix);
-    return result;
-  }
+    int length = key == null ? 0 : key.length();
+    if (length != 32 && length != 48 && length != 64) {
+      throw new InvalidMaskingConfigurationException("`key` must be 32, 48, or 64 characters");
+    }
+    Matcher matcher = MATERIAL_CONTENT_PATTERN.matcher(key);
+    if (!matcher.matches()) {
+      throw new InvalidMaskingConfigurationException(
+          "`key` must contain only characters 0-9 and a-f");
+    }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
+    length = tweak == null ? 0 : tweak.length();
+    if (length != 16) {
+      throw new InvalidMaskingConfigurationException("`tweak` must be 16 characters");
     }
-    if (!super.equals(obj)) {
-      return false;
+    matcher = MATERIAL_CONTENT_PATTERN.matcher(tweak);
+    if (!matcher.matches()) {
+      throw new InvalidMaskingConfigurationException(
+          "`tweak` must contain only characters 0-9 and a-f");
     }
-    if (!(obj instanceof FPEMaskingProviderConfig)) {
-      return false;
+
+    if (padding != Pad.NONE && !inputType.supportsPadding()) {
+      if (!matcher.matches()) {
+        throw new InvalidMaskingConfigurationException("`padding` has the value " + padding.name()
+            + " but the `inputType` value " + inputType.name() + " does not support padding");
+      }
     }
-    FPEMaskingProviderConfig other = (FPEMaskingProviderConfig) obj;
-    return caseInsensitive == other.caseInsensitive && pad == other.pad
-        && preserveSymbolLocation == other.preserveSymbolLocation && radix == other.radix;
   }
 }
