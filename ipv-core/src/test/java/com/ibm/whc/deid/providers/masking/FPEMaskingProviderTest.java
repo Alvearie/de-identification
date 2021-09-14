@@ -14,6 +14,7 @@ import com.ibm.whc.deid.providers.masking.fpe.FPEDriverBase;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.UsageType;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.privacylogistics.FF3Cipher;
 
 public class FPEMaskingProviderTest {
@@ -28,7 +29,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[0-9]+");
     String original = "897435847";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -52,7 +53,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[0-9]{3}+a&[0-9]{6}+@");
     String original = "897a&435847@";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -78,7 +79,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[0-9]+");
     String original = "6789";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(6, result.length());
     Matcher matcher = pattern.matcher(result);
@@ -103,7 +104,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[0-9]{3}+a-A[0-9]{3}+@");
     String original = "6a-A789@";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(10, result.length());
     Matcher matcher = pattern.matcher(result);
@@ -128,7 +129,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[a-z]+");
     String original = "abcdefghijklmnopqrstuvwxyz";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -155,7 +156,7 @@ public class FPEMaskingProviderTest {
     String original = "0abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
     String originalNoSym = "abcdefghijklmnopqrstuvwxyz";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -190,7 +191,7 @@ public class FPEMaskingProviderTest {
     Pattern pattern = Pattern.compile("[A-Z]+");
     String original = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -220,7 +221,7 @@ public class FPEMaskingProviderTest {
     String original = "zABC-DEF-GHI-JKL-MNO-PQR-STU-VWX-YZ9";
     String originalNoSym = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -257,7 +258,7 @@ public class FPEMaskingProviderTest {
     String originalNoSym = "abcxyz";
     Pattern pattern = Pattern.compile("[a-z]{3}+\\$8[a-z]{3} \t");
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -321,7 +322,7 @@ public class FPEMaskingProviderTest {
     String originalNoSym = "abcxyz";
     Pattern pattern = Pattern.compile("[A-Z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -351,7 +352,7 @@ public class FPEMaskingProviderTest {
     String originalNoSym = "abcxyz";
     Pattern pattern = Pattern.compile("[a-z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
-    System.out.println(result);
+    System.out.println(original + " -> " + result);
     // verify length and content
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
@@ -368,6 +369,169 @@ public class FPEMaskingProviderTest {
     // recapitalization from original as desired
     assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
         cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase()))));
+  }
+
+  @Test
+  public void testDigitsLettersLowerSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_LOWER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "A#0123456789#abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
+    String originalNoSym = "0123456789abcdefghijklmnopqrstuvwxyz";
+    Pattern pattern = Pattern.compile(
+        "A#[0-9a-z]{10}+#[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{2}Z");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    // verify reversible
+    StringBuilder buffer = new StringBuilder(originalNoSym.length());
+    buffer.append(result.substring(2, 12));
+    buffer.append(result.substring(13, 16));
+    buffer.append(result.substring(17, 20));
+    buffer.append(result.substring(21, 24));
+    buffer.append(result.substring(25, 28));
+    buffer.append(result.substring(29, 32));
+    buffer.append(result.substring(33, 36));
+    buffer.append(result.substring(37, 40));
+    buffer.append(result.substring(41, 44));
+    buffer.append(result.substring(45, 47));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
+  }
+
+  @Test
+  public void testDigitsLettersUpperSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_UPPER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "#a0123456789#ABC-DEF-GHI-JKL-MNO-PQR-STU-VWX-YZz";
+    String originalNoSym = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    Pattern pattern = Pattern.compile(
+        "#a[0-9A-Z]{10}+#[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{2}z");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    // verify reversible
+    StringBuilder buffer = new StringBuilder(originalNoSym.length());
+    buffer.append(result.substring(2, 12));
+    buffer.append(result.substring(13, 16));
+    buffer.append(result.substring(17, 20));
+    buffer.append(result.substring(21, 24));
+    buffer.append(result.substring(25, 28));
+    buffer.append(result.substring(29, 32));
+    buffer.append(result.substring(33, 36));
+    buffer.append(result.substring(37, 40));
+    buffer.append(result.substring(41, 44));
+    buffer.append(result.substring(45, 47));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()).toUpperCase());
+  }
+
+  @Test
+  public void testDigitsLettersInsensitiveLowerSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_INSENSITIVE_AS_LOWER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "@0123456789#abc-DEF-ghi-JKL-MNO-PQR-STU-VWX-YZ@";
+    String originalNoSym = "0123456789abcdefghijklmnopqrstuvwxyz";
+    Pattern pattern = Pattern.compile(
+        "@[0-9a-z]{10}+#[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{2}@");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    // verify reversible
+    StringBuilder buffer = new StringBuilder(originalNoSym.length());
+    buffer.append(result.substring(1, 11));
+    buffer.append(result.substring(12, 15));
+    buffer.append(result.substring(16, 19));
+    buffer.append(result.substring(20, 23));
+    buffer.append(result.substring(24, 27));
+    buffer.append(result.substring(28, 31));
+    buffer.append(result.substring(32, 35));
+    buffer.append(result.substring(36, 39));
+    buffer.append(result.substring(40, 43));
+    buffer.append(result.substring(44, 46));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
+  }
+
+  @Test
+  public void testDigitsLettersInsensitiveUpperSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_INSENSITIVE_AS_UPPER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "@0123456789#abc-DEF-ghi-JKL-MNO-PQR-STU-VWX-YZ@";
+    String originalNoSym = "0123456789abcdefghijklmnopqrstuvwxyz";
+    Pattern pattern = Pattern.compile(
+        "@[0-9A-Z]{10}+#[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{2}@");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    // verify reversible
+    StringBuilder buffer = new StringBuilder(originalNoSym.length());
+    buffer.append(result.substring(1, 11));
+    buffer.append(result.substring(12, 15));
+    buffer.append(result.substring(16, 19));
+    buffer.append(result.substring(20, 23));
+    buffer.append(result.substring(24, 27));
+    buffer.append(result.substring(28, 31));
+    buffer.append(result.substring(32, 35));
+    buffer.append(result.substring(36, 39));
+    buffer.append(result.substring(40, 43));
+    buffer.append(result.substring(44, 46));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
+  }
+
+  @Test
+  public void testTooLong() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_INSENSITIVE_AS_UPPER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("longlong");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "#a0123456789#ABC-DEF-GHI-JKL-MNO-PQR-STU-VWX-YZz";
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    assertEquals("longlong", result);
   }
 
   // check null

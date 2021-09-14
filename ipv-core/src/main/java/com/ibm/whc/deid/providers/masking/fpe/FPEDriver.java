@@ -32,10 +32,20 @@ public interface FPEDriver {
         driver = new FPEDriverLettersInsensitive(OutputCase.ORIGINAL);
         break;
       case LETTERS_SENSITIVE:
+        // TODO: finish
+        throw new RuntimeException("not yet implemented");
       case DIGITS_LETTERS_LOWER:
+        driver = new FPEDriverDigitsLettersLower();
+        break;
       case DIGITS_LETTERS_UPPER:
+        driver = new FPEDriverDigitsLettersUpper();
+        break;
       case DIGITS_LETTERS_INSENSITIVE_AS_LOWER:
+        driver = new FPEDriverDigitsLettersInsensitive(OutputCase.LOWER);
+        break;
       case DIGITS_LETTERS_INSENSITIVE_AS_UPPER:
+        driver = new FPEDriverDigitsLettersInsensitive(OutputCase.UPPER);
+        break;
       case DIGITS_LETTERS_SENSITIVE:
         // TODO: finish
         throw new RuntimeException("not yet implemented");

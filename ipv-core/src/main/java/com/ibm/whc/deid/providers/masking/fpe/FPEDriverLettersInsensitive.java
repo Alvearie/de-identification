@@ -50,7 +50,7 @@ public class FPEDriverLettersInsensitive extends FPEDriverBaseSinglePhase {
       case LOWER:
         break;
       case UPPER:
-        outLetters = outLetters.toUpperCase();
+        outLetters = outLetters.toUpperCase(Locale.US);
         break;
       case ORIGINAL:
         StringBuilder buffer = new StringBuilder(outLetters);
