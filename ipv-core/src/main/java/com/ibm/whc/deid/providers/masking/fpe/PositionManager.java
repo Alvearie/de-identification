@@ -11,7 +11,7 @@ public class PositionManager {
     DIGIT, UPPER, LOWER, OTHER
   }
 
-  protected class Position {
+  public class Position {
     private char original;
     // TODO: keep?
     private char encrypted;
@@ -56,6 +56,10 @@ public class PositionManager {
     for (int i = 0; i < len; i++) {
       positions[i] = new Position(original.charAt(i));
     }
+  }
+
+  public Position[] getPositions() {
+    return positions;
   }
 
   public String extract(boolean includeDigits, boolean includeLower, boolean includeUpper) {

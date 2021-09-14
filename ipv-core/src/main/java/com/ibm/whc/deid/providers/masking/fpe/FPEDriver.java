@@ -17,12 +17,20 @@ public interface FPEDriver {
         driver = new FPEDriverDigits();
         break;
       case LETTERS_LOWER:
-        driver = new FPEDriverLetters(Radix.LOWER, false, true, false);
+        driver = new FPEDriverLettersLower();
         break;
       case LETTERS_UPPER:
+        driver = new FPEDriverLettersUpper();
+        break;
       case LETTERS_INSENSITIVE_AS_LOWER:
+        driver = new FPEDriverLettersInsensitive(OutputCase.LOWER);
+        break;
       case LETTERS_INSENSITIVE_AS_UPPER:
+        driver = new FPEDriverLettersInsensitive(OutputCase.UPPER);
+        break;
       case LETTERS_INSENSITIVE_AS_ORIGINAL:
+        driver = new FPEDriverLettersInsensitive(OutputCase.ORIGINAL);
+        break;
       case LETTERS_SENSITIVE:
       case DIGITS_LETTERS_LOWER:
       case DIGITS_LETTERS_UPPER:
