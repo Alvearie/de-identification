@@ -534,6 +534,50 @@ public class FPEMaskingProviderTest {
     assertEquals("longlong", result);
   }
 
+  @Test
+  public void testLettersSensitiveSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.LETTERS_SENSITIVE);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "@0123456789#abc-DEF-ghi-JKL-MNO-PQR-STU-vwx-YZ@";
+    Pattern pattern = Pattern.compile(
+        "@0123456789#[a-z]{3}-[A-Z]{3}-[a-z]{3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[a-z]{3}-[A-Z]{2}@");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+  }
+
+  @Test
+  public void testDigitsLettersSensitiveSuccessSymbols() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_SENSITIVE);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    String original = "@0123456789#abc-DEF-ghi-JKL-MNO-PQR-STU-vwx-YZ@";
+    Pattern pattern = Pattern.compile(
+        "@[0-9]{10}#[a-z]{3}-[A-Z]{3}-[a-z]{3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[a-z]{3}-[A-Z]{2}@");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+  }
+
   // check null
   // check empty string
   // check just symbols

@@ -32,8 +32,8 @@ public interface FPEDriver {
         driver = new FPEDriverLettersInsensitive(OutputCase.ORIGINAL);
         break;
       case LETTERS_SENSITIVE:
-        // TODO: finish
-        throw new RuntimeException("not yet implemented");
+        driver = new FPEDriverLettersSensitive();
+        break;
       case DIGITS_LETTERS_LOWER:
         driver = new FPEDriverDigitsLettersLower();
         break;
@@ -47,8 +47,8 @@ public interface FPEDriver {
         driver = new FPEDriverDigitsLettersInsensitive(OutputCase.UPPER);
         break;
       case DIGITS_LETTERS_SENSITIVE:
-        // TODO: finish
-        throw new RuntimeException("not yet implemented");
+        driver = new FPEDriverDigitsLettersSensitive();
+        break;
       default:
         throw new IllegalArgumentException(type.name());
     }
