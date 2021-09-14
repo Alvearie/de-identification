@@ -12,32 +12,32 @@
 # modify that method
 set -x
 
+echo preDockerBuild.sh start
+
 rc=0
 
-#########################################################
-# Update the maven version for each build               #
-#########################################################
-# Remember the current directory.  Subsequent functions may go into different directories
+# Remember the current directory.  Subsequent functions may go into different directories.
 export rootDir=`pwd`
 
-DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
-curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+# This is the branch name for de-id-devops
+DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
 
+curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+source toolchain_util.sh
+
+git submodule update --init --recursive
 
 #########################################################
 # Setup the artifactory repo settings                   #
 #########################################################
 if [ ! -f ${HOME}/.m2/settings.xml ]; then
-    mkdir ${HOME}/.m2
+    mkdir -p ${HOME}/.m2
 fi
 
-# This is the branch name for de-id-devops
-DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
+curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
-
-# Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT
-# If the branch is not master, include branch name in the version
+# Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
+# If the branch is not master, include branch name in the version.
 RELEASE_VERSION=1.0.1
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then
@@ -48,6 +48,9 @@ fi
 echo "revision:"
 cat .mvn/maven.config
 
+#########################################################
+# CI Validate                                           #
+#########################################################
 # If we are running ci validate toolchain, just build the jar files and exit
 echo "Taskname $taskname"
 if [ "$taskname" == "civalidate" ]; then
@@ -59,9 +62,9 @@ if [ "$taskname" == "civalidate" ]; then
 
   mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install -Dmaven.repo.local=./m2/repository
 
-  # Run the sonarqube scan.  This scan is going to fail as there is not sonarqube pod running yet.
-  # The purpose is for maven to download the correct dependencies for sonarqube
-  echo "Running sonarqube to get dependencies.  This is expected to fail"
+  # Run the sonarqube scan.  This scan is going to fail as there is no sonarqube pod running yet.
+  # The purpose is for maven to download the correct dependencies for sonarqube.
+  echo "Running sonarqube to get dependencies.  This is expected to fail."
   mvn sonar:sonar -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Dmaven.repo.local=./m2/repository
   exit 0
 fi
@@ -72,7 +75,6 @@ fi
 mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install 
 
 rc=$((rc || $? ))
-
 if [[ ! "$rc" == "0" ]]; then
     echo "BUILD FAILURE; SEE ABOVE OUTPUT FOR DETAILS AND RESOLUTION";
     exit $rc;
@@ -84,8 +86,10 @@ fi
 mvn -B deploy -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
 
 rc=$((rc || $? ))
-
 if [[ ! "$rc" == "0" ]]; then
     echo "FAILED to deploy artifacts; SEE ABOVE OUTPUT FOR DETAILS AND RESOLUTION";
     exit $rc;
 fi
+
+echo preDockerBuild.sh end
+
