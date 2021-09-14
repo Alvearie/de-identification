@@ -1,3 +1,3 @@
 [submodule "ipv-core/submodules/java-fpe"]
 	path = ipv-core/submodules/java-fpe
-	url = https://github.com/de-identification/java-fpe
+	url = https://github.com/mysto/java-fpe
