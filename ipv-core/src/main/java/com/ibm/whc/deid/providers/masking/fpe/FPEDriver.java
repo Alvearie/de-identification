@@ -16,17 +16,20 @@ public interface FPEDriver {
       case DIGITS:
         driver = new FPEDriverDigits();
         break;
+      case LETTERS_LOWER:
+        driver = new FPEDriverLetters(Radix.LOWER, false, true, false);
+        break;
+      case LETTERS_UPPER:
+      case LETTERS_INSENSITIVE_AS_LOWER:
+      case LETTERS_INSENSITIVE_AS_UPPER:
+      case LETTERS_INSENSITIVE_AS_ORIGINAL:
+      case LETTERS_SENSITIVE:
+      case DIGITS_LETTERS_LOWER:
+      case DIGITS_LETTERS_UPPER:
       case DIGITS_LETTERS_INSENSITIVE_AS_LOWER:
       case DIGITS_LETTERS_INSENSITIVE_AS_UPPER:
-      case DIGITS_LETTERS_LOWER:
       case DIGITS_LETTERS_SENSITIVE:
-      case DIGITS_LETTERS_UPPER:
-      case LETTERS_INSENSITIVE_AS_LOWER:
-      case LETTERS_INSENSITIVE_AS_ORIGINAL:
-      case LETTERS_INSENSITIVE_AS_UPPER:
-      case LETTERS_LOWER:
-      case LETTERS_SENSITIVE:
-      case LETTERS_UPPER:
+        // TODO: finish
         throw new RuntimeException("not yet implemented");
       default:
         throw new IllegalArgumentException(type.name());

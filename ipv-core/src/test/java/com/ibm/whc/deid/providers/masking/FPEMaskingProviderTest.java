@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Test;
+import com.ibm.whc.deid.providers.masking.fpe.FPEDriverBase;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.UsageType;
@@ -115,6 +116,31 @@ public class FPEMaskingProviderTest {
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
     String resultNoSymbols = result.substring(0, 3) + result.substring(6, 9);
     assertEquals("006789", cipher.decrypt(resultNoSymbols));
+  }
+
+  @Test
+  public void testLettersSuccess() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.LETTERS_LOWER);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    Pattern pattern = Pattern.compile("[a-z]+");
+    String original = "abcdefghijklmnopqrstuvwxyz";
+    String result = provider.mask(original);
+    System.out.println(result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    // verify reversible
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
+    assertEquals(original, FPEDriverBase
+        .shiftBase26ToLetters(cipher.decrypt(FPEDriverBase.shiftLettersToBase26(result))));
   }
 
 }

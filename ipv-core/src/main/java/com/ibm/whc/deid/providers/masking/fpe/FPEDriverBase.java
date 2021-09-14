@@ -5,12 +5,39 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
+import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 import com.privacylogistics.FF3Cipher;
 
 public abstract class FPEDriverBase implements FPEDriver {
+
+  protected static final char[] BASE26 = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8',
+      '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'};
+  protected static final char[] LETTERS = new char[] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+      'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+  public static String shiftLettersToBase26(String in) {
+    return convertChars(in, LETTERS, BASE26);
+  }
+
+  public static String shiftBase26ToLetters(String in) {
+    return convertChars(in, BASE26, LETTERS);
+  }
+
+  private static String convertChars(String in, char[] sourceRange, char[] targetRange) {
+    StringBuilder buffer = new StringBuilder(in.length());
+    int length = in.length();
+    char ch;
+    int index;
+    for (int i = 0; i < length; i++) {
+      ch = in.charAt(i);
+      index = Arrays.binarySearch(sourceRange, ch);
+      buffer.append(targetRange[index]);
+    }
+    return buffer.toString();
+  }
 
   protected int calculatePadNeeded(String input, Radix radix) throws UnsupportedLengthException {
     int length = input.length();
