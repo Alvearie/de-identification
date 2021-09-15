@@ -248,6 +248,8 @@ public abstract class MaskingProviderConfig implements Serializable {
         return new DateTimeConsistentShiftMaskingProviderConfig();
       case EMAIL:
         return new EmailMaskingProviderConfig();
+      case FPE:
+        return new FPEMaskingProviderConfig();
       case GENDER:
         return new GenderMaskingProviderConfig();
       case GENERALIZE:
