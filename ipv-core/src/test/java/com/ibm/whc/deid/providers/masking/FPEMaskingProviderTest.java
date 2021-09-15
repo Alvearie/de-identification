@@ -6,7 +6,10 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Test;
@@ -49,6 +52,7 @@ public class FPEMaskingProviderTest {
     config.setInputType(UsageType.DIGITS);
     config.setKey("11111111222222223333333344444444");
     config.setTweak("aaaabbbbccccdddd");
+    config.setPadding(Pad.BACK); // not needed
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
     Pattern pattern = Pattern.compile("[0-9]{3}+a&[0-9]{6}+@");
     String original = "897a&435847@";
@@ -520,21 +524,6 @@ public class FPEMaskingProviderTest {
   }
 
   @Test
-  public void testTooLong() throws Exception {
-    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
-    config.setInputType(UsageType.DIGITS_LETTERS_INSENSITIVE_AS_UPPER);
-    config.setKey("11111111222222223333333344444444");
-    config.setTweak("aaaabbbbccccdddd");
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
-    config.setUnexpectedInputReturnMessage("longlong");
-    FPEMaskingProvider provider = new FPEMaskingProvider(config);
-    String original = "#a0123456789#ABC-DEF-GHI-JKL-MNO-PQR-STU-VWX-YZz";
-    String result = provider.mask(original);
-    System.out.println(original + " -> " + result);
-    assertEquals("longlong", result);
-  }
-
-  @Test
   public void testLettersSensitiveSuccessSymbols() throws Exception {
     FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
     config.setInputType(UsageType.LETTERS_SENSITIVE);
@@ -554,6 +543,57 @@ public class FPEMaskingProviderTest {
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
+  }
+
+  @Test
+  public void testLettersSensitiveLengths() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.LETTERS_SENSITIVE);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("X");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    
+    // minimum lower and upper
+    String original = "abc-123-DEF-gh-JK";
+    Pattern pattern = Pattern.compile("[a-z]{3}-123-[A-Z]{3}-[a-z]{2}-[A-Z]{2}");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+    
+    // one lower too few
+    assertEquals("X", provider.mask(original.substring(1)));
+
+    // one upper too few
+    assertEquals("X", provider.mask(original.substring(0, original.length() - 1)));
+
+    // maximum lower and upper
+    original = "abcdefghijklmnopqrstuvwxyzabcdefghijklmn-ABCDEFGHIJKLMNOPQRSTUVXXYZABCDEFGHIJKLMN";
+    pattern = Pattern.compile("[a-z]{40}+-[A-Z]{40}+");
+    result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+
+    // one lower too many
+    assertEquals("X", provider.mask(original + "a"));
+    
+    // one upper too many
+    assertEquals("X", provider.mask(original + "A"));
   }
 
   @Test
@@ -578,7 +618,161 @@ public class FPEMaskingProviderTest {
     }
   }
 
-  // check null
-  // check empty string
-  // check just symbols
+  @Test
+  public void testNothingToMask() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    for (UsageType usage : UsageType.values()) {
+      config.setInputType(usage);
+      FPEMaskingProvider provider = new FPEMaskingProvider(config);
+      assertNull("usage:" + usage.name(), provider.mask(null));
+      String original = "";
+      assertEquals("usage:" + usage.name(), original, provider.mask(original));
+      original = " $$$ ";
+      assertEquals("usage:" + usage.name(), original, provider.mask(original));
+    }
+  }
+
+  @Test
+  public void testLength() throws Exception {
+    for (UsageType usage : UsageType.values()) {
+      switch (usage) {
+        case DIGITS:
+          doTestLength(6, 56, '5', usage);
+          break;
+        case LETTERS_LOWER:
+        case LETTERS_INSENSITIVE_AS_LOWER:
+        case LETTERS_INSENSITIVE_AS_UPPER:
+        case LETTERS_INSENSITIVE_AS_ORIGINAL:
+          doTestLength(5, 40, 'v', usage);
+          break;
+        case LETTERS_UPPER:
+          doTestLength(5, 40, 'R', usage);
+          break;
+        case DIGITS_LETTERS_LOWER:
+        case DIGITS_LETTERS_UPPER:
+        case DIGITS_LETTERS_INSENSITIVE_AS_LOWER:
+        case DIGITS_LETTERS_INSENSITIVE_AS_UPPER:
+          doTestLength(4, 36, '3', usage);
+          break;
+        case LETTERS_SENSITIVE:          
+        case DIGITS_LETTERS_SENSITIVE:
+          // not tested here
+          break;
+        default:
+          fail("unexpected usage: " + usage.name());
+      }
+    }
+  }
+
+  private void doTestLength(int min, int max, char valid, UsageType usage) {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(usage);
+    config.setKey("aaaabbbbccccdddd11111111222222223333333344444444aaaabbbbccccdddd");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("bad length");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    StringBuilder buffer = new StringBuilder(max + 5);
+
+    // try one less than min
+    for (int i = 0; i < min - 1; i++) {
+      buffer.append(valid);
+    }
+    assertEquals("bad length", provider.mask(buffer.toString()));
+
+    // try adding a symbol
+    buffer.append("-");
+    assertEquals("bad length", provider.mask(buffer.toString()));
+
+    // try at min
+    buffer.setLength(buffer.length() - 1);
+    buffer.append(valid);
+    String in = buffer.toString();
+    String result = provider.mask(in);
+    assertEquals(min, result.length());
+    assertNotEquals(in, result);
+
+    // try at max
+    for (int i = min; i < max; i++) {
+      buffer.append(valid);
+    }
+    in = buffer.toString();
+    result = provider.mask(in);
+    assertEquals(max, result.length());
+    assertNotEquals(in, result);
+
+    // try with one more char
+    buffer.append(valid);
+    assertEquals("bad length", provider.mask(buffer.toString()));
+
+    // try encryption with max length and a symbol
+    buffer.setLength(max);
+    buffer.append('$');
+    String resultSym = provider.mask(buffer.toString());
+    assertEquals(result + "$", resultSym);
+  }
+
+  @Test
+  public void testPadding() throws Exception {
+    for (UsageType usage : UsageType.values()) {
+      switch (usage) {
+        case DIGITS:
+          doTestPad(6, '5', usage);
+          break;
+        case LETTERS_LOWER:
+        case LETTERS_INSENSITIVE_AS_LOWER:
+        case LETTERS_INSENSITIVE_AS_UPPER:
+        case LETTERS_INSENSITIVE_AS_ORIGINAL:
+          doTestPad(5, 'v', usage);
+          break;
+        case LETTERS_UPPER:
+          doTestPad(5, 'R', usage);
+          break;
+        case DIGITS_LETTERS_LOWER:
+        case DIGITS_LETTERS_UPPER:
+        case DIGITS_LETTERS_INSENSITIVE_AS_LOWER:
+        case DIGITS_LETTERS_INSENSITIVE_AS_UPPER:
+          doTestPad(4, '3', usage);
+          break;
+        case LETTERS_SENSITIVE:
+        case DIGITS_LETTERS_SENSITIVE:
+          // no padding allowed
+          break;
+        default:
+          fail("unexpected usage: " + usage.name());
+      }
+    }
+  }
+
+  private void doTestPad(int min, char valid, UsageType usage) {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(usage);
+    config.setKey("aaaabbbbccccdddd11111111222222223333333344444444aaaabbbbccccdddd");
+    config.setTweak("aaaabbbbccccdddd");
+    StringBuilder buffer = new StringBuilder(min + 2);
+    buffer.append('-').append('-');
+
+    for (int count = 1; count <= min; count++) {
+      buffer.insert(1, valid);
+      String in = buffer.toString();
+
+      config.setPadding(Pad.FRONT);
+      FPEMaskingProvider provider = new FPEMaskingProvider(config);
+      String result = provider.mask(in);
+      System.out.println(in + " -> " + result);
+      assertEquals(min + 2, result.length());
+      assertEquals('-', result.charAt(min + 2 - 1));
+      assertEquals('-', result.charAt(min + 2 - 1 - count - 1));
+
+      config.setPadding(Pad.BACK);
+      provider = new FPEMaskingProvider(config);
+      result = provider.mask(in);
+      System.out.println(in + " -> " + result);
+      assertEquals(min + 2, result.length());
+      assertEquals('-', result.charAt(0));
+      assertEquals('-', result.charAt(count + 1));
+    }
+  }
 }

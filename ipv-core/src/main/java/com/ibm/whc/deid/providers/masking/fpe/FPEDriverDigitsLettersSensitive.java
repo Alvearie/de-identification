@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
-import java.util.Locale;
+import com.ibm.whc.deid.providers.masking.fpe.PositionManager.CharType;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.Position;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
-public class FPEDriverDigitsLettersSensitive extends FPEDriverBase {
+public class FPEDriverDigitsLettersSensitive extends FPEDriverLettersSensitive {
 
   @Override
   public String encrypt(String in, String key, String tweak, Pad padding)
@@ -17,38 +17,10 @@ public class FPEDriverDigitsLettersSensitive extends FPEDriverBase {
 
     PositionManager posMgr = new PositionManager(in);
 
-    String lowerInput = posMgr.extract(false, true, false);
-    String upperInput = posMgr.extract(false, false, true);
-    String digitsInput = posMgr.extract(true, false, false);
+    String lowerResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.LOWER);
+    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.UPPER);
+    String digitsResult = getEncryptedChars(key, tweak, posMgr, Radix.DIGITS, CharType.DIGIT);
 
-    // no padding supported
-    // verify both sets of input are of suitable length
-    // method itself checks for too much input
-    int padNeeded = calculatePadNeeded(lowerInput, Radix.LOWER);
-    if (padNeeded > 0) {
-      // TODO: log message
-      throw new UnsupportedLengthException(padNeeded);
-    }
-    padNeeded = calculatePadNeeded(upperInput, Radix.LOWER);
-    if (padNeeded > 0) {
-      // TODO: log message
-      throw new UnsupportedLengthException(padNeeded);
-    }
-    padNeeded = calculatePadNeeded(digitsInput, Radix.DIGITS);
-    if (padNeeded > 0) {
-      // TODO: log message
-      throw new UnsupportedLengthException(padNeeded);
-    }
-
-    lowerInput = shiftLettersToBase26(lowerInput);
-    upperInput = shiftLettersToBase26(upperInput.toLowerCase(Locale.US));
-
-    String lowerEncrypted = encrypt(lowerInput, key, tweak, Radix.LOWER);
-    String upperEncrypted = encrypt(upperInput, key, tweak, Radix.LOWER);
-    String digitsEncrypted = encrypt(digitsInput, key, tweak, Radix.DIGITS);
-
-    String lowerResult = shiftBase26ToLetters(lowerEncrypted);
-    String upperResult = shiftBase26ToLetters(upperEncrypted).toUpperCase(Locale.US);
 
     int lowerResultIndex = 0;
     int upperResultIndex = 0;
@@ -63,7 +35,7 @@ public class FPEDriverDigitsLettersSensitive extends FPEDriverBase {
           buffer.append(upperResult.charAt(upperResultIndex++));
           break;
         case DIGIT:
-          buffer.append(digitsEncrypted.charAt(digitsResultIndex++));
+          buffer.append(digitsResult.charAt(digitsResultIndex++));
           break;
         default:
           buffer.append(p.getOriginal());

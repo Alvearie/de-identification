@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking.fpe;
 
 import java.util.Locale;
+import com.ibm.whc.deid.providers.masking.fpe.PositionManager.CharType;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.Position;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
@@ -17,31 +18,8 @@ public class FPEDriverLettersSensitive extends FPEDriverBase {
 
     PositionManager posMgr = new PositionManager(in);
 
-    String lowerInput = posMgr.extract(false, true, false);
-    String upperInput = posMgr.extract(false, false, true);
-
-    // no padding supported
-    // verify both sets of input are of suitable length
-    // method itself checks for too much input
-    int padNeeded = calculatePadNeeded(lowerInput, Radix.LOWER);
-    if (padNeeded > 0) {
-      // TODO: log message
-      throw new UnsupportedLengthException(padNeeded);
-    }
-    padNeeded = calculatePadNeeded(upperInput, Radix.LOWER);
-    if (padNeeded > 0) {
-      // TODO: log message
-      throw new UnsupportedLengthException(padNeeded);
-    }
-
-    lowerInput = shiftLettersToBase26(lowerInput);
-    upperInput = shiftLettersToBase26(upperInput.toLowerCase(Locale.US));
-
-    String lowerEncrypted = encrypt(lowerInput, key, tweak, Radix.LOWER);
-    String upperEncrypted = encrypt(upperInput, key, tweak, Radix.LOWER);
-
-    String lowerResult = shiftBase26ToLetters(lowerEncrypted);
-    String upperResult = shiftBase26ToLetters(upperEncrypted).toUpperCase(Locale.US);
+    String lowerResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.LOWER);
+    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.UPPER);
 
     int lowerResultIndex = 0;
     int upperResultIndex = 0;
@@ -60,5 +38,43 @@ public class FPEDriverLettersSensitive extends FPEDriverBase {
       }
     }
     return buffer.toString();
+  }
+
+  protected String getEncryptedChars(String key, String tweak, PositionManager posMgr, Radix radix,
+      CharType charType) throws UnsupportedLengthException, EncryptionEngineException {
+
+    String result;
+
+    String input = posMgr.extract(charType == CharType.DIGIT, charType == CharType.LOWER,
+        charType == CharType.UPPER);
+
+    if (input.isEmpty()) {
+      result = "";
+
+    } else {
+      // no padding supported
+      // verify both sets of input are of suitable length
+      // method itself checks for too much input
+      int padNeeded = calculatePadNeeded(input, radix);
+      if (padNeeded > 0) {
+        throw new UnsupportedLengthException(input.length(), radix.getMinStringLength(),
+            radix.getMaxStringLength());
+      }
+
+      if (charType == CharType.UPPER) {
+        input = input.toLowerCase(Locale.US);
+      }
+      if (charType == CharType.LOWER || charType == CharType.UPPER) {
+        input = shiftLettersToBase26(input);
+      }
+      result = encrypt(input, key, tweak, radix);
+      if (charType == CharType.LOWER || charType == CharType.UPPER) {
+        result = shiftBase26ToLetters(result);
+      }
+      if (charType == CharType.UPPER) {
+        result = result.toUpperCase(Locale.US);
+      }
+    }
+    return result;
   }
 }

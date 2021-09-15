@@ -7,19 +7,16 @@ package com.ibm.whc.deid.providers.masking.fpe;
 
 public class PositionManager {
 
-  protected enum CharType {
+  public enum CharType {
     DIGIT, UPPER, LOWER, OTHER
   }
 
   public class Position {
     private char original;
-    // TODO: keep?
-    private char encrypted;
     private CharType type;
 
     public Position(char ch) {
       original = ch;
-      encrypted = ch;
       if (ch >= '0' && ch <= '9') {
         type = CharType.DIGIT;
       } else if (ch >= 'a' && ch <= 'z') {
@@ -29,14 +26,6 @@ public class PositionManager {
       } else {
         type = CharType.OTHER;
       }
-    }
-
-    public char getEncrypted() {
-      return encrypted;
-    }
-
-    public void setEncrypted(char encrypted) {
-      this.encrypted = encrypted;
     }
 
     public char getOriginal() {

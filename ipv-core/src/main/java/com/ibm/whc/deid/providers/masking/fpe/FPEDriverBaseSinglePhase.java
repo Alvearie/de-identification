@@ -12,27 +12,31 @@ public abstract class FPEDriverBaseSinglePhase extends FPEDriverBase {
   @Override
   public String encrypt(String in, String key, String tweak, Pad padding)
       throws UnsupportedLengthException, EncryptionEngineException {
+    String output;
 
     PositionManager posMgr = new PositionManager(in);
 
     String input = posMgr.extract(isEncryptDigits(), isEncryptLower(), isEncryptUpper());
 
-    int padNeeded = calculatePadNeeded(input, getRadix());
-    if (padNeeded > 0) {
-      input = addPadding(input, padNeeded, padding, getRadix());
+    if (input.isEmpty()) {
+      // nothing to encrypt, just return original value
+      output = in;
+
+    } else {
+      int padNeeded = calculatePadNeeded(input, getRadix());
+      if (padNeeded > 0) {
+        input = addPadding(input, padNeeded, padding, getRadix());
+      }
+
+      input = processInput(input, posMgr, padNeeded, padding);
+
+      String encrypted = encrypt(input, key, tweak, getRadix());
+
+      encrypted = processOutput(encrypted, posMgr, padNeeded, padding);
+
+      output = replaceSymbols(padNeeded, padding, posMgr, encrypted, isEncryptDigits(),
+          isEncryptLower(), isEncryptUpper());
     }
-
-    input = processInput(input, posMgr, padNeeded, padding);
-
-    String encrypted = encrypt(input, key, tweak, getRadix());
-
-    encrypted = processOutput(encrypted, posMgr, padNeeded, padding);
-
-    // adjust offsets if padding was added to the front
-    // no adjustment needed if padding was added to the back
-    int padAdjust = padNeeded > 0 && padding == Pad.FRONT ? padNeeded : 0;
-    String output = replaceSymbols(posMgr, encrypted, padAdjust, isEncryptDigits(),
-        isEncryptLower(), isEncryptUpper());
 
     return output;
   }

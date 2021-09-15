@@ -11,9 +11,10 @@ import com.ibm.whc.deid.providers.masking.fpe.UnsupportedLengthException;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.UsageType;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
 /**
- * Masks identifiers as per NIST Format-Preserving Encryption FF3-1.
+ * Masks input as per NIST Format-Preserving Encryption FF3-1.
  */
 public class FPEMaskingProvider extends AbstractMaskingProvider {
 
@@ -48,10 +49,11 @@ public class FPEMaskingProvider extends AbstractMaskingProvider {
       return FPEDriver.getFPEDriver(usageType).encrypt(identifier, key, tweak, padding);
 
     } catch (UnsupportedLengthException e) {
-      // TODO: add log message
+      // this message is safe to log
+      log.logError(LogCodes.WPH1027E, Integer.toString(e.getMin()), Integer.toString(e.getMax()),
+          Integer.toString(e.getLength()));
       return applyUnexpectedValueHandling(identifier, null);
     } catch (EncryptionEngineException e) {
-      // TODO: add log message
       throw new RuntimeException(e);
     }
   }

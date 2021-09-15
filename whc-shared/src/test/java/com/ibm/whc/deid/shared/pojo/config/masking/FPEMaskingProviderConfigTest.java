@@ -168,61 +168,23 @@ public class FPEMaskingProviderConfigTest {
     }
     config.setTweak("0000000000000000");
 
-    config.setPadding(Pad.FRONT);
-    config.validate(null);
-    config.setPadding(Pad.BACK);
-    config.validate(null);
-    config.setInputType(UsageType.DIGITS_LETTERS_SENSITIVE);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(
-          "`padding` has the value BACK but the `inputType` value DIGITS_LETTERS_SENSITIVE does not support padding",
-          e.getMessage());
+    for (UsageType usage : UsageType.values()) {
+      for (Pad pad : Pad.values()) {
+        config.setPadding(pad);
+        config.setInputType(usage);
+        if ((usage == UsageType.DIGITS_LETTERS_SENSITIVE || usage == UsageType.LETTERS_SENSITIVE)
+            && (pad == Pad.FRONT || pad == Pad.BACK)) {
+          try {
+            config.validate(null);
+            fail("expected exception");
+          } catch (InvalidMaskingConfigurationException e) {
+            assertEquals("`padding` has the value " + pad.name() + " but the `inputType` value "
+                + usage.name() + " does not support padding", e.getMessage());
+          }
+        } else {
+          config.validate(null);
+        }
+      }
     }
-    config.setPadding(Pad.FRONT);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(
-          "`padding` has the value FRONT but the `inputType` value DIGITS_LETTERS_SENSITIVE does not support padding",
-          e.getMessage());
-    }
-    config.setPadding(Pad.NONE);
-    config.validate(null);
-    config.setInputType(UsageType.LETTERS_SENSITIVE);
-    config.validate(null);
-    config.setPadding(Pad.FRONT);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(
-          "`padding` has the value FRONT but the `inputType` value LETTERS_SENSITIVE does not support padding",
-          e.getMessage());
-    }
-    config.setPadding(Pad.BACK);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals(
-          "`padding` has the value BACK but the `inputType` value LETTERS_SENSITIVE does not support padding",
-          e.getMessage());
-    }
-    config.setInputType(UsageType.DIGITS_LETTERS_LOWER);
-    config.validate(null);
-
-    config.setUnspecifiedValueHandling(5);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
-    config.validate(null);
   }
 }

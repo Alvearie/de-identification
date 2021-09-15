@@ -42,7 +42,8 @@ public abstract class FPEDriverBase implements FPEDriver {
   protected int calculatePadNeeded(String input, Radix radix) throws UnsupportedLengthException {
     int length = input.length();
     if (length > radix.getMaxStringLength()) {
-      throw new UnsupportedLengthException(length);
+      throw new UnsupportedLengthException(length, radix.getMinStringLength(),
+          radix.getMaxStringLength());
     }
     return Math.max(radix.getMinStringLength() - length, 0);
   }
@@ -50,8 +51,8 @@ public abstract class FPEDriverBase implements FPEDriver {
   protected String addPadding(String input, int padNeeded, Pad padding, Radix radix)
       throws UnsupportedLengthException {
     if (padding == Pad.NONE) {
-      // TODO: log message?
-      throw new UnsupportedLengthException(input.length());
+      throw new UnsupportedLengthException(input.length(), radix.getMinStringLength(),
+          radix.getMaxStringLength());
     }
     StringBuilder buffer = new StringBuilder(radix.getMinStringLength());
     if (padding == Pad.FRONT) {
@@ -79,12 +80,26 @@ public abstract class FPEDriverBase implements FPEDriver {
     }
   }
 
-  protected String replaceSymbols(PositionManager posMgr, String encrypted, int padAdjust,
-      boolean includeDigits, boolean includeLower, boolean includeUpper) {
-    String prefix = encrypted.substring(0, padAdjust);
-    String base = encrypted.substring(padAdjust);
+  protected String replaceSymbols(int padNeeded, Pad padding, PositionManager posMgr,
+      String encrypted, boolean includeDigits, boolean includeLower, boolean includeUpper) {
+    String base = "";
+    String prefix = "";
+    String suffix = "";
+    if (padNeeded > 0) {
+      if (padding == Pad.FRONT) {
+        prefix = encrypted.substring(0, padNeeded);
+        base = encrypted.substring(padNeeded);
+      } else if (padding == Pad.BACK) {
+        base = encrypted.substring(0, encrypted.length() - padNeeded); 
+        suffix = encrypted.substring(encrypted.length() - padNeeded);
+      }
+    } else {
+      base = encrypted;
+    }
     String replaced = posMgr.replaceSymbols(base, includeDigits, includeLower, includeUpper);
-    String output = padAdjust > 0 ? prefix + replaced : replaced;
+    StringBuilder buffer = new StringBuilder(encrypted.length());
+    buffer.append(prefix).append(replaced).append(suffix);
+    String output = buffer.toString();
     return output;
   }
 }
