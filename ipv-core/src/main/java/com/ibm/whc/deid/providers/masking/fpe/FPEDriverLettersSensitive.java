@@ -10,6 +10,13 @@ import com.ibm.whc.deid.providers.masking.fpe.PositionManager.CharType;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.Position;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
+/**
+ * Class for processing sequences containing any lower case letters and upper case letters as
+ * separate domains. Any input characters in these two groups are extracted, concatenated, and used
+ * as an input to the encryption engine, therefore two separate encryption calls are possible. After
+ * encryption the results are used to reconstruct an output value in the same format as the
+ * original.
+ */
 public class FPEDriverLettersSensitive extends FPEDriverBase {
 
   @Override

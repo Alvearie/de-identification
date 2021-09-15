@@ -5,6 +5,10 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
+/**
+ * Defines the set of different characters that can be encrypted. Based on the number of characters
+ * in the set, a minimum and maximum number of input characters are supported.
+ */
 public enum Radix {
 
   /**
@@ -18,7 +22,7 @@ public enum Radix {
   LOWER(26, 5, 40, 'a'),
 
   /**
-   * Digits 0-9 or lower case letters a-z
+   * Digits 0-9 and lower case letters a-z
    */
   DIGITS_LOWER(36, 4, 36, 'a');
 
@@ -34,18 +38,35 @@ public enum Radix {
     padchar = pad;
   }
 
+  /**
+   * 
+   * @return the number of different characters that are recognized and encrypted
+   */
   public int value() {
     return value;
   }
 
+  /**
+   * 
+   * @return the minimum number of input characters that the encryption engine can support
+   */
   public int getMinStringLength() {
     return minchars;
   }
 
+  /**
+   * 
+   * @return the maximum number of input characters that the encryption engine can support
+   */
   public int getMaxStringLength() {
     return maxchars;
   }
 
+  /**
+   * 
+   * @return the character that is added to the input if additional characters are required to meet
+   *         the minimum input requirements and if padding of additional characters is requested
+   */
   public char getPadChar() {
     return padchar;
   }

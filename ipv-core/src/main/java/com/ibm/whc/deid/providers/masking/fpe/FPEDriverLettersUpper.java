@@ -8,6 +8,9 @@ package com.ibm.whc.deid.providers.masking.fpe;
 import java.util.Locale;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
+/**
+ * Concrete subclass for processing sequences of upper case letters.
+ */
 public class FPEDriverLettersUpper extends FPEDriverBaseSinglePhase {
 
   @Override

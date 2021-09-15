@@ -10,6 +10,9 @@ import com.ibm.whc.deid.providers.masking.fpe.PositionManager.CharType;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.Position;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
+/**
+ * Concrete subclass for processing sequences of letters without regard for character case.
+ */
 public class FPEDriverLettersInsensitive extends FPEDriverBaseSinglePhase {
 
   private OutputCase outputCase;
@@ -71,6 +74,8 @@ public class FPEDriverLettersInsensitive extends FPEDriverBaseSinglePhase {
         }
         outLetters = buffer.toString();
         break;
+      default:
+        throw new RuntimeException("unexpected output case value " + outputCase.name());
     }
     return outLetters;
   }

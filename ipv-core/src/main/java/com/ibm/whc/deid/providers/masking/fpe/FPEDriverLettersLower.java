@@ -7,6 +7,9 @@ package com.ibm.whc.deid.providers.masking.fpe;
 
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 
+/**
+ * Concrete subclass for processing sequences of lower case letters.
+ */
 public class FPEDriverLettersLower extends FPEDriverBaseSinglePhase {
 
   @Override

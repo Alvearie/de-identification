@@ -5,6 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
+/**
+ * Concrete subclass for processing sequences of digits and lower case letters.
+ */
 public class FPEDriverDigitsLettersLower extends FPEDriverBaseSinglePhase {
 
   @Override

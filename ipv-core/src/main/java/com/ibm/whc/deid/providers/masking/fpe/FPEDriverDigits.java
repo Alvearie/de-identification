@@ -5,6 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
+/**
+ * Concrete class for processing input numeric sequences.
+ */
 public class FPEDriverDigits extends FPEDriverBaseSinglePhase {
 
   @Override
