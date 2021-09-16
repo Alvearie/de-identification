@@ -10,8 +10,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.masking.fpe.FPEDriverBase;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
@@ -773,6 +775,32 @@ public class FPEMaskingProviderTest {
       assertEquals(min + 2, result.length());
       assertEquals('-', result.charAt(0));
       assertEquals('-', result.charAt(count + 1));
+    }
+  }
+
+  @Test
+  @Ignore("Long running test, not routinely required")
+  public void testEngine1() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS);
+    config.setKey("aaaabbbbccccdddd11111111222222223333333344444444aaaabbbbccccdddd");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setPadding(Pad.NONE);
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    HashSet<String> set = new HashSet<>(1600000);
+    int originalLength = 7;
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
+    String original;
+
+    for (int i = 0; i <= 1000000; i++) {
+      original = String.format("%07d", i);
+      String result = provider.mask(original);
+      // expected length
+      assertEquals(originalLength, result.length());
+      // unique
+      assertTrue(set.add(result));
+      // reverses
+      assertEquals(original, cipher.decrypt(result));
     }
   }
 }
