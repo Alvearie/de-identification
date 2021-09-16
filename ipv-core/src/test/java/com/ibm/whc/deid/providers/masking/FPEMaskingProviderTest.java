@@ -621,6 +621,64 @@ public class FPEMaskingProviderTest {
   }
 
   @Test
+  public void testDigitsLettersSensitiveLengths() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.DIGITS_LETTERS_SENSITIVE);
+    config.setKey("11111111222222223333333344444444");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("X");
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+
+    // minimum lengths
+    String original = "abc-123-DEF-gh-456-JK";
+    Pattern pattern = Pattern.compile("[a-z]{3}-[0-9]{3}-[A-Z]{3}-[a-z]{2}-[0-9]{3}-[A-Z]{2}");
+    String result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    Matcher matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+
+    // one digit too few
+    assertEquals("X", provider.mask(original.replace('1', '*')));
+
+    // one lower too few
+    assertEquals("X", provider.mask(original.substring(1)));
+
+    // one upper too few
+    assertEquals("X", provider.mask(original.substring(0, original.length() - 1)));
+
+    // maximum lengths
+    original =
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmn-12345678901234567890123456789012345678901234567890123456-ABCDEFGHIJKLMNOPQRSTUVXXYZABCDEFGHIJKLMN";
+    pattern = Pattern.compile("[a-z]{40}-[0-9]{56}-[A-Z]{40}");
+    result = provider.mask(original);
+    System.out.println(original + " -> " + result);
+    // verify length and content
+    assertEquals(original.length(), result.length());
+    matcher = pattern.matcher(result);
+    assertTrue(result, matcher.matches());
+    // verify repeatable
+    for (int i = 0; i < 3; i++) {
+      assertEquals(result, provider.mask(original));
+    }
+
+    // one lower too many
+    assertEquals("X", provider.mask(original + "a"));
+
+    // one upper too many
+    assertEquals("X", provider.mask(original + "A"));
+
+    // one digit too many
+    assertEquals("X", provider.mask("2" + original));
+  }
+
+  @Test
   public void testNothingToMask() throws Exception {
     FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
     config.setKey("11111111222222223333333344444444");
