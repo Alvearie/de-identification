@@ -45,6 +45,7 @@ import java.io.Serializable;
         name = MaskingProviderType.Constants.DATETIME_CONSISTENT_SHIFT_VALUE),
     @Type(value = EmailMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.EMAIL_VALUE),
+    @Type(value = FPEMaskingProviderConfig.class, name = MaskingProviderType.Constants.FPE_VALUE),
     @Type(value = GenderMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.GENDER_VALUE),
     @Type(value = GeneralizeMaskingProviderConfig.class,
@@ -247,6 +248,8 @@ public abstract class MaskingProviderConfig implements Serializable {
         return new DateTimeConsistentShiftMaskingProviderConfig();
       case EMAIL:
         return new EmailMaskingProviderConfig();
+      case FPE:
+        return new FPEMaskingProviderConfig();
       case GENDER:
         return new GenderMaskingProviderConfig();
       case GENERALIZE:

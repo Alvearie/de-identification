@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -24,6 +24,7 @@ public enum MaskingProviderType implements MaskingProviderTypes {
   DATETIME(Constants.DATETIME_VALUE, MaskingProviderCategory.CategoryI),
   DATETIME_CONSISTENT_SHIFT(Constants.DATETIME_CONSISTENT_SHIFT_VALUE, MaskingProviderCategory.CategoryI),
   EMAIL(Constants.EMAIL_VALUE, MaskingProviderCategory.CategoryI),
+  FPE(Constants.FPE_VALUE, MaskingProviderCategory.CategoryI),
   GENDER(Constants.GENDER_VALUE, MaskingProviderCategory.CategoryI),
   GEN(Constants.GEN_VALUE, MaskingProviderCategory.CategoryII),
   GENERALIZE(Constants.GENERALIZE_VALUE, MaskingProviderCategory.CategoryII),
@@ -117,6 +118,7 @@ public enum MaskingProviderType implements MaskingProviderTypes {
     public static final String DATEDEPENDENCY_VALUE = "DATEDEPENDENCY";
     public static final String EMAIL_VALUE = "EMAIL";
     public static final String FHIR_VALUE = "FHIR";
+    public static final String FPE_VALUE = "FPE";
     public static final String GENERALIZE_VALUE = "GENERALIZE";
     public static final String GENDER_VALUE = "GENDER";
     public static final String GEN_VALUE = "GEN";

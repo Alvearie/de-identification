@@ -22,6 +22,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProvider
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.EmailMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GUIDMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GenderMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GeneralizeMaskingProviderConfig;
@@ -134,6 +135,9 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case FHIR:
         provider = new FHIRMaskingProvider(deidMaskingConfig, this, tenantId);
+        break;
+      case FPE:
+        provider = new FPEMaskingProvider((FPEMaskingProviderConfig) config);
         break;
       case GEN:
         provider = new GenericMaskingProvider(deidMaskingConfig, this, tenantId);
