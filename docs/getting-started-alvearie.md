@@ -7,10 +7,13 @@
  - Compilation: To compile the De-Identification server, clone the GIT repository and compile with Maven.
 
 ```
-   git clone https://github.com/Alvearie/de-identification
+   git clone --recurse-submodules https://github.com/Alvearie/de-identification
    cd de-identification/
    mvn clean package
 ```
+
+ NOTE - `--recurse-submodules` is required as the repository contains a third-party encryption engine as a Git submodule.  For reference, the
+ host repository for the submodule is `https://github.com/mysto/java-fpe`.
 
  - To start the server, use the following command: 
 
