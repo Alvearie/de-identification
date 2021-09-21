@@ -151,6 +151,8 @@
 						<arg>-Xlint:all</arg>
 						<arg>-Xlint:-processing</arg>
 						<arg>-Xlint:-rawtypes</arg>
+						<!-- Some required third-party packages have deprecated methods -->
+						<arg>-Xlint:-deprecation</arg>
 						<arg>-Werror</arg>
 					</compilerArgs>
 				</configuration>
