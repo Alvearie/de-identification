@@ -16,6 +16,7 @@ To preserve utility in the data being de-identified, the IBM Data De-Identificat
 * [DATETIME](#datetime)
 * [DATETIME_CONSISTENT_SHIFT](#datetime_consistent_shift)
 * [EMAIL](#email)
+* [FPE](#fpe)
 * [GENDER](#gender)
 * [GENERALIZE](#generalize)
 * [GUID](#guid)
@@ -727,6 +728,114 @@ date at */dateWritten*.
 |------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
 | preserveDomains | Integer  | Number of domains to preserve starting from the right; if value = -1 then all domains will be preserved (that is, everything after \@) | 1                 |
 | nameLength      | Integer  | Length of username to generate; if value = -1, then the username will be 5 to 8 characters long. 0 is invalid      | \-1               |
+
+#### FPE
+
+FPE stands for Format-Preserving Encryption.  This provider encrypts and replaces a set of characters in the input value 
+using an encryption algorithm compliant with the NIST FPE FF3-1 standard.  The encrypted character sequence is of the 
+same length as the original sequence.  Any characters in the input that are not part 
+of the set being encrypted are retained in their current positions.  This allows the encrypted value to be presented with 
+the same formatting and separator characters as the original value.
+
+An important aspect of the NIST FPE FF3-1 standard is that if the same value is presented for encryption multiple times
+using the same encryption keys, the output is the same each time.  Additionally, when the keys are the same, no input value 
+will produce the same output value as any other input value.  The standard provides unique, repeatable encryption.  Finally,
+if you have access to the encryption keys, the algorithm can be used to re-produce the original value, as the encryption is
+reversible.  Note, however, that the privacy provider itself does not currently offer a decryption configuration.
+
+The implementation of the NIST FPE FF3-1 standard places some restrictions on the input value, primarily which characters can be encrypted 
+and the length of the sequence that can be encrypted.  These restrictions are detailed below.  The privacy provider 
+supports an option to apply the algorithm in situations where the minimum number of input characters is not met, although
+the algorithm is not compliant with the NIST FPE FF3-1 standard in those cases.  That option is detailed below as well.
+
+To illustrate the capabilities of the provider, consider the following example input value:
+
+```
+A10-B20-C30-D40-E50
+```
+
+If the provider is configured to encrypt the digits, the resulting output value would look something like this:
+
+```
+A28-B92-C67-D99-E21
+```
+
+If the provider is configured to encrypt the upper-case characters, given the same input, the resulting output value would look 
+something like this:
+
+```
+X10-U20-D30-M40-P50
+```
+
+Internally, the characters not selected for encryption are removed, the remaining character sequence is encrypted, and the removed 
+characters are replaced in the output in their original positions.  Because the separator characters are not part of the encryption, they 
+have no impact on the encrypted sequence.  For example, when digits are being encrypted and the keys remain unchanged, all of these
+input values would yield outputs that have the same sequence of digits, since the sequence to be encrypted in all of these values is
+the same - 1020304050:
+
+```
+A10-B20-C30-D40-E50
+A10+B20+C30:D40:E50
+Z10xZ20xZ30xZ40xZ50
+```
+
+
+| **Option name**               | **Type**           | **Description**                                                                                             | **Default value** |
+|-------------------------------|--------------------|-----------------------------------------------------------------------------------|----------------|
+| key                           | string             | The encryption key - a string of 32, 48, or 64 characters, each character must be 0-9 or a-f (case-sensitive)        | none (required) |
+| tweak                         | string             | Adjustment to the encryption key - a string of 16 characters, each character must be 0-9 or a-f (case-sensitive)        | none (required) |
+| inputType                     | string (see below) | Determines which characters are encrypted and which are symbols or separators that are not encrypted                | DIGITS          |
+| padding                       | string (see below) | Whether and where pad characters should be added to the input value to meet minimum encryption length requirements        | NONE            |
+
+
+The `key` and `tweak` values are the encryption key material.  If the same values for these parameters are used, a given input input will always 
+generate the same output value, even across multiple privacy protection sessions.
+ 
+
+**Supported values for `inputType`**
+| Value                           | Description                                                      |  Number of Encrypted Characters Required| Supports padding | Pad char |
+|----------------|-----------------------------------------------------------------------------------|---------|-------|----|
+| DIGITS                          | Only characters 0-9 are encrypted                                | 6-56    | true  | 0  |
+| LETTERS_LOWER                   | Only characters a-z are encrypted                                | 5-40    | true  | a  | 
+| LETTERS_UPPER                   | Only characters A-Z are encrypted                                | 5-40    | true  | A  | 
+| LETTERS_INSENSITIVE_AS_LOWER    | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output are lower case.      | 5-40    | true  | a  | 
+| LETTERS_INSENSITIVE_AS_UPPER    | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output are upper case.      | 5-40    | true  | a  | 
+| LETTERS_INSENSITIVE_AS_ORIGINAL | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output have the case of the original letter in the same position.  | 5-40    | true  | a  | 
+| LETTERS_SENSITIVE               | Only characters a-z and A-Z are encrypted. Lower case letters are replaced with lower case letters and upper case letters are replaced with upper case letters.  | 5-40 lower case letters and 5-40 upper case letters    | false   | |
+| DIGITS_LETTERS_LOWER            | Only characters 0-9 and a-z are encrypted. Digits and letters are considered to be from the same character set.  A digit in the original value could be replaced with a lower case letter in the output and vice-versa.   | 4-36    | true  | 0  | 
+| DIGITS_LETTERS_UPPER            | Only characters 0-9 and A-Z are encrypted. Digits and letters are considered to be from the same character set.  A digit in the original value could be replaced with an upper case letter in the output and vice-versa.  | 4-36    | true  | 0  | 
+| DIGITS_LETTERS_INSENSITIVE_AS_LOWER  | Only characters 0-9, a-z, and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Digits and letters are considered to be from the same character set.  A digit in the original value could be replaced with a letter in the output and vice-versa.  Letters in the output are lower case.  | 4-36    | true  | 0  | 
+| DIGITS_LETTERS_INSENSITIVE_AS_UPPER  | Only characters 0-9, a-z, and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Digits and letters are considered to be from the same character set.  A digit in the original value could be replaced with a letter in the output and vice-versa.  Letters in the output are upper case.  | 4-36    | true  | 0  | 
+| DIGITS_LETTERS_SENSITIVE             | Only characters 0-9, a-z, and A-Z are encrypted. Digits are replaced with digits, lower case letters are replaced with lower case letters, and upper case letters are replaced with upper case letters.  | 6-56 digits, 5-40 lower case letters, and 5-40 upper case letters    | false |  | 
+
+
+As indicated in the above chart, the set of characters to be encrypted determines the minimum and maximum sequence lengths that are supported.
+If an input value contains more characters to be encrypted than is supported for the selected inputType, the configured handling of unexpected 
+input values is applied.  See the **Handling unexpected input values** section below.  If an input value contains fewer characters than are
+required for the selected inputType, unexpected input handling is applied unless Padding has been configured.
+
+##### Padding
+Padding is a convenience function offered by the privacy provider.  If configured, it automatically adds additional characters to the input sequence
+to be encrypted when the input does not have enough characters itself.  This allows the algorithm to be applied to generate an encrypted sequence 
+when it otherwise couldn't be.  There are some important issues to note when configuring padding:
+1. The output will be longer than the input, as all the characters produced are retained.  If padding is applied to the front of the input, the 
+positions of the non-encrypted characters are shifted to the right by the number of padding characters that had to be added.  For example, 
+if using front padding while encrypting digits, -9 would yield a value with the format 82739-8.
+1. The padded input value cannot be distinguished from an actual input value of greater length that has actual characters that match the padding 
+characters.  For example, if using front padding while encrypting digits, the actual values 9, 09, and 000009 will all produce the same encrypted
+sequence, assuming the encryption keys are unchanged.
+1. If an external decryption process is applied to the output value, the original value plus the padding would be returned.
+Without some additional knowledge of the input, there would be no way
+to determine whether a padding character was added as padding or was an actual part of the original value.
+1. In the cases where padding is applied, the encryption algorithm cannot be claimed to be in compliance with NIST FPE FF3-1.
+
+**Supported values for `padding`**
+| Value   | Description                                                                    |
+|---------|--------------------------------------------------------------------------------|
+| NONE    | No padding occurs                                                              |
+| FRONT   | Any necessary padding characters are added at the beginning of the input value |
+| BACK    | Any necessary padding characters are added at the end of the input value       |
+
 
 #### GENDER
 
