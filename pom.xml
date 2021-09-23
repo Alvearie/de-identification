@@ -10,7 +10,6 @@
 		<scala.binary.version>2.12.12</scala.binary.version>
 		<json.path.version>2.4.0</json.path.version>
 		<curator.version>2.7.1</curator.version>
-		<junit.version>4.12</junit.version>
 		<mockito.version>1.10.19</mockito.version>
 		<jdefault.version>2.0.0</jdefault.version>
 		<jackson.version>2.10.5</jackson.version>
@@ -20,7 +19,6 @@
 		<commons-math3.version>3.5</commons-math3.version>
 		<commons-csv.version>1.8</commons-csv.version>
 		<commons-codec.version>1.10</commons-codec.version>
-		<commons-compress.version>1.20</commons-compress.version>
 		<springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -89,8 +87,8 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
+			<!-- managed from spring-boot-dependencies -->
+            <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
