@@ -87,12 +87,6 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Bean Validation API support -->
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-		</dependency>
-
 		<!-- openapi v3 / swagger -->
 		<dependency>
     		<groupId>org.springdoc</groupId>
