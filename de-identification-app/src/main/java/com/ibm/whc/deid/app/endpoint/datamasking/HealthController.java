@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "Health", description = "Health apis")
+@Tag(name = "Health", description = "Health APIs")
 public class HealthController {
 	static final LogManager log = LogManager.getInstance();
 
@@ -42,7 +42,7 @@ public class HealthController {
     @Operation(summary = "server status", description = "Get the status of the server",
         tags = {"Health"})
 	@ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "The masked output, as a JSON array.",
+        @ApiResponse(responseCode = "200", description = "A status report in JSON format",
             content = @Content(schema = @Schema(implementation = String.class)))})
 	@GetMapping("/health")
 	public ResponseEntity<?> getStatus()
