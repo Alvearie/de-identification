@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping("/api/v1")
-@Tag(name = "De-Identification", description = "Masking apis")
+@Tag(name = "De-Identification", description = "Masking APIs")
 public class DataMaskingController extends AbstractDataMaskingInvoker {
 
   private final DataMaskingService dataMaskingService;
@@ -49,11 +49,11 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
     this.dataMaskingService = dataMaskingService;
   }
 
-  @Operation(summary = "deidentify data",
-      description = "Deidentify data using the configuration provided in the tenantConfigs API",
+  @Operation(summary = "de-identify data",
+      description = "De-identify the given data using the given configuration",
       tags = {"De-Identification"})
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "The masked output, as a JSON array.",
+      @ApiResponse(responseCode = "200", description = "The protected output as a JSON array.",
           content = @Content(schema = @Schema(implementation = String.class)))})
   @PostMapping("/deidentification")
   public ResponseEntity<?> maskJson(@RequestBody DataMaskingModel maskRequest)
@@ -87,5 +87,4 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       throw new DeidException(e.getMessage());
     }
   }
-
 }
