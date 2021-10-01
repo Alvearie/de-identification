@@ -946,23 +946,23 @@ The values in the examples are for demonstration purposes only.
    
 ```
 
->   In the example above, a rule consisting of two value sets is applied to the
->   Patient address city data element. The value sets are examined sequentially as
->   follows:
+In the example above, a rule consisting of two value sets is applied to the
+Patient address city data element. The value sets are examined sequentially as
+follows:
 
-> 1.  If the city value of the data element is one of the cities listed in
+1.  If the city value of the data element is one of the cities listed in
     the sourceValueIn property of the first value set (that is, any of **Bangkok**,
     **Manila**, **Shanghai**, **Taipei**, or **Mumbai**), then it is replaced with
     the value specified in the targetValue property value (that is, **Asian City**).
     No other value sets are examined.
     
-> 2.  Otherwise, if the city value of the data element is one of the cities listed
+1.  Otherwise, if the city value of the data element is one of the cities listed
     in the sourceValueIn property of the second value set (that is, **Addis Ababa**,
     **Cairo**, **Cape Town**, or **Lagos**), then it is replaced with the value
     specified in the targetValue property (that is, **African City**). No other value 
     sets, if any, are examined.
 
-> 3.  Otherwise, since the city value of the data element has not been matched and
+1.  Otherwise, since the city value of the data element has not been matched and
     there are no more value sets to examine, the original value is maintained.
 
 **Example 5: Generalize example with special value**
@@ -1380,19 +1380,19 @@ Here are the options and their default values for the PSEUDONYM  provider:
 
 #### RANDOM
 
->   Replaces an original data value with random characters, by:
+Replaces an original data value with random characters, by:
 
-> 1.  Replacing numerical characters with numerical characters;
+1.  Replacing numerical characters with numerical characters;
 
-> 2.  Replacing letter characters with letter characters;
+1.  Replacing letter characters with letter characters;
 
-> 3.  Maintaining other characters, for example, commas, dashes, and asterisks.
+1.  Maintaining other characters, for example, commas, dashes, and asterisks.
 
->   If non-English characters are replaced, the characters are replaced with an
->   appropriately-cased Latin letter. If the character does not have an associated case,
->   such as Chinese or Japanese characters, it is replaced with an uppercase Latin letter.
+If non-English characters are replaced, the characters are replaced with an
+appropriately-cased Latin letter. If the character does not have an associated case,
+such as Chinese or Japanese characters, it is replaced with an uppercase Latin letter.
 
-  This provider has no configuration options.
+This provider has no configuration options.
 
 #### REDACT
 
@@ -1516,19 +1516,19 @@ Here are the options and their default values for the PSEUDONYM  provider:
 >   If multiple options are set to **True** in the postal code masking algorithm, the
 >   operations are performed in this order:
 
-> 1.  Replace the postal code with a neighboring postal code (approximate geographic distance)
+1.  Replace the postal code with a neighboring postal code (approximate geographic distance)
 
-> 2.  Zero out the postal code's three-digit prefix if the total population in the
+2.  Zero out the postal code's three-digit prefix if the total population in the
     geographical unit, formulated by combining all postal codes with the same
     three-digit prefix as the original postal code, contains less than a specified
     minimum population. Additionally, the postal code may be truncated to a
     specified length if the minimum population in the formulated geographical
     unit is not reached.
 
-> 3.  Replace the postal code digits suffix either with random digits, or with digits that
+3.  Replace the postal code digits suffix either with random digits, or with digits that
     result in a random valid postal code with the same prefix.
 
-> 4.  Truncate the postal code to the prefix.
+4.  Truncate the postal code to the prefix.
 
 | **Option name**                      | **Type** | **Description**                                                                   | **Default value** |
 |--------------------------------------|----------|-----------------------------------------------------------------------------------|-------------------|
