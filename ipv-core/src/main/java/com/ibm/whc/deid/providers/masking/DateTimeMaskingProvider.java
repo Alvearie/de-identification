@@ -273,9 +273,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       try {
         final DateTimeFormatter fixedFormatter =
             new DateTimeFormatterBuilder().appendPattern(this.fixedFormatString)
-            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
         try {
           TemporalAccessor t = fixedFormatter.withZone(ZoneId.systemDefault()).parse(identifier);
           d = Date.from(Instant.from(t));
