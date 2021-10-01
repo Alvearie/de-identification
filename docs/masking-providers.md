@@ -387,46 +387,45 @@ This privacy provider supports these options:
 
 #### DATETIME
 
->   Masks datetime (timestamp) objects. There are several options supported,
->   for example, shifting dates, generalizing to month, and generalizing to year.
->   Additional options include adding random offsets to the various datetime
->   elements, for example, years, months, days, hours, and seconds). If
->   multiple options are set to true in the datetime masking algorithm, the
->   following order is respected.
+Masks datetime (timestamp) objects. There are several options supported,
+for example, shifting dates, generalizing to month, and generalizing to year.
+Additional options include adding random offsets to the various datetime
+elements, for example, years, months, days, hours, and seconds). If
+multiple options are set to true in the datetime masking algorithm, the
+following order is respected.
 
->  These examples are for the 10th of January 2016:
+These examples are for the 10th of January 2016:
 
-> 1.  Override with default or specified value, for example, **90+** or **Over 90 y.o.**.
+1.  Override with default or specified value, for example, **90+** or **Over 90 y.o.**.
 
-> 2.  Shift the date by constant amount.
+2.  Shift the date by constant amount.
 
-> 3.  Generalize to week number/year, for example, 02/2016.
+3.  Generalize to week number/year, for example, 02/2016.
 
-> 4.  Generalize to month/year, for example, 01/2016.
+4.  Generalize to month/year, for example, 01/2016.
 
-> 5.  Generalize to quarter year, for example, 01/2016.
+5.  Generalize to quarter year, for example, 01/2016.
 
-> 6.  Generalize to year, for example, 2016.
+6.  Generalize to year, for example, 2016.
 
-> 7.  Generalize to N-year interval, for example, 2015-2019.
+7.  Generalize to N-year interval, for example, 2015-2019.
 
-> 8.  Generalize to year (for example, 1927) and mask any age over 90.
+8.  Generalize to year (for example, 1927) and mask any age over 90.
 
-> 9.  Generalize to month/year (for example, 02/1927) and mask any age over 90.
+9.  Generalize to month/year (for example, 02/1927) and mask any age over 90.
 
-> 10. Add random offsets to year, month, day, hour, minutes, and seconds.
+10. Add random offsets to year, month, day, hour, minutes, and seconds.
 
-> 11. Apply maximum years ago.
+11. Apply maximum years ago.
 
-> 12. Apply maximum days ago.
+12. Apply maximum days ago.
 
-   If the override option of the provider is set to **True**, then the override
-   is processed first. If the rule criteria are met, all other options
-   of the DATETIME provider are ignored.
+If the override option of the provider is set to **True**, then the override
+is processed first. If the rule criteria are met, all other options
+of the DATETIME provider are ignored.
 
 
-   The following date formats are supported by the DATETIME masking provider.
-   This uses the option datetime.format.fixed:
+The following formats are supported by the DATETIME masking provider by default:
 
 | **Supported date / datetime format**         | **Example of recognized input value** |
 |----------------------------------------------|---------------------------------------|
@@ -441,6 +440,7 @@ This privacy provider supports these options:
 | dd/MM/yyyy[ HH:mm:ss ]                       | 24/12/2018 12:01:12                   |
 | yyyy/MM/dd[ HH:mm:ss ]                       | 2018/12/24 12:01:12                   |
 
+
  The DATETIME masking provider supports the following configuration options.
 
 **Options to change the recognized date and time formats**
@@ -448,6 +448,10 @@ This privacy provider supports these options:
 | **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | formatFixed                                       | String   | Datetime format                                                                                                                                                                                                                                                  | null              |
+
+If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  The format must at minimum include a year component.  The given value must be valid as per the java.time.format.DateTimeFormatter class.
+
+
 **Options to return a fixed value if the year is a given number of years ago**
    
 | **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
@@ -1133,20 +1137,20 @@ The values in the examples are for demonstration purposes only.
 
 #### NUMBERVARIANCE
 
->   Masks a numeric data value by adding a random offset. There are two options
->   available. These are processed in the following order:
+Masks a numeric data value by adding a random offset. There are two options
+available. These are processed in the following order:
 
-> 1.  Calculating the offset by randomly selecting a numeric value from within a
+1.  Calculating the offset by randomly selecting a numeric value from within a
     pre-specified interval / range.
 
-> 2.  Calculating the offset based on given percentages signifying the acceptable
+2.  Calculating the offset based on given percentages signifying the acceptable
     distance of the new value from the original value.
 
 | **Option name**                 | **Type** | **Description**                                                                                 | **Default value** |
 |---------------------------------|----------|-------------------------------------------------------------------------------------------------|-------------------|
 | augmentMask                     | Boolean  | Augment the numeric data value                                                                  | false             |
 | augmentLowerBound               | double   | Range interval lower bound                                                                      | 1.0               |
-| augmentUpperBound               | double   | Range interval upper bound                                                                      | 10.               |
+| augmentUpperBound               | double   | Range interval upper bound                                                                      | 10.0               |
 | resultWithPrecision             | Boolean  | Result includes decimal digits for precision                                                    | false             |
 | precisionDigits                 | Integer  | Number of decimal digits to keep when precision is set to true; -1 to provide maximum precision | -1                |
 | maskLimitUp                     | double   | Up percentage limit                                                                             | 10.0              |
