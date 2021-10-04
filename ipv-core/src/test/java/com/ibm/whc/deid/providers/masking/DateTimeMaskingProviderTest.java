@@ -139,6 +139,36 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
+  public void testMaskFixedFormat_year() throws Exception {
+
+    DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
+    config.setFormatFixed("yyyy");
+    config.setYearMask(true);
+    config.setDayMask(false);
+    config.setHourMask(false);
+    config.setMinutesMask(false);
+    config.setSecondsMask(false);
+    config.setMonthMask(false);
+    config.setYearRangeDown(2);
+    config.setYearRangeUp(2);
+
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
+
+    String originalDateTime = "1981";
+    boolean changed = false;
+    for (int i = 0; i < 20; i++) {
+      String maskedDateTime = maskingProvider.mask(originalDateTime);
+      assertNotNull(maskedDateTime);
+      int year = Integer.parseInt(maskedDateTime);
+      assertTrue(1979 <= year && year <= 1983);
+      if (!maskedDateTime.equals(originalDateTime)) {
+        changed = true;
+      }
+    }
+    assertTrue(changed);
+  }
+
+  @Test
   public void testMaskFixedFormat_badInput() throws Exception {
 
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
