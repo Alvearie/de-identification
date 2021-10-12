@@ -27,13 +27,6 @@ source toolchain_util.sh
 
 git submodule update --init --recursive
 
-# Safety check.  Verify the key file in the submodule has not changed.
-currentSum=`sha256sum ipv-core/submodules/java-fpe/src/main/java/com/privacylogistics/FF3Cipher.java | awk '{print $1}'`
-if [ $currentSum != "0a09910abcc5748e37037695f44b8990d0dccd475c7cd71da5e7d201b6712c6e" ]; then
-  echo FF3Cipher.java appears to have changed, current sum = $currentSum
-  exit 2
-fi
-
 #########################################################
 # Setup the artifactory repo settings                   #
 #########################################################
