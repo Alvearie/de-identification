@@ -11,8 +11,4 @@
 	<root level="debug">
 		<appender-ref ref="stdout" />
 	</root>
-
-	<logger name="com.privacylogistics.FF3Cipher" level="OFF" additivity="false">
-		<!-- no appender, all logging suppressed -->
-	</logger>
 </configuration>
