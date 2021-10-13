@@ -36,14 +36,22 @@ fi
 
 curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
-# Set the version.  If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
+#########################################################
+# Set the version                                       #
+#########################################################
+# If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
+# If the branch is a release branch, use the ${RELEASE_VERSION}.
 # If the branch is not master, include branch name in the version.
-RELEASE_VERSION=1.0.1
+RELEASE_VERSION=1.1.0
+RELEASE_BUILD=false
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then
-    echo "-Drevision=${RELEASE_VERSION}-SNAPSHOT" >  .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}-SNAPSHOT" > .mvn/maven.config
+elif [[ "${GIT_BRANCH}" == "release"* ]]; then
+    echo "-Drevision=${RELEASE_VERSION}" > .mvn/maven.config
+    RELEASE_BUILD=true
 else
-    echo "-Drevision=${RELEASE_VERSION}-${GIT_BRANCH}-SNAPSHOT" >  .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}-${GIT_BRANCH}-SNAPSHOT" > .mvn/maven.config
 fi
 echo "revision:"
 cat .mvn/maven.config
@@ -83,7 +91,13 @@ fi
 #########################################################
 # Deploy the binaries to artifactory using maven        #
 #########################################################
-mvn -B deploy -DaltDeploymentRepository=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+if [ "${RELEASE_BUILD} == "true" ]; then
+    MAVEN_REPO=releases::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-release-maven-local
+else    
+    MAVEN_REPO=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
+fi
+
+mvn -B deploy -DaltDeploymentRepository=${MAVEN_REPO}
 
 rc=$((rc || $? ))
 if [[ ! "$rc" == "0" ]]; then
@@ -92,4 +106,3 @@ if [[ ! "$rc" == "0" ]]; then
 fi
 
 echo preDockerBuild.sh end
-
