@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tagOrRef:
-        decription: 'Release tag or branch reference'
+        decription: 'Release tag or branch reference (no leading v)'
         required: true
   release:
     types: [published, edited]
@@ -46,7 +46,7 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: |
-        mvn -B package --file pom.xml
+        git submodule update --init --recursive && mvn -B package --file pom.xml
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
 
@@ -54,7 +54,7 @@ jobs:
     - name: Build Image
       run: |
         cd de-identification-app
-        docker build -f Dockerfile -t alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }} .
+        docker build -f Dockerfile --build-arg RELEASE_VERSION=${{ steps.release_info.outputs.SOURCE_TAG }} -t alvearie/deid:v${{ steps.release_info.outputs.SOURCE_TAG }} .
     - name: List Docker Images
       run: docker images
     - name: Login to Docker Hub
@@ -64,4 +64,4 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: Push Docker Images
       run: |
-        docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
+        docker push alvearie/deid:v${{ steps.release_info.outputs.SOURCE_TAG }}
