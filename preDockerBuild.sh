@@ -91,7 +91,7 @@ fi
 #########################################################
 # Deploy the binaries to artifactory using maven        #
 #########################################################
-if [ "${RELEASE_BUILD} == "true" ]; then
+if [ "${RELEASE_BUILD}" == "true" ]; then
     MAVEN_REPO=releases::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-release-maven-local
 else    
     MAVEN_REPO=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
