@@ -3,26 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
-		<revision>1.0.1-SNAPSHOT</revision>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hbase.version>1.2.1</hbase.version>
+		<revision>1.1.0-SNAPSHOT</revision>
+		<!-- see org.springframework.boot:spring-boot-dependencies for additional managed dependency versions -->
 		<scala.version>2.12.12</scala.version>
 		<scala.binary.version>2.12.12</scala.binary.version>
-		<json.path.version>2.4.0</json.path.version>
-		<curator.version>2.7.1</curator.version>
 		<mockito.version>1.10.19</mockito.version>
 		<jdefault.version>2.0.0</jdefault.version>
-		<jackson.version>2.10.5</jackson.version>
-		<slf4j.version>1.7.30</slf4j.version>
-		<commons.version>3.4</commons.version>
-		<commons-lang3.version>3.4</commons-lang3.version>
-		<commons-math3.version>3.5</commons-math3.version>
 		<commons-csv.version>1.8</commons-csv.version>
-		<commons-codec.version>1.10</commons-codec.version>
 		<springdoc-openapi-ui.version>1.5.0</springdoc-openapi-ui.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>		
 	</properties>
 
 	<groupId>com.ibm.whc.deid</groupId>
@@ -58,28 +49,23 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
