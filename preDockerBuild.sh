@@ -53,7 +53,6 @@ elif [[ "${GIT_BRANCH}" == "release"* ]]; then
 else
     echo "-Drevision=${RELEASE_VERSION}-${GIT_BRANCH}-SNAPSHOT" > .mvn/maven.config
 fi
-echo "revision:"
 cat .mvn/maven.config
 
 #########################################################
@@ -97,7 +96,7 @@ else
     MAVEN_REPO=snapshots::default::https://na.artifactory.swg-devops.com:443/artifactory/wh-de-id-snapshot-maven-local
 fi
 
-mvn -B deploy -DaltDeploymentRepository=${MAVEN_REPO}
+mvn -B deploy -DaltDeploymentRepository=${MAVEN_REPO} -DskipTests=true
 
 rc=$((rc || $? ))
 if [[ ! "$rc" == "0" ]]; then

@@ -160,17 +160,5 @@
 			<artifactId>scala-library</artifactId>
 			<version>${scala.version}</version>
 		</dependency>
-		<!-- used in submodules -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <!-- version managed from spring-boot-dependencies pom -->
-        </dependency>
-        <!-- used in submodules -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <!-- version managed from spring-boot-dependencies pom -->
-        </dependency>
 	</dependencies>
 </project>
