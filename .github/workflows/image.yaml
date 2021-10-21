@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tagOrRef:
-        decription: 'Release tag or branch reference (no leading v)'
+        decription: 'Release tag or branch reference'
         required: true
   release:
     types: [published, edited]
@@ -26,15 +26,24 @@ jobs:
         else
            echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
         fi
+        tempTag=${{ steps.release_info.outputs.SOURCE_TAG }}
+        if [ ${tempTag:0:1} == "v" ]; then
+           echo ::set-output name=RAW_SOURCE_TAG::${tempTag:1}
+        else
+           echo ::set-output name=RAW_SOURCE_TAG::${tempTag}
+        fi        
     - name: Print Release Information 
       run: |
         echo $SOURCE_NAME
         echo $SOURCE_BRANCH
         echo $SOURCE_TAG
+        echo $RAW_SOURCE_TAG
       env:
         SOURCE_NAME: ${{ steps.release_info.outputs.SOURCE_NAME }}
         SOURCE_BRANCH: ${{ steps.release_info.outputs.SOURCE_BRANCH }}
         SOURCE_TAG: ${{ steps.release_info.outputs.SOURCE_TAG }}
+        RAW_SOURCE_TAG: ${{ steps.release_info.outputs.RAW_SOURCE_TAG }}
+        
     # Build Java targets
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -54,7 +63,7 @@ jobs:
     - name: Build Image
       run: |
         cd de-identification-app
-        docker build -f Dockerfile --build-arg RELEASE_VERSION=${{ steps.release_info.outputs.SOURCE_TAG }} -t alvearie/deid:v${{ steps.release_info.outputs.SOURCE_TAG }} .
+        docker build -f Dockerfile --build-arg RELEASE_VERSION=${{ steps.release_info.outputs.RAW_SOURCE_TAG }} -t alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }} .
     - name: List Docker Images
       run: docker images
     - name: Login to Docker Hub
@@ -64,4 +73,4 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: Push Docker Images
       run: |
-        docker push alvearie/deid:v${{ steps.release_info.outputs.SOURCE_TAG }}
+        docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
