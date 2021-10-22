@@ -23,7 +23,7 @@ jobs:
         echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
         # github.event.inputs.tagOrRef is only present if manually launched
         if [ ! -z ${{ github.event.inputs.tagOrRef }} ]; then
-           tag=${{ github.event.inputs.tagOrRef }}          
+           tag=${{ github.event.inputs.tagOrRef }}
         else
            tag=${GITHUB_REF#refs/tags/}
         fi
