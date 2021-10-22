@@ -8,8 +8,10 @@ Get the application URL by running these commands:
 {{- if contains "NodePort" .Values.service.type }}
 
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "deid.fullname" . }})
-  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")  
-  echo De-Identification server : http://$NODE_IP:$NODE_PORT/api/v1/deidentification
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+    
+  De-Identification Service Health endpoint: http://$NODE_IP:$NODE_PORT/api/v1/health
+  De-Identification Service DeId endpoint: http://$NODE_IP:$NODE_PORT/api/v1/deidentification
   
 {{- else if contains "LoadBalancer" .Values.service.type }}
 
@@ -21,15 +23,17 @@ You can watch the status by running the following command and wait unti the exte
 
 Once the external IP has been assigned run the following:
 
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "deid.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') 
-  echo De-Identification server: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/deidentification
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "deid.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   
+  De-Identification Service Health endpoint: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/health
+  De-Identification Service DeId endpoint: http://$SERVICE_IP:{{ .Values.service.Port }}/api/v1/deidentification
 
 {{- else if contains "ClusterIP" .Values.service.type }}
 
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "deid.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  echo De-Identification Service Health endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/health
-  echo De-Identification Service DeId endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/deidentification
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.port }}:{{ .Values.service.port }}
-  
+
+  De-Identification Service Health endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/health
+  De-Identification Service DeId endpoint: http://127.0.0.1:{{ .Values.service.port }}/api/v1/deidentification  
 
 {{- end }}
