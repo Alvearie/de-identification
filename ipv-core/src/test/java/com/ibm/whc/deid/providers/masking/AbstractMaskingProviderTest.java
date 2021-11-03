@@ -84,7 +84,7 @@ public class AbstractMaskingProviderTest {
       provider.applyUnexpectedValueHandling("Input-value", null);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("Input-value"));
+      assertFalse(e.getMessage(), e.getMessage().contains("Input-value"));
       assertTrue(e.getMessage(), e.getMessage().contains("theRuleName"));
     }
 

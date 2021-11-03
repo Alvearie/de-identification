@@ -8,6 +8,7 @@ package com.ibm.whc.deid.providers.masking;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.util.Arrays;
@@ -134,7 +135,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
       maskingProvider.mask(invalidOccupation);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage().contains(invalidOccupation));
+      assertFalse(e.getMessage().contains(invalidOccupation));
     }
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }

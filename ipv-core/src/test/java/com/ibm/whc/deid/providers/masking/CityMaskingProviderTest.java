@@ -187,12 +187,14 @@ public class CityMaskingProviderTest extends TestLogSetUp implements MaskingProv
     CityMaskingProvider maskingProvider =
         (CityMaskingProvider) maskingProviderFactory.getProviderFromType(MaskingProviderType.CITY,
             null, maskingConfiguration, tenantId, localizationProperty);
+    maskingProvider.setName("ruleX");
     String invalidCity = "Invalid City";
     try {
       maskingProvider.mask(invalidCity);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage().contains(invalidCity));
+      assertFalse(e.getMessage().contains(invalidCity));
+      assertTrue(e.getMessage().contains("ruleX"));
     }
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
