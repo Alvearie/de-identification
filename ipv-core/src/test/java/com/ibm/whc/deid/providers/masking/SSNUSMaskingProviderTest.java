@@ -192,7 +192,7 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
       maskingProvider.mask(invalidSSNUS);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage().contains(invalidSSNUS));
+      assertFalse(e.getMessage().contains(invalidSSNUS));
     }
   }
 }

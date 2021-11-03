@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -178,7 +179,7 @@ public class HospitalMaskingProviderTest implements MaskingProviderTest {
     try {
       maskingProvider.mask(invalidHospital);
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage().contains(invalidHospital));
+      assertFalse(e.getMessage().contains(invalidHospital));
     }
   }
 }
