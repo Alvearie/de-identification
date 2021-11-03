@@ -188,7 +188,7 @@ public class ContinentMaskingProviderTest implements MaskingProviderTest {
       maskingProvider.mask(invalidContinent);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage().contains(invalidContinent));
+      // good
     }
   }
 

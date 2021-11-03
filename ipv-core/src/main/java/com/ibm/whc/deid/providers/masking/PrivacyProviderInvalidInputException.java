@@ -17,7 +17,9 @@ public class PrivacyProviderInvalidInputException extends IllegalArgumentExcepti
   public static final String MESSAGE_ID = LogCodes.WPH1024E;
 
   public PrivacyProviderInvalidInputException(String input, String ruleName) {
-    super(Messages.getMessage(MESSAGE_ID, input, ruleName));
+    // do not use the actual input value - it could be sensitive data (PHI)
+    // and the exception message could be logged in some environments
+    super(Messages.getMessage(MESSAGE_ID, ruleName));
   }
 
   @Override

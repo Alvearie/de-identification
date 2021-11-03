@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.time.format.DateTimeFormatter;
@@ -65,7 +66,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("nameABC"));
-      assertTrue(e.getMessage().contains("value-abc"));
+      assertFalse(e.getMessage().contains("value-abc"));
     }
   }
 
@@ -248,7 +249,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
       provider.applyOffsetAndReformat("10333", -1, customFormatters);
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("10333"));
+      assertFalse(e.getMessage(), e.getMessage().contains("10333"));
       assertTrue(e.getMessage(), e.getMessage().contains("rule2"));
     }
   }
@@ -538,7 +539,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-XX"));
-      assertTrue(e.getMessage().contains("`patient identifier ```"));
+      assertFalse(e.getMessage().contains("`patient identifier ```"));
     }
 
     config = new DateTimeConsistentShiftMaskingProviderConfig();
@@ -554,7 +555,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-X2"));
-      assertTrue(e.getMessage().contains("`20-01-02`"));
+      assertFalse(e.getMessage().contains("`20-01-02`"));
     }
 
     target = parent.get("five");
@@ -565,7 +566,7 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
       fail("expected exception");
     } catch (PrivacyProviderInvalidInputException e) {
       assertTrue(e.getMessage().contains("name-X2"));
-      assertTrue(e.getMessage().contains("` `"));
+      assertFalse(e.getMessage().contains("` `"));
     }
   }
 
