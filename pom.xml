@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
-		<revision>1.1.0</revision>
+		<revision>1.1.1</revision>
 		<!-- see org.springframework.boot:spring-boot-dependencies for additional managed dependency versions -->
 		<scala.version>2.12.12</scala.version>
 		<scala.binary.version>2.12.12</scala.binary.version>
