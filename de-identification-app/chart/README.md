@@ -16,14 +16,15 @@ This [Helm](https://github.com/kubernetes/helm) chart installs an instance of th
 Git clone this repository.
 
 ```bash
-git clone git clone --recurse-submodules https://github.com/Alvearie/de-identification.git
+git clone --recurse-submodules https://github.com/Alvearie/de-identification.git
 ```
 
 ### Install the Chart
 
-Install the helm chart with a desired release name, such as `deid` and follow the resulting instructions:
+Install the helm chart with a desired release name, such as `deid`, and follow the resulting instructions:
 
 ```bash
+git checkout <tag-of-release-you-wish-to-install>
 cd de-identification/de-identification-app/chart
 helm install deid .
 ```
