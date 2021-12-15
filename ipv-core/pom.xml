@@ -121,10 +121,6 @@
 			<version>2.6</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.iban4j</groupId>
 			<artifactId>iban4j</artifactId>
 			<version>3.2.0</version>
@@ -160,5 +156,10 @@
 			<artifactId>scala-library</artifactId>
 			<version>${scala.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>       		
 	</dependencies>
 </project>

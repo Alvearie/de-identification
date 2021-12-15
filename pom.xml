@@ -58,14 +58,12 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 		</dependency>
+		<!-- Allow all child modules to make use of the slf4j interface.            -->
+		<!-- The actual slf4j implementation is pulled in by de-identification-app  -->
+		<!-- which has dependencies on the spring starter bundles.                  -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
