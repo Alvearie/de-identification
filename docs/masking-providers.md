@@ -803,7 +803,7 @@ generate the same output value, even across multiple privacy protection sessions
 | LETTERS_LOWER                   | Only characters a-z are encrypted                                | 5-40    | true  | a  | 
 | LETTERS_UPPER                   | Only characters A-Z are encrypted                                | 5-40    | true  | A  | 
 | LETTERS_INSENSITIVE_AS_LOWER    | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output are lower case.      | 5-40    | true  | a  | 
-| LETTERS_INSENSITIVE_AS_UPPER    | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output are upper case.      | 5-40    | true  | a  | 
+| LETTERS_INSENSITIVE_AS_UPPER    | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output are upper case.      | 5-40    | true  | A  | 
 | LETTERS_INSENSITIVE_AS_ORIGINAL | Only characters a-z and A-Z are encrypted. Upper and lower case versions of the same letter are considered interchangeable.  Letters in the output have the case of the original letter in the same position.  | 5-40    | true  | a  | 
 | LETTERS_SENSITIVE               | Only characters a-z and A-Z are encrypted. Lower case letters are replaced with lower case letters and upper case letters are replaced with upper case letters.  | 5-40 lower case letters and 5-40 upper case letters    | false   | |
 | DIGITS_LETTERS_LOWER            | Only characters 0-9 and a-z are encrypted. Digits and letters are considered to be from the same character set.  A digit in the original value could be replaced with a lower case letter in the output and vice-versa.   | 4-36    | true  | 0  | 
@@ -1513,8 +1513,7 @@ This provider has no configuration options.
 >     set population criteria, typically, whether it contains more than
 >     20,000 people.
 
->   If multiple options are set to **True** in the postal code masking algorithm, the
->   operations are performed in this order:
+>   If multiple options are set to **True**, the operations are performed in this order:
 
 1.  Replace the postal code with a neighboring postal code (approximate geographic distance)
 
@@ -1542,7 +1541,7 @@ This provider has no configuration options.
 | maskTruncateLengthIfNotMinPopulation | Integer  | Number of digits to truncate the postal code to if the minimum population is not reached | 2                 |
 | maskSuffixTruncate                   | Boolean  | Truncate the postal code to the prefix                                                   | true              |
 | maskSuffixReplaceWithRandom          | Boolean  | Replace the postal code suffix with random                                               | false             |
-| maskSuffixReplaceWithValidOnly       | Boolean  | Replace the postal code suffix resulting in valid postal code only                          | false             |
+| maskSuffixReplaceWithValidOnly       | Boolean  | Replace the postal code suffix resulting in valid postal code only. Only used if `maskSuffixReplaceWithRandom` is `true`.     | false             |
 
 
 ## Applying multiple data protection methods to the same data element
