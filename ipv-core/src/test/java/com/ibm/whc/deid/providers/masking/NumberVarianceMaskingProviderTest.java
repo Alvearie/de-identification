@@ -5,15 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.NumberVarianceMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
-import org.junit.Test;
 
 public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
@@ -361,7 +358,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals(null, maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -374,7 +371,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals(null, maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -388,7 +385,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
     // return null for this provider
     assertEquals(null, maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -402,7 +399,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals("OTHER", maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -417,7 +414,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals("Test NumberVariance", maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -430,6 +427,6 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals(null, maskedNumberVariance);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 }

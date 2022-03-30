@@ -98,7 +98,6 @@ public class LogCodeGenerator {
       });
       aWriter.write("}\n");
       aWriter.flush();
-      aWriter.close();
     } catch (IOException ex) {
       logger.logError(LogCodes.WPH4000E, ex);
     }

@@ -1,19 +1,18 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.jsonpath;
 
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
 
 public class JSONPathExtractorTest {
 
@@ -37,65 +36,66 @@ public class JSONPathExtractorTest {
   public void testJSONPathExpressions() throws Exception {
     JsonNode selection = JSONPathExtractor.extract(testJson, validPattern);
     assertNotNull(selection);
-    assertThat(selection.asDouble(), is(8.95));
+    // use asText as assertEquals doesn't like exact compare with real numbers
+    assertEquals("8.95", selection.asText());
   }
 
   @Test
   public void testUpdate() throws Exception {
     JsonNode selection = JSONPathExtractor.extract(testJson, validPattern);
     assertNotNull(selection);
-    assertThat(selection.asDouble(), is(8.95));
+    assertEquals("8.95", selection.asText());
 
     JsonNode update = JSONPathExtractor.update(testJson, validPattern, 10.001);
 
     assertNotNull(selection);
-    assertThat(JSONPathExtractor.extract(update, validPattern).asDouble(), is(10.001));
+    assertEquals("10.001", JSONPathExtractor.extract(update, validPattern).asText());
   }
 
   @Test
   public void testUpdateWithDoubleValue() throws Exception {
     JsonNode update = JSONPathExtractor.update(testJson, validPattern, ((10.001)));
-    assertThat(JSONPathExtractor.extract(update, validPattern).asDouble(), is(10.001));
+    assertEquals("10.001", JSONPathExtractor.extract(update, validPattern).asText());
   }
 
   @Test
   public void testUpdateWithStringValue() throws Exception {
     JsonNode update = JSONPathExtractor.update(testJson, validPattern, "10.001");
-    assertThat(JSONPathExtractor.extract(update, validPattern).asText(), is("10.001"));
+    assertEquals("10.001", JSONPathExtractor.extract(update, validPattern).asText());
   }
 
   @Test
   public void testUpdateWithIntValue() throws Exception {
     JsonNode update = JSONPathExtractor.update(testJson, validPattern, ((10)));
-    assertThat(JSONPathExtractor.extract(update, validPattern).asInt(), is(10));
+    assertEquals(10, JSONPathExtractor.extract(update, validPattern).asInt());
   }
 
   @Test
   public void testUpdateWithLongValue() throws Exception {
     JsonNode update = JSONPathExtractor.update(testJson, validPattern, ((long) (10.001)));
-    assertThat(JSONPathExtractor.extract(update, validPattern).asLong(), is(10L));
+    assertEquals(10L, JSONPathExtractor.extract(update, validPattern).asLong());
   }
 
   @Test
   public void testUpdateWithJSONNodeAsValue() throws Exception {
     JsonNode update = JSONPathExtractor.extract(testJson, "/store/book/1/price");
     JsonNode updatedNode = JSONPathExtractor.update(testJson, "/store/book/0/price", update);
-    assertThat(JSONPathExtractor.extract(updatedNode, "/store/book/0/price").asDouble(), is(12.99));
+    assertEquals("12.99", JSONPathExtractor.extract(updatedNode, "/store/book/0/price").asText());
   }
 
   @Test
   public void testUpdateWithJSONNodeAsStringValue() throws Exception {
     JsonNode update = JSONPathExtractor.extract(testJson, "/store/book/1/title");
     JsonNode updatedNode = JSONPathExtractor.update(testJson, "/store/book/0/title", update);
-    assertThat(JSONPathExtractor.extract(updatedNode, "/store/book/0/title").asText(),
-        is("Sword of Honour"));
+    assertEquals("Sword of Honour",
+        JSONPathExtractor.extract(updatedNode, "/store/book/0/title").asText());
   }
 
   @Test
   public void testUpdateWithJSONNodeAsBooleanValue() throws Exception {
     JsonNode update = JSONPathExtractor.extract(testJson, "/store/bicycle/isRide");
     JsonNode updatedNode = JSONPathExtractor.update(testJson, "/store/book/0/title", update);
-    assertThat(JSONPathExtractor.extract(updatedNode, "/store/book/0/title").asBoolean(), is(true));
+    assertTrue(JSONPathExtractor.extract(updatedNode, "/store/book/0/title").asBoolean());
   }
 
   @Test
