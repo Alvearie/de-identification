@@ -31,14 +31,20 @@ export INPUT_GIT_UMBRELLA_BRANCH="openshift"-${DEVELOPER_ID}
 
 export CLUSTER_NAMESPACE="deid"-${DEVELOPER_ID}
 
-# Clone the toolchain repo
-curl -sSL "https://${GIT_API_KEY}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
-source toolchain_util.sh
-cloneRepo whc-commons "github.ibm.com/whc-toolchain" "/tmp"
+# Clone the toolchain repo if its not already there
 curdir=`pwd`
-cd /tmp/whc-commons
-git checkout ${TOOLCHAIN_BRANCH}
-chmod 755 tools/createToolchain.sh
+if [ -d /tmp/whc-commons/.git ]; then
+   cd /tmp/whc-commons
+   git checkout ${TOOLCHAIN_BRANCH}
+   git pull
+else   
+   curl -sSL "https://${GIT_API_KEY}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+   source toolchain_util.sh
+   cloneRepo whc-commons "github.ibm.com/whc-toolchain" "/tmp"
+   cd /tmp/whc-commons
+   git checkout ${TOOLCHAIN_BRANCH}
+   chmod 755 tools/createToolchain.sh
+fi
 cd $curdir
 
 # Get the property file
@@ -46,5 +52,3 @@ curl -sSL -u "${GIT_USER}:${GIT_API_KEY}" "https://raw.github.ibm.com/de-identif
 source common.properties
 
 /tmp/whc-commons/tools/createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH} -v ${INPUT_GIT_UMBRELLA_BRANCH}
-
-rm -rf /tmp/whc-commons
