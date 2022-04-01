@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # Script to create a toolchain.  The toolchain name and the GIT URL is stored in toolchain.properties
 
