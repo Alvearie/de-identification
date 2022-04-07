@@ -46,6 +46,8 @@ import java.io.Serializable;
     @Type(value = EmailMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.EMAIL_VALUE),
     @Type(value = FPEMaskingProviderConfig.class, name = MaskingProviderType.Constants.FPE_VALUE),
+    @Type(value = FHIRMortalityDependencyMaskingProviderConfig.class,
+        name = MaskingProviderType.Constants.FHIR_MORTALITY_DEPENDENCY_VALUE),
     @Type(value = GenderMaskingProviderConfig.class,
         name = MaskingProviderType.Constants.GENDER_VALUE),
     @Type(value = GeneralizeMaskingProviderConfig.class,
@@ -248,6 +250,8 @@ public abstract class MaskingProviderConfig implements Serializable {
         return new DateTimeConsistentShiftMaskingProviderConfig();
       case EMAIL:
         return new EmailMaskingProviderConfig();
+      case FHIR_MORTALITY_DEPENDENCY:
+        return new FHIRMortalityDependencyMaskingProviderConfig();
       case FPE:
         return new FPEMaskingProviderConfig();
       case GENDER:

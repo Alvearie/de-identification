@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
+import com.ibm.whc.deid.providers.masking.fhir.FHIRMortalityDependencyMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.GenericMaskingProvider;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ATCMaskingProviderConfig;
@@ -22,6 +23,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProvider
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.EmailMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.FHIRMortalityDependencyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GUIDMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GenderMaskingProviderConfig;
@@ -135,6 +137,10 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case FHIR:
         provider = new FHIRMaskingProvider(deidMaskingConfig, this, tenantId);
+        break;
+      case FHIR_MORTALITY_DEPENDENCY:
+        provider = new FHIRMortalityDependencyMaskingProvider(
+            (FHIRMortalityDependencyMaskingProviderConfig) config, this, tenantId);
         break;
       case FPE:
         provider = new FPEMaskingProvider((FPEMaskingProviderConfig) config);
