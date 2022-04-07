@@ -1,16 +1,13 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,10 +27,12 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
   public void testMask() throws Exception {
     EmailMaskingProvider maskingProvider = new EmailMaskingProvider();
 
-    assertThat(maskingProvider.mask("dummyEmail@ie.ibm.com"), not("dummyEmail@ie.ibm.com"));
-    assertThat(maskingProvider.mask("adsfasdfafs12341@fdlkjfsal.com"),
-        not("adsfasdfafs12341@fdlkjfsal.com"));
-    assertThat(maskingProvider.mask("a12399@fdsaf.eu"), not("a12399@fdsaf.eu"));
+    String value = "dummyEmail@ie.ibm.com";
+    assertNotEquals(value, maskingProvider.mask(value));
+    value = "adsfasdfafs12341@fdlkjfsal.com";
+    assertNotEquals(value, maskingProvider.mask(value));
+    value = "a12399@fdsaf.eu";
+    assertNotEquals(value, maskingProvider.mask(value));
     assertTrue(maskingProvider.mask("dummyname@test.com").endsWith(".com"));
     assertTrue(maskingProvider.mask("dummyname@test.co.uk").endsWith(".co.uk"));
     assertTrue(maskingProvider.mask("a12399@fdsaf.eu").endsWith(".eu"));
@@ -48,7 +47,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals(null, maskedEmail);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -61,7 +60,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals(null, maskedEmail);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -76,7 +75,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
 
     assertFalse(maskedEmail.equals(invalidEmail));
     assertTrue(identifier.isOfThisType(maskedEmail));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -93,7 +92,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     assertNotEquals(invalidEmail, maskedEmail);
     assertNotEquals("OTHER", maskedEmail);
     assertTrue(identifier.isOfThisType(maskedEmail));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -106,7 +105,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals("OTHER", maskedEmail);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -120,7 +119,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals("Test Email", maskedEmail);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -133,7 +132,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals(null, maskedEmail);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -149,26 +148,21 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
     // may/may not be the same as the original tld.
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(originalValue);
-      assertThat(maskingProvider.mask("dummyEmail@ie.ibm.com"), not("dummyEmail@ie.ibm.com"));
+      assertNotEquals(originalValue, maskedValue);
       if (!maskedValue.endsWith(".com")) {
         domainOK++;
       }
-      // System.out.println("=======> eMail preserveDomain = 0,
-      // originValue ["
-      // + originalValue + "], masked value [" + maskedValue + "]");
     }
     assertTrue(domainOK > 0);
 
+    originalValue = "dummyname@test.co.uk";
     domainOK = 0;
     for (int i = 0; i < 100; i++) {
       String maskedValue = maskingProvider.mask(originalValue);
-      assertThat(maskingProvider.mask("dummyname@test.co.uk"), not("dummyname@test.co.uk"));
+      assertNotEquals(originalValue, maskedValue);
       if (!maskedValue.endsWith(".co.uk")) {
         domainOK++;
       }
-      // System.out.println("=======> eMail preserveDomain = 0,
-      // originValue ["
-      // + originalValue + "], masked value [" + maskedValue + "]");
     }
     assertTrue(domainOK > 0);
   }

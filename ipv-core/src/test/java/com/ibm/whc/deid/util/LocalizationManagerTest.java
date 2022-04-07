@@ -5,21 +5,17 @@
  */
 package com.ibm.whc.deid.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import com.ibm.whc.deid.shared.localization.Resource;
 import com.ibm.whc.deid.shared.localization.Resources;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -45,7 +41,7 @@ public class LocalizationManagerTest {
         Collection<ResourceEntry> resources = manager.getResources(resource);
 
         assertNotNull(resources);
-        assertThat(resources.size(), is(not(0)));
+        assertNotEquals(0, resources.size());
       }
     }
   }
@@ -56,13 +52,11 @@ public class LocalizationManagerTest {
         manager.getResources(Resource.COUNTRY, Collections.singleton("us"));
 
     assertNotNull(resources);
-    assertThat(resources.size(), is(1));
+    assertEquals(1, resources.size());
 
     for (ResourceEntry resourceEntry : resources)
-      assertThat(resourceEntry.getCountryCode(), is("en"));
+      assertEquals("en", resourceEntry.getCountryCode());
   }
-
-
 
   @Test
   public void getResourcesWithCountry() throws Exception {
@@ -73,8 +67,7 @@ public class LocalizationManagerTest {
             manager.getResources(resource, Collections.singleton("us"));
 
         assertNotNull(resources);
-        assertThat("Resource  " + resource + " size should not be zero", resources.size(),
-            is(not(0)));
+        assertNotEquals("Resource  " + resource + " size should not be zero", 0, resources.size());
       }
     }
   }

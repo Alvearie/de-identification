@@ -9,3 +9,4 @@ pom.xml.versionsBackup
 /.flattened-pom.xml
 common.properties
 createToolchain.sh
+toolchain_util.sh

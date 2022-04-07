@@ -5,11 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
@@ -188,7 +186,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String maskedName = maskingProvider.mask(invalidName);
 
     assertEquals(null, maskedName);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -203,7 +201,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String maskedName = maskingProvider.mask(invalidName);
 
     assertEquals(null, maskedName);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -223,8 +221,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     assertEquals(2, replacements.length);
     assertTrue(maskingProvider.getNamesManager().isFirstName(replacements[0]));
     assertTrue(maskingProvider.getNamesManager().isLastName(replacements[1]));
-
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -238,7 +235,7 @@ public class NameMaskingProviderTest extends TestLogSetUp implements MaskingProv
     String maskedName = maskingProvider.mask(invalidName);
 
     assertEquals("OTHER", maskedName);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test

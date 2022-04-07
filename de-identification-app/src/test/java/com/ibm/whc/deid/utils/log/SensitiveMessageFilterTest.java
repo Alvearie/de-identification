@@ -93,6 +93,7 @@ public class SensitiveMessageFilterTest {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Map<String, String> getMdc() {
       return null;
     }

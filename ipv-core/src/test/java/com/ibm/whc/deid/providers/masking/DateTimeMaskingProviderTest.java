@@ -5,11 +5,9 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -512,7 +510,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals(null, maskedDateTime);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -525,7 +523,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals(null, maskedDateTime);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -542,7 +540,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     assertFalse(maskedDateTime.equals(invalidDateTime));
     assertTrue(identifier.isOfThisType(maskedDateTime));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -555,7 +553,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals("OTHER", maskedDateTime);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -570,7 +568,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals("Test Date Time", maskedDateTime);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -583,7 +581,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals(null, maskedDateTime);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test

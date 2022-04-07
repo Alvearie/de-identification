@@ -29,7 +29,7 @@ public class RandomReplacement implements PipelineObject {
     int inputLength = input.length();
 
     if (offset >= inputLength) {
-      return new Tuple(input, true);
+      return new Tuple<>(input, Boolean.TRUE);
     }
 
     int end = offset + depth;
@@ -38,6 +38,6 @@ public class RandomReplacement implements PipelineObject {
     }
 
     String maskedValue = RandomGenerators.randomReplacement(input.substring(offset, end));
-    return new Tuple(maskedValue, true);
+    return new Tuple<>(maskedValue, Boolean.TRUE);
   }
 }

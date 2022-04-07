@@ -43,7 +43,6 @@
 
 	<artifactId>de-identification-app</artifactId>
 	<packaging>jar</packaging>
-
 	<name>DE-IDENTIFICATION-APPLICATION-ENDPOINT</name>
 	<description>endpoint service for de-identification</description>
 
@@ -57,56 +56,47 @@
 					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-undertow</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.ibm.whc.deid</groupId>
 			<artifactId>ipv-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<!-- openapi v3 / swagger -->
 		<dependency>
     		<groupId>org.springdoc</groupId>
     		<artifactId>springdoc-openapi-ui</artifactId>
     		<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>
-		
+		</dependency>		
 		<!-- Required because the project includes a logback-specific filter class.  -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 			<groupId>com.ibm.whc.deid</groupId>
 			<artifactId>whc-shared</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -124,19 +114,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<showWarnings>true</showWarnings>
-					<compilerArgs>
-						<arg>-Xlint:all</arg>
-						<arg>-Xlint:-processing</arg>
-						<arg>-Xlint:-rawtypes</arg>
-						<!-- Some required third-party packages have deprecated methods -->
-						<arg>-Xlint:-deprecation</arg>
-						<arg>-Werror</arg>
-					</compilerArgs>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -180,6 +157,7 @@
 				<artifactId>flatten-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
