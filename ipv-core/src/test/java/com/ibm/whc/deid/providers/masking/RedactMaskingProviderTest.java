@@ -5,12 +5,10 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
 
 public class RedactMaskingProviderTest extends TestLogSetUp {
 
@@ -53,6 +51,6 @@ public class RedactMaskingProviderTest extends TestLogSetUp {
     String maskedRedact = maskingProvider.mask(invalidRedact);
 
     assertEquals(null, maskedRedact);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 }

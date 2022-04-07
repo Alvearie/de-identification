@@ -5,9 +5,8 @@
  */
 package com.ibm.whc.deid.jsonpath;
 
-import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.component.ArrayComponent;
@@ -41,7 +40,7 @@ public class ArrayComponentTest {
     assertNotNull(arrayComponent);
 
     JsonNode newNode = arrayComponent.apply(selection);
-    assertThat(newNode.get("price").asDouble(), is(8.99));
+    assertEquals("8.99", newNode.get("price").asText());
   }
 
   @Test(expected = IllegalArgumentException.class)

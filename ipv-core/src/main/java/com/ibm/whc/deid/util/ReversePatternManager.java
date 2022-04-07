@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,7 +7,6 @@ package com.ibm.whc.deid.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,17 +21,15 @@ import com.ibm.whc.deid.util.localization.ResourceEntry;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
-public final class ReversePatternManager extends ResourceBasedManager<ReversePatternGenerator>
-    implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4317861826867615401L;
-	private static ReversePatternManager patternManager = null;
+public final class ReversePatternManager extends ResourceBasedManager<ReversePatternGenerator> {
+
+  private static final long serialVersionUID = 4317861826867615401L;
+
+  private static transient ReversePatternManager patternManager = null;
+
   private HashMap<String, String> resourcePatterns = new HashMap<String, String>();
   private Map<String, Map<String, ReversePatternGenerator>> patterns =
       new HashMap<String, Map<String, ReversePatternGenerator>>();
-  private static boolean testingOnly_ExceptionOnLoadProperties = false;
 
   private static LogManager log = LogManager.getInstance();
 
@@ -47,7 +44,8 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
    */
   public static ReversePatternManager getInstance() {
     if (patternManager == null) {
-			patternManager = new ReversePatternManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+      patternManager =
+          new ReversePatternManager(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
       patternManager.readResourcesFromFile(patternManager.getResources());
     }
     return patternManager;
@@ -121,9 +119,6 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
     for (ResourceEntry entry : entries) {
       String countryCode = entry.getCountryCode().toUpperCase();
       try (InputStream inputStream = entry.createStream()) {
-        if (testingOnly_ExceptionOnLoadProperties) {
-          throw new IOException("For testing only");
-        }
         Properties reader = new Properties();
         reader.load(inputStream);
         for (Entry<Object, Object> line : reader.entrySet()) {
@@ -133,7 +128,6 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
           getPatternByPattern(patternAtKey, countryCode);
           resourcePatterns.put(key, patternAtKey);
         }
-        inputStream.close();
       } catch (IOException e) {
         log.logError(LogCodes.WPH1013E, e);
       }
@@ -151,15 +145,5 @@ public final class ReversePatternManager extends ResourceBasedManager<ReversePat
       }
     }
     return returnMe;
-  }
-
-  /**
-   * For testing only.
-   *
-   * @param value true to cause exception, otherwise false
-   */
-  static void setTestingOnlyExceptionOnLoadProperties(boolean value) {
-    testingOnly_ExceptionOnLoadProperties = value;
-    patternManager = null;
   }
 }

@@ -18,16 +18,18 @@ import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
 
 public class TLDManager {
-	private static TLDManager instance = new TLDManager();
-  /** The Random. */
-  SecureRandom random;
+
+  private static TLDManager instance = new TLDManager();
+
+  private SecureRandom random;
 
   private String[] tlds = {"com", "org", "edu", "co.uk"};
-  private Set<String>[] tldSet = new HashSet[256];
+  @SuppressWarnings("unchecked")
+  private Set<String>[] tldSet = new Set[256];
 
-  private static LogManager logger = LogManager.getInstance();
+  private static final LogManager logger = LogManager.getInstance();
 
-	private TLDManager() {
+  private TLDManager() {
     this.random = new SecureRandom();
 
     for (int i = 0; i < 256; i++) {
@@ -37,23 +39,24 @@ public class TLDManager {
     buildList();
   }
 
-	/**
-	 * Instance tld manager.
-	 *
-	 * @return the tld manager
-	 */
-	public static TLDManager instance() {
-		return instance;
-	}
+  /**
+   * Instance tld manager.
+   *
+   * @return the tld manager
+   */
+  public static TLDManager instance() {
+    return instance;
+  }
 
   private void buildList() {
-		// Assume TLD is english only and loads the default localization.properties
-		ResourceEntry filename = LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
-        .getResources(Resource.PUBLIC_SUFFIX_LIST).iterator().next();
+    // Assume TLD is english only and loads the default localization.properties
+    ResourceEntry filename =
+        LocalizationManager.getInstance(LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES)
+            .getResources(Resource.PUBLIC_SUFFIX_LIST).iterator().next();
 
     String line = null;
     try (SecEngBufferedReader reader =
-        new SecEngBufferedReader(new InputStreamReader(filename.createStream()))){
+        new SecEngBufferedReader(new InputStreamReader(filename.createStream()))) {
       while ((line = reader.readLine()) != null) {
         line = line.trim();
         if (line.length() == 0 || line.startsWith("//")) {
@@ -67,8 +70,6 @@ public class TLDManager {
 
         tldSet[index].add(line);
       }
-
-      reader.close();
     } catch (Exception e) {
       logger.logError(LogCodes.WPH1013E, e);
       // throw new RuntimeException("error building TLD list");

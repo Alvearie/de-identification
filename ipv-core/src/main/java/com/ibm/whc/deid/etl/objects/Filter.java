@@ -24,6 +24,6 @@ public class Filter implements PipelineObject {
   @Override
   public Tuple<String, Boolean> apply(String input) {
     boolean match = pattern.matcher(input).matches();
-    return new Tuple(null, match);
+    return new Tuple<>(null, match ? Boolean.TRUE : Boolean.FALSE);
   }
 }

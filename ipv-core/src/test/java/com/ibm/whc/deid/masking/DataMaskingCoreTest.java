@@ -5,10 +5,9 @@
  */
 package com.ibm.whc.deid.masking;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,7 +135,7 @@ public class DataMaskingCoreTest {
     JsonNode maskedNode = objectMapper.readTree(maskedData);
 
     assertFalse(maskedNode.path("address").get(0).path("city").textValue().isEmpty());
-    assertThat(maskedNode.path("address").get(0).path("city").textValue(), not("PleasantVille"));
+    assertNotEquals("PleasantVille", maskedNode.path("address").get(0).path("city").textValue());
 
     System.out.println("Masked output is: " + maskedNode.toString());
   }
@@ -169,8 +168,8 @@ public class DataMaskingCoreTest {
     assertTrue(maskedNode.path("identifier").get(0).path("value").isNull());
     assertTrue(maskedNode.path("identifier").get(1).path("type").path("text").isNull());
     assertTrue(maskedNode.path("identifier").get(1).path("value").isNull());
-    assertThat(maskedNode.path("patient").path("reference").textValue(),
-        not("Patient/2.16.840.1.113883.19.5"));
+    assertNotEquals("Patient/2.16.840.1.113883.19.5",
+        maskedNode.path("patient").path("reference").textValue());
   }
 
   @Test
@@ -193,7 +192,7 @@ public class DataMaskingCoreTest {
     JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());
 
     assertFalse(maskedNode.path("address").get(0).path("city").textValue().isEmpty());
-    assertThat(maskedNode.path("address").get(0).path("city").textValue(), not("PleasantVille"));
+    assertNotEquals("PleasantVille", maskedNode.path("address").get(0).path("city").textValue());
   }
 
   @Test
@@ -221,7 +220,7 @@ public class DataMaskingCoreTest {
     assertTrue(maskedNode.path("identifier").get(0).path("value").isNull());
     assertTrue(maskedNode.path("identifier").get(1).path("type").path("text").isNull());
     assertTrue(maskedNode.path("identifier").get(1).path("value").isNull());
-    assertThat(maskedNode.path("patient").path("reference").textValue(),
-        not("Patient/2.16.840.1.113883.19.5"));
+    assertNotEquals("Patient/2.16.840.1.113883.19.5",
+        maskedNode.path("patient").path("reference").textValue());
   }
 }

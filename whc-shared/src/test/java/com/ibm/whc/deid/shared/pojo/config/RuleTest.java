@@ -5,10 +5,9 @@
  */
 package com.ibm.whc.deid.shared.pojo.config;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -57,10 +56,10 @@ public class RuleTest {
 
     CityMaskingProviderConfig cityConfig =
         (CityMaskingProviderConfig) rule.getMaskingProviders().get(0);
-    assertThat(cityConfig.getType(), is(MaskingProviderType.CITY));
+    assertEquals(MaskingProviderType.CITY, cityConfig.getType());
 
-    assertThat(rule.getMaskingProviders().get(0), instanceOf(CityMaskingProviderConfig.class));
-    assertThat(rule.getMaskingProviders().get(1), instanceOf(RedactMaskingProviderConfig.class));
+    assertTrue(rule.getMaskingProviders().get(0) instanceof CityMaskingProviderConfig);
+    assertTrue(rule.getMaskingProviders().get(1) instanceof RedactMaskingProviderConfig);
   }
 
   @Test
@@ -71,7 +70,7 @@ public class RuleTest {
     ObjectMapper objectMapper = new ObjectMapper();
     Rule rule = objectMapper.readValue(json, Rule.class);
 
-    assertThat(rule.getMaskingProviders().get(0), instanceOf(CityMaskingProviderConfig.class));
-    assertThat(rule.getMaskingProviders().get(1), instanceOf(RedactMaskingProviderConfig.class));
+    assertTrue(rule.getMaskingProviders().get(0) instanceof CityMaskingProviderConfig);
+    assertTrue(rule.getMaskingProviders().get(1) instanceof RedactMaskingProviderConfig);
   }
 }

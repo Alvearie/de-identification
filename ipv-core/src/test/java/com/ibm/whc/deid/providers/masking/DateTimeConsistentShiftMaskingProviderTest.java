@@ -184,22 +184,26 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     // 01 NOV 2020 is end of daylight savings time in America/Chicago (CST/CDT)
     // ---------------------------------------------------------------------------
 
-    // input offset overridden by zone id when both supplied
+    // When an offset and a zone ID are both supplied, the behavior is different
+    // between Java 8 and Java 11.  Java 11 javadoc appears to indicate the 
+    // offset will be used in preference to the zone ID.  The tests here do not 
+    // include that type of input conflict.
+
     assertEquals("2020-10-31T05:06:07-05:00[America/Chicago]", provider.applyOffsetAndReformat(
-        "2020-11-01T05:06:07+10:00[America/Chicago]", -1, customFormatters));
+        "2020-11-01T05:06:07-06:00[America/Chicago]", -1, customFormatters));
     assertEquals("2020-11-01T01:06:07-06:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-11-04T01:06:07-08:00[America/Chicago]", -3,
+        provider.applyOffsetAndReformat("2020-11-04T01:06:07-06:00[America/Chicago]", -3,
             customFormatters));
     assertEquals("2020-11-01T01:06:07-05:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-10-27T01:06:07-08:00[America/Chicago]", 5,
+        provider.applyOffsetAndReformat("2020-10-27T01:06:07-05:00[America/Chicago]", 5,
             customFormatters));
     assertEquals("2020-11-01T02:06:07-06:00[America/Chicago]",
-        provider.applyOffsetAndReformat("2020-10-27T02:06:07-08:00[America/Chicago]", 5,
+        provider.applyOffsetAndReformat("2020-10-27T02:06:07-05:00[America/Chicago]", 5,
             customFormatters));
     assertEquals("2020-05-01T13:14:15-05:00[America/Chicago]",
         provider.applyOffsetAndReformat("2020-04-01T13:14:15-05:00[America/Chicago]", 30,
             customFormatters));
-
+    
     assertEquals("2020-10-31T05:06:07 CDT",
         provider.applyOffsetAndReformat("2020-11-01T05:06:07 CDT", -1, customFormatters));
     // pattern is for short zone name

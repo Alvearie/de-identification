@@ -5,17 +5,12 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.providers.identifiers.CreditCardIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
@@ -40,18 +35,18 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
         new CreditCardMaskingProvider(defaultMaskingConfiguration, tenantId, localizationProperty);
 
     // different values
-    assertThat(ccMaskingProvider.mask("123456789"), not("123456789"));
+    assertNotEquals("123456789", ccMaskingProvider.mask("123456789"));
     assertFalse("123456789".equals(ccMaskingProvider.mask("123456789")));
 
     String test = "1234-1234-1234-1234";
     String res = ccMaskingProvider.mask(test);
 
     // same length
-    assertThat(res.length(), is(test.length()));
+    assertEquals(test.length(), res.length());
 
     // same pattern
     for (int i = 0; i < test.length(); ++i) {
-      assertThat(Character.isDigit(res.charAt(i)), is(Character.isDigit(test.charAt(i))));
+      assertTrue(Character.isDigit(res.charAt(i)) == Character.isDigit(test.charAt(i)));
     }
   }
 
@@ -99,7 +94,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     CreditCardMaskingProviderConfig config =
         objectMapper.readValue(str, CreditCardMaskingProviderConfig.class);
 
-    assertThat(config.getType(), is(MaskingProviderType.CREDIT_CARD));
+    assertEquals(MaskingProviderType.CREDIT_CARD, config.getType());
 
     MaskingProvider maskingProvider =
         new CreditCardMaskingProvider(config, tenantId, localizationProperty);
@@ -108,7 +103,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals(null, maskedCreditCard);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -122,7 +117,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals(null, maskedCreditCard);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -138,7 +133,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
 
     assertFalse(maskedCreditCard.equals(invalidCreditCard));
     assertTrue(identifier.isOfThisType(maskedCreditCard));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -153,7 +148,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals("OTHER", maskedCreditCard);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -169,7 +164,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals("Test Credit Card", maskedCreditCard);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
@@ -183,7 +178,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals(null, maskedCreditCard);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
+    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 
   @Test
