@@ -140,7 +140,7 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
         break;
       case FHIR_MORTALITY_DEPENDENCY:
         provider = new FHIRMortalityDependencyMaskingProvider(
-            (FHIRMortalityDependencyMaskingProviderConfig) config, this, tenantId);
+            (FHIRMortalityDependencyMaskingProviderConfig) config);
         break;
       case FPE:
         provider = new FPEMaskingProvider((FPEMaskingProviderConfig) config);
