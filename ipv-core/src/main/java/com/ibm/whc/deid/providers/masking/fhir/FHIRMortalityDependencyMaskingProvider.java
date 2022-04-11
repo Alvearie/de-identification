@@ -6,6 +6,7 @@
 package com.ibm.whc.deid.providers.masking.fhir;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -72,56 +73,94 @@ public class FHIRMortalityDependencyMaskingProvider extends AbstractMaskingProvi
   }
 
   protected void maskDateTime(MaskingActionInputIdentifier i, ObjectNode parent) {
-    putField(i, null);
+    // The datetime value of this node will always be removed.
+    // Determine whether the related boolean property should be set to True or
+    // removed completely, based on the age of the person when mortality occurred.
+    // This must be checked before the value of this node is removed.
+    JsonNode newNode =
+        isBooleanRemovalNeeded(parent) ? NullNode.getInstance() : BooleanNode.getTrue();
+    parent.set(BOOLEAN_FIELD, newNode);
 
-    // create or modify boolean field
-    JsonNode newNode = isTooYoung(parent) ? NullNode.getInstance() : BooleanNode.getTrue();
-    JsonNode boolNode = parent.get(BOOLEAN_FIELD);
-    if (boolNode == null || boolNode.isNull() || boolNode.asText(null) == null) {
-      parent.set(BOOLEAN_FIELD, newNode);
-    } else if (boolNode.isValueNode()) { // expected
-      parent.set(BOOLEAN_FIELD, newNode);
-    } else { // boolean is a container node - not allowed
-      StringBuilder buffer = new StringBuilder(80);
-      buffer.append("Input data property ").append(BOOLEAN_FIELD)
-          .append(" must be a value, not a JSON container object for masking rule ")
-          .append(getName());
-      logger.logError(LogCodes.WPH1013E, buffer.toString());
-      throw new KeyedRuntimeException(LogCodes.WPH1028E, getName());
-    }
+    putField(i, null);
   }
 
   protected void maskBoolean(MaskingActionInputIdentifier i, ObjectNode parent) {
-    if (isTooYoung(parent)) {
+    // get the value of this node
+    boolean deceased = true;
+    JsonNode node = parent.get(BOOLEAN_FIELD);
+    // being conservative, so unless the value is explicitly false, consider the person deceased
+    if (node != null && !node.isNull() && node.isValueNode()
+        && "false".equalsIgnoreCase(node.asText())) {
+      deceased = false;
+    }
+    // if deceased, remove value completely based on patient age
+    if (deceased && isBooleanRemovalNeeded(parent)) {
       putField(i, null);
     }
   }
 
-  protected boolean isTooYoung(ObjectNode parent) {
-    boolean young = false;
-    JsonNode birthNode = parent.get(BIRTHDATE_FIELD);
-    if (birthNode == null || birthNode.isNull() || birthNode.asText(null) == null) {
-      // birth date not provided - assume young
-      young = true;
-    } else if (birthNode.isValueNode()) { // expected
-      String birthString = birthNode.asText();
+  protected LocalDate getDateFromDateNode(ObjectNode parent, String propertyName) {
+    LocalDate date = null;
+    JsonNode node = parent.get(propertyName);
+    if (node != null && !node.isNull() && node.isValueNode() && node.asText(null) != null) {
+      String stringValue = node.asText();
       try {
-        LocalDate birthDate = LocalDate.parse(birthString);
-        LocalDate currentDate = LocalDate.now();
-        long age = ChronoUnit.YEARS.between(currentDate, birthDate);
-        young = age <= this.minYears;
+        date = LocalDate.parse(stringValue);
       } catch (DateTimeParseException e) {
         logger.logWarn(LogCodes.WPH1012W, e, e.getMessage());
         StringBuilder buffer = new StringBuilder(80);
-        buffer.append("Value in input for ").append(BIRTHDATE_FIELD)
-            .append(" could not be parsed into a date - nullifying deceased indicator");
+        // do not include the actual data in the log message
+        buffer.append("Value in input for ").append(propertyName)
+            .append(" could not be parsed into a date");
         logger.logError(LogCodes.WPH1013E, buffer.toString());
-        young = true;
       }
-    } else { // container node
-      // invalid node type for birthdate - assume young
-      young = true;
     }
+    return date;
+  }
+
+  protected LocalDate getDateFromDateTimeNode(ObjectNode parent, String propertyName) {
+    LocalDate date = null;
+    JsonNode node = parent.get(propertyName);
+    if (node != null && !node.isNull() && node.isValueNode() && node.asText(null) != null) {
+      String stringValue = node.asText();
+      try {
+        LocalDateTime datetime = LocalDateTime.parse(stringValue);
+        date = LocalDate.from(datetime);
+      } catch (DateTimeParseException e) {
+        logger.logWarn(LogCodes.WPH1012W, e, e.getMessage());
+        StringBuilder buffer = new StringBuilder(80);
+        // do not include the actual data in the log message
+        buffer.append("Value in input for ").append(propertyName)
+            .append(" could not be parsed into a date");
+        logger.logError(LogCodes.WPH1013E, buffer.toString());
+      }
+    }
+    return date;
+  }
+
+  protected boolean isBooleanRemovalNeeded(ObjectNode parent) {
+    boolean remove = false;
+    LocalDate birthDate = getDateFromDateNode(parent, BIRTHDATE_FIELD);
+    if (birthDate == null) {
+      // not sure the age of the person, therefore assume deceased indicators must be removed
+      remove = true;
+    } else {
+      // get the deceased date value as a date
+      LocalDate mortalityDate = getDateFromDateTimeNode(parent, DATE_TIME_FIELD);
+      if (mortalityDate == null) {
+        // not sure when the person became deceased, compare the birthdate to the current date
+        LocalDate currentDate = LocalDate.now();
+        remove = isTooYoung(birthDate, currentDate);
+      } else {
+        remove = isTooYoung(birthDate, mortalityDate);
+      }
+    }
+    return remove;
+  }
+
+  protected boolean isTooYoung(LocalDate birthDate, LocalDate compareDate) {
+    long age = ChronoUnit.YEARS.between(birthDate, compareDate);
+    boolean young = age <= this.minYears;
     return young;
   }
 }

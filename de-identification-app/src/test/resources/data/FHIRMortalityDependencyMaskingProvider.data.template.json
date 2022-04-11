@@ -1,0 +1,40 @@
+{
+    "resourceType": "Patient",
+    "id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "text": {
+        "status": "",
+        "div": ""
+    },
+    "identifier": [
+        {
+            "use": "",
+            "system": "",
+            "value": "",
+            "type": {
+                "coding": [
+                    {
+                        "system": "",
+                        "version": "",
+                        "code": "",
+                        "display": "",
+                        "userSelected": false
+                    }
+                ],
+                "text": ""
+            },
+            "lsf_resourcetype": "Organization",
+            "period": {
+                "start": "",
+                "end": ""
+            }
+        }
+    ],
+    "gender": "",
+    "{1name}": {1value},
+    "{2name}": {2value},
+    "{3name}": {3value},
+    "processedTime_TZ": "",
+    "objectName": "",
+    "receiveTime_GMT": "",
+    "deviceInfo": ""
+}
