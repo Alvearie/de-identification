@@ -99,35 +99,23 @@ public class FHIRMortalityDependencyMaskingProvider extends AbstractMaskingProvi
     }
   }
 
-  protected LocalDate getDateFromDateNode(ObjectNode parent, String propertyName) {
+  protected LocalDate getDateFromNode(ObjectNode parent, String propertyName) {
     LocalDate date = null;
     JsonNode node = parent.get(propertyName);
     if (node != null && !node.isNull() && node.isValueNode() && node.asText(null) != null) {
       String stringValue = node.asText();
-      try {
-        date = LocalDate.parse(stringValue);
-      } catch (DateTimeParseException e) {
-        logger.logWarn(LogCodes.WPH1012W, e, e.getMessage());
-        StringBuilder buffer = new StringBuilder(80);
-        // do not include the actual data in the log message
-        buffer.append("Value in input for ").append(propertyName)
-            .append(" could not be parsed into a date");
-        logger.logError(LogCodes.WPH1013E, buffer.toString());
+      // check for time component and strip it off if found (can be supplied in deceasedDateTime)
+      int timeIndex = stringValue.indexOf('T');
+      if (timeIndex > -1) {
+        stringValue = stringValue.substring(0, timeIndex);
       }
-    }
-    return date;
-  }
-
-  protected LocalDate getDateFromDateTimeNode(ObjectNode parent, String propertyName) {
-    LocalDate date = null;
-    JsonNode node = parent.get(propertyName);
-    if (node != null && !node.isNull() && node.isValueNode() && node.asText(null) != null) {
-      String stringValue = node.asText();
+      String[] components = stringValue.split("-");
       try {
-        LocalDateTime datetime = LocalDateTime.parse(stringValue);
-        date = LocalDate.from(datetime);
-      } catch (DateTimeParseException e) {
-        logger.logWarn(LogCodes.WPH1012W, e, e.getMessage());
+        int year = Integer.parseInt(components[0]);
+        int month = components.length > 1 ? Integer.parseInt(components[1]) : 1;
+        int day = components.length > 2 ? Integer.parseInt(components[2]) : 1;
+        date = LocalDate.of(year, month, day);
+      } catch (NumberFormatException e) {
         StringBuilder buffer = new StringBuilder(80);
         // do not include the actual data in the log message
         buffer.append("Value in input for ").append(propertyName)
@@ -140,13 +128,13 @@ public class FHIRMortalityDependencyMaskingProvider extends AbstractMaskingProvi
 
   protected boolean isBooleanRemovalNeeded(ObjectNode parent) {
     boolean remove = false;
-    LocalDate birthDate = getDateFromDateNode(parent, BIRTHDATE_FIELD);
+    LocalDate birthDate = getDateFromNode(parent, BIRTHDATE_FIELD);
     if (birthDate == null) {
       // not sure the age of the person, therefore assume deceased indicators must be removed
       remove = true;
     } else {
       // get the deceased date value as a date
-      LocalDate mortalityDate = getDateFromDateTimeNode(parent, DATE_TIME_FIELD);
+      LocalDate mortalityDate = getDateFromNode(parent, DATE_TIME_FIELD);
       if (mortalityDate == null) {
         // not sure when the person became deceased, compare the birthdate to the current date
         LocalDate currentDate = LocalDate.now();
