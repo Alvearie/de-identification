@@ -8,11 +8,9 @@
 To compile the De-Identification server, clone the GIT repository and compile with Maven.
 
 ```
-   export RELEASE=1.1.0   (change to the release you want to build)
    git clone --recurse-submodules https://github.com/Alvearie/de-identification
    cd de-identification/
-   git checkout v${RELEASE}
-   mvn clean package
+   mvn clean install package
 ```
 
  Note: `--recurse-submodules` is required because the repository contains a third-party encryption engine as a Git submodule.  For reference, the
@@ -23,7 +21,7 @@ To compile the De-Identification server, clone the GIT repository and compile wi
  - To start the server, use the following command: 
 
  ```
-   java -jar de-identification-app/target/de-identification-app-${RELEASE}-exec.jar
+   java -jar de-identification-app/target/de-identification-app-*.jar
  ```
 
  - After you start the server, verify that it is running properly. Invoke the health API:
@@ -37,6 +35,16 @@ To compile the De-Identification server, clone the GIT repository and compile wi
  ```
    {"status":"UP"}
  ```
+
+## Build a new version
+The De-Identification service is versioned using the `revision` property within the [Maven POM File](../pom.xml). To build a new version:
+
+```shell
+export DEID_VERSION=1.5.0
+git checkout -b ${DEID_VERSION} 
+# make meaningful code updates and changes
+mvn -Drevision=${DEID_VERSION} clean install package
+````
 
 ## Helm deployment
 You can also deploy a release version of the De-Identification service to a Kubernetes cluster using Helm.  Container images for De-Identification releases are stored on Docker Hub.  For more information, see `de-identification/de-identification-app/chart/README.md`.
