@@ -31,8 +31,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.app.endpoint.Application;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.FHIRMortalityDependencyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 
 @RunWith(SpringRunner.class)
@@ -56,6 +59,7 @@ public class FHIRMortalityDependencyMaskingProviderEndToEndTest {
   private String dataTemplate_;
   private String configDatetimeFirst_;
   private String configBooleanFirst_;
+  private String configDatetimeOnly_;
 
   @Before
   public void setup() throws Exception {
@@ -67,6 +71,9 @@ public class FHIRMortalityDependencyMaskingProviderEndToEndTest {
         .toURI())));
     configBooleanFirst_ = new String(Files.readAllBytes(Paths.get(getClass()
         .getResource("/config/fhir/FHIRMortalityDependencyMaskingProvider.boolean.first.json")
+        .toURI())));
+    configDatetimeOnly_ = new String(Files.readAllBytes(Paths.get(getClass()
+        .getResource("/config/fhir/FHIRMortalityDependencyMaskingProvider.datetime.only.json")
         .toURI())));
   }
 
@@ -406,6 +413,78 @@ public class FHIRMortalityDependencyMaskingProviderEndToEndTest {
             .andExpect(jsonPath("$.data[0].deceasedDateTime").value(nullValue()));
       }
     }
+  }
+
+  @Test
+  public void testNegativeThreshold() throws Exception {
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    DeidMaskingConfig datetimeFirstObj =
+        mapper.readValue(configDatetimeFirst_, DeidMaskingConfig.class);
+    FHIRMortalityDependencyMaskingProviderConfig configObj =
+        (FHIRMortalityDependencyMaskingProviderConfig) datetimeFirstObj.getRules().get(0)
+            .getMaskingProviders().get(0);
+    configObj.setMortalityIndicatorMinYears(-1);
+    DeidMaskingConfig booleanFirstObj =
+        mapper.readValue(configBooleanFirst_, DeidMaskingConfig.class);
+    configObj = (FHIRMortalityDependencyMaskingProviderConfig) booleanFirstObj.getRules().get(0)
+        .getMaskingProviders().get(0);
+    configObj.setMortalityIndicatorMinYears(-1);
+    for (String config : new String[] {mapper.writeValueAsString(datetimeFirstObj),
+        mapper.writeValueAsString(booleanFirstObj)}) {
+      // birthDate isn't used in this scenario and can be anything
+      for (String birthDate : new String[] {"\"2022-01-12\"", "\"invalid\"", "null"}) {
+        String data = dataTemplate_;
+        data = data.replace("{1name}", "birthDate");
+        data = data.replace("{1value}", birthDate);
+        data = data.replace("{2name}", "deceasedDateTime");
+        data = data.replace("{2value}", "\"X\"");
+        data = data.replace("{3name}", "deceasedBoolean");
+        data = data.replace("{3value}", "true");
+        System.out.println(data);
+
+        List<String> inputList = new ArrayList<>();
+        inputList.add(data);
+        DataMaskingModel dataMaskingModel =
+            new DataMaskingModel(config, inputList, ConfigSchemaType.FHIR);
+        String request = mapper.writeValueAsString(dataMaskingModel);
+
+        this.mockMvc
+            .perform(post(basePath + "/deidentification")
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$.data[0].deceasedBoolean").value(equalTo(Boolean.TRUE)))
+            .andExpect(jsonPath("$.data[0].deceasedDateTime").value(nullValue()));
+      }
+    }
+  }
+
+  @Test
+  public void testBooleanAddedWithNoRuleRes() throws Exception {
+    String data = dataTemplate_;
+    data = data.replace("{1name}", "birthDate");
+    data = data.replace("{1value}", "\"1922\"");
+    data = data.replace("{2name}", "deceasedDateTime");
+    data = data.replace("{2value}", "\"1990\"");
+    data = data.replace("{3name}", "deceasedBooleanX");
+    data = data.replace("{3value}", "\"gone\"");
+    System.out.println(data);
+
+    List<String> inputList = new ArrayList<>();
+    inputList.add(data);
+    DataMaskingModel dataMaskingModel =
+        new DataMaskingModel(configDatetimeOnly_, inputList, ConfigSchemaType.FHIR);
+    String request = new ObjectMapper().writeValueAsString(dataMaskingModel);
+
+    this.mockMvc
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(request))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$.data[0].deceasedBoolean").value(equalTo(Boolean.TRUE)))
+        .andExpect(jsonPath("$.data[0].deceasedDateTime").value(nullValue()))
+        .andExpect(jsonPath("$.data[0].birthDate").value(nullValue()))
+        .andExpect(jsonPath("$.data[0].deceasedBooleanX").value(nullValue()))
+        .andExpect(jsonPath("$.data[0].resourceType").value(nullValue()))
+        .andExpect(jsonPath("$.data[0].text.status").value(nullValue()));
   }
 
   @Test

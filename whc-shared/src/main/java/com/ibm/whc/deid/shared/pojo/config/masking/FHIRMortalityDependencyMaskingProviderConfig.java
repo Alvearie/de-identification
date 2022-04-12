@@ -21,8 +21,8 @@ public class FHIRMortalityDependencyMaskingProviderConfig extends MaskingProvide
   private static final long serialVersionUID = -4162093284769724219L;
 
   /**
-   * The minimum age of the patient in number of years before the privacy provider will allow
-   * mortality indicators to remain in the data.
+   * The age of the patient in number of years that must be exceeded before the privacy provider
+   * will allow mortality indicators to remain in the data.
    */
   private int mortalityIndicatorMinYears = 8;
 
@@ -36,16 +36,6 @@ public class FHIRMortalityDependencyMaskingProviderConfig extends MaskingProvide
 
   public void setMortalityIndicatorMinYears(int mortalityIndicatorMinYears) {
     this.mortalityIndicatorMinYears = mortalityIndicatorMinYears;
-  }
-
-  @Override
-  public void validate(DeidMaskingConfig maskingConfig)
-      throws InvalidMaskingConfigurationException {
-    super.validate(maskingConfig);
-    if (mortalityIndicatorMinYears < 0) {
-      throw new InvalidMaskingConfigurationException(
-          "`mortalityIndicatorMinYears` must be greater than or equal to 0");
-    }
   }
 
   @Override
