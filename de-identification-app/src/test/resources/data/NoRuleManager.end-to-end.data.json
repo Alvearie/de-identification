@@ -14,21 +14,35 @@
                 "coding": [
                     {
                         "system": "",
-                        "version": "",
+                        "version": 1,
                         "code": "",
                         "display": "",
                         "userSelected": false
                     },
                     {
                         "system": "",
-                        "version": "",
+                        "version": 1,
                         "code": "",
                         "display": "",
                         "userSelected": false
-                    }                
+                    }
                 ],
                 "text": ""
             },
+            "vector": 
+                [                    
+                    1,
+                    2,
+                    3,
+                    "",
+                    "",
+                    "X",
+                    "X",
+                    null,
+                    null,
+                    false,
+                    false                
+                ],            
             "lsf_resourcetype": "Organization",
             "period": {
                 "start": "",
@@ -37,11 +51,10 @@
         }
     ],
     "gender": "",
-    "{1name}": {1value},
-    "{2name}": {2value},
-    "{3name}": {3value},
+    "birthDate": "2000-04-18",
+    "birthDate2": "2000-04-18",
     "processedTime_TZ": "",
-    "objectName": "",
+    "objectName": true,
     "receiveTime_GMT": "",
-    "deviceInfo": ""
+    "deviceInfo": true
 }

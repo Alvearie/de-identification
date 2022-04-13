@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,7 +8,9 @@ package com.ibm.whc.deid.providers.masking;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.function.Supplier;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
@@ -110,22 +112,39 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   }
 
   protected final void putField(MaskingActionInputIdentifier i, String value) {
+    // TextNode does not expect null as its value, so use NullNode.
+    // TextNode typically works, but as of Jackson 2.11.4, some methods like hashCode() get NPE.
+    JsonNode newNode = value == null ? NullNode.getInstance() : new TextNode(value);
     if (i.getParent().isObject()) {
-      TextNode newNode = new TextNode(value);
-      i.setParent(((ObjectNode) i.getParent()).set(i.getPath(), newNode));
+      ((ObjectNode) i.getParent()).set(i.getPath(), newNode);
       i.setCurrentNode(newNode);
     } else if (i.getParent().isArray()) {
-      ArrayNode aNode = (ArrayNode) i.getParent();
-      int indexOfResult = -1;
-      int size = aNode.size();
-      for (int currentIndex = 0; currentIndex < size; currentIndex++) {
-        if (aNode.get(currentIndex) == i.getNode()) {
-          indexOfResult = currentIndex;
-          break;
-        }
+      // Do not use object identity to find the array member.
+      // Jackson flyweights certain node objects so the same JsonNode
+      // can appear multiple times within a document tree.
+      String path = i.getPath();
+      int index = path.lastIndexOf('[');
+      if (index < 0) { // safety check - should not occur
+        throw new RuntimeException("path to member of array node does not contain `[`");
       }
-      TextNode newNode = new TextNode(value);
-      aNode.set(indexOfResult, newNode);
+      int closeIndex = path.indexOf(']', index);
+      if (closeIndex < 0) { // safety check - should not occur
+        throw new RuntimeException("path to member of array node does not contain `]` after `[`");
+      }
+      int offset;
+      try {
+        offset = Integer.parseInt(path.substring(index + 1, closeIndex));
+      } catch (NumberFormatException e) {
+        // should not occur
+        throw new RuntimeException("offset in path cannot be converted to an integer");
+      }
+      try {
+        ((ArrayNode) i.getParent()).set(offset, newNode);
+      } catch (IndexOutOfBoundsException e) {
+        // should not occur
+        throw new RuntimeException("offset in path was " + offset + " but ArrayNode has only "
+            + ((ArrayNode) i.getParent()).size() + " members");
+      }
       i.setCurrentNode(newNode);
     }
   }

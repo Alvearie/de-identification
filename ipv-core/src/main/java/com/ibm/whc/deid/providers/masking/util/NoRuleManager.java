@@ -25,10 +25,12 @@ public class NoRuleManager {
     
     private final JsonNode parent;
     private final String pathInParent;
+    private final int hashcode;
     
     public NoRuleManagerHashKey(JsonNode n, String path) {
       parent = n;
       pathInParent = path;
+      hashcode = 31 * System.identityHashCode(parent) + pathInParent.hashCode();
     }
 
     @Override
@@ -38,7 +40,7 @@ public class NoRuleManager {
 
     @Override
     public int hashCode() {
-      return 31 * parent.hashCode() + pathInParent.hashCode();
+      return hashcode;
     }
   }
 
@@ -82,9 +84,13 @@ public class NoRuleManager {
             if (childNode.isArray() || childNode.isObject()) {
               findLeaves(rootNode, childPath, childNode, resourceId, resourceType);
             } else {
-              map.put(new NoRuleManagerHashKey(parentNode, childPath),
-                  new MaskingActionInputIdentifier(noRuleResProvider, childNode, parentNode,
-                      childPath, resourceType, resourceId, rootNode));
+              NoRuleManagerHashKey key = new NoRuleManagerHashKey(parentNode, childPath);
+              if (map.containsKey(key)) {
+                // this should not be possible
+                throw new RuntimeException("NoRuleManager map already has incoming object key");
+              }
+              map.put(key, new MaskingActionInputIdentifier(noRuleResProvider, childNode,
+                  parentNode, childPath, resourceType, resourceId, rootNode));
             }
           }
         }
@@ -99,9 +105,13 @@ public class NoRuleManager {
           } else if (childNode.isArray() || childNode.isObject()) {
             findLeaves(rootNode, entry.getKey(), childNode, resourceId, resourceType);
           } else {
-            map.put(new NoRuleManagerHashKey(parentNode, entry.getKey()),
-                new MaskingActionInputIdentifier(noRuleResProvider, childNode, parentNode,
-                    entry.getKey(), resourceType, resourceId, rootNode));
+            NoRuleManagerHashKey key = new NoRuleManagerHashKey(parentNode, entry.getKey());
+            if (map.containsKey(key)) {
+              // this should not be possible
+              throw new RuntimeException("NoRuleManager map already has incoming array key");
+            }
+            map.put(key, new MaskingActionInputIdentifier(noRuleResProvider, childNode, parentNode,
+                entry.getKey(), resourceType, resourceId, rootNode));
           }
         }
       }
