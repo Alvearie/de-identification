@@ -21,29 +21,6 @@ import com.ibm.whc.deid.providers.masking.fhir.MaskingProviderBuilder;
  */
 public class NoRuleManager {
 
-  private static class NoRuleManagerHashKey {
-    
-    private final JsonNode parent;
-    private final String pathInParent;
-    private final int hashcode;
-    
-    public NoRuleManagerHashKey(JsonNode n, String path) {
-      parent = n;
-      pathInParent = path;
-      hashcode = 31 * System.identityHashCode(parent) + pathInParent.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      return o instanceof NoRuleManagerHashKey && this.parent == ((NoRuleManagerHashKey) o).parent && this.pathInParent.equals(((NoRuleManagerHashKey) o).pathInParent);
-    }
-
-    @Override
-    public int hashCode() {
-      return hashcode;
-    }
-  }
-
   private MaskingProvider noRuleResProvider;
 
   private HashMap<NoRuleManagerHashKey, MaskingActionInputIdentifier> map = new HashMap<>(1000);

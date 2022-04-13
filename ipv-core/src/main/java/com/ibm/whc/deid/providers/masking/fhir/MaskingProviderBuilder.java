@@ -794,6 +794,7 @@ public class MaskingProviderBuilder implements Serializable {
             dataPath, 0, maskingAction, fullPath, node));
 
       } else if (elementNode.has(conditionName)) {
+        // elementNode must be an ObjectNode for has() to have returned True
         JsonNode key = elementNode.get(conditionName);
         String value = key.asText();
         if (value.equals(conditionValue) || ("*".equals(conditionValue)
