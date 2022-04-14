@@ -1,0 +1,27 @@
+{
+    "rules": [
+        {
+            "name": "mortality",
+            "maskingProviders": [
+                {
+                    "type": "FHIR_MORTALITY_DEPENDENCY",
+                    "mortalityIndicatorMinYears": 8
+                }
+            ]
+        }
+    ],
+    "defaultNoRuleResolution": false,
+    "json": {
+        "schemaType": "FHIR",
+        "messageTypeKey": "resourceType",
+        "messageTypes": [
+            "Patient"
+        ],
+        "maskingRules": [
+            {
+                "jsonPath": "/fhir/Patient/deceasedDateTime",
+                "rule": "mortality"
+            }
+        ]
+    }
+}

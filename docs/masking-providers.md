@@ -16,6 +16,7 @@ To preserve utility in the data being de-identified, the IBM Data De-Identificat
 * [DATETIME](#datetime)
 * [DATETIME_CONSISTENT_SHIFT](#datetime_consistent_shift)
 * [EMAIL](#email)
+* [FHIR_MORTALITY_DEPENDENCY](#fhir_mortality_dependency)
 * [FPE](#fpe)
 * [GENDER](#gender)
 * [GENERALIZE](#generalize)
@@ -732,6 +733,36 @@ date at */dateWritten*.
 |------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
 | preserveDomains | Integer  | Number of domains to preserve starting from the right; if value = -1 then all domains will be preserved (that is, everything after \@) | 1                 |
 | nameLength      | Integer  | Length of username to generate; if value = -1, then the username will be 5 to 8 characters long. 0 is invalid      | \-1               |
+
+#### FHIR_MORTALITY_DEPENDENCY
+
+This provider enforces a specific type of dependency between the birth date and the deceased datetime and deceased boolean properties that exist in a FHIR Patient resource, which is a very specific schema imposed on a JSON document. 
+
+This provider may only be applied to properties named either exactly "deceasedDateTime" or "deceasedBoolean".  When using this provider, it is recommended to configure the provider on both of these properties. It is expected that both of these properties and another property named "birthDate" all belong to the same parent object in the JSON document. 
+
+When the privacy provider is applied to "deceasedDateTime" and "deceasedDateTime" has a non-null value in the input document, the value of "deceasedDateTime" is set to null.  In addition, the value of "deceasedBoolean" is either set to _true_ or _null_ depending upon the age of this patient when death occurred.  If "deceasedBoolean" does not exist as a sibling of "deceasedDateTime", it will be added to the JSON structure. 
+
+The age of the patient at the time of death is determined by comparing the value of the "deceasedDateTime" property with the value of the "birthDate" property. If the value of either property contains a 'T', which indicates the beginning of a time component in a DateTime value in FHIR, the portion of the value beginning with the 'T' is dropped. The remainder of the value is matched to one of these allowed formats: 
+* yyyy = four digit year 
+* yyyy-MM = four digit year, two digit month 
+* yyyy-MM-dd = four digit year, two digit month, two digit day 
+
+The formats are not lenient. All components of the date must be provided at their full length, no other separator besides the dash (-) is allowed, and the resulting date value must be a valid calendar date. 
+
+If the number of complete years between "birthDate" and "deceasedDateTime" is less than or equal to the value of the privacy provider's configuration property "mortalityIndicatorMinYears", the "deceasedBoolean" field is set to _null_. If the number of completed years is greater than the configuration property value, "deceasedBoolean" is set to _true_. 
+
+Note, however, that when the configured value of "mortalityIndicatorMinYears" is less than 0, the patient is always old enough to allow the "deceasedBoolean" indicator to remain in the data. In such cases the date values are not retrieved and checked. 
+
+If the "birthDate" property does not exist in the same JSON object as "deceasedDateTime" or it has a null value or its value cannot be parsed, "deceasedBoolean" is set to _null_. 
+
+If the value of "deceasedDateTime" cannot be parsed, the current date is used as the date of death and is compared to "birthDate" as described above. 
+
+When the privacy provider is applied to "deceasedBoolean" and "deceasedBoolean" has any value other than "false" (case-insensitive if provided as a string), the "birthDate" value is compared to the current date as described above. If the number of completed years between those dates is less than or equal to the configuration property value or if the "birthDate" value cannot be found or processed as described above, "deceasedBoolean" is set to _null_.
+
+| **Option name**            | **Type** | **Description**                                                                                             | **Default value** |
+|------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
+| mortalityIndicatorMinYears | Integer  | The age of the patient in number of years that must be exceeded before the privacy provider will allow mortality indicators to remain in the data. |  8  |
+
 
 #### FPE
 
