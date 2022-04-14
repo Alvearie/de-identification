@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -248,14 +248,20 @@ public class MaskingProviderBuilder implements Serializable {
     }
 
     if (valueNode.isArray()) {
+      StringBuilder buffer = new StringBuilder(100);
+      int offset = -1;
       Iterator<JsonNode> items = valueNode.elements();
       while (items.hasNext()) {
         JsonNode item = items.next();
+        offset++;
         if (item.isNull() || item.isObject() || item.isArray()) {
           continue;
         }
-        returnRecords.add(new MaskingActionInputIdentifier(maskingProvider, item, valueNode, path,
-            resourceType, resourceId, root));
+        buffer.setLength(0);
+        buffer.append(path).append('[').append(offset).append(']');
+        String pathToArrayMember = buffer.toString();
+        returnRecords.add(new MaskingActionInputIdentifier(maskingProvider, item, valueNode,
+            pathToArrayMember, resourceType, resourceId, root));
       }
 
     } else {
@@ -794,6 +800,7 @@ public class MaskingProviderBuilder implements Serializable {
             dataPath, 0, maskingAction, fullPath, node));
 
       } else if (elementNode.has(conditionName)) {
+        // elementNode must be an ObjectNode for has() to have returned True
         JsonNode key = elementNode.get(conditionName);
         String value = key.asText();
         if (value.equals(conditionValue) || ("*".equals(conditionValue)

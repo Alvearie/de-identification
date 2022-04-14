@@ -92,7 +92,7 @@ public class MaskingProviderBuilderTest {
     JsonNode maskedDevice = genericMaskingProvider.mask(device);
 
     JsonNode expiryNode = maskedDevice.get("expiry");
-    assertNull(expiryNode.asText());
+    assertNull(expiryNode.asText(null));
   }
 
   /**
@@ -217,12 +217,12 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully deleted and the rest weren't
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNull(maskedValue.get("identifier").get(1).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText());
-    assertNull(maskedValue.get("identifier").get(0).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText());
-    assertNull(maskedValue.get("identifier").get(2).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText());
+    assertNull(maskedValue.get("identifier").get(1).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText(null));
+    assertNull(maskedValue.get("identifier").get(0).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText(null));
+    assertNull(maskedValue.get("identifier").get(2).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText(null));
   }
 
   @Ignore
@@ -382,9 +382,9 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNull(maskedValue.get("array").get(0).asText());
-    assertNull(maskedValue.get("array").get(1).asText());
-    assertNull(maskedValue.get("array").get(2).asText());
+    assertNull(maskedValue.get("array").get(0).asText(null));
+    assertNull(maskedValue.get("array").get(1).asText(null));
+    assertNull(maskedValue.get("array").get(2).asText(null));
   }
 
   @Test
@@ -557,12 +557,12 @@ public class MaskingProviderBuilderTest {
 
     // Check that the specified item was successfully deleted and the rest weren't
     JsonNode maskedValue = genericMaskingProvider.mask(group);
-    assertNull(maskedValue.get("identifier").get(1).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText());
-    assertNotNull(maskedValue.get("identifier").get(0).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText());
-    assertNotNull(maskedValue.get("identifier").get(2).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText());
+    assertNull(maskedValue.get("identifier").get(1).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(0).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(2).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText(null));
   }
 
   @Test
@@ -626,12 +626,12 @@ public class MaskingProviderBuilderTest {
 
     // Check that the specified item was successfully deleted and the rest weren't
     JsonNode maskedValue = genericMaskingProvider.mask(group);
-    assertNull(maskedValue.get("identifier").get(1).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText());
-    assertNull(maskedValue.get("identifier").get(0).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText());
-    assertNull(maskedValue.get("identifier").get(2).get("value").asText());
-    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText());
+    assertNull(maskedValue.get("identifier").get(1).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(1).get("system").asText(null));
+    assertNull(maskedValue.get("identifier").get(0).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(0).get("system").asText(null));
+    assertNull(maskedValue.get("identifier").get(2).get("value").asText(null));
+    assertNotNull(maskedValue.get("identifier").get(2).get("system").asText(null));
   }
 
   @Test
@@ -768,9 +768,9 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNotNull(maskedValue.get("array").get(0).asText());
-    assertNull(maskedValue.get("array").get(1).asText());
-    assertNotNull(maskedValue.get("array").get(2).asText());
+    assertNotNull(maskedValue.get("array").get(0).asText(null));
+    assertNull(maskedValue.get("array").get(1).asText(null));
+    assertNotNull(maskedValue.get("array").get(2).asText(null));
   }
 
   @Test
@@ -793,9 +793,9 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNull(maskedValue.get("array").get(0).asText());
-    assertNull(maskedValue.get("array").get(1).asText());
-    assertNull(maskedValue.get("array").get(2).asText());
+    assertNull(maskedValue.get("array").get(0).asText(null));
+    assertNull(maskedValue.get("array").get(1).asText(null));
+    assertNull(maskedValue.get("array").get(2).asText(null));
   }
 
   @Test
@@ -818,9 +818,10 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNotNull(maskedValue.get("array").get(0).asText());
-    assertNull(maskedValue.get("array").get(1).asText());
-    assertNull(maskedValue.get("array").get(2).asText());
+    JsonNode arrayNode = maskedValue.get("array");
+    assertNotNull(arrayNode.get(0).asText(null));
+    assertNull(arrayNode.get(1).asText(null));
+    assertNull(arrayNode.get(2).asText(null));
   }
 
   @Test
@@ -843,9 +844,9 @@ public class MaskingProviderBuilderTest {
     // Check that the specified item was successfully masked
     JsonNode maskedValue = genericMaskingProvider.mask(group);
 
-    assertNull(maskedValue.get("array").get(0).asText());
-    assertNotNull(maskedValue.get("array").get(1).asText());
-    assertNull(maskedValue.get("array").get(2).asText());
+    assertNull(maskedValue.get("array").get(0).asText(null));
+    assertNotNull(maskedValue.get("array").get(1).asText(null));
+    assertNull(maskedValue.get("array").get(2).asText(null));
   }
 
   @Test

@@ -1,0 +1,60 @@
+{
+    "resourceType": "Patient",
+    "id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "text": {
+        "status": "",
+        "div": ""
+    },
+    "identifier": [
+        {
+            "use": "",
+            "system": "",
+            "value": "",
+            "type": {
+                "coding": [
+                    {
+                        "system": "",
+                        "version": 1,
+                        "code": "",
+                        "display": "",
+                        "userSelected": false
+                    },
+                    {
+                        "system": "",
+                        "version": 1,
+                        "code": "",
+                        "display": "",
+                        "userSelected": false
+                    }
+                ],
+                "text": ""
+            },
+            "vector": 
+                [                    
+                    1,
+                    2,
+                    3,
+                    "",
+                    "",
+                    "X",
+                    "X",
+                    null,
+                    null,
+                    false,
+                    false                
+                ],            
+            "lsf_resourcetype": "Organization",
+            "period": {
+                "start": "",
+                "end": ""
+            }
+        }
+    ],
+    "gender": "",
+    "birthDate": "2000-04-18",
+    "birthDate2": "2000-04-18",
+    "processedTime_TZ": "",
+    "objectName": true,
+    "receiveTime_GMT": "",
+    "deviceInfo": true
+}

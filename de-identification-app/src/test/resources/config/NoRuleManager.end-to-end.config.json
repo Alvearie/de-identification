@@ -1,0 +1,36 @@
+{
+	"rules": [
+		{
+			"name": "hash",
+			"maskingProviders": [
+				{
+					"type": "HASH",
+					"algorithmDefault": "SHA-256",
+					"salt": "testingNoRule"
+				}
+			]
+		}
+	],
+	"defaultNoRuleResolution": true,
+	"json": {
+		"schemaType": "FHIR",
+		"messageTypeKey": "resourceType",
+		"messageTypes": [
+			"Patient"
+		],
+		"maskingRules": [
+			{
+				"jsonPath": "/fhir/Patient/birthDate",
+				"rule": "hash"
+			},
+			{
+				"jsonPath": "/fhir/Patient/identifier/vector[{1,3,5,7,9}]",
+				"rule": "hash"
+			},
+			{
+				"jsonPath": "/fhir/Patient/text/status",
+				"rule": "hash"
+			}
+		]
+	}
+}

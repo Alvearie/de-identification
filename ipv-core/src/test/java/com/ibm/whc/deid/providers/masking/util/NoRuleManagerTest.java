@@ -34,6 +34,8 @@ public class NoRuleManagerTest {
     buffer.append("       \"v102\",");
     buffer.append("       \"v101\",");
     buffer.append("       \"v103\",");
+    buffer.append("       \"\",");
+    buffer.append("       \"\",");
     buffer.append("       null,");
     buffer.append("       {\"a\":1, \"b\":2},");
     buffer.append("       [\"box1\", \"box2\"],");
@@ -46,9 +48,8 @@ public class NoRuleManagerTest {
         new MaskingProviderBuilder.MaskingResource("id", root, null), "r1", provider);
     mgr.applyToRemainingNodes();
     assertEquals(
-        "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,null,null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":null,\"d\":null,\"e\":null}]]}]}",
+        "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,null,null,null,null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":null,\"d\":null,\"e\":null}]]}]}",
         om.writeValueAsString(root));
-
     root = om.readTree(doc);
     mgr = new NoRuleManager(new MaskingProviderBuilder.MaskingResource("id", root, null), "r1",
         provider);
@@ -56,7 +57,7 @@ public class NoRuleManagerTest {
     JsonNode otherNode = om.readTree("{\"a\":1}");
     JsonNode lineNode = root.get("address").get(0).get("line");
     JsonNode childNode = lineNode.get(2);
-    JsonNode cParentNode = root.get("address").get(0).get("line").get(7).get(0);
+    JsonNode cParentNode = root.get("address").get(0).get("line").get(9).get(0);
     JsonNode cNode = cParentNode.get("c");
     JsonNode eNode = cParentNode.get("e");
     List<MaskingActionInputIdentifier> list = new ArrayList<>();
@@ -78,7 +79,7 @@ public class NoRuleManagerTest {
     mgr.removeNodesAlreadyMasked(list);
     mgr.applyToRemainingNodes();
     assertEquals(
-        "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,\"v101\",null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":3,\"d\":null,\"e\":null}]]}]}",
+        "{\"resourceType\":null,\"id\":null,\"address\":[{\"line\":[null,null,\"v101\",null,null,null,null,{\"a\":null,\"b\":null},[null,null],[{\"c\":3,\"d\":null,\"e\":null}]]}]}",
         om.writeValueAsString(root));
 
     // root is value node - not supported by system
