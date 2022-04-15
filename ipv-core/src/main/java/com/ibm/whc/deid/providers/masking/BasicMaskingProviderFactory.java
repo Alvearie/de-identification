@@ -135,18 +135,12 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
       case EMAIL:
         provider = new EmailMaskingProvider((EmailMaskingProviderConfig) config);
         break;
-      case FHIR:
-        provider = new FHIRMaskingProvider(deidMaskingConfig, this, tenantId);
-        break;
       case FHIR_MORTALITY_DEPENDENCY:
         provider = new FHIRMortalityDependencyMaskingProvider(
             (FHIRMortalityDependencyMaskingProviderConfig) config);
         break;
       case FPE:
         provider = new FPEMaskingProvider((FPEMaskingProviderConfig) config);
-        break;
-      case GEN:
-        provider = new GenericMaskingProvider(deidMaskingConfig, this, tenantId);
         break;
       case GENDER:
         provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId,

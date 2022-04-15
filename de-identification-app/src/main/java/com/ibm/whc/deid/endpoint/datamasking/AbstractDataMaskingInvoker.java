@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,12 +10,14 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.shared.exception.InvalidInputException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
+import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 
 public abstract class AbstractDataMaskingInvoker {
 
-  // validates data is non-null and non-empty. Validates individual strings for non-null as well.
+  // Validates data is non-null and non-empty. Validates individual strings for non-null as well.
   protected void validateData(List<String> data) throws InvalidInputException {
     if (data == null || data.isEmpty()) {
       throw new InvalidInputException("data");
@@ -27,6 +29,23 @@ public abstract class AbstractDataMaskingInvoker {
       }
       i++;
     }
+  }
+
+  // validates the global (a.k.a. document-level) configuration and returns it as a Java object
+  protected GlobalProcessorConfig validateGlobalConfig(String gpConfigString)
+      throws InvalidInputException {
+    GlobalProcessorConfig gpConfig = null;
+    // global processor config is optional
+    if (gpConfigString != null && !gpConfigString.trim().isEmpty()) {
+      try {
+        gpConfig = ObjectMapperFactory.getObjectMapper().readValue(gpConfigString,
+            GlobalProcessorConfig.class);
+      } catch (IOException e) {
+        throw new InvalidInputException("could not parse global configuration");
+      }
+      gpConfig.validate();
+    }
+    return gpConfig;
   }
 
   // validates the schemaType is non-null
@@ -47,5 +66,4 @@ public abstract class AbstractDataMaskingInvoker {
     maskedNode.set("data", aNode);
     return objectMapper.writeValueAsString(maskedNode);
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.ibm.whc.deid.masking.DataMaskingCore;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
@@ -28,24 +30,29 @@ public class DataMaskingService {
   private final DataMaskingCore dataMaskingCore = new DataMaskingCore();
 
   /**
-   * @param configuration
-   * @param list
-   * @return
+   * @param configuration masking configuration
+   * @param gpConfig global (document-level) configuration
+   * @param list JSON documents to process
+   * 
+   * @return the processed JSON documents in string format
+   * 
    * @throws DeidException
    * @throws IOException
    * @throws JsonMappingException
    * @throws JsonParseException
    */
-  public final List<String> maskData(final String configuration, final List<String> list,
+  public final List<String> maskData(final DeidMaskingConfig configuration,
+      final GlobalProcessorConfig gpConfig, final List<String> list,
       ConfigSchemaTypes schemaType)
       throws DeidException, JsonParseException, JsonMappingException, IOException {
 
     List<String> outputRecords = new ArrayList<>();
     try {
       AtomicInteger messageOrder = new AtomicInteger();
-      outputRecords.addAll(dataMaskingCore.maskData(configuration, list.stream().map(input -> {
+      outputRecords
+          .addAll(dataMaskingCore.maskData(configuration, gpConfig, list.stream().map(input -> {
         return new ReferableData(String.valueOf(messageOrder.getAndIncrement()), input);
-      }).collect(Collectors.toList()), schemaType).stream().map(input -> {
+          }).collect(Collectors.toList()), schemaType).stream().map(input -> {
         return input.getData();
       }).collect(Collectors.toList()));
     } catch (IOException e) {
@@ -54,5 +61,4 @@ public class DataMaskingService {
     }
     return outputRecords;
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,19 +7,17 @@ package com.ibm.whc.deid.providers.masking.fhir;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 
 public class FHIRResourceMaskingAction implements Serializable {
 
-  private static final long serialVersionUID = 4703951735249581684L;
+  private static final long serialVersionUID = 3577202668575530209L;
 
   private final String fullPath;
   private final String path;
   private final String[] paths;
 
   private final MaskingProvider maskingProvider;
-  private final AbstractComplexMaskingProvider abstractComplexMaskingProvider;
 
   public String getShortRuleName() {
     return path;
@@ -40,12 +38,7 @@ public class FHIRResourceMaskingAction implements Serializable {
     return maskingProvider;
   }
 
-  public AbstractComplexMaskingProvider getAbstractComplexMaskingProvider() {
-    return abstractComplexMaskingProvider;
-  }
-
-  public FHIRResourceMaskingAction(String fullPath, String path, MaskingProvider maskingProvider,
-      AbstractComplexMaskingProvider abstractComplexMaskingProvider) {
+  public FHIRResourceMaskingAction(String fullPath, String path, MaskingProvider maskingProvider) {
     this.fullPath = fullPath;
     this.path = path;
     int eqeqIndex = path.indexOf("==");
@@ -64,13 +57,11 @@ public class FHIRResourceMaskingAction implements Serializable {
       }
     }
     this.maskingProvider = maskingProvider;
-    this.abstractComplexMaskingProvider = abstractComplexMaskingProvider;
   }
 
   @Override
   public String toString() {
     return "FHIRResourceMaskingAction [fullPath=" + fullPath + ", path=" + path + ", paths="
-        + Arrays.toString(paths) + ", maskingProvider=" + maskingProvider
-        + ", abstractComplexMaskingProvider=" + abstractComplexMaskingProvider + "]";
+        + Arrays.toString(paths) + ", maskingProvider=" + maskingProvider + "]";
   }
 }

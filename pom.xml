@@ -6,8 +6,6 @@
 	<properties>
 		<revision>1.2.0-SNAPSHOT</revision>
 		<!-- see org.springframework.boot:spring-boot-dependencies for additional managed dependency versions -->
-		<scala.version>2.12.12</scala.version>
-		<scala.binary.version>2.12.12</scala.binary.version>
 		<mockito.version>1.10.19</mockito.version>
 		<jdefault.version>2.0.0</jdefault.version>
 		<commons-csv.version>1.8</commons-csv.version>

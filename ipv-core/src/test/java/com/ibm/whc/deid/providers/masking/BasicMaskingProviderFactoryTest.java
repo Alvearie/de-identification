@@ -43,21 +43,19 @@ public class BasicMaskingProviderFactoryTest {
     DeidMaskingConfig deidMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
 
     for (MaskingProviderType providerType : MaskingProviderType.values()) {
-      // The complex masking providers FHIR and GEN do not have MaskingProviderConfig of their own
-      if (providerType != MaskingProviderType.FHIR && providerType != MaskingProviderType.GEN) {        
-        MaskingProvider maskingProvider = mpf.getProviderFromType(providerType, deidMaskingConfig,
-            MaskingProviderConfig.getDefaultMaskingProviderConfig(providerType), tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
-        assertTrue(maskingProvider instanceof Serializable);
-        try {
-          MaskingProvider clone = SerializationUtils.clone(maskingProvider);
-          assertNotSame(maskingProvider, clone);
-        } catch (Exception e) {
-          log.logError(LogCodes.WPH1013E, e, "non-Serializable type: " + providerType);
-          //TODO: update these providers
-          if (providerType != MaskingProviderType.CREDIT_CARD
-              && providerType != MaskingProviderType.PHONE) {
-            fail("non-Serializable type: " + providerType);
-          }
+      MaskingProvider maskingProvider = mpf.getProviderFromType(providerType, deidMaskingConfig,
+          MaskingProviderConfig.getDefaultMaskingProviderConfig(providerType), tenantId,
+          LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+      assertTrue(maskingProvider instanceof Serializable);
+      try {
+        MaskingProvider clone = SerializationUtils.clone(maskingProvider);
+        assertNotSame(maskingProvider, clone);
+      } catch (Exception e) {
+        log.logError(LogCodes.WPH1013E, e, "non-Serializable type: " + providerType);
+        // TODO: update these providers
+        if (providerType != MaskingProviderType.CREDIT_CARD
+            && providerType != MaskingProviderType.PHONE) {
+          fail("non-Serializable type: " + providerType);
         }
       }
     }
