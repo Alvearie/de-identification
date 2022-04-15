@@ -134,7 +134,7 @@ public class FHIRMaskingProvider implements ComplexMaskingProvider, Serializable
     }).collect(Collectors.toList());
 
     // call the global processor, if configured
-    if (this.gpConfig != null
+    if (!toMask.isEmpty() && this.gpConfig != null
         && GlobalProcessorConfig.DEFAULT_RULE_SET.equals(this.gpConfig.getRuleSet())) {
       toMask = new GlobalProcessorFactory().getGlobalProcessor().processBatch(toMask);
     }
