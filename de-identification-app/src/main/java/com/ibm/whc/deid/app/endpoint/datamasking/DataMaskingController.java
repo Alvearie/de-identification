@@ -72,7 +72,6 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       throws InvalidMaskingConfigurationException, DeidException, InvalidInputException {
     List<String> maskedData;
     try {
-      String config = maskRequest.getConfig();
       String globalConfig = maskRequest.getGlobalConfig();
       List<String> data = maskRequest.getData();
       ConfigSchemaTypes schemaType = maskRequest.getSchemaType();

@@ -47,7 +47,7 @@ public class GlobalProcessorConfig implements Serializable {
   public void validate() throws InvalidInputException {
     // only allowed non-empty value for ruleSet is the default ruleSet
     if (ruleSet != null && !ruleSet.isEmpty()
-        && !ruleSet.equalsIgnoreCase(DEFAULT_RULE_SET)) {
+        && !ruleSet.equals(DEFAULT_RULE_SET)) {
       throw new InvalidInputException("illegal value in global configuration");
     }
   }

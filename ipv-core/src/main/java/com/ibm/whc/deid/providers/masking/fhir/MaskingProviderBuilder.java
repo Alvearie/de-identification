@@ -21,6 +21,7 @@ import com.ibm.whc.deid.providers.masking.util.JsonNodeIdentityWrapper;
 import com.ibm.whc.deid.providers.masking.util.NoRuleManager;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -141,13 +142,14 @@ public class MaskingProviderBuilder implements Serializable {
         throw new RuntimeException("invalid masking configuration: no rule for " + ruleName);
       }
 
-      rule.getMaskingProviders().stream().forEach(p -> {
+      for (MaskingProviderConfig p : rule.getMaskingProviders()) {
         MaskingProvider maskingProvider =
-            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId,
+                LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
         maskingProvider.setName(ruleName);
         maskingActions
             .add(new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier, maskingProvider));
-      });
+      }
     }
 
     return maskingActions;
@@ -603,9 +605,7 @@ public class MaskingProviderBuilder implements Serializable {
       }
 
       MaskingProvider currentProvider = maskingAction.getMaskingProvider();
-      if (currentProvider != null) {
-        currentProvider.maskIdentifierBatch(listToMask);
-      }
+      currentProvider.maskIdentifierBatch(listToMask);
     }
 
     for (MaskingResource resource : maskList) {

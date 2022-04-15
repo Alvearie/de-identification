@@ -5,12 +5,10 @@
  */
 package com.ibm.whc.deid.masking;
 
-import java.io.IOException;
 import java.util.List;
 import com.ibm.whc.deid.providers.masking.BasicMaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.ComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.ComplexMaskingProviderFactoryUtil;
-import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
@@ -27,13 +25,10 @@ public class DataMaskingCore {
    * @param list JSON documents to process
    * 
    * @return the processed documents with their identifiers
-   * 
-   * @throws IOException
-   * @throws DeidException
    */
   public List<ReferableData> maskData(final DeidMaskingConfig deidMaskingConfig,
       final GlobalProcessorConfig gpConfig, final List<ReferableData> inputData,
-      ConfigSchemaTypes schemaType) throws IOException, DeidException {
+      ConfigSchemaTypes schemaType) {
     ComplexMaskingProvider complexMaskingProvider =
         ComplexMaskingProviderFactoryUtil.getComplexMaskingProviderFactory().get(schemaType,
             deidMaskingConfig, new BasicMaskingProviderFactory(), gpConfig, null);

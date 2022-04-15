@@ -41,7 +41,7 @@ public abstract class AbstractDataMaskingInvoker {
         gpConfig = ObjectMapperFactory.getObjectMapper().readValue(gpConfigString,
             GlobalProcessorConfig.class);
       } catch (IOException e) {
-        throw new InvalidInputException("could not parse global configuration");
+        throw new InvalidInputException("could not parse global configuration: " + e.getMessage());
       }
       gpConfig.validate();
     }

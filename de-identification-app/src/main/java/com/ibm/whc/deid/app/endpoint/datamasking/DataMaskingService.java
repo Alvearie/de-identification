@@ -5,27 +5,19 @@
  */
 package com.ibm.whc.deid.app.endpoint.datamasking;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.ibm.whc.deid.masking.DataMaskingCore;
-import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
-import com.ibm.whc.deid.utils.log.LogCodes;
-import com.ibm.whc.deid.utils.log.LogManager;
 
 @Service
 public class DataMaskingService {
-
-  private static final LogManager log = LogManager.getInstance();
 
   private final DataMaskingCore dataMaskingCore = new DataMaskingCore();
 
@@ -35,30 +27,18 @@ public class DataMaskingService {
    * @param list JSON documents to process
    * 
    * @return the processed JSON documents in string format
-   * 
-   * @throws DeidException
-   * @throws IOException
-   * @throws JsonMappingException
-   * @throws JsonParseException
    */
   public final List<String> maskData(final DeidMaskingConfig configuration,
       final GlobalProcessorConfig gpConfig, final List<String> list,
-      ConfigSchemaTypes schemaType)
-      throws DeidException, JsonParseException, JsonMappingException, IOException {
-
+      ConfigSchemaTypes schemaType) {
     List<String> outputRecords = new ArrayList<>();
-    try {
-      AtomicInteger messageOrder = new AtomicInteger();
-      outputRecords
-          .addAll(dataMaskingCore.maskData(configuration, gpConfig, list.stream().map(input -> {
-        return new ReferableData(String.valueOf(messageOrder.getAndIncrement()), input);
-          }).collect(Collectors.toList()), schemaType).stream().map(input -> {
-        return input.getData();
-      }).collect(Collectors.toList()));
-    } catch (IOException e) {
-      log.logError(LogCodes.WPH6000E, e, "Unable to mask data");
-      throw new DeidException("Unable to mask message", e);
-    }
+    AtomicInteger messageOrder = new AtomicInteger();
+    outputRecords
+        .addAll(dataMaskingCore.maskData(configuration, gpConfig, list.stream().map(input -> {
+          return new ReferableData(String.valueOf(messageOrder.getAndIncrement()), input);
+        }).collect(Collectors.toList()), schemaType).stream().map(input -> {
+          return input.getData();
+        }).collect(Collectors.toList()));
     return outputRecords;
   }
 }

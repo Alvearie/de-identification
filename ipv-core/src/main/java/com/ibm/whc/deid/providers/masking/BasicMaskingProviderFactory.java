@@ -1,14 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
-import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMortalityDependencyMaskingProvider;
-import com.ibm.whc.deid.providers.masking.fhir.GenericMaskingProvider;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ATCMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
