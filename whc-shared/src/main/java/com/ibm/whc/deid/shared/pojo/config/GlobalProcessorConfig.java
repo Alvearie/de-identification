@@ -45,8 +45,8 @@ public class GlobalProcessorConfig implements Serializable {
    * @throws InvalidInputException if any part of the content is not valid.
    */
   public void validate() throws InvalidInputException {
-    // only allowed non-whitespace value for ruleSet is the default ruleSet
-    if (ruleSet != null && !ruleSet.trim().isEmpty()
+    // only allowed non-empty value for ruleSet is the default ruleSet
+    if (ruleSet != null && !ruleSet.isEmpty()
         && !ruleSet.equalsIgnoreCase(DEFAULT_RULE_SET)) {
       throw new InvalidInputException("illegal value in global configuration");
     }
