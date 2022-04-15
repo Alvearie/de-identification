@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,8 +21,8 @@ import com.ibm.whc.deid.providers.masking.BasicMaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableNode;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-import scala.Tuple2;
 
 public class GenericMaskingProviderTest {
 
@@ -50,8 +50,8 @@ public class GenericMaskingProviderTest {
       logger.info("Processing: " + filename);
       try (InputStream is = this.getClass().getResourceAsStream(filename)) {
         JsonNode node = mapper.readTree(is);
-        List<Tuple2<String, JsonNode>> resultList = genericMaskingProvider
-            .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node)));
+        List<ReferableNode> resultList =
+            genericMaskingProvider.maskResources(Arrays.asList(new ReferableNode("123", node)));
         assertTrue(1 == resultList.size());
       }
     }
@@ -95,7 +95,7 @@ public class GenericMaskingProviderTest {
     assertEquals("Acme Healthcare", identifier.get("assigner").get("display").asText());
 
     String result = mapper.writeValueAsString(genericMaskingProvider
-        .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))).get(0)._2);
+        .maskResources(Arrays.asList(new ReferableNode("123", node))).get(0).getNode());
     JsonNode resultNode = mapper.readTree(result);
     JsonNode maskedIdentifier = resultNode.get("identifier").iterator().next();
     String maskedPeriodStart = maskedIdentifier.get("period").get("start").asText();

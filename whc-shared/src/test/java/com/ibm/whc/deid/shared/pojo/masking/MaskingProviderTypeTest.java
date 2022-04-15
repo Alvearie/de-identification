@@ -28,10 +28,8 @@ public class MaskingProviderTypeTest {
       switch (type) {
         case BINNING:
         case CONDITIONAL:
-        case GEN:
         case GENERALIZE:
         case GUID:
-        case FHIR:
         case HASH:
         case MAINTAIN:
         case NULL:

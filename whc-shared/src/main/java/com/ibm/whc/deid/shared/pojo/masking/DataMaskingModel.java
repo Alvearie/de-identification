@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-/*
- * The model class which represents the post data for deidentification rest api
+/**
+ * The model class which represents the post data for De-Identification REST API
  */
 @Schema(name = "dataMaskingModel", description = "De-identification input object")
 public class DataMaskingModel {
@@ -20,22 +20,41 @@ public class DataMaskingModel {
   @Schema(description = "Masking configuration")
   protected final String config;
 
+  @Schema(description = "Document level processing configuration")
+  protected final String globalConfig;
+
   @Schema(description = "A list of data to be masked")
   protected final List<String> data;
 
+  @Schema(description = "The format of the data to be masked")
   protected final ConfigSchemaTypes schemaType;
 
-  @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
   public DataMaskingModel(@JsonProperty("config") String config,
       @JsonProperty("data") List<String> data,
       @JsonProperty("schemaType") ConfigSchemaTypes schemaType) {
     this.config = config;
     this.data = data;
     this.schemaType = schemaType;
+    this.globalConfig = null;
+  }
+
+  @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+  public DataMaskingModel(@JsonProperty("config") String config,
+      @JsonProperty("globalConfig") String globalConfig,
+      @JsonProperty("data") List<String> data,
+      @JsonProperty("schemaType") ConfigSchemaTypes schemaType) {
+    this.config = config;
+    this.data = data;
+    this.schemaType = schemaType;
+    this.globalConfig = globalConfig;
   }
 
   public String getConfig() {
     return config;
+  }
+
+  public String getGlobalConfig() {
+    return globalConfig;
   }
 
   public List<String> getData() {

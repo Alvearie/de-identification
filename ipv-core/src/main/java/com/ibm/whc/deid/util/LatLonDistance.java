@@ -10,13 +10,31 @@ import java.util.Collection;
 import java.util.List;
 import com.ibm.whc.deid.models.LatitudeLongitude;
 import com.ibm.whc.deid.models.Location;
-import scala.Tuple2;
 
 /**
  * A calculator for distances between points expressed as latitude and longitude coordinates.
  */
 public class LatLonDistance<K extends Location> {
 
+  private static class DistanceToLocation<K extends Location> {
+    
+    private final Double distance;
+    private final K location;
+    
+    public DistanceToLocation(Double d, K l) {
+      distance = d;
+      location = l;
+    }
+    
+    public Double getDistance() {
+      return distance;
+    }
+    
+    public K getLocation() {
+      return location;
+    }
+  }
+      
   private final Collection<K> locations;
 
   /**
@@ -51,21 +69,21 @@ public class LatLonDistance<K extends Location> {
   public List<K> findNearestK(LatitudeLongitude current, int k) {
 
     // Find the euclidean distance between this point and others
-    List<Tuple2<Double, K>> closest = new ArrayList<>(locations.size());
+    List<DistanceToLocation<K>> closest = new ArrayList<>(locations.size());
     for (K l : locations) {
       LatitudeLongitude latlon = l.getLocation();
       if (latlon != null) {
         Double result = euclidean(latlon, current);
-        closest.add(new Tuple2<>(result, l));
+        closest.add(new DistanceToLocation<>(result, l));
       }
     }
 
     // Sort the list
     closest.sort((element1, element2) -> {
-      return element1._1().compareTo(element2._1());
+      return element1.getDistance().compareTo(element2.getDistance());
     });
 
-    closest.removeIf(i -> (i._1().equals(0.0)));
+    closest.removeIf(i -> (i.getDistance().equals(0.0)));
 
     // Return the first k records
     if (k > closest.size()) {
@@ -76,7 +94,7 @@ public class LatLonDistance<K extends Location> {
     }
     List<K> toReturn = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
-      toReturn.add(closest.get(i)._2());
+      toReturn.add(closest.get(i).getLocation());
     }
 
     return toReturn;

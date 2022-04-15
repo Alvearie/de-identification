@@ -1,14 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.providers.masking.fhir.DateDependencyMaskingProvider;
-import com.ibm.whc.deid.providers.masking.fhir.FHIRMaskingProvider;
 import com.ibm.whc.deid.providers.masking.fhir.FHIRMortalityDependencyMaskingProvider;
-import com.ibm.whc.deid.providers.masking.fhir.GenericMaskingProvider;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ATCMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.AddressMaskingProviderConfig;
@@ -135,18 +133,12 @@ public class BasicMaskingProviderFactory implements MaskingProviderFactory {
       case EMAIL:
         provider = new EmailMaskingProvider((EmailMaskingProviderConfig) config);
         break;
-      case FHIR:
-        provider = new FHIRMaskingProvider(deidMaskingConfig, this, tenantId);
-        break;
       case FHIR_MORTALITY_DEPENDENCY:
         provider = new FHIRMortalityDependencyMaskingProvider(
             (FHIRMortalityDependencyMaskingProviderConfig) config);
         break;
       case FPE:
         provider = new FPEMaskingProvider((FPEMaskingProviderConfig) config);
-        break;
-      case GEN:
-        provider = new GenericMaskingProvider(deidMaskingConfig, this, tenantId);
         break;
       case GENDER:
         provider = new GenderMaskingProvider((GenderMaskingProviderConfig) config, tenantId,
