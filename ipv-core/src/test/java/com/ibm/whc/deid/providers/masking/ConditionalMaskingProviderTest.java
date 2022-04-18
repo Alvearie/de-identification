@@ -1,17 +1,19 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.providers.masking;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.Set;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -644,8 +646,50 @@ public class ConditionalMaskingProviderTest {
       mapper.readValue(maskingOptionValue, ConditionalMaskingProviderConfig.class);
     } catch (JsonMappingException e) {
       assertTrue(e.getMessage().contains(
-          "String \"INVALID_OPERATOR\": not one of the values accepted for Enum class: [containedIn, equalsIgnoreCase, contains, equals]"));
+          "String \"INVALID_OPERATOR\": not one of the values accepted for Enum class: ["));
       throw e;
     }
+  }
+  
+  /*
+   * Test conditional invalid operator value.
+   */
+  @Test
+  public void testGetConditionArrayFieldValue() throws IOException {
+    // @formatter_off
+    String data = "{" +
+        "\"resourceType\": \"PatientX\"," +
+        "\"gender\": [" +
+        "                   {\"system\": \"f1\",  \"value\": \"yarg1\"}," +
+        "                   {\"system\": \"f2\",  \"value\": \"yarg2\"}," +
+        "                   {\"system\": null,  \"value\": \"yarg2\"}," +
+        "                   {\"system\": \"f1\",  \"value\": null}," +
+        "                   {\"system\": \"f1\",  \"valueX\": \"y3\"}," +
+        "                   {\"system\": 1,  \"valueX\": \"y3\"}," +
+        "                   [6,7,8]," +
+        "                   null," +
+        "                   \"first\"," +
+        "                   {\"systemx\": 1,  \"valueX\": \"y3\"}," +
+        "                   {\"system\": \"f1\",  \"value\": \"male\"}" +
+        "        ]," +
+        "\"birthDate\": \"1920-02-04\"" +
+        "}";
+    // @formatter_on
+    
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    JsonNode root = mapper.readTree(data);
+
+    Condition condition = new Condition();
+    condition.setField("/gender/value(system==f1)");
+    condition.setOperator(ConditionOperator.EQUALS);
+    condition.setValue("v2");
+    
+    ConditionalMaskingProvider provider = new ConditionalMaskingProvider(new ConditionalMaskingProviderConfig(), null, null, null, null);
+    
+    Set<String> valueSet = provider.getConditionArrayFieldValue(condition, root, null);
+    assertNotNull(valueSet);
+    assertTrue(valueSet.toString(), valueSet.contains("yarg1"));
+    assertTrue(valueSet.contains("male"));
+    assertEquals(2, valueSet.size());
   }
 }

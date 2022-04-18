@@ -232,7 +232,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    * 
    * @return the set of value(s) of a condition field
    */
-  private Set<String> getConditionArrayFieldValue(Condition condition, JsonNode root,
+  protected Set<String> getConditionArrayFieldValue(Condition condition, JsonNode root,
       String resourceType) {
 
     Set<String> valueSet = new HashSet<>();
