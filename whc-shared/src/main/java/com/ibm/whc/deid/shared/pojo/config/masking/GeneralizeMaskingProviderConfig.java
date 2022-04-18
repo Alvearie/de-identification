@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -64,13 +64,7 @@ public class GeneralizeMaskingProviderConfig extends MaskingProviderConfig {
             String targetValue = null;
             if (ruleNode.has(JSON_TARGETVALUE_TAG)) {
               JsonNode targetValueNode = ruleNode.path(JSON_TARGETVALUE_TAG);
-              if (targetValueNode.isTextual()) {
-                targetValue = targetValueNode.asText();
-              }
-            }
-            if (targetValue == null) {
-              throw new InvalidMaskingConfigurationException(
-                  "`" + JSON_TARGETVALUE_TAG + "` is null for value set " + index);
+              targetValue = targetValueNode.asText(null);
             }
 
             JsonNode sourceValueInNode = null;
