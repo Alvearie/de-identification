@@ -759,6 +759,8 @@ If the value of "deceasedDateTime" cannot be parsed, the current date is used as
 
 When the privacy provider is applied to "deceasedBoolean" and "deceasedBoolean" has any value other than "false" (case-insensitive if provided as a string), the "birthDate" value is compared to the current date as described above. If the number of completed years between those dates is less than or equal to the configuration property value or if the "birthDate" value cannot be found or processed as described above, "deceasedBoolean" is set to _null_.
 
+Note that if a value for "deceasedBoolean" exists in the input data, but there is no privacy provider assigned to that property, the fact that "deceasedBoolean" is changed by the FHIR_MORTALITY_DEPENDENCY provider assigned to "deceasedDateTime" will not be sufficient to prevent "deceasedBoolean" from later being changed to *null* if the **defaultNoRuleResolution** option is set to *false* in the masking configuration.  As stated previously, it is recommended that if the FHIR_MORTALITY_DEPENDENCY provider is configured it be assigned to both "deceasedDateTime" and "deceasedBoolean".
+
 | **Option name**            | **Type** | **Description**                                                                                             | **Default value** |
 |------------------------|----------|-------------------------------------------------------------------------------------------------------------|-------------------|
 | mortalityIndicatorMinYears | Integer  | The age of the patient in number of years that must be exceeded before the privacy provider will allow mortality indicators to remain in the data. |  8  |
@@ -908,6 +910,8 @@ Asian Religions”.
    a data element that stores the spoken languages of individuals, GENERALIZE
    can be configured to replace all languages that are not listed as **Spanish**
    or **English**, with value **Other**.
+
+It is also possible to configure *null* as the replacement value.  This supports removing prohibited values from the input data.
 
    **Options supported by GENERALIZE**
 
