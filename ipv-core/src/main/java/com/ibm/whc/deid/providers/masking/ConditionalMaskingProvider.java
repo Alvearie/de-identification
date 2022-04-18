@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,8 +26,6 @@ import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
 public class ConditionalMaskingProvider extends AbstractMaskingProvider {
 
   private static final long serialVersionUID = -13830496083023321L;
-
-  private static final String ERROR_MESSAGE = "A Conditional node value was unparsable";
 
   private final List<ConditionalMaskRuleSet> maskRuleSet;
   private final DeidMaskingConfig deidMaskingConfig;
@@ -72,12 +70,19 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    return maskRuleSet.stream().filter(rule -> {
-      return evaluateConditionTypeString(identifier, rule, root, resourceType);
-    }).findFirst().map(rule -> {
-      MaskingProvider maskingProvider = getMaskingProvider(rule.getMaskingProvider());
+    ConditionalMaskRuleSet matchingRuleSet = null;
+    for (ConditionalMaskRuleSet ruleSet : maskRuleSet) {
+      if (evaluateConditionTypeString(identifier, ruleSet, root, resourceType)) {
+        matchingRuleSet = ruleSet;
+        break;
+      }
+    }
+    if (matchingRuleSet != null) {
+      MaskingProvider maskingProvider = getMaskingProvider(matchingRuleSet.getMaskingProvider());
+      // TODO: switch to maskIdentifierBatch()
       return maskingProvider.mask(identifier);
-    }).orElse(identifier);
+    }
+    return identifier;
   }
 
   private MaskingProvider getMaskingProvider(MaskingProviderConfig config) {
@@ -102,18 +107,20 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       return conditionalMaskRuleSet.getMaskingProvider() != null;
     }
 
-    Set<String> valueSet;
+    Set<String> inputValues;
     if (condition.getField().contains("==")) {
       // Array query path
-      valueSet = getConditionArrayFieldValue(condition, root, resourceType);
+      inputValues = getConditionArrayFieldValue(condition, root, resourceType);
     } else {
       // Regular path
-      valueSet = getConditionRegularFieldValues(condition, root, resourceType);
+      inputValues = getConditionRegularFieldValues(condition, root, resourceType);
     }
-    boolean conditionMatch = false;
-    String conditionValue = condition.getValue();
 
-    for (String value : valueSet) {
+    String conditionValue = condition.getValue();
+    Set<String> conditionValueSet = null;
+    Set<String> conditionValueSetLowerCase = null;
+
+    for (String value : inputValues) {
       switch (condition.getOperator()) {
         case EQUALS:
           if (value.equals(conditionValue)) {
@@ -135,9 +142,41 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
             return true;
           }
           break;
+        case ANY_OF:
+          if (conditionValueSet == null) {
+            conditionValueSet = getConditionValueSet(condition);
+          }
+          if (conditionValueSet.contains(value)) {
+            return true;
+          }
+          break;
+        case NOT_ANY_OF:
+          if (conditionValueSet == null) {
+            conditionValueSet = getConditionValueSet(condition);
+          }
+          if (!conditionValueSet.contains(value)) {
+            return true;
+          }
+          break;
+        case ANY_OF_IGNORE_CASE:
+          if (conditionValueSetLowerCase == null) {
+            conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
+          }
+          if (conditionValueSetLowerCase.contains(value.toLowerCase())) {
+            return true;
+          }
+          break;
+        case NOT_ANY_OF_IGNORE_CASE:
+          if (conditionValueSetLowerCase == null) {
+            conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
+          }
+          if (!conditionValueSetLowerCase.contains(value.toLowerCase())) {
+            return true;
+          }
+          break;
       }
     }
-    return conditionMatch;
+    return false;
   }
 
   private Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
@@ -165,7 +204,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
        * at the end sets nodeList to childNodeList which for the next loop nodeList becomes the new
        * parent.
        */
-
       currentPath = paths[i];
       // System.out.println("========> " + i + " currentPath: " +
       // currentPath);
@@ -180,25 +218,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       // elementNode.toString());
       if (elementNode.isValueNode()) {
         Object value = getValue(elementNode);
-        if (value == null) {
-          throw new RuntimeException(ERROR_MESSAGE);
-        }
-        valueSet.add(value.toString());
-      } else {
-        Iterator<Entry<String, JsonNode>> dataNodeList = elementNode.fields();
-        while (dataNodeList.hasNext()) {
-          Entry<String, JsonNode> entryNode = dataNodeList.next();
-          String key = entryNode.getKey();
-          JsonNode valueNode = entryNode.getValue();
-          if (key.equalsIgnoreCase(condition.getValue())) {
-            // System.out.println(" NextNode=======> key : " + key +
-            // " valuNode: " + valueNode.toString());
-            Object value = getValue(valueNode);
-            if (value == null) {
-              throw new RuntimeException(ERROR_MESSAGE);
-            }
-            valueSet.add(value.toString());
-          }
+        if (value != null) {
+          valueSet.add(value.toString());
         }
       }
     }
@@ -245,7 +266,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     String conditionName = null;
     String conditionValue = null;
     String valueName = null;
-    List<String> dataPathList = new ArrayList<>();
 
     /*
      * We go through two loops: The first loop goes through the paths elements to get to the leaf
@@ -262,7 +282,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
         // This the paths element that has the condition, get the
         // condition name and value
         String[] arrayElementAndCondition = paths[i].split("\\(");
-
         String arrayElement = arrayElementAndCondition[0].trim();
         String conditionELement = arrayElementAndCondition[1].trim().replace(")", "");
         String[] pathCondition = conditionELement.split("==");
@@ -270,13 +289,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
         conditionValue = pathCondition[1].trim();
         valueName = arrayElement;
 
-        // System.out.println("\n\n========> conditionName: " +
-        // conditionName);
-        // System.out.println("\n\n========> conditionValue: " +
-        // conditionValue);
-        // System.out.println("\n\n========> valueName: " + valueName);
-
-        dataPathList.add(arrayElement);
       } else {
         /*
          * The Following code for each paths.i traverses the nodes and collects the child nodes,
@@ -284,44 +296,37 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
          * the new parent.
          */
         currentPath = paths[i];
-
         nodeList = getChildrenNodes(root, currentPath, nodeList);
         if (nodeList == null) {
           return valueSet;
         }
       }
     }
+
     /*
      * The second loop walks through the array resource node to find the leaf node with sibling that
      * matches the condition name and value determined in the first loop above. Note: the
      * conditionName of * and conditionValue of * are used as a wild card. *
      */
-    // JsonNode arrayNode = node.get(arrayPath);
-
-    // JsonNode arrayNode = getNodeFromPath(arrayPath, node);
-    // for (JsonNode elementNode : arrayNode) {
     for (JsonNode elementNode : nodeList) {
       if (elementNode.has(conditionName)) {
-        // System.out.println("\n\n========> elementNode: " +
-        // elementNode.toString());
-        String elementConditionValue = elementNode.get(conditionName).textValue();
-        if (elementConditionValue.equals(conditionValue) || ("*".equals(conditionValue))) {
-          Iterator<Entry<String, JsonNode>> dataNodeList = elementNode.fields();
-          while (dataNodeList.hasNext()) {
-            Entry<String, JsonNode> entryNode = dataNodeList.next();
-            String key = entryNode.getKey();
-            JsonNode valueNode = entryNode.getValue();
-            if (key.equalsIgnoreCase(valueName)) {
-              // System.out.println(" NextNode=======> key : " +
-              // key + " valuNode: " + valueNode.toString());
-
-              Object value = getValue(valueNode);
-              if (value == null) {
-                throw new RuntimeException(ERROR_MESSAGE);
+        JsonNode conditionNameNode = elementNode.get(conditionName);
+        if (conditionNameNode != null && !conditionNameNode.isNull()
+            && conditionNameNode.isValueNode()) {
+          String elementConditionValue = conditionNameNode.asText(null);
+          if ((elementConditionValue != null && elementConditionValue.equals(conditionValue))
+              || ("*".equals(conditionValue))) {
+            Iterator<Entry<String, JsonNode>> dataNodeList = elementNode.fields();
+            while (dataNodeList.hasNext()) {
+              Entry<String, JsonNode> entryNode = dataNodeList.next();
+              String key = entryNode.getKey();
+              JsonNode valueNode = entryNode.getValue();
+              if (key.equalsIgnoreCase(valueName)) {
+                Object value = getValue(valueNode);
+                if (value != null) {
+                  valueSet.add(value.toString());
+                }
               }
-              valueSet.add(value.toString());
-
-              return valueSet;
             }
           }
         }
@@ -344,7 +349,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       JsonNode currentNode = node.get(currentPath);
 
       if (currentNode == null || currentNode.isNull()) {
-        // The FHIR resource node does not exist.
+        // The node does not exist.
         // The rule does not apply.
         return null;
       }
@@ -409,6 +414,21 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       return value.toString();
     }
     return value.textValue();
+  }
+
+  private Set<String> getConditionValueSet(Condition condition) {
+    return new HashSet<>(condition.getValueList());
+  }
+
+  private Set<String> getConditionValueSetLowerCase(Condition condition) {
+    List<String> tempList = condition.getValueList();
+    HashSet<String> set = new HashSet<>(tempList.size() * 2);
+    for (String s : tempList) {
+      if (s != null) {
+        set.add(s.toLowerCase());
+      }
+    }
+    return set;
   }
 
   @Override
