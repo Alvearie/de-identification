@@ -17,44 +17,36 @@ import org.junit.Test;
 public class GeneralizeMaskingProviderTest extends TestLogSetUp {
 
   @Test
-  public void testPatientCityReplaced() {
+  public void testSourceIn() {
     String maskingOptionValue =
         "[{\"targetValue\": \"AsiaCity\", \"sourceValueIn\": [\"Bangkok\",\"Manila\",\"Shanghi\",\"TiPei\",\"Mumbai\"]},"
-            + " {\"targetValue\": \"AfricaCity\", \"sourceValueIn\": [\"Addis Ababa\",\"Cairo\",\"Cape Town\",\"Lagos\"]}]";
+            + " {\"targetValue\": \"AfricaCity\", \"sourceValueIn\": [\"Addis Ababa\",\"Cairo\",\"Cape Town\",\"Lagos\"]},"
+            + " {\"targetValue\": null, \"sourceValueIn\": [\"Rejected City\"]}]";
 
     GeneralizeMaskingProviderConfig configuration = new GeneralizeMaskingProviderConfig();
     configuration.setMaskRuleSet(maskingOptionValue);
 
     GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
 
-    String identifier = "Bangkok";
-    String maskedValue = maskingProvider.mask(identifier);
+    assertEquals("AsiaCity", maskingProvider.mask("Bangkok"));
+    assertEquals("AsiaCity", maskingProvider.mask("Manila"));
+    assertEquals("AsiaCity", maskingProvider.mask("Shanghi"));
+    assertEquals("AsiaCity", maskingProvider.mask("TiPei"));
+    assertEquals("AsiaCity", maskingProvider.mask("Mumbai"));
 
-    // The identifier "Bangkok" should be generalized to "AsiaCity" since it
-    // exists in AsiaCity city values
-    assertTrue(maskedValue.equals("AsiaCity"));
+    assertEquals("AfricaCity", maskingProvider.mask("Addis Ababa"));
+    assertEquals("AfricaCity", maskingProvider.mask("Cairo"));
+    assertEquals("AfricaCity", maskingProvider.mask("Cape Town"));
+    assertEquals("AfricaCity", maskingProvider.mask("Lagos"));
+
+    assertNull(maskingProvider.mask("Rejected City"));
+
+    assertEquals("Rochester", maskingProvider.mask("Rochester"));
+    assertEquals("not listed city", maskingProvider.mask("not listed city"));
   }
 
   @Test
-  public void testPatientCityNotReplaced() {
-    String maskingOptionValue =
-        "[{\"targetValue\": \"AsiaCity\", \"sourceValueIn\": [\"Bangkok\",\"Manila\",\"Shanghi\",\"TiPei\",\"Mumbai\"]},"
-            + " {\"targetValue\": \"AfricaCity\", \"sourceValueIn\": [\"Addis Ababa\",\"Cairo\",\"Cape Town\",\"Lagos\"]}]";
-    GeneralizeMaskingProviderConfig configuration = new GeneralizeMaskingProviderConfig();
-    configuration.setMaskRuleSet(maskingOptionValue);
-
-    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
-
-    String identifier = "Dallas";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Dallas" should not be generalized, since it is not
-    // listed
-    assertTrue(maskedValue.equals("Dallas"));
-  }
-
-  @Test
-  public void testPractitionerCityChicago() {
+  public void testSourceInWildcard() {
     String maskingOptionValue =
         "[{\"targetValue\": \"USCity\", \"sourceValueIn\": [\"New York\",\"Chicago\",\"Houston\",\"Minneapolis\",\"Boston\" ]},"
             + "{\"targetValue\": \"CanadaCity\", \"sourceValueIn\": [\"Toronto\",\"Montreal\",\"Vancouver\",\"Calgary\"]},"
@@ -65,55 +57,13 @@ public class GeneralizeMaskingProviderTest extends TestLogSetUp {
 
     GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
 
-    String identifier = "Chicago";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Chicago" should be generalized to "UsCity" since it
-    // exists in USCity list of values
-    assertTrue(maskedValue.equals("USCity"));
+    assertEquals("USCity", maskingProvider.mask("Chicago"));
+    assertEquals("CanadaCity", maskingProvider.mask("Montreal"));
+    assertEquals("Other", maskingProvider.mask("St. Paul"));
   }
 
   @Test
-  public void testPractitionerCityMontreal() {
-    String maskingOptionValue =
-        "[{\"targetValue\": \"USCity\", \"sourceValueIn\": [\"New York\",\"Chicago\",\"Houston\",\"Minneapolis\",\"Boston\" ]},"
-            + "{\"targetValue\": \"CanadaCity\", \"sourceValueIn\": [\"Toronto\",\"Montreal\",\"Vancouver\",\"Calgary\"]},"
-            + "{\"targetValue\": \"Other\", \"sourceValueIn\": [\"*\"]}]";
-
-    GeneralizeMaskingProviderConfig configuration = new GeneralizeMaskingProviderConfig();
-    configuration.setMaskRuleSet(maskingOptionValue);
-
-    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
-
-    String identifier = "Montreal";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Montreal" should be generalized to "CanadaCity" since
-    // it exists in CanadaCity list of values
-    assertTrue(maskedValue.equals("CanadaCity"));
-  }
-
-  @Test
-  public void testPractitionerCityOther() {
-    String maskingOptionValue =
-        "[{\"targetValue\": \"USCity\", \"sourceValueIn\": [\"New York\",\"Chicago\",\"Houston\",\"Minneapolis\",\"Boston\" ]},"
-            + "{\"targetValue\": \"CanadaCity\", \"sourceValueIn\": [\"Toronto\",\"Montreal\",\"Vancouver\",\"Calgary\"]},"
-            + "{\"targetValue\": \"Other\", \"sourceValueIn\": [\"*\"]}]";
-
-    GeneralizeMaskingProviderConfig configuration = new GeneralizeMaskingProviderConfig();
-    configuration.setMaskRuleSet(maskingOptionValue);
-
-    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
-    String identifier = "Dallas";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Dallas" should be generalized to "Other" since it is
-    // not listed in the US or Canada cities and defaults to * rule
-    assertTrue(maskedValue.equals("Other"));
-  }
-
-  @Test
-  public void testNegationRuleDeviceComponentLanguageReplace() {
+  public void testSourceNotIn() {
     String maskingOptionValue =
         "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]";
 
@@ -122,30 +72,10 @@ public class GeneralizeMaskingProviderTest extends TestLogSetUp {
 
     GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
 
-    String identifier = "Porteguses";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Porteguses" should be generalized to "Other" since it
-    // is not one of the languages listed.
-    assertTrue(maskedValue.equals("Other"));
-  }
-
-  @Test
-  public void testNegationRuleDeviceComponentLanguageNotReplace() {
-    String maskingOptionValue =
-        "[{\"targetValue\": \"Other\", \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]";
-
-    GeneralizeMaskingProviderConfig configuration = new GeneralizeMaskingProviderConfig();
-    configuration.setMaskRuleSet(maskingOptionValue);
-
-    GeneralizeMaskingProvider maskingProvider = new GeneralizeMaskingProvider(configuration);
-
-    String identifier = "Spanish";
-    String maskedValue = maskingProvider.mask(identifier);
-
-    // The identifier "Spanish" should not be generalized since is in the
-    // list
-    assertTrue(maskedValue.equals("Spanish"));
+    assertEquals("Spanish", maskingProvider.mask("Spanish"));
+    assertEquals("Other", maskingProvider.mask("German"));
+    assertEquals("Other", maskingProvider.mask("spanish")); // case-sensitivie
+    assertEquals("French", maskingProvider.mask("French"));
   }
 
   @Test
@@ -161,7 +91,7 @@ public class GeneralizeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testTagetValueParsingError() {
+  public void testTargetValueParsingError() {
     try {
       String maskingOptionValue =
           "[{\"targetValuexxx\": \"Other\", \"sourceValueIn\": [\"Italian\",\"English\"], \"sourceValueNotIn\": [\"French\",\"Spanish\"]}]";
