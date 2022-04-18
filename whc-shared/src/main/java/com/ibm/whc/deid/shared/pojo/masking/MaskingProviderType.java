@@ -27,10 +27,8 @@ public enum MaskingProviderType implements MaskingProviderTypes {
   FHIR_MORTALITY_DEPENDENCY(Constants.FHIR_MORTALITY_DEPENDENCY_VALUE, MaskingProviderCategory.CategoryI),
   FPE(Constants.FPE_VALUE, MaskingProviderCategory.CategoryI),
   GENDER(Constants.GENDER_VALUE, MaskingProviderCategory.CategoryI),
-  GEN(Constants.GEN_VALUE, MaskingProviderCategory.CategoryII),
   GENERALIZE(Constants.GENERALIZE_VALUE, MaskingProviderCategory.CategoryII),
   GUID(Constants.GUID_VALUE, MaskingProviderCategory.CategoryII),
-  FHIR(Constants.FHIR_VALUE, MaskingProviderCategory.CategoryII),
   HASH(Constants.HASH_VALUE, MaskingProviderCategory.CategoryII),
   HOSPITAL(Constants.HOSPITAL_VALUE, MaskingProviderCategory.CategoryI),
   IBAN(Constants.IBAN_VALUE, MaskingProviderCategory.CategoryI),
@@ -118,12 +116,10 @@ public enum MaskingProviderType implements MaskingProviderTypes {
     public static final String DATETIME_CONSISTENT_SHIFT_VALUE = "DATETIME_CONSISTENT_SHIFT";
     public static final String DATEDEPENDENCY_VALUE = "DATEDEPENDENCY";
     public static final String EMAIL_VALUE = "EMAIL";
-    public static final String FHIR_VALUE = "FHIR";
     public static final String FHIR_MORTALITY_DEPENDENCY_VALUE = "FHIR_MORTALITY_DEPENDENCY";
     public static final String FPE_VALUE = "FPE";
     public static final String GENERALIZE_VALUE = "GENERALIZE";
     public static final String GENDER_VALUE = "GENDER";
-    public static final String GEN_VALUE = "GEN";
     public static final String GUID_VALUE = "GUID";
     public static final String HASH_VALUE = "HASH";
     public static final String HOSPITAL_VALUE = "HOSPITAL";

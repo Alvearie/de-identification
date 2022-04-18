@@ -14,15 +14,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.ibm.whc.deid.providers.masking.AbstractComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.providers.masking.util.JsonNodeIdentityWrapper;
 import com.ibm.whc.deid.providers.masking.util.NoRuleManager;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.Rule;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
@@ -143,13 +142,14 @@ public class MaskingProviderBuilder implements Serializable {
         throw new RuntimeException("invalid masking configuration: no rule for " + ruleName);
       }
 
-      rule.getMaskingProviders().stream().forEach(p -> {
+      for (MaskingProviderConfig p : rule.getMaskingProviders()) {
         MaskingProvider maskingProvider =
-            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
+            maskingProviderFactory.getProviderFromType(p.getType(), deidMaskingConfig, p, tenantId,
+                LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
         maskingProvider.setName(ruleName);
-        maskingActions.add(
-            new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier, maskingProvider, null));
-      });
+        maskingActions
+            .add(new FHIRResourceMaskingAction(fullRuleName, pathToIdentifier, maskingProvider));
+      }
     }
 
     return maskingActions;
@@ -184,41 +184,6 @@ public class MaskingProviderBuilder implements Serializable {
         break;
     }
     throw new IllegalArgumentException(message);
-  }
-
-  /**
-   * @param resourceType
-   * @param resourceId
-   * @param node
-   * @param unMaskedNode
-   * @param valueNode
-   * @param path
-   * @param maskingAction
-   */
-  private List<MaskingActionInputIdentifier> maskFinalPathComplex(String resourceType,
-      String resourceId, JsonNode node, JsonNode valueNode, String path,
-      FHIRResourceMaskingAction maskingAction, JsonNode root) {
-    List<MaskingActionInputIdentifier> returnRecords = new ArrayList<>();
-    if (valueNode == null) {
-      return returnRecords;
-    }
-    AbstractComplexMaskingProvider abstractComplexMaskingProvider =
-        maskingAction.getAbstractComplexMaskingProvider();
-
-    if (valueNode.isObject()) {
-      returnRecords.add(new MaskingActionInputIdentifier(abstractComplexMaskingProvider, valueNode,
-          node, path, resourceType, resourceId, root));
-    } else if (valueNode.isArray()) {
-
-      Iterator<JsonNode> items = valueNode.elements();
-
-      while (items.hasNext()) {
-        JsonNode item = items.next();
-        returnRecords.add(new MaskingActionInputIdentifier(abstractComplexMaskingProvider, item,
-            node, null, resourceType, resourceId, root));
-      }
-    }
-    return returnRecords;
   }
 
   /**
@@ -317,14 +282,10 @@ public class MaskingProviderBuilder implements Serializable {
         returnList.addAll(determineMaskingActionInputs(resourceType, resourceId, valueNode, paths,
             pathIndex + 1, maskingAction, actualFullPath, root));
       }
+
     } else {
-      if (maskingAction.getAbstractComplexMaskingProvider() != null) {
-        returnList.addAll(maskFinalPathComplex(resourceType, resourceId, node, valueNode, path,
-            maskingAction, root));
-      } else {
-        returnList.addAll(maskFinalPathSimple(resourceType, resourceId, node, valueNode, path,
-            maskingAction, root));
-      }
+      returnList.addAll(maskFinalPathSimple(resourceType, resourceId, node, valueNode, path,
+          maskingAction, root));
     }
 
     return returnList;
@@ -644,14 +605,7 @@ public class MaskingProviderBuilder implements Serializable {
       }
 
       MaskingProvider currentProvider = maskingAction.getMaskingProvider();
-      if (currentProvider != null) {
-        currentProvider.maskIdentifierBatch(listToMask);
-      } else {
-        currentProvider = maskingAction.getAbstractComplexMaskingProvider();
-        if (currentProvider != null) {
-          currentProvider.maskIdentifierBatch(listToMask);
-        }
-      }
+      currentProvider.maskIdentifierBatch(listToMask);
     }
 
     for (MaskingResource resource : maskList) {

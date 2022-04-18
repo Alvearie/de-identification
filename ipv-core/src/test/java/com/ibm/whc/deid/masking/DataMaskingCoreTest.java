@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,27 +12,29 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 
 public class DataMaskingCoreTest {
 
-  private String maskingConf = null;
-  private String maskingConf_generic = null;
+  private DeidMaskingConfig maskingConf = null;
+  private DeidMaskingConfig maskingConf_generic = null;
 
   private static List<ReferableData> convertList(List<String> inputList) {
-    return inputList.stream().map(input -> {
-      return new ReferableData(input);
-    }).collect(Collectors.toList());
+    ArrayList<ReferableData> outlist = new ArrayList<>(inputList.size());
+    for (String s : inputList) {
+      outlist.add(new ReferableData(s));
+    }
+    return outlist;
   }
 
   @Before
@@ -41,78 +43,16 @@ public class DataMaskingCoreTest {
         InputStream inputStream =
             this.getClass().getResourceAsStream("/config/fhir/masking_config.json");
         Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      maskingConf = scanner.useDelimiter("\\A").next();
+      String s = scanner.useDelimiter("\\A").next();
+      maskingConf = ObjectMapperFactory.getObjectMapper().readValue(s, DeidMaskingConfig.class);
     }
     try (
         InputStream inputStream =
             this.getClass().getResourceAsStream("/config/generic/masking_config.json");
         Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      maskingConf_generic = scanner.useDelimiter("\\A").next();
-    }
-  }
-
-  /**
-   * Test a config with invalid parameter name.
-   *
-   * @throws IOException
-   * @throws DeidException
-   */
-  @Test(expected = DeidException.class)
-  public void testInvalidConfig() throws IOException, DeidException {
-    DataMaskingCore dataMask = new DataMaskingCore();
-    String invalidConfig;
-    try (
-        InputStream inputStream = this.getClass()
-            .getResourceAsStream("/config/fhir/masking_config_incorrect_rule_name.json");
-        Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      invalidConfig = scanner.useDelimiter("\\A").next();
-    }
-
-    String patientData = null;
-
-    try (InputStream inputStream = this.getClass().getResourceAsStream("/fhir/patientExample.json");
-        Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      patientData = scanner.useDelimiter("\\A").next();
-    }
-    try {
-      dataMask.maskData(invalidConfig, Arrays.asList(new ReferableData(patientData)),
-          ConfigSchemaType.FHIR);
-    } catch (DeidException e) {
-      assertTrue(e.getMessage().contains("Unrecognized field \"INVALID_rules\""));
-      throw e;
-    }
-  }
-
-  /**
-   * Test a JSON config that points to a rule that does not exist.
-   *
-   * @throws IOException
-   * @throws DeidException
-   */
-  @Test(expected = DeidException.class)
-  public void testInvalidConfig_missing_rule() throws IOException, DeidException {
-    DataMaskingCore dataMask = new DataMaskingCore();
-    String invalidConfig;
-    try (
-        InputStream inputStream =
-            this.getClass().getResourceAsStream("/config/fhir/masking_config_missing_rule.json");
-        Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      invalidConfig = scanner.useDelimiter("\\A").next();
-    }
-
-    String patientData = null;
-
-    try (InputStream inputStream = this.getClass().getResourceAsStream("/fhir/patientExample.json");
-        Scanner scanner = new Scanner(inputStream, "UTF-8")) {
-      patientData = scanner.useDelimiter("\\A").next();
-    }
-    try {
-      dataMask.maskData(invalidConfig, Arrays.asList(new ReferableData(patientData)),
-          ConfigSchemaType.FHIR);
-    } catch (DeidException e) {
-      assertTrue(e.getMessage().contains(
-          "the rule assignment with `rule` value `NO_SUCH_RULE` does not refer to a valid rule"));
-      throw e;
+      String s = scanner.useDelimiter("\\A").next();
+      maskingConf_generic =
+          ObjectMapperFactory.getObjectMapper().readValue(s, DeidMaskingConfig.class);
     }
   }
 
@@ -128,7 +68,7 @@ public class DataMaskingCoreTest {
       patientData = scanner.useDelimiter("\\A").next();
     }
     inputList.add(patientData);
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf, null,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
     String maskedData = maskedDataList.get(0).getData();
     ObjectMapper objectMapper = new ObjectMapper();
@@ -155,7 +95,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf, null,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -185,7 +125,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(patientData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic, null,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -208,7 +148,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic, null,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());

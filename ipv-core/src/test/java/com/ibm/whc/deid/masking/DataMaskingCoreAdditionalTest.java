@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -7,7 +7,9 @@ package com.ibm.whc.deid.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,13 +27,15 @@ public class DataMaskingCoreAdditionalTest {
   public void testRulesAppliedInAssignmentOrder() throws Exception {
     DataMaskingCore dataMask = new DataMaskingCore();
 
-    String config = readStringResource("/config/ruleOrderMaintained.config.json");
+    String configStr = readStringResource("/config/ruleOrderMaintained.config.json");
+    DeidMaskingConfig config =
+        ObjectMapperFactory.getObjectMapper().readValue(configStr, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(config, null, convertList(inputList), ConfigSchemaType.FHIR);
 
     String result = readStringResource("/result/ruleOrderMaintained.result.json");
     assertEquals(1, maskedDataList.size());
@@ -45,12 +49,14 @@ public class DataMaskingCoreAdditionalTest {
     String config = readStringResource("/config/ruleOrderMaintained.config.json");
     config =
         config.replace("\"defaultNoRuleResolution\": true,", "\"defaultNoRuleResolution\": false,");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
 
     String result = readStringResource("/result/ruleOrderMaintained.norule.result.json");
     assertEquals(1, maskedDataList.size());
@@ -62,12 +68,14 @@ public class DataMaskingCoreAdditionalTest {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String config = readStringResource("/config/identical-array.json");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/identical-array.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.GEN);
+        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.GEN);
 
     assertEquals(1, maskedDataList.size());
     assertEquals(
@@ -78,6 +86,8 @@ public class DataMaskingCoreAdditionalTest {
   @Test
   public void testInvalidPathNotLeaf() throws Exception {
     String config = readStringResource("/config/pathNotLeaf.config.json");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/pathNotLeaf.leaf.json"));
@@ -94,7 +104,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
 
     assertEquals(5, maskedDataList.size());
     assertEquals(resultLeaf, maskedDataList.get(0).getData());
@@ -107,6 +117,8 @@ public class DataMaskingCoreAdditionalTest {
   @Test
   public void testInvalidPathNotLeaf_noRule() throws Exception {
     String config = readStringResource("/config/pathNotLeaf.norule.config.json");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/pathNotLeaf.leaf.json"));
@@ -125,7 +137,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
 
     assertEquals(5, maskedDataList.size());
     assertEquals(resultLeaf, maskedDataList.get(0).getData());
@@ -138,6 +150,8 @@ public class DataMaskingCoreAdditionalTest {
   @Test
   public void testNoRule_ResourceTypes() throws Exception {
     String config = readStringResource("/config/defNoRuleRes.config.json");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/defNoRuleRes.type-listed-no-rules.json"));
@@ -153,7 +167,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertedList, ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, null, convertedList, ConfigSchemaType.FHIR);
 
     assertEquals(3, maskedDataList.size());
     boolean foundListed = false;
@@ -180,6 +194,8 @@ public class DataMaskingCoreAdditionalTest {
   @Test
   public void testMessageTypesIgnoredWhenDefault() throws Exception {
     String config = readStringResource("/config/generic/messageTypesIgnored.json");
+    DeidMaskingConfig maskingConfig =
+        ObjectMapperFactory.getObjectMapper().readValue(config, DeidMaskingConfig.class);
 
     List<String> inputList = new ArrayList<>();
     inputList.add(readStringResource("/data/messageTypesIgnored.json"));
@@ -189,7 +205,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, convertedList, ConfigSchemaType.GEN);
+        dataMask.maskData(maskingConfig, null, convertedList, ConfigSchemaType.GEN);
 
     assertEquals(1, maskedDataList.size());
     assertEquals(resultList, maskedDataList.get(0).getData());
@@ -205,5 +221,4 @@ public class DataMaskingCoreAdditionalTest {
     return new String(Files.readAllBytes(Paths.get(getClass().getResource(path).toURI())),
         StandardCharsets.UTF_8);
   }
-
 }

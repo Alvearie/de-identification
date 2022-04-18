@@ -318,11 +318,6 @@ public abstract class MaskingProviderConfig implements Serializable {
         return new VINMaskingProviderConfig();
       case ZIPCODE:
         return new ZIPCodeMaskingProviderConfig();
-
-      // FHIR/GEN are complex masking providers which do not have
-      // masking provider config
-      case FHIR:
-      case GEN:
       default:
         throw new IllegalArgumentException("Unsupported provider type" + type);
     }

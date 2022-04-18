@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,6 +21,8 @@ import com.ibm.whc.deid.endpoint.exception.BadRequestException;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.exception.InvalidInputException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
+import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
+import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.shared.util.MaskingConfigUtils;
@@ -66,17 +68,20 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
   }
 
   protected ResponseEntity<?> maskJsonMethod(DataMaskingModel maskRequest,
-      DataMaskingService dataMaskingService)
+      DataMaskingService service)
       throws InvalidMaskingConfigurationException, DeidException, InvalidInputException {
     List<String> maskedData;
     try {
-      String config = maskRequest.getConfig();
+      String globalConfig = maskRequest.getGlobalConfig();
       List<String> data = maskRequest.getData();
       ConfigSchemaTypes schemaType = maskRequest.getSchemaType();
-      MaskingConfigUtils.validateConfig(maskRequest.getConfig());
+
+      DeidMaskingConfig maskingConfig = MaskingConfigUtils.validateConfig(maskRequest.getConfig());
+      GlobalProcessorConfig gpConfig = validateGlobalConfig(globalConfig);
       validateData(data);
       validateSchemaType(schemaType);
-      maskedData = dataMaskingService.maskData(config, data, schemaType);
+
+      maskedData = service.maskData(maskingConfig, gpConfig, data, schemaType);
 
       ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
       String maskedOutput = getString(objectMapper, maskedData);

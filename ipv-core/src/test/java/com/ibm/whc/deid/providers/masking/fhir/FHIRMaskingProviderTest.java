@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,8 +25,8 @@ import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
+import com.ibm.whc.deid.shared.pojo.masking.ReferableNode;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
-import scala.Tuple2;
 
 public class FHIRMaskingProviderTest {
 
@@ -91,23 +90,22 @@ public class FHIRMaskingProviderTest {
       assertTrue(node.get("dispenseRequest").get("numberOfRepeatsAllowed").isInt());
       assertEquals(2, node.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue());
 
-      ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-      // We are using random to mask the value. to avoid the masked value
+      // We are using random to mask the value. To avoid the masked value
       // happens to be the original, try 10 times.
-      String masked = mapper.writeValueAsString(IntStream.range(0, 10)
-          .mapToObj(x -> fhirMaskingProvider
-              .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))))
-          .filter(maskedStr -> {
-            JsonNode maskedNode = maskedStr.get(0)._2;
-            int numberOfRepeatsAllowed =
-                maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue();
-            return numberOfRepeatsAllowed != 2;
-          }).findFirst().get().get(0)._2);
-      JsonNode maskedNode = ObjectMapperFactory.getObjectMapper().readTree(masked);
-
-      assertTrue(maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue() != 2);
-
-      assertTrue(maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").isInt());
+      boolean good = false;
+      for (int i = 1; i < 10; i++) {
+        List<ReferableNode> masked =
+            fhirMaskingProvider.maskResources(Arrays.asList(new ReferableNode("123", node)));
+        JsonNode maskedNode = masked.get(0).getNode();
+        assertTrue(maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").isInt());
+        int numberOfRepeatsAllowed =
+            maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").intValue();
+        if (numberOfRepeatsAllowed != 2) {
+          good = true;
+          break;
+        }
+      }
+      assertTrue("value did not change after several attempts", good);
     }
   }
 
@@ -120,44 +118,8 @@ public class FHIRMaskingProviderTest {
         this.getClass().getResourceAsStream("/fhir/MedicationAdministration-239202.json")) {
       JsonNode node = ObjectMapperFactory.getObjectMapper().readTree(is);
       JsonNode maskedNode = fhirMaskingProvider
-          .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))).get(0)._2();
-
+          .maskResources(Arrays.asList(new ReferableNode("123", node))).get(0).getNode();
       assertTrue(maskedNode.get("practitioner").get("reference").asText().length() > 0);
-    }
-  }
-
-  @Ignore
-  @Test
-  public void testMaintainsDataTypeArrays() throws Exception {
-    DeidMaskingConfig defaultFhirConfig = (new ConfigGenerator()).getTestDeidConfig();
-    FHIRMaskingProvider fhirMaskingProvider =
-        new FHIRMaskingProvider(defaultFhirConfig, maskingProviderFactory, tenantId);
-
-    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
-    try (InputStream is =
-        this.getClass().getResourceAsStream("/fhir/MedicationOrder-arrays-230986.json")) {
-      JsonNode node = ObjectMapperFactory.getObjectMapper().readTree(is);
-
-      assertTrue(node.get("dispenseRequest").get("numberOfRepeatsAllowed").isArray());
-      assertEquals(2, node.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue());
-
-      // We are using random to mask the value. to avoid the masked value
-      // happens to be the original, try 10 times
-      String masked = mapper.writeValueAsString(IntStream.range(0, 10)
-          .mapToObj(x -> fhirMaskingProvider
-              .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))))
-          .filter(maskedStr -> {
-            JsonNode maskedNode = maskedStr.get(0)._2;
-            int numberOfRepeatsAllowed =
-                maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue();
-            return numberOfRepeatsAllowed != 2;
-          }).findFirst().get().get(0)._2);
-      JsonNode maskedNode = ObjectMapperFactory.getObjectMapper().readTree(masked);
-
-      assertTrue(
-          maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).intValue() != 2);
-
-      assertTrue(maskedNode.get("dispenseRequest").get("numberOfRepeatsAllowed").get(0).isInt());
     }
   }
 
@@ -181,7 +143,7 @@ public class FHIRMaskingProviderTest {
         String original = node.asText();
 
         String masked = mapper.writeValueAsString(fhirMaskingProvider
-            .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))).get(0)._2);
+            .maskResources(Arrays.asList(new ReferableNode("123", node))).get(0).getNode());
         assertNotEquals(original, masked);
       }
     }
@@ -209,23 +171,24 @@ public class FHIRMaskingProviderTest {
 
     String filename = "/fhir/patientExample.json";
 
-    InputStream is = this.getClass().getResourceAsStream(filename);
+    try (InputStream is = this.getClass().getResourceAsStream(filename)) {
+      JsonNode node = mapper.readTree(is);
+      JsonNode identifier = node.get("identifier").iterator().next();
+      String originalPeriodStart = identifier.get("period").get("start").asText();
+      assertEquals("2001-05-06", originalPeriodStart);
+      assertEquals("12345", identifier.get("value").asText());
+      assertEquals("Acme Healthcare", identifier.get("assigner").get("display").asText());
 
-    JsonNode node = mapper.readTree(is);
-    JsonNode identifier = node.get("identifier").iterator().next();
-    String originalPeriodStart = identifier.get("period").get("start").asText();
-    assertEquals("2001-05-06", originalPeriodStart);
-    assertEquals("12345", identifier.get("value").asText());
-    assertEquals("Acme Healthcare", identifier.get("assigner").get("display").asText());
+      String result = mapper.writeValueAsString(fhirMaskingProvider
+          .maskResources(Arrays.asList(new ReferableNode("123", node))).get(0).getNode());
 
-    String result = mapper.writeValueAsString(fhirMaskingProvider
-        .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node))).get(0)._2());
-    JsonNode resultNode = mapper.readTree(result);
-    JsonNode maskedIdentifier = resultNode.get("identifier").iterator().next();
-    String maskedPeriodStart = maskedIdentifier.get("period").get("start").asText();
+      JsonNode resultNode = mapper.readTree(result);
+      JsonNode maskedIdentifier = resultNode.get("identifier").iterator().next();
+      String maskedPeriodStart = maskedIdentifier.get("period").get("start").asText();
 
-    assertNotEquals("2001-05-06", maskedPeriodStart);
-    assertTrue(maskedIdentifier.get("value").isNull());
+      assertNotEquals("2001-05-06", maskedPeriodStart);
+      assertTrue(maskedIdentifier.get("value").isNull());
+    }
   }
 
   @Test
@@ -351,12 +314,12 @@ public class FHIRMaskingProviderTest {
     ObjectMapper mapper = new ObjectMapper();
 
     for (String filename : filenames) {
-      InputStream is = this.getClass().getResourceAsStream(filename);
-      JsonNode node = mapper.readTree(is);
-
-      List<Tuple2<String, JsonNode>> resultList = fhirMaskingProvider
-          .maskJsonNode(Arrays.asList(new Tuple2<String, JsonNode>("123", node)));
-      assertTrue(1 == resultList.size());
+      try (InputStream is = this.getClass().getResourceAsStream(filename)) {
+        JsonNode node = mapper.readTree(is);
+        List<ReferableNode> resultList =
+            fhirMaskingProvider.maskResources(Arrays.asList(new ReferableNode("123", node)));
+        assertTrue(1 == resultList.size());
+      }
     }
   }
 }

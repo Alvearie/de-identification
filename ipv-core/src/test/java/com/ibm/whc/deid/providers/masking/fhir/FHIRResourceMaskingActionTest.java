@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -13,7 +13,7 @@ public class FHIRResourceMaskingActionTest {
   @Test
   public void testPaths() {
     FHIRResourceMaskingAction maskingAction =
-        new FHIRResourceMaskingAction("/fhir/Device/owner/details", "/owner/details", null, null);
+        new FHIRResourceMaskingAction("/fhir/Device/owner/details", "/owner/details", null);
 
     String[] paths = maskingAction.getPaths();
     assertEquals(2, paths.length);
