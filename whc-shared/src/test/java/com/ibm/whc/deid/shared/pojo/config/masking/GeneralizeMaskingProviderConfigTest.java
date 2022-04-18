@@ -102,7 +102,8 @@ public class GeneralizeMaskingProviderConfigTest {
       config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`targetValue` is null for value set 0", e.getMessage());
+      assertEquals("one of `sourceValueIn` or `sourceValueNotIn` must be specified in value set 0",
+          e.getMessage());
     }
 
     config.setMaskRuleSet("[{\"targetValue\": \"Other\", \"sourceValueIn\": [\"Italian\",\"English\"], \"sourceValueNotIn\": null}, {}]");
@@ -110,18 +111,15 @@ public class GeneralizeMaskingProviderConfigTest {
       config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`targetValue` is null for value set 1", e.getMessage());
+      assertEquals("one of `sourceValueIn` or `sourceValueNotIn` must be specified in value set 1",
+          e.getMessage());
     }
 
     config.setMaskRuleSet("[{\"targetValue\": null, \"sourceValueIn\": [\"Italian\",\"English\"], \"sourceValueNotIn\": null}]");
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`targetValue` is null for value set 0", e.getMessage());
-    }
+    config.validate(null);
 
-    config.setMaskRuleSet("[{\"targetValue\": \"\", \"sourceValueIn\": [\"Italian\",\"English\"], \"sourceValueNotIn\": null}, {\"targetValue\": \" \", \"sourceValueIn\": [\"Italian\",\"English\"]}, {\"targetValue\": \"a\", \"sourceValueIn\": null, \"sourceValueNotIn\": [\"Italian\", \"\", \"French\"]}, {\"targetValue\": \"b\", \"sourceValueNotIn\": [\" \", \"\", \"French\", false, 4]}]");
+    config.setMaskRuleSet(
+        "[{\"targetValue\": \"\", \"sourceValueIn\": [\"Italian\",\"English\"], \"sourceValueNotIn\": null}, {\"targetValue\": \" \", \"sourceValueIn\": [\"Italian\",\"English\"]}, {\"targetValue\": \"a\", \"sourceValueIn\": null, \"sourceValueNotIn\": [\"Italian\", \"\", \"French\"]}, {\"targetValue\": null, \"sourceValueNotIn\": [\" \", \"\", \"French\", false, 4]}]");
     config.validate(null);
     rules = config.parseMaskRuleSet(config.getMaskRuleSet());
     assertNotNull(rules);
@@ -150,7 +148,7 @@ public class GeneralizeMaskingProviderConfigTest {
     assertTrue(rule.getValueSet().contains(""));
     assertTrue(it.hasNext());
     rule = it.next();
-    assertEquals("b", rule.getCategory());
+    assertNull(rule.getCategory());
     assertTrue(rule.getLogicalNegation());
     assertEquals(5, rule.getValueSet().size());
     assertTrue(rule.getValueSet().contains(" "));
@@ -160,7 +158,8 @@ public class GeneralizeMaskingProviderConfigTest {
     assertTrue(rule.getValueSet().contains("4"));
     assertFalse(it.hasNext());
 
-    config.setMaskRuleSet("[{\"targetValue\": \"value1\", \"sourceValueIn\": null, \"sourceValueNotIn\": null}]");
+    config.setMaskRuleSet(
+        "[{\"targetValue\": null, \"sourceValueIn\": null, \"sourceValueNotIn\": null}]");
     try {
       config.validate(null);
       fail("expected exception");
