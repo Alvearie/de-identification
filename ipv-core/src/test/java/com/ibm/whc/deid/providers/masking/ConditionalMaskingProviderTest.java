@@ -38,6 +38,8 @@ public class ConditionalMaskingProviderTest {
 
   private class TestConditionalMaskingProvider extends ConditionalMaskingProvider {
 
+    private static final long serialVersionUID = 1L;
+
     public final List<Set<String>> valueSets = new ArrayList<>();
 
     public TestConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration,
