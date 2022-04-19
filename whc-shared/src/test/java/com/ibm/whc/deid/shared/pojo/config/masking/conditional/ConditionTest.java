@@ -98,6 +98,14 @@ public class ConditionTest {
     condition.setOperator(ConditionOperator.NOT_ANY_OF_IGNORE_CASE);
     condition.validate("x"); // not used, not validated
 
+    condition.setValueList(Arrays.asList("value1", "value2", null));
+    try {
+      condition.validate("maskRuleSet.condition");
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals("`maskRuleSet.condition.valueList[2]` is missing", e.getMessage());
+    }
+
     condition.setValueList(null);
     try {
       condition.validate("maskRuleSet.condition");
@@ -138,7 +146,7 @@ public class ConditionTest {
       assertEquals("`maskRuleSet.condition.valueList` is missing", e.getMessage());
     }
 
-    condition.getValueList().add(null);
+    condition.setValueList(Arrays.asList("value1", "value2"));
     condition.validate("x"); // not used, not validated
 
     condition.setType(null);

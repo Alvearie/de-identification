@@ -78,6 +78,14 @@ public class Condition {
         throw new InvalidMaskingConfigurationException(
             "`" + String.valueOf(parentName) + ".valueList` is missing");
       }
+      int offset = 0;
+      for (String v : valueList) {
+        if (v == null) {
+          throw new InvalidMaskingConfigurationException(
+              "`" + String.valueOf(parentName) + ".valueList[" + offset + "]` is missing");
+        }
+        offset++;
+      }
     } else {
       if (value == null) {
         throw new InvalidMaskingConfigurationException(
