@@ -27,6 +27,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskRuleSet;
 import com.ibm.whc.deid.shared.pojo.config.masking.ConditionalMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.PseudonymMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.RedactMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.ConditionOperator;
 import com.ibm.whc.deid.shared.pojo.config.masking.conditional.ConditionType;
@@ -34,6 +35,26 @@ import com.ibm.whc.deid.shared.util.ConfigGenerator;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class ConditionalMaskingProviderTest {
+
+  private class TestConditionalMaskingProvider extends ConditionalMaskingProvider {
+
+    public final List<Set<String>> valueSets = new ArrayList<>();
+
+    public TestConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration,
+        String tenantId, DeidMaskingConfig deidMaskingConfig, String localizationProperty,
+        MaskingProviderFactory maskingProviderFactory) {
+      super(configuration, tenantId, deidMaskingConfig, localizationProperty,
+          maskingProviderFactory);
+    }
+
+    @Override
+    protected Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
+        String resourceType) {
+      Set<String> vs = super.getConditionRegularFieldValues(condition, root, resourceType);
+      valueSets.add(vs);
+      return vs;
+    }
+  }
 
   private String localizationProperty = LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES;
 
@@ -341,6 +362,381 @@ public class ConditionalMaskingProviderTest {
 
     assertTrue(!maskedValue.equals(identifier));
     assertTrue(maskedValue.length() == 15);
+  }
+
+  /*
+   * Test conditional operator anyOf
+   */
+  @Test
+  public void testConditionalAnyOf() throws Exception {
+    ConditionalMaskingProviderConfig conditionalMaskingProviderConfig =
+        new ConditionalMaskingProviderConfig();
+    RedactMaskingProviderConfig redactConfig = new RedactMaskingProviderConfig();
+    com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
+    condition.setField("procedure/code/value");
+    condition.setOperator(ConditionOperator.ANY_OF);
+    condition.setType(ConditionType.STRING);
+    condition.setValueList(Arrays.asList("201", "202", "203"));
+    List<ConditionalMaskRuleSet> maskRuleSet = new ArrayList<>();
+    ConditionalMaskRuleSet ruleSet1 = new ConditionalMaskRuleSet();
+    ruleSet1.setCondition(condition);
+    ruleSet1.setMaskingProvider(redactConfig);
+    conditionalMaskingProviderConfig.setMaskRuleSet(maskRuleSet);
+    maskRuleSet.add(ruleSet1);
+
+    //@formatter:off
+    String doc1 = "{\"text\": \"medical procedure\",\n"
+        + "      \"procedure\":[{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 101\",\n"
+        + "               \"value\": \"101\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 301\",\n"
+        + "               \"value\": \"301\"\n"
+        + "           }},{\n"        
+        + "           \"code\": {\n"
+        + "               \"desc\": \"null description\",\n"
+        + "               \"value\": null\n"        
+        + "           }},{\n"
+        + "           \"codex\": {\n"
+        + "               \"desc\": \"description of 302\",\n"
+        + "               \"value\": \"302\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 303\",\n"
+        + "               \"Value\": \"303\"\n"
+        + "           }},[1,3,4],{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 201\",\n"
+        + "               \"value\": \"201\"\n"
+        + "           }}\n"
+        + "       ] }\n";
+    //@formatter:on
+
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    JsonNode nodeRoot = mapper.readTree(doc1);
+    JsonNode nodeParent = nodeRoot;
+    JsonNode inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii = new MaskingActionInputIdentifier(null, inputDataNode,
+        nodeParent, "text", "", "", nodeRoot);
+
+    //@formatter:off
+    String doc2 = "{\"text\": \"second procedure\",\n"
+        + "      \"procedure\":{\n"
+        + "           \"code\": {\n"
+        + "               \"value\": [\"701\",\"911\", {\"a\":1, \"b\":2}, \"abc\", \"\", null]\n"
+        + "            }} }\n";
+    //@formatter:on
+
+    nodeRoot = mapper.readTree(doc2);
+    nodeParent = nodeRoot;
+    inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii2 =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    TestConditionalMaskingProvider maskingProvider =
+        new TestConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
+    maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
+
+    String maskedValue = maii.getRoot().get("text").asText();
+    assertEquals("XXXXXXXXXXXXXXXXX", maskedValue);
+    Set<String> vs = maskingProvider.valueSets.get(0);
+    assertTrue(vs.contains("101"));
+    assertTrue(vs.contains("301"));
+    assertTrue(vs.contains("201"));
+    assertEquals(3, vs.size());
+
+    maskedValue = maii2.getRoot().get("text").asText();
+    assertEquals("second procedure", maskedValue);
+    vs = maskingProvider.valueSets.get(1);
+    assertTrue(vs.contains("701"));
+    assertTrue(vs.contains("911"));
+    assertTrue(vs.contains("abc"));
+    assertTrue(vs.contains(""));
+    assertEquals(4, vs.size());
+  }
+
+  /*
+   * Test conditional operator notAnyOf
+   */
+  @Test
+  public void testConditionalNotAnyOf() throws Exception {
+    ConditionalMaskingProviderConfig conditionalMaskingProviderConfig =
+        new ConditionalMaskingProviderConfig();
+    RedactMaskingProviderConfig redactConfig = new RedactMaskingProviderConfig();
+    com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
+    condition.setField("procedure/code/value");
+    condition.setOperator(ConditionOperator.NOT_ANY_OF);
+    condition.setType(ConditionType.STRING);
+    condition.setValueList(Arrays.asList("201", "202", "203", "204"));
+    List<ConditionalMaskRuleSet> maskRuleSet = new ArrayList<>();
+    ConditionalMaskRuleSet ruleSet1 = new ConditionalMaskRuleSet();
+    ruleSet1.setCondition(condition);
+    ruleSet1.setMaskingProvider(redactConfig);
+    conditionalMaskingProviderConfig.setMaskRuleSet(maskRuleSet);
+    maskRuleSet.add(ruleSet1);
+
+    //@formatter:off
+    String doc1 = "{\"text\": \"medical procedure\",\n"
+        + "      \"procedure\":[{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 202\",\n"
+        + "               \"value\": \"202\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 203\",\n"
+        + "               \"value\": \"203\"\n"
+        + "           }},{\n"        
+        + "           \"code\": {\n"
+        + "               \"desc\": \"null description\",\n"
+        + "               \"value\": null\n"        
+        + "           }},{\n"
+        + "           \"codex\": {\n"
+        + "               \"desc\": \"description of 302\",\n"
+        + "               \"value\": \"302\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 303\",\n"
+        + "               \"Value\": \"303\"\n"
+        + "           }},[1,3,4],{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 201\",\n"
+        + "               \"value\": \"201\"\n"
+        + "           }}\n"
+        + "       ] }\n";
+    //@formatter:on
+
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    JsonNode nodeRoot = mapper.readTree(doc1);
+    JsonNode nodeParent = nodeRoot;
+    JsonNode inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    //@formatter:off
+    String doc2 = "{\"text\": \"second procedure\",\n"
+        + "      \"procedure\":{\n"
+        + "           \"code\": {\n"
+        + "               \"value\": [\"701\",\"911\", {\"a\":1, \"b\":2}, \"abc\", \"\", null]\n"
+        + "            }} }\n";
+    //@formatter:on
+
+    nodeRoot = mapper.readTree(doc2);
+    nodeParent = nodeRoot;
+    inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii2 =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    TestConditionalMaskingProvider maskingProvider =
+        new TestConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
+    maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
+
+    Set<String> vs = maskingProvider.valueSets.get(0);
+    assertTrue(vs.contains("201"));
+    assertTrue(vs.contains("202"));
+    assertTrue(vs.contains("203"));
+    assertEquals(3, vs.size());
+    String maskedValue = maii.getRoot().get("text").asText();
+    assertEquals("medical procedure", maskedValue);
+
+    vs = maskingProvider.valueSets.get(1);
+    assertTrue(vs.contains("701"));
+    assertTrue(vs.contains("911"));
+    assertTrue(vs.contains("abc"));
+    assertTrue(vs.contains(""));
+    assertEquals(4, vs.size());
+    maskedValue = maii2.getRoot().get("text").asText();
+    assertEquals("XXXXXXXXXXXXXXXX", maskedValue);
+  }
+
+  /*
+   * Test conditional operator AnyOfIgnoreCase
+   */
+  @Test
+  public void testConditionalAnyOfIgnoreCase() throws Exception {
+    ConditionalMaskingProviderConfig conditionalMaskingProviderConfig =
+        new ConditionalMaskingProviderConfig();
+    RedactMaskingProviderConfig redactConfig = new RedactMaskingProviderConfig();
+    com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
+    condition.setField("procedure/code/value");
+    condition.setOperator(ConditionOperator.ANY_OF_IGNORE_CASE);
+    condition.setType(ConditionType.STRING);
+    condition.setValueList(Arrays.asList("Abc", "202", "Def"));
+    List<ConditionalMaskRuleSet> maskRuleSet = new ArrayList<>();
+    ConditionalMaskRuleSet ruleSet1 = new ConditionalMaskRuleSet();
+    ruleSet1.setCondition(condition);
+    ruleSet1.setMaskingProvider(redactConfig);
+    conditionalMaskingProviderConfig.setMaskRuleSet(maskRuleSet);
+    maskRuleSet.add(ruleSet1);
+
+    //@formatter:off
+    String doc1 = "{\"text\": \"medical procedure\",\n"
+        + "      \"procedure\":[{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 101\",\n"
+        + "               \"value\": \"101\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 301\",\n"
+        + "               \"value\": \"301\"\n"
+        + "           }},{\n"        
+        + "           \"code\": {\n"
+        + "               \"desc\": \"null description\",\n"
+        + "               \"value\": null\n"        
+        + "           }},{\n"
+        + "           \"codex\": {\n"
+        + "               \"desc\": \"description of 302\",\n"
+        + "               \"value\": \"302\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 303\",\n"
+        + "               \"Value\": \"303\"\n"
+        + "           }},[1,3,4],{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 201\",\n"
+        + "               \"value\": \"201\"\n"
+        + "           }}\n"
+        + "       ] }\n";
+    //@formatter:on
+
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    JsonNode nodeRoot = mapper.readTree(doc1);
+    JsonNode nodeParent = nodeRoot;
+    JsonNode inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    //@formatter:off
+    String doc2 = "{\"text\": \"second procedure\",\n"
+        + "      \"procedure\":{\n"
+        + "           \"code\": {\n"
+        + "               \"value\": [\"701\",\"911\", {\"a\":1, \"b\":2}, \"abc\", \"\", null]\n"
+        + "            }} }\n";
+    //@formatter:on
+
+    nodeRoot = mapper.readTree(doc2);
+    nodeParent = nodeRoot;
+    inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii2 =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    TestConditionalMaskingProvider maskingProvider =
+        new TestConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
+    maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
+
+    String maskedValue = maii.getRoot().get("text").asText();
+    assertEquals("medical procedure", maskedValue);
+    Set<String> vs = maskingProvider.valueSets.get(0);
+    assertTrue(vs.contains("101"));
+    assertTrue(vs.contains("301"));
+    assertTrue(vs.contains("201"));
+    assertEquals(3, vs.size());
+
+    maskedValue = maii2.getRoot().get("text").asText();
+    assertEquals("XXXXXXXXXXXXXXXX", maskedValue);
+    vs = maskingProvider.valueSets.get(1);
+    assertTrue(vs.contains("701"));
+    assertTrue(vs.contains("911"));
+    assertTrue(vs.contains("abc"));
+    assertTrue(vs.contains(""));
+    assertEquals(4, vs.size());
+  }
+
+  /*
+   * Test conditional operator NotAnyOfIgnoreCase
+   */
+  @Test
+  public void testConditionalNotAnyOfIgnoreCase() throws Exception {
+    ConditionalMaskingProviderConfig conditionalMaskingProviderConfig =
+        new ConditionalMaskingProviderConfig();
+    RedactMaskingProviderConfig redactConfig = new RedactMaskingProviderConfig();
+    com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
+    condition.setField("procedure/code/value");
+    condition.setOperator(ConditionOperator.NOT_ANY_OF_IGNORE_CASE);
+    condition.setType(ConditionType.STRING);
+    condition.setValueList(Arrays.asList("Abc", "202", "Def"));
+    List<ConditionalMaskRuleSet> maskRuleSet = new ArrayList<>();
+    ConditionalMaskRuleSet ruleSet1 = new ConditionalMaskRuleSet();
+    ruleSet1.setCondition(condition);
+    ruleSet1.setMaskingProvider(redactConfig);
+    conditionalMaskingProviderConfig.setMaskRuleSet(maskRuleSet);
+    maskRuleSet.add(ruleSet1);
+
+    //@formatter:off
+    String doc1 = "{\"text\": \"medical procedure\",\n"
+        + "      \"procedure\":[{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 1ABC\",\n"
+        + "               \"value\": \"1ABC\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 202\",\n"
+        + "               \"value\": \"202\"\n"
+        + "           }},{\n"        
+        + "           \"code\": {\n"
+        + "               \"desc\": \"null description\",\n"
+        + "               \"value\": null\n"        
+        + "           }},{\n"
+        + "           \"codex\": {\n"
+        + "               \"desc\": \"description of 302\",\n"
+        + "               \"value\": \"302\"\n"
+        + "           }},{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of 303\",\n"
+        + "               \"Value\": \"abc\"\n"
+        + "           }},[1,3,4],{\n"
+        + "           \"code\": {\n"
+        + "               \"desc\": \"description of def\",\n"
+        + "               \"value\": \"Def\"\n"
+        + "           }}\n"
+        + "       ] }\n";
+    //@formatter:on
+
+    ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+    JsonNode nodeRoot = mapper.readTree(doc1);
+    JsonNode nodeParent = nodeRoot;
+    JsonNode inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    //@formatter:off
+    String doc2 = "{\"text\": \"second procedure\",\n"
+        + "      \"procedure\":{\n"
+        + "           \"code\": {\n"
+        + "               \"value\": [\"ABC\",\"def\", {\"a\":1, \"b\":2}, \"202\", null]\n"
+        + "            }} }\n";
+    //@formatter:on
+
+    nodeRoot = mapper.readTree(doc2);
+    nodeParent = nodeRoot;
+    inputDataNode = nodeParent.get("text");
+    MaskingActionInputIdentifier maii2 =
+        new MaskingActionInputIdentifier(null, inputDataNode, nodeParent, "text", "", "", nodeRoot);
+
+    TestConditionalMaskingProvider maskingProvider =
+        new TestConditionalMaskingProvider(conditionalMaskingProviderConfig, tenantId,
+            deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
+    maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
+
+    Set<String> vs = maskingProvider.valueSets.get(0);
+    assertTrue(vs.contains("1ABC")); // value that causes the match on not any of
+    assertTrue(vs.contains("202"));
+    assertTrue(vs.contains("Def"));
+    assertEquals(3, vs.size());
+    String maskedValue = maii.getRoot().get("text").asText();
+    assertEquals("XXXXXXXXXXXXXXXXX", maskedValue);
+
+    vs = maskingProvider.valueSets.get(1);
+    assertTrue(vs.contains("ABC"));
+    assertTrue(vs.contains("def"));
+    assertTrue(vs.contains("202"));
+    assertEquals(3, vs.size());
+    maskedValue = maii2.getRoot().get("text").asText();
+    assertEquals("second procedure", maskedValue);
   }
 
   /*

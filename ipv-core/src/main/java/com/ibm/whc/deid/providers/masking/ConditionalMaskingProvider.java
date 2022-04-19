@@ -179,7 +179,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     return false;
   }
 
-  private Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
+  protected Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
       String resourceType) {
 
     Set<String> valueSet = new HashSet<>();
@@ -205,8 +205,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
        * parent.
        */
       currentPath = paths[i];
-      // System.out.println("========> " + i + " currentPath: " +
-      // currentPath);
       nodeList = getChildrenNodes(root, currentPath, nodeList);
       if (nodeList == null) {
         return valueSet;
@@ -214,8 +212,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     }
 
     for (JsonNode elementNode : nodeList) {
-      // System.out.println("\n\n========> elementNode: " +
-      // elementNode.toString());
       if (elementNode.isValueNode()) {
         Object value = getValue(elementNode);
         if (value != null) {
@@ -254,8 +250,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
         paths = path.split("/");
       }
     }
-
-    // System.out.println("\n\n========> paths: " + Arrays.toString(paths));
 
     /*
      * Currently, only array leaf nodes and a single condition is supported. This path is for array
@@ -356,23 +350,15 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       if (currentNode.isArray()) {
         for (JsonNode childNode : currentNode) {
           nodeList.add(childNode);
-          // System.out.println("========> " +
-          // " nodeList.add(childNode): " + childNode);
         }
       } else {
         nodeList.add(currentNode);
-        // System.out.println("========> " +
-        // " nodeList.add(currentNode): " + currentNode);
       }
     } else {
 
       List<JsonNode> childNodeList = new ArrayList<>();
       for (JsonNode subNode : nodeList) {
         JsonNode currentNode = subNode.get(currentPath);
-        // System.out.println("========> " + " currentPath: " +
-        // currentPath);
-        // System.out.println("========> " + " subNode: " +
-        // subNode.toString());
         if (currentNode == null || currentNode.isNull()) {
           continue;
         }
@@ -380,14 +366,9 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
         if (currentNode.isArray()) {
           for (JsonNode childNode : currentNode) {
             childNodeList.add(childNode);
-            // System.out.println("========> " +
-            // " childNodeList.add(childNode): " +
-            // childNode.toString());
           }
         } else {
           childNodeList.add(currentNode);
-          // System.out.println("========> " +
-          // " childNodeList.add(currentNode): " + currentNode);
         }
       }
       nodeList = childNodeList;
