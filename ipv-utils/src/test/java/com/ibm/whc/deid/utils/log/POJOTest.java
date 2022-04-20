@@ -161,8 +161,9 @@ public abstract class POJOTest<T> {
         return clazz.getEnumConstants()[0];
       }
 
-      return clazz.newInstance();
-    } catch (IllegalAccessException | InstantiationException e) {
+      return clazz.getDeclaredConstructor().newInstance();
+    } catch (IllegalAccessException | InstantiationException | NoSuchMethodException
+        | IllegalArgumentException | InvocationTargetException | SecurityException e) {
       throw new RuntimeException("Unable to create objects for field '" + fieldName + "'.", e);
     }
   }

@@ -72,6 +72,6 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
     long lowerBase = normalizedStartValue + (this.binSize * binsToApply);
     long higherBase = lowerBase + this.binSize;
 
-    return String.format(this.format, new Long(lowerBase), new Long(higherBase));
+    return String.format(this.format, Long.valueOf(lowerBase), Long.valueOf(higherBase));
   }
 }

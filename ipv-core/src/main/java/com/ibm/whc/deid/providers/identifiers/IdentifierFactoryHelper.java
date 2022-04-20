@@ -10,6 +10,7 @@ import com.ibm.whc.deid.utils.log.LogManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -35,7 +36,8 @@ public class IdentifierFactoryHelper implements Serializable {
           registerIdentifier((Class<? extends Identifier>) Class.forName(name));
         }
       } catch (IOException | ClassNotFoundException | InstantiationException
-          | IllegalAccessException e) {
+          | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
         log.logError(LogCodes.WPH1013E, e);
       }
     }
@@ -46,7 +48,9 @@ public class IdentifierFactoryHelper implements Serializable {
     identifierClassNames.forEach(name -> {
       try {
         registerIdentifier((Class<? extends Identifier>) Class.forName(name));
-      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException e) {
+      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException
+          | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException e) {
         log.logError(LogCodes.WPH1013E, e);
       }
     });
@@ -67,10 +71,15 @@ public class IdentifierFactoryHelper implements Serializable {
    * @param identifierType the identifier type
    * @throws IllegalAccessException the illegal access exception
    * @throws InstantiationException the instantiation exception
+   * @throws SecurityException
+   * @throws NoSuchMethodException
+   * @throws InvocationTargetException
+   * @throws IllegalArgumentException
    */
   public void registerIdentifier(final Class<? extends Identifier> identifierType)
-      throws IllegalAccessException, InstantiationException {
-    registerIdentifier(identifierType.newInstance());
+      throws IllegalAccessException, InstantiationException, IllegalArgumentException,
+      InvocationTargetException, NoSuchMethodException, SecurityException {
+    registerIdentifier(identifierType.getDeclaredConstructor().newInstance());
   }
 
   /**
