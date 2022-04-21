@@ -75,4 +75,4 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: Push Docker Images
       run: |
-        echo docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
+        docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
