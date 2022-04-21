@@ -121,20 +121,20 @@ options and their default values.
 
    The Data De-Identification Service supports the **conditional** masking of a
    data element, based on the value of another data element that appears in the
-   same FHIR Resource. That is, the masking method performed on a data element
-   A (target field), depends on whether another data element B (condition
-   field) in the same Resource satisfies a specified condition.
+   same input document. That is, the masking method performed on a data element
+   A (target field) depends on whether another data element B (condition
+   field) in the same document satisfies a specified condition.
 
    The conditional masking provider supports a single configuration option,
-   conditional.mask.ruleSet, which contains a JSON array consisting of a set of
-   one or more masking providers, along with their associated conditions.
-   See the example below.
+   the **maskRuleSet**, which consists of a JSON array in which each member contains
+   an optional condition and the configuration of a privacy provider to apply if the condition 
+   is met.  The members of the array are processed in order until the condition in 
+   one of the members is met or until a member does not have a condition.  In either case 
+   the associated privacy provider is applied to the target field and processing stops.  
+   If a condition is present but not met, processing continues to the next array member.  
+   If all members have conditions and no conditions are met, the target field is not changed.
 
-   **Note:** The array conditions are processed in the order that they are listed. Data
-   element A is masked by the first data masking provider (and its associated
-   configuration options) that meets its condition.
-
-   **Example 1: Conditional masking of a FHIR data element based on another FHIR data element with regular path**
+   **Example 1: Conditional masking of a data element based on another data element with regular path**
 
 ```
     {
@@ -184,59 +184,13 @@ options and their default values.
     }
 ```
     
-  Example 1 contains a CONDITIONAL ruleset for a condition field with a
-   regular path, that is, not a FHIR array data element.
+   In Example 1 the objective is to mask the **version** data element of FHIR Device resource 
+   documents using the PSEUDONYM masking provider if the input document contains a data element 
+   named **model** with the value **example_model**. If that condition is not met, the next entry 
+   in the maskRuleSet is checked.  Since that array member does not include a condition, it is met
+   automatically and so the HASH masking provider is applied to the **version**.
 
-   In the example, the objective of the CONDITIONAL ruleset is to mask
-   the version data element of the Device FHIR Resource using the PSEUDONYM
-   masking provider; this applies if the model data element of the Device FHIR Resource has
-   the value **example_model**. Otherwise, the default HASH masking provider is
-   used. By construction, if none of the conditions specified in the ruleset
-   is met, the specified default option is used.
-
-   Each array node of the conditional.mask.ruleSet JSON contains a data masking
-   provider along with its optional configuration parameters. The condition
-   properties that must be satisfied in order for this provider to be applied
-   (for example, the PSEUDONYM masking provider in Example 1, along with the options
-   **generateViaOptionsMinLength = 12** and
-   **generateViaOptionsMaxLength = 12**) are applied to mask the
-   version data element only when the model data element has the value
-   **example_model**. When the first condition is met, the corresponding
-   data masking provider is applied. Optionally, a default data masking
-   provider can be used, if none of the conditions of the previous rules in the
-   conditional ruleset is met. The default masking provider should be placed
-   last in the list.
-
-   **Note:** If a default data masking provider
-   (without condition) is not provided, and if none of the conditions of the
-   specified masking providers (with conditions) is met, then the data value
-   is not masked. It is maintained as-is.
-
->   The configured CONDITIONAL JSON element consists of four properties:
-
->-  **field**: This contains the path of the condition field in the FHIR Resource
-    type. The path may be either a regular path (that is, a non-array element path) or an
-    array query format path. For a description, see [Introduction to the Data De-Identification service configuration](masking-config-overview.md).
-
->-   **value**: This contains the expected value of the condition field.
-
->-   **type**: This contains the data type of the condition field. Currently, only
-    String data elements are supported.
-
->-   **operator**: The comparison operator to be used between the actual value of
-    the condition field and the user-requested value. Currently, four String
-    comparison operators are supported in CONDITIONAL: equals, equalsIgnoreCase,
-    contains, and contained_in.
-
->   Operator equals checks if the actual value is the same as the user-requested
->   value. Operator equalsIgnoreCase performs the same check, but ignores the case
->   (capitalized versus non-capitalized letters). The contains operator checks if the
->   value of the condition field contains, as a subset, the user-specified value.
->   Finally, the contained_in operator checks if the value of the condition field is
->   contained in the user specified-value.
-
-
-   **Example 2: Conditional masking of a FHIR data element, based on another FHIR data element value in an array node**
+   **Example 2: Conditional masking of a data element based on another data element value in an array node**
 
 ```
     {
@@ -289,6 +243,64 @@ options and their default values.
    <http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName>
    and a valueString value **Asthma_Inhaler**. Otherwise, the original value of
    the status data element is maintained as-is.
+   In Example 2 the objective is 
+   to mask the **status** data element of FHIR Device resources using the
+   PSEUDONYM masking provider if the input document contains an **extension** element
+   that contains an array of objects that have fields **valueString** and **url** and at least
+   one of those has a **url** value of **http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName**
+   and a **valueString** value of **Asthma-Inhaler**.  If the input document does not meet that condition,
+   the **status** data element is maintained as-is.
+
+Each **condition** within a **maskRuleSet** member contains four parameters:
+
+>-  **field**: The path to the condition field in the input document.
+    The path may be either a regular path or an
+    array query format path. For a description, see [Introduction to the Data De-Identification service configuration](masking-config-overview.md).  The **field** value should not contain any schema type and resource type
+    prefixes.  It should be the relative path to the condition field from the root of the input document.
+
+>-  **value**: The value to which the actual value found at the path in **field** is compared.  It is used when a
+    single-value operator is specified.  See the list of supported operators below.
+
+>-  **valueList**: The list of comparison values to which the actual value found at the path in **field** is compared.  This list
+    is used when a multi-value operator is specified.  Note that the order of the values in this
+    list is not relevant in the comparison.   See the list of supported operators below.
+
+>-  **type**: The data type used by the comparison operators.  Currently only String comparisons are supported.
+
+>-  **operator**: The comparison operator used to compare the actual value of
+    the condition field in the input document to the configured value given in the
+    **value** or **valueList** parameter.
+    
+| Operator             | Description                                                                               | Uses       |
+|----------------------|-------------------------------------------------------------------------------------------|------------|
+| equals               | the actual value is the same as the configured value                                      | value      |
+| equalsIgnoreCase     | the actual value is the same as the configured value ignoring character case              | value      |
+| contains             | the actual value contains, as a sub-string, the configured value                          | value      |
+| contained_in         | the actual value is contained in the configured value                                     | value      |    
+| anyOf                | the actual value is the same as any of the configured values                              | valueList  |        
+| anyOfIgnoreCase      | the actual value is the same as any of the configured values ignoring character case      | valueList  |        
+| notAnyOf             | the actual value is not the same as any of the configured values                          | valueList  |        
+| notAnyOfIgnoreCase   | the actual value is not the same as any of the configured values ignoring character case  | valueList  |        
+
+**Effect of arrays in the input document** - Note that due to JSON arrays, the input document might have several different fields that can be mapped to the path given in the **field** parameter in a **condition** in a **maskRuleSet** entry.  Consider the following example document:
+
+```
+{
+  "text": "this is a medical procedure",
+  "procedures": [
+     {"code": "701"},
+     {"code": "911"},
+     {"code": "456"}, 
+     {"code": "a19.3"}
+  ],
+  <other members>
+}
+```
+
+If the value specified for the configuration parameter **field** in a **maskRuleSet** entry is **procedures/code**, there would be four actual values found in the input document:  701, 911, 456, and a19.3.  When this occurs, each of the actual values is used in the condition and if any of the actual values causes the condition to be met, the condition is considered met and the associated privacy provider is applied.
+
+**Null values** - *Null* values are not considered when evaluating conditions.  The **value** configuration property cannot be given as *null* and none of the entries in the **valueList** configuration property can be *null*.  If the path given in **field** does not exist in an input document or if the value found at that path is *null*, the condition is not met and processing moves on to the next rule in the **maskRuleSet**, if any.  If multiple values are found at that path, any *null* values are not included in the set of values compared with the condition.
+
 
 #### CONTINENT
 
@@ -929,6 +941,7 @@ to determine whether a padding character was added as padding or was an actual p
 | NONE    | No padding occurs                                                              |
 | FRONT   | Any necessary padding characters are added at the beginning of the input value |
 | BACK    | Any necessary padding characters are added at the end of the input value       |
+
 
 #### GENDER
 
