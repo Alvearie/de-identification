@@ -24,7 +24,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
   public void testMask() {
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider();
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -43,7 +43,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -60,7 +60,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -80,7 +80,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskLimitDown(35.5);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -100,7 +100,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskLimitDown(0);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -120,7 +120,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskLimitDown(0);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
 
     for (int i = 0; i < 100; i++) {
@@ -135,7 +135,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithNoPrecision_IntegerInput() {
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
     int lowerBound = 2;
     int upperBound = 4;
@@ -158,7 +158,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithNoPrecision_DoubleInput() {
-    Double originalValue = new Double(50.03);
+    Double originalValue = Double.valueOf(50.03);
     String value = originalValue.toString();
     double lowerBound = 2.1;
     double upperBound = 4.9;
@@ -181,7 +181,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithPrecision_IntegerInput_DefaultPrecision() {
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
     int lowerBound = 2;
     int upperBound = 4;
@@ -205,7 +205,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithPrecision_IntegerInput_PrecisionDigitThree() {
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
     double lowerBound = 2;
     double upperBound = 4;
@@ -230,7 +230,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithPrecision_DoubleInput_DefaultPrecision() {
-    Double originalValue = new Double(50.03);
+    Double originalValue = Double.valueOf(50.03);
     String value = originalValue.toString();
     double lowerBound = 2.1;
     double upperBound = 4.9;
@@ -253,7 +253,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithPrecision_DoubleInput_PrecisionDigitZero() {
-    Double originalValue = new Double(50.03);
+    Double originalValue = Double.valueOf(50.03);
     String value = originalValue.toString();
     double lowerBound = 2.1;
     double upperBound = 4.9;
@@ -276,7 +276,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testAugmentWithPrecision_DoubleInput_PrecisionDigitThree() {
-    Double originalValue = new Double(50.03);
+    Double originalValue = Double.valueOf(50.03);
     String value = originalValue.toString();
     double lowerBound = 2.1;
     double upperBound = 4.9;
@@ -302,7 +302,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
     // this should not occur as validation should have prevented the provider from being called
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
     int lowerBound = 2;
     int upperBound = 2;
@@ -328,7 +328,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
 
     // this should not occur as validation should have prevented the provider from being called
 
-    Double originalValue = new Double(50);
+    Double originalValue = Double.valueOf(50);
     String value = originalValue.toString();
     int lowerBound = 44;
     int upperBound = 22;
