@@ -45,7 +45,7 @@ public class ZIPCodeManagerTest implements MaskingProviderTest {
     assertEquals(-1, zipCodeManager.getZipCodeLength(""));
     assertEquals("", zipCodeManager.getZipCodeReplacement(""));
 
-    Integer testDataPop = new Integer(51917 + 21968 + 26332 + 17598 + 1428);
+    Integer testDataPop = Integer.valueOf(51917 + 21968 + 26332 + 17598 + 1428);
     assertEquals(testDataPop, zipCodeManager.getPopulationByPrefix("us", "5590"));
     assertEquals(Integer.valueOf(0), zipCodeManager.getPopulationByPrefix("us", "00000"));
     assertNull(zipCodeManager.getPopulationByPrefix(null, "5590"));

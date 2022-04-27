@@ -73,7 +73,7 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
         if (precisionDigits < 0) {
           numberAsString = Double.toString(number);
         } else {
-          numberAsString = String.format("%." + precisionDigits + "f", new Double(number));
+          numberAsString = String.format("%." + precisionDigits + "f", Double.valueOf(number));
         }
       } else {
         number += RandomGenerators.randomWithinRange((int) augmentLowerBound, 0, 0, 0,
@@ -96,7 +96,7 @@ public class NumberVarianceMaskingProvider extends AbstractMaskingProvider {
       if (precisionDigits < 0) {
         numberAsString = Double.toString(number);
       } else {
-        numberAsString = String.format("%." + precisionDigits + "f", new Double(number));
+        numberAsString = String.format("%." + precisionDigits + "f", Double.valueOf(number));
       }
     } else {
       int percentage = RandomGenerators.randomWithinRange(0, (int) limitDown, (int) limitUp);
