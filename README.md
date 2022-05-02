@@ -12,7 +12,7 @@ The samples directory contains the following files:
 
 ## Quick Links to Other Documentation
 * [REST API details - docs/deid-rest-api.md](docs/deid-rest-api.md)
-* [Masking configuration - docs/masking-config-overview.md](docs/masking-config-overview.md)
+* [Configuration of the service - docs/masking-config-overview.md](docs/masking-config-overview.md)
 * [Masking/privacy providers - docs/masking-providers.md](docs/masking-providers.md)
 * [Localization - docs/localization.md](docs/localization.md)
 
