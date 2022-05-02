@@ -1,3 +1,5 @@
+# Contributing Guide
+
 ## Contributing In General
 Our project welcomes external contributions. If you have an itch, please feel
 free to scratch it.
