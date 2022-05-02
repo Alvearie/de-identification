@@ -1,4 +1,4 @@
-# de-identification
+# De-Identification Service
 The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.
 
 Please see [docs/getting-started-alvearie.md](docs/getting-started-alvearie.md) for instructions on how to install and run the service.
@@ -10,5 +10,12 @@ The samples directory contains the following files:
 - deid_output.json: Sample output
 
 
-# Contributing
+## Quick Links to Other Documentation
+1. [docs/deid-rest-api.md](docs/deid-rest-api.md)
+1. [docs/masking-config-overview.md](docs/masking-config-overview.md)
+1. [docs/masking-providers.md](docs/masking-providers.md)
+1. [docs/localization.md](docs/localization.md)
+
+
+## Contributing
 Please review the [contributing guide](docs/contributing.md) for information on how to get started contributing to the project.
