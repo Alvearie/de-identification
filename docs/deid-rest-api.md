@@ -1,3 +1,4 @@
+# RESTful API
 
 You can find the RESTful API for the IBM Data De-Identification service at this location: api/v1/deidentification.
 

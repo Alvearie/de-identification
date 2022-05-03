@@ -1863,4 +1863,8 @@ These privacy providers cannot generate random values and so treat the `unexpect
 
 If a data protection method encounters an exception while attempting to privacy-protect an input data value, it logs the exception and stops the privacy protection process.  The service attempts to find problems in input data before privacy protection begins.  However, problems such as a sudden loss of communication with external services or databases can occur after privacy protection begins.
 
+## Next steps
 
+- Explore resource localization:
+
+   [localization.md](localization.md)
