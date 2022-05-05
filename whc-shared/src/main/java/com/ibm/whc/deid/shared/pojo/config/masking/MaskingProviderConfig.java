@@ -13,6 +13,7 @@ import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderTypes;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 
 /*
@@ -139,11 +140,15 @@ public abstract class MaskingProviderConfig implements Serializable {
    */
   public static final String UNEXPECTED_INPUT_RETURN_MESSAGE_OTHER = "OTHER";
 
+  @Schema(description = "Masking provider identifier", implementation = String.class)
   protected MaskingProviderTypes type;
 
+  @Schema(description = "Use unexpectedInputHandling instead")
   protected int unspecifiedValueHandling;
+  @Schema(description = "Use unexpectedInputReturnMessage instead")
   protected String unspecifiedValueReturnMessage = UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER;
 
+  @Schema(description = "How unexpected or unrecognized input values are to be handled")
   protected UnexpectedMaskingInputHandler unexpectedInputHandling = null;
   protected String unexpectedInputReturnMessage = UNEXPECTED_INPUT_RETURN_MESSAGE_OTHER;
 

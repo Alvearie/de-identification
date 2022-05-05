@@ -43,8 +43,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "De-Identification", description = "Masking APIs")
 public class DataMaskingController extends AbstractDataMaskingInvoker {
 
-  private final DataMaskingService dataMaskingService;
   private static final LogManager log = LogManager.getInstance();
+
+  private final DataMaskingService dataMaskingService;
 
   @Autowired
   DataMaskingController(DataMaskingService dataMaskingService) {
@@ -72,7 +73,8 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       throws InvalidMaskingConfigurationException, DeidException, InvalidInputException {
     List<String> maskedData;
     try {
-      String globalConfig = maskRequest.getGlobalConfig();
+      // String globalConfig = maskRequest.getGlobalConfig();
+      String globalConfig = null;
       List<String> data = maskRequest.getData();
       ConfigSchemaTypes schemaType = maskRequest.getSchemaType();
 
