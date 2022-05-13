@@ -22,7 +22,7 @@ export rootDir=`pwd`
 # This is the branch name for de-id-devops
 DEVOPS_BRANCH="${DEVOPS_BRANCH:-master}"
 
-curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+curl -sSL "https://${gitApiKey}@raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
 source toolchain_util.sh
 
 git submodule update --init --recursive
@@ -34,7 +34,7 @@ if [ ! -f ${HOME}/.m2/settings.xml ]; then
     mkdir -p ${HOME}/.m2
 fi
 
-curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
+curl -sSL "https://${gitApiKey}@raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
 #########################################################
 # Set the version                                       #
@@ -65,7 +65,7 @@ if [ "$taskname" == "civalidate" ]; then
   # and a maven repository.  The jar file dependencies are download in this step
   # so that later in sonarqube stages, the jar files are available.
   mkdir -p ./m2/repository
-  curl -sSL "https://${gitApiKey}@raw.github.ibm.com/de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
+  curl -sSL "https://${gitApiKey}@raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ./m2/settings.xml
 
   mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install -Dmaven.repo.local=./m2/repository
 
