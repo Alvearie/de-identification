@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Script to create a toolchain.  The toolchain name and the GIT URL is stored in toolchain.properties
+# Script to create a CI toolchain.
 
-# Usage: Set the following property in the environment variable and run the script
-#        If running toolchain from a fork, please change the gitrepourl variable to your fork
+# Usage: Set the following environment variables and run the script.
+#        If running toolchain from a fork, please change the gitrepourl variable to your fork.
 
-# IBM_CLOUD_API_KEY       # IBM cloud API Key used for pipeline execution.  Note the deid function id key does not work.  Please use a personal key
-# GIT_API_KEY             # github.ibm.com API key
+# IBM_CLOUD_API_KEY       # IBM cloud API Key used for pipeline execution.  Note the deid function id key does not work.  Please use a personal key.
+# GIT_API_KEY             # github.com/WH-WH-de-identification API key
 # DEVELOPER_BRANCH        # name of the GIT branch used for de-id-devops, if empty or null defaults to master
 # DEVELOPER_ID            # name used to specify namespace/umbrella repo
 
@@ -23,32 +23,19 @@ else
   export TOOLCHAIN_NAME=alvearie-de-identification-CI-${INPUT_GIT_BRANCH}-${TOOLCHAIN_BRANCH}
 fi
 
-# if DEVELOPER_BRANCH env variable is not set or null, use master branch
-export DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
-export DEVELOPER_ID="${DEVELOPER_ID:-ns}"
-
+DEVELOPER_ID="${DEVELOPER_ID:-ns}"
 export INPUT_GIT_UMBRELLA_BRANCH="openshift"-${DEVELOPER_ID}
-
 export CLUSTER_NAMESPACE="deid"-${DEVELOPER_ID}
 
+# if DEVELOPER_BRANCH env variable is not set or null, use master branch
+DEVELOPER_BRANCH="${DEVELOPER_BRANCH:-master}"
+
 # Clone the toolchain repo if its not already there
-curdir=`pwd`
-if [ -d /tmp/whc-commons/.git ]; then
-   cd /tmp/whc-commons
-   git checkout ${TOOLCHAIN_BRANCH}
-   git pull
-else   
-   curl -sSL "https://${GIT_API_KEY}@raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
-   source toolchain_util.sh
-   cloneRepo whc-commons "github.ibm.com/whc-toolchain" "/tmp"
-   cd /tmp/whc-commons
-   git checkout ${TOOLCHAIN_BRANCH}
-   chmod 755 tools/createToolchain.sh
-fi
-cd $curdir
+curl -sSL "https://${GIT_API_KEY}@raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/toolchain_util.sh" > toolchain_util.sh
+source toolchain_util.sh
+cloneToolchainBranch "/tmp" $TOOLCHAIN_BRANCH $GIT_API_KEY
 
 # Get the property file
-curl -sSL -u "${GIT_USER}:${GIT_API_KEY}" "https://raw.github.ibm.com/de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/common.properties" > common.properties
-source common.properties
+curl -sSL -u "${GIT_USER}:${GIT_API_KEY}" "https://raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVELOPER_BRANCH}/scripts/common.properties" > common.properties
 
-/tmp/whc-commons/tools/createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH} -v ${INPUT_GIT_UMBRELLA_BRANCH}
+/tmp/whc-commons/tools/createToolchain.sh -t CI -b ${TOOLCHAIN_BRANCH} -s common.properties -c ${TOOLCHAIN_NAME} -m ${gitrepourl} -i ${INPUT_GIT_BRANCH} -v ${INPUT_GIT_UMBRELLA_BRANCH} -g ${GIT_API_KEY}
