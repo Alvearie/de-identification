@@ -118,12 +118,12 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
+			<version>${commons-lang.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.iban4j</groupId>
 			<artifactId>iban4j</artifactId>
-			<version>3.2.0</version>
+			<version>${iban4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.ibm.whc.deid</groupId>
