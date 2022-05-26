@@ -3,6 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.ibm.whc.deid</groupId>
+        <artifactId>de-identification</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>whc-shared</artifactId>
+    <name>DeID Shared</name>
+    <url>http://maven.apache.org</url>
 
 	<properties>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
@@ -50,42 +61,23 @@
 		</plugins>
 	</build>
 
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.ibm.whc.deid</groupId>
-		<artifactId>de-identification</artifactId>
-		<version>${revision}</version>
-	</parent>
-
-	<artifactId>whc-shared</artifactId>
-	<name>DeID Shared</name>
-	<url>http://maven.apache.org</url>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.ibm.whc.deid</groupId>
 			<artifactId>ipv-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
-
 		<dependency>
     		<groupId>org.springdoc</groupId>
     		<artifactId>springdoc-openapi-ui</artifactId>
     		<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
-
-		<!-- Use a convenient function to determine if a JUNIT is executed on Unix 
-			. Setting the scope to test only -->
+		<!-- Use a convenient function to determine if a JUNIT is executed -->
+		<!-- on Unix. Setting the scope to test only                       -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
