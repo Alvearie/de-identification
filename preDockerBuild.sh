@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#  (C) Copyright IBM Corp. 2021
+#  (C) Copyright IBM Corp. 2021, 2022
 #
 #  SPDX-License-Identifier: Apache-2.0
 #
@@ -42,7 +42,7 @@ curl -sSL "https://${gitApiKey}@raw.githubusercontent.com/WH-WH-de-identificatio
 # If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
 # If the branch is a release branch, use the ${RELEASE_VERSION}.
 # If the branch is not master, include branch name in the version.
-RELEASE_VERSION=1.2.0
+RELEASE_VERSION=1.1.3
 RELEASE_BUILD=false
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then

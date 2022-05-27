@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -26,7 +26,7 @@ public class SwaggerConfiguration {
         "The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.")
         .license(new License().name("license")
             .url("https://github.com/Alvearie/de-identification/blob/master/LICENSE"))
-        .version("1.2.0")
+        .version("1.1.3")
         .contact(new Contact().name("IBM").url("https://github.com/Alvearie/de-identification"));
   }
 

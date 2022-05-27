@@ -14,7 +14,7 @@ type: application
 
 # This is the chart version.  It is normally changed when the chart or application changes.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.2.0
+version: 1.1.3
 
 keywords:
   - ibm
