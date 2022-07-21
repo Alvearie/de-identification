@@ -70,9 +70,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -132,9 +132,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -173,7 +173,7 @@ public class ConditionalMaskingProviderTest {
     pseudonymConfig.setGenerateViaOptionsMaxLength(15);
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
     condition.setField(
-        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)");
+        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)");
     condition.setOperator(ConditionOperator.EQUALS_IGNORE_CASE);
     condition.setType(ConditionType.STRING);
     condition.setValue("Asthma-Inhaler");
@@ -194,9 +194,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -234,7 +234,7 @@ public class ConditionalMaskingProviderTest {
     pseudonymConfig.setGenerateViaOptionsMaxLength(15);
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
     condition.setField(
-        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)");
+        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)");
     condition.setOperator(ConditionOperator.CONTAINS);
     condition.setType(ConditionType.STRING);
     condition.setValue("Inhaler");
@@ -255,9 +255,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -292,7 +292,7 @@ public class ConditionalMaskingProviderTest {
     pseudonymConfig.setGenerateViaOptionsMaxLength(15);
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
     condition.setField(
-        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)");
+        "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)");
     condition.setOperator(ConditionOperator.CONTAINED_IN);
     condition.setType(ConditionType.STRING);
     condition.setValue("Asthma-Inhaler for Genral Use");
@@ -313,9 +313,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -371,9 +371,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -433,9 +433,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -474,7 +474,7 @@ public class ConditionalMaskingProviderTest {
     pseudonymConfig.setGenerateViaOptionsMaxLength(15);
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
     condition.setField(
-        "extension_NOT_MET/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)");
+        "extension_NOT_MET/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)");
     condition.setOperator(ConditionOperator.CONTAINED_IN);
     condition.setType(ConditionType.STRING);
     condition.setValue("Asthma-Inhaler for Genral Use");
@@ -491,9 +491,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -532,7 +532,7 @@ public class ConditionalMaskingProviderTest {
     pseudonymConfig.setGenerateViaOptionsMaxLength(15);
     com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition condition = new Condition();
     condition.setField(
-        "extension_NOT_MET/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)");
+        "extension_NOT_MET/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)");
     condition.setOperator(ConditionOperator.CONTAINED_IN);
     condition.setType(ConditionType.STRING);
     condition.setValue("Asthma-Inhaler for Genral Use");
@@ -553,9 +553,9 @@ public class ConditionalMaskingProviderTest {
         + "      \"version\": \"2.6\","
         + "      \"telecom\":[{\"system\":\"phone\", \"value\":\"123456789-987654321\"}],"
         + "      \"extension\":["
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/requestID\", \"valueString\":\"Req_ID\"},"
-        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName\", \"valueString\":\"Asthma-Inhaler\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/requestID\", \"valueString\":\"Req_ID\"},"
+        + "      {\"url\":\"http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/messageID\", \"valueString\":\"Msg_ID\"}]"
         + "    }";
 
     // Define JSON data to parse
@@ -596,7 +596,7 @@ public class ConditionalMaskingProviderTest {
     String maskingOptionValue = "[{\"default.masking.provider\": \"PSEUDONYM\","
         + "\"pseudonym.generateViaOptions.minLength\": 15,"
         + "\"pseudonym.generateViaOptions.maxLength\": 15," + "\"condition\" : {"
-        + "\"field_MISSING\":\"extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)\","
+        + "\"field_MISSING\":\"extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName)\","
         + "\"operator\" : \"equals\", " + "\"type\" : \"string\", "
         + "\"value\" : \"Asthma-Inhaler for Genral Use\"} " + "},"
         + "{\"default.masking.provider\": \"HASH\"} " + "]";

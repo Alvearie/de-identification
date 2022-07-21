@@ -7,11 +7,11 @@
   },
   "extension": [
     {
-      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/studyid",
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/test-data/1.0/studyid",
       "valueString": "reference"
     },
     {
-      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/siteid",
+      "url": "http://www.ibm.com/watsonhealth/fhir/extensions/test-data/1.0/siteid",
       "valueString": "reference"
     }
   ],
