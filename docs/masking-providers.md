@@ -240,7 +240,7 @@ options and their default values.
               "maskRuleSet": [
                 {
                   "condition": {
-                    "field": "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName)",
+                    "field": "extension/valueString(url==http://www.ibm.com/watsonhealth/fhir/extensions/testcompany1/r1/resourceName)",
                     "operator": "equals",
                     "type": "string",
                     "value": "Asthma-Inhaler"
@@ -277,7 +277,7 @@ options and their default values.
    to mask the status data element of the Device FHIR Resource using the
    PSEUDONYM masking provider. This applies only if the Device Resource contains both an
    extension array node with a URL of
-   <http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName>
+   <http://www.ibm.com/watsonhealth/fhir/extensions/testcompany1/r1/resourceName>
    and a valueString value **Asthma_Inhaler**. Otherwise, the original value of
    the status data element is maintained as-is.
 
