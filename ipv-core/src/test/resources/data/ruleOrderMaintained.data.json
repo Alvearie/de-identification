@@ -11,15 +11,15 @@
 	},
 	"extension": [
 		{
-			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/studyid",
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/test-data/1.0/studyid",
 			"valueString": "study1"
 		},
 		{
-			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/siteid",
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/test-data/1.0/siteid",
 			"valueString": "site1"
 		},
 		{
-			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/1.0/patientid",
+			"url": "http://www.ibm.com/watsonhealth/fhir/extensions/test-data/1.0/patientid",
 			"valueString": "patient1"
 		}
 	],
