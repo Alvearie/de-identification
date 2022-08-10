@@ -19,6 +19,12 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
   private final int startValue;
   private final boolean useStartValue;
   private final int normalizedStartValue;
+  private boolean useSingleBucketOverThreshold;
+  private double singleBucketOverThresholdValue;
+  private String singleBucketOverThresholdReplacement;
+  private boolean useSingleBucketUnderThreshold;
+  private double singleBucketUnderThresholdValue;
+  private String singleBucketUnderThresholdReplacement;
 
   /**
    * Instantiates a new Binning masking provider.
@@ -32,6 +38,13 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
     this.startValue = config.getStartValue();
     this.useStartValue = config.isUseStartValue();
     this.normalizedStartValue = normalizeStartValue();
+    this.singleBucketOverThresholdReplacement=config.getSingleBucketOverThresholdReplacement();
+    this.singleBucketOverThresholdValue=config.getSingleBucketOverThresholdValue();
+    this.singleBucketUnderThresholdReplacement=config.getSingleBucketUnderThresholdReplacement();
+    this.singleBucketUnderThresholdValue=config.getSingleBucketUnderThresholdValue();
+    this.useSingleBucketOverThreshold=config.isUseSingleBucketOverThreshold();
+    this.useSingleBucketUnderThreshold=config.isUseSingleBucketUnderThreshold();
+    
   }
 
   // normalize start value to lowest positive bin start value
@@ -73,5 +86,44 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
     long higherBase = lowerBase + this.binSize;
 
     return String.format(this.format, Long.valueOf(lowerBase), Long.valueOf(higherBase));
+  }
+  
+  public String maskConstant(String identifier) {
+    if (identifier == null) {
+      debugFaultyInput("identifier");
+      return null;
+    }
+    
+    if (this.useSingleBucketOverThreshold==false || this.useSingleBucketUnderThreshold==false) {
+    	debugFaultyInput("identifier");
+        return null;
+    } 
+    
+    String range="";
+    double value;
+    double upperRange=this.singleBucketOverThresholdValue;
+    double lowerRange=this.singleBucketUnderThresholdValue;
+    
+    try {
+      value = Double.parseDouble(identifier);
+    } catch (NumberFormatException e) {
+      // For this provider, we do not return a random value
+      return applyUnexpectedValueHandling(identifier, null);
+    }
+    
+    if(value>=upperRange) {
+    	range=String.valueOf((int)upperRange);
+    	range=range+"+";
+    }
+     
+    else if(value<lowerRange) {
+    	range=String.valueOf((int)lowerRange);
+    	range="<"+range;
+    }
+    
+    else {
+    	return mask(identifier);
+    }
+    return range;
   }
 }

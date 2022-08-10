@@ -37,6 +37,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("-10--5", maskingProvider.mask("-10.00"));
     assertEquals("-10--5", maskingProvider.mask("-10"));
     assertEquals("-15--10", maskingProvider.mask("-10.1"));
+ 
   }
 
   @Test
@@ -158,5 +159,52 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertEquals("1:7", maskingProvider.mask("2"));
     assertEquals("7:13", maskingProvider.mask("7"));
     assertEquals("7:13", maskingProvider.mask("7.0001"));
+  }
+  
+  @Test
+  public void testConstantValues() {
+    BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();  
+    config.setUseSingleBucketOverThreshold(true);
+    config.setUseSingleBucketUnderThreshold(true);
+    MaskingProvider maskingProvider = new BinningMaskingProvider(config);
+    
+    assertEquals("<10", maskingProvider.maskConstant("0"));
+    assertEquals("<10", maskingProvider.maskConstant("0.1"));
+    assertEquals("<10", maskingProvider.maskConstant("3"));
+    assertEquals("<10", maskingProvider.maskConstant("3.01"));
+    assertEquals("<10", maskingProvider.maskConstant("5.0"));
+    assertEquals("<10", maskingProvider.maskConstant("5.000001"));
+    assertEquals("<10", maskingProvider.maskConstant("9.9999999"));
+    assertEquals("<10", maskingProvider.maskConstant("-0.01"));
+    assertEquals("<10", maskingProvider.maskConstant("-4.9"));    
+    assertEquals("<10", maskingProvider.maskConstant("-7.3"));
+    assertEquals("<10", maskingProvider.maskConstant("-100.5"));
+    assertEquals("10-15", maskingProvider.maskConstant("10"));
+    assertEquals("50-55", maskingProvider.maskConstant("50.2"));
+    assertEquals("85-90", maskingProvider.maskConstant("89.9999"));
+    assertEquals("90+", maskingProvider.maskConstant("90"));
+    assertEquals("90+", maskingProvider.maskConstant("92.2"));
+    assertEquals("90+", maskingProvider.maskConstant("120"));
+
+  
+    //changing default values
+    config.setSingleBucketOverThresholdValue(110);
+    config.setSingleBucketUnderThresholdValue(5);
+    maskingProvider = new BinningMaskingProvider(config);
+    assertEquals("<5", maskingProvider.maskConstant("0"));
+    assertEquals("<5", maskingProvider.maskConstant("0.1"));
+    assertEquals("<5", maskingProvider.maskConstant("3"));
+    assertEquals("<5", maskingProvider.maskConstant("3.01"));
+    assertEquals("<5", maskingProvider.maskConstant("4.9999999"));
+    assertEquals("<5", maskingProvider.maskConstant("-4.9")); 
+    assertEquals("5-10", maskingProvider.maskConstant("5.0")); 
+    assertEquals("<5", maskingProvider.maskConstant("-7.3"));
+    assertEquals("50-55", maskingProvider.maskConstant("50.2"));
+    assertEquals("105-110", maskingProvider.maskConstant("109.9999"));
+    assertEquals("110+", maskingProvider.maskConstant("110"));
+    assertEquals("110+", maskingProvider.maskConstant("112.2"));
+    assertEquals("110+", maskingProvider.maskConstant("120"));
+    assertEquals("<5", maskingProvider.maskConstant("-115.5"));
+    
   }
 }

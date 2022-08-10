@@ -69,6 +69,10 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
   public String mask(String identifier, String fieldName) {
     return mask(identifier);
   }
+  
+  public String maskConstant(String identifier) {
+	  return mask(identifier);
+  }
 
   protected void debugFaultyInput(String faultyInput) {
     if (log.isDebugEnabled()) {
