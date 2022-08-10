@@ -13,6 +13,8 @@
 		<iban4j.version>3.2.0</iban4j.version>
 		<guava.version>16.0.1</guava.version>
 		<springdoc-openapi-ui.version>1.6.8</springdoc-openapi-ui.version>
+		<!-- used by maven compiler plugin -->
+		<maven.compiler.release>11</maven.compiler.release>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<aggregate.report.dir>target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>		
@@ -135,7 +137,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
                     <configuration>
-                        <release>11</release>
+                    	<!-- release set by maven.compiler.release property -->
                         <showWarnings>true</showWarnings>
                         <compilerArgs>
                             <arg>-Xlint:all</arg>
