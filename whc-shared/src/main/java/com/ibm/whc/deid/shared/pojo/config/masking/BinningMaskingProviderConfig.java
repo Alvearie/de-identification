@@ -5,6 +5,8 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -115,28 +117,17 @@ public class BinningMaskingProviderConfig extends MaskingProviderConfig {
 	public void setSingleBucketUnderThresholdReplacement(String singleBucketUnderThresholdReplacement) {
 		this.singleBucketUnderThresholdReplacement = singleBucketUnderThresholdReplacement;
 	}
-	
+
 	@Override
 	public void validate(DeidMaskingConfig maskingConfig) throws InvalidMaskingConfigurationException {
 		super.validate(maskingConfig);
 		if (binSize < 1) {
 			throw new InvalidMaskingConfigurationException("`binSize` must be greater than 0");
 		}
-		 if (singleBucketOverThresholdReplacement == null) {
-		      throw new InvalidMaskingConfigurationException("`singleBucketOverThresholdReplacement` must not be null");
-		 }
-		 if (singleBucketUnderThresholdReplacement == null) {
-		      throw new InvalidMaskingConfigurationException("`singleBucketUnderThresholdReplacement` must not be null");
-		 }
-		 if (singleBucketOverThresholdValue < 1) {
-				throw new InvalidMaskingConfigurationException("`singleBucketOverThresholdValue` must be greater than 0");
-			}
-		 if (singleBucketUnderThresholdValue < 1) {
-				throw new InvalidMaskingConfigurationException("`singleBucketUnderThresholdValue` must be greater than 0");
-			}
 		if (useSingleBucketOverThreshold == true && useSingleBucketUnderThreshold == true) {
 			if (singleBucketOverThresholdValue < singleBucketUnderThresholdValue) {
-				throw new InvalidMaskingConfigurationException("`singleBucketOverThresholdValue` must be greater than singleBucketUnderThresholdValue");
+				throw new InvalidMaskingConfigurationException(
+						"`singleBucketOverThresholdValue` must be greater than or equal to 'singleBucketUnderThresholdValue'");
 			}
 		}
 	}
@@ -145,10 +136,9 @@ public class BinningMaskingProviderConfig extends MaskingProviderConfig {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + binSize;
-		result = prime * result + (format == null ? 0 : format.hashCode());
-		result = prime * result + startValue;
-		result = prime * result + (useStartValue ? 1231 : 1237);
+		result = prime * result + Objects.hash(binSize, format, singleBucketOverThresholdReplacement,
+				singleBucketOverThresholdValue, singleBucketUnderThresholdReplacement, singleBucketUnderThresholdValue,
+				startValue, useSingleBucketOverThreshold, useSingleBucketUnderThreshold, useStartValue);
 		return result;
 	}
 
@@ -157,29 +147,24 @@ public class BinningMaskingProviderConfig extends MaskingProviderConfig {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof BinningMaskingProviderConfig)) {
 			return false;
 		}
 		BinningMaskingProviderConfig other = (BinningMaskingProviderConfig) obj;
-		if (binSize != other.binSize) {
-			return false;
-		}
-		if (format == null ? other.format != null : !format.equals(other.format)) {
-			return false;
-		}
-		if (startValue != other.startValue) {
-			return false;
-		}
-		if (useStartValue != other.useStartValue) {
-			return false;
-		}
-		return true;
+		return binSize == other.binSize && Objects.equals(format, other.format)
+				&& Objects.equals(singleBucketOverThresholdReplacement, other.singleBucketOverThresholdReplacement)
+				&& Double.doubleToLongBits(singleBucketOverThresholdValue) == Double
+						.doubleToLongBits(other.singleBucketOverThresholdValue)
+				&& Objects.equals(singleBucketUnderThresholdReplacement, other.singleBucketUnderThresholdReplacement)
+				&& Double.doubleToLongBits(singleBucketUnderThresholdValue) == Double
+						.doubleToLongBits(other.singleBucketUnderThresholdValue)
+				&& startValue == other.startValue && useSingleBucketOverThreshold == other.useSingleBucketOverThreshold
+				&& useSingleBucketUnderThreshold == other.useSingleBucketUnderThreshold
+				&& useStartValue == other.useStartValue;
 	}
+
 
 }

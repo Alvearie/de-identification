@@ -31,8 +31,6 @@ public interface MaskingProvider extends Serializable {
    * @return the string
    */
   String mask(String identifier, String fieldName);
-  
-  public String maskConstant(String identifier);
 
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers);
 
