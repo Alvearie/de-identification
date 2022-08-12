@@ -52,46 +52,6 @@ public class BinningMaskingProviderConfigTest {
 			assertEquals("`binSize` must be greater than 0", e.getMessage());
 		}
 		config.setBinSize(5);
-
-		config.validate(null);
-		config.setSingleBucketOverThresholdReplacement(null);
-		try {
-			config.validate(null);
-			fail("expected exception");
-		} catch (InvalidMaskingConfigurationException e) {
-			assertTrue(e.getMessage().contains("`singleBucketOverThresholdReplacement` must not be null"));
-		}
-		config.setSingleBucketOverThresholdReplacement("90+");
-
-		config.validate(null);
-		config.setSingleBucketOverThresholdValue(-1);
-		try {
-			config.validate(null);
-			fail("expected exception");
-		} catch (InvalidMaskingConfigurationException e) {
-			assertTrue(e.getMessage().contains("`singleBucketOverThresholdValue` must be greater than 0"));
-		}
-		config.setSingleBucketOverThresholdValue(90.0);
-
-		config.validate(null);
-		config.setSingleBucketUnderThresholdReplacement(null);
-		try {
-			config.validate(null);
-			fail("expected exception");
-		} catch (InvalidMaskingConfigurationException e) {
-			assertTrue(e.getMessage().contains("`singleBucketUnderThresholdReplacement` must not be null"));
-		}
-		config.setSingleBucketUnderThresholdReplacement("<10");
-
-		config.validate(null);
-		config.setSingleBucketUnderThresholdValue(-1);
-		try {
-			config.validate(null);
-			fail("expected exception");
-		} catch (InvalidMaskingConfigurationException e) {
-			assertTrue(e.getMessage().contains("`singleBucketUnderThresholdValue` must be greater than 0"));
-		}
-		config.setSingleBucketUnderThresholdValue(10.0);
 		
 		config.validate(null);
 		config.setUseSingleBucketOverThreshold(true);
@@ -102,7 +62,7 @@ public class BinningMaskingProviderConfigTest {
 			config.validate(null);
 			fail("expected exception");
 		} catch (InvalidMaskingConfigurationException e) {
-			assertTrue(e.getMessage().contains("`singleBucketOverThresholdValue` must be greater than singleBucketUnderThresholdValue"));
+			assertTrue(e.getMessage().contains("`singleBucketOverThresholdValue` must be greater than or equal to 'singleBucketUnderThresholdValue'"));
 		}
 	}
 

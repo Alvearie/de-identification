@@ -19,12 +19,12 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
   private final int startValue;
   private final boolean useStartValue;
   private final int normalizedStartValue;
-  private boolean useSingleBucketOverThreshold;
-  private double singleBucketOverThresholdValue;
-  private String singleBucketOverThresholdReplacement;
-  private boolean useSingleBucketUnderThreshold;
-  private double singleBucketUnderThresholdValue;
-  private String singleBucketUnderThresholdReplacement;
+  private final boolean useSingleBucketOverThreshold;
+  private final double singleBucketOverThresholdValue;
+  private final String singleBucketOverThresholdReplacement;
+  private final boolean useSingleBucketUnderThreshold;
+  private final double singleBucketUnderThresholdValue;
+  private final String singleBucketUnderThresholdReplacement;
 
   /**
    * Instantiates a new Binning masking provider.
@@ -68,13 +68,27 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
       debugFaultyInput("identifier");
       return null;
     }
-
+    
     double value;
     try {
       value = Double.parseDouble(identifier);
     } catch (NumberFormatException e) {
       // For this provider, we do not return a random value
       return applyUnexpectedValueHandling(identifier, null);
+    }  
+
+    if (this.useSingleBucketOverThreshold==true && this.useSingleBucketUnderThreshold==true) {
+    	
+        double upperRange=this.singleBucketOverThresholdValue;
+        double lowerRange=this.singleBucketUnderThresholdValue;
+        
+        if(value>=upperRange) {
+        	return this.singleBucketOverThresholdReplacement;
+        }
+         
+        else if(value<lowerRange) {
+        	return this.singleBucketUnderThresholdReplacement;
+        }   
     }
 
     double adjusted = value - this.normalizedStartValue;
@@ -87,43 +101,5 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
 
     return String.format(this.format, Long.valueOf(lowerBase), Long.valueOf(higherBase));
   }
-  
-  public String maskConstant(String identifier) {
-    if (identifier == null) {
-      debugFaultyInput("identifier");
-      return null;
-    }
-    
-    if (this.useSingleBucketOverThreshold==false || this.useSingleBucketUnderThreshold==false) {
-    	debugFaultyInput("identifier");
-        return null;
-    } 
-    
-    String range="";
-    double value;
-    double upperRange=this.singleBucketOverThresholdValue;
-    double lowerRange=this.singleBucketUnderThresholdValue;
-    
-    try {
-      value = Double.parseDouble(identifier);
-    } catch (NumberFormatException e) {
-      // For this provider, we do not return a random value
-      return applyUnexpectedValueHandling(identifier, null);
-    }
-    
-    if(value>=upperRange) {
-    	range=String.valueOf((int)upperRange);
-    	range=range+"+";
-    }
-     
-    else if(value<lowerRange) {
-    	range=String.valueOf((int)lowerRange);
-    	range="<"+range;
-    }
-    
-    else {
-    	return mask(identifier);
-    }
-    return range;
-  }
+ 
 }
