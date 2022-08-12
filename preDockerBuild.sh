@@ -37,6 +37,26 @@ fi
 curl -sSL "https://${gitApiKey}@raw.githubusercontent.com/WH-WH-de-identification/de-id-devops/${DEVOPS_BRANCH}/scripts/de-identification-settings.xml" > ${HOME}/.m2/settings.xml
 
 #########################################################
+# Check Java target version                             #
+#                                                       #
+# To change the release level used to build the jars,   #
+# add this parameter to the CI toolchain after it is    #
+# built.  Values are Java releases such as 8 or 11.     #
+#########################################################
+if [ ! -z "$JAVA_COMPILER_RELEASE" ]; then
+	JAVA_RELEASE="-java${JAVA_COMPILER_RELEASE}"
+	mvn --no-transfer-progress versions:set-property -Dproperty=maven.compiler.release -DnewVersion=${JAVA_COMPILER_RELEASE}
+	rc=$((rc || $? ))
+	if [[ ! "$rc" == "0" ]]; then
+    	echo "BUILD FAILURE; COULD NOT UPDATE MAVEN JAVA COMPILER VERSION";
+    	exit $rc;
+	fi	
+else
+	JAVA_RELEASE=
+    echo building jars at default Java release level
+fi
+
+#########################################################
 # Set the version                                       #
 #########################################################
 # If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
@@ -46,12 +66,12 @@ RELEASE_VERSION=1.2.0
 RELEASE_BUILD=false
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then
-    echo "-Drevision=${RELEASE_VERSION}-SNAPSHOT" > .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}${JAVA_RELEASE}-SNAPSHOT" > .mvn/maven.config
 elif [[ "${GIT_BRANCH}" == "release"* ]]; then
-    echo "-Drevision=${RELEASE_VERSION}" > .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}${JAVA_RELEASE}" > .mvn/maven.config
     RELEASE_BUILD=true
 else
-    echo "-Drevision=${RELEASE_VERSION}-${GIT_BRANCH}-SNAPSHOT" > .mvn/maven.config
+    echo "-Drevision=${RELEASE_VERSION}-${GIT_BRANCH}${JAVA_RELEASE}-SNAPSHOT" > .mvn/maven.config
 fi
 cat .mvn/maven.config
 
