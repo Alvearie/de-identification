@@ -611,6 +611,11 @@ The provider supports input values in any of these formats.
 
 The provider formats the shifted date using the same pattern that matched the original input value.  
 Minor changes to precision and formatting between the original value and the shifted value can occur, however.
+For formats that include text, such dd-MMM-yyyy which contains the abbreviation for the month name,
+the recognized values for the text portions are based on the default locale of the system that is
+performing the masking.  For example, the recognized abbreviation for January might be **Jan** when 
+the default locale of the system is US English, **Jan.** when it is Canadian English, and **janv.** 
+when it is Canadian French.
 
 If the input contains values to be protected that do not match any of these patterns, additional formats 
 can be added using the `customFormats` configuration parameter.  Input is matched to custom formats 
