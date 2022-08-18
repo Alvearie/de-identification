@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.WordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.JSONPath;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
@@ -69,7 +68,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
   // parse with that formatter - reduces the expense of creating exceptions related
   // to input-to-pattern mismatches
   private static final Pattern[] datePatterns =
-      new Pattern[] {Pattern.compile("^\\d{2}-\\w{3}-\\d{4}$"),
+      new Pattern[] {Pattern.compile("^\\d{2}-.{3,}-\\d{4}$"),
           Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$"), Pattern.compile("^\\d{4}/\\d{2}/\\d{2}$"),
           Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"),
           Pattern.compile("^\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}$"),
@@ -364,16 +363,12 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
     // try the builtin formats that do not include time zones next
     if (parseResponse == null) {
-      // if using alphabetics, camelcase the month, otherwise it will not be recognized
-      String capitalizedValue = originalValue.matches(".*[a-zA-Z].*")
-          ? WordUtils.capitalizeFully(originalValue, new char[] {'-'})
-          : originalValue;
       for (int i = 0; i < datePatterns.length; i++) {
         Pattern p = datePatterns[i];
-        if (p.matcher(capitalizedValue).matches()) {
+        if (p.matcher(originalValue).matches()) {
           try {
             DateTimeFormatter f = dateFormaters[i];
-            TemporalAccessor d = f.parse(capitalizedValue);
+            TemporalAccessor d = f.parse(originalValue);
             parseResponse = new ParseResponse(f, null, d);
             break;
           } catch (Exception e2) {

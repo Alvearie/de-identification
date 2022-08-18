@@ -9,10 +9,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
@@ -156,8 +159,12 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     assertEquals(badInputValue, provider.applyOffsetAndReformat("04/16/1967", 1, null));
     assertEquals(badInputValue, provider.applyOffsetAndReformat("16/04/1967 14", 1, null));
 
-    assertEquals("01-May-1967", provider.applyOffsetAndReformat("29-apr-1967", 2, null));
-    assertEquals("01-Jun-1967", provider.applyOffsetAndReformat("29-APR-1967", 33, null));
+    String[] abbreviations = getMonthAbrvs(); // 0-based indexing for month names
+
+    assertEquals("01-" + abbreviations[4] + "-1967",
+        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 2, null));
+    assertEquals("01-" + abbreviations[5] + "-1967",
+        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 33, null));
 
     assertEquals(badInputValue, provider.applyOffsetAndReformat("29-apx-1967", 33, null));
   }
@@ -204,24 +211,30 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
         provider.applyOffsetAndReformat("2020-04-01T13:14:15-05:00[America/Chicago]", 30,
             customFormatters));
     
-    assertEquals("2020-10-31T05:06:07 CDT",
-        provider.applyOffsetAndReformat("2020-11-01T05:06:07 CDT", -1, customFormatters));
-    // pattern is for short zone name
-    assertEquals("2020-11-03T05:06:07 CST",
-        provider.applyOffsetAndReformat("2020-11-01T05:06:07 America/Chicago", 2,
-            customFormatters));
-    // target day is 23 hours
-    assertEquals("2020-03-08T03:03:04 CDT",
-        provider.applyOffsetAndReformat("2020-03-11T02:03:04 CDT", -3, customFormatters));
-    // target day is 23 hours
-    assertEquals("2020-03-08T01:03:04 CST",
-        provider.applyOffsetAndReformat("2020-03-01T02:03:04 America/Chicago", 7,
-            customFormatters));
-    // target day is 23 hours, but target hour exists
-    assertEquals("2020-03-08T14:03:04 CDT",
-        provider.applyOffsetAndReformat("2020-03-01T14:03:04 America/Chicago", 7,
-            customFormatters));
-
+    // only do these tests if in English in the US or Canada - otherwise the legacy 
+    // time zone names might be interpreted differently
+    String lang = Locale.getDefault().getLanguage();
+    String region = Locale.getDefault().getCountry();
+    if ("en".equals(lang) && ("US".equals(region) || "CA".equals(region))) {
+      assertEquals("2020-10-31T05:06:07 CDT",
+          provider.applyOffsetAndReformat("2020-11-01T05:06:07 CDT", -1, customFormatters));
+      // pattern is for short zone name
+      assertEquals("2020-11-03T05:06:07 CST",
+          provider.applyOffsetAndReformat("2020-11-01T05:06:07 America/Chicago", 2,
+              customFormatters));
+      // target day is 23 hours
+      assertEquals("2020-03-08T03:03:04 CDT",
+          provider.applyOffsetAndReformat("2020-03-11T02:03:04 CDT", -3, customFormatters));
+      // target day is 23 hours
+      assertEquals("2020-03-08T01:03:04 CST",
+          provider.applyOffsetAndReformat("2020-03-01T02:03:04 America/Chicago", 7,
+              customFormatters));
+      // target day is 23 hours, but target hour exists
+      assertEquals("2020-03-08T14:03:04 CDT",
+          provider.applyOffsetAndReformat("2020-03-01T14:03:04 America/Chicago", 7,
+              customFormatters));
+    }
+    
     assertEquals("99355", provider.applyOffsetAndReformat("99365", -10, customFormatters));
     assertEquals("98365", provider.applyOffsetAndReformat("99365", -365, customFormatters));
     assertEquals("00001", provider.applyOffsetAndReformat("99365", 1, customFormatters));
@@ -626,5 +639,17 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     JsonNode parent = root.get("b");
     JsonNode target = parent.get("one");
     return new MaskingActionInputIdentifier(provider, target, parent, "three", "type", "id", root);
+  }
+
+  /**
+   * Gets the month abbreviations in the default locale, which can be different for each caller.
+   */
+  private String[] getMonthAbrvs() {
+    String[] abrvs = new String[12];
+    DateTimeFormatter f = new DateTimeFormatterBuilder().appendPattern("MMM").toFormatter();
+    for (int i = 0; i < 12; i++) {
+      abrvs[i] = f.format(LocalDate.of(2022, i + 1, 20));
+    }
+    return abrvs;
   }
 }
