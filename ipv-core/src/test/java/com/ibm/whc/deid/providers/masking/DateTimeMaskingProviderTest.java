@@ -745,9 +745,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
         subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     String maskedDateTime = maskingProvider.mask(originalDateTime);
 
-    // Should return original date format - subtract 365 days (default) from
-    // current date
-    assertTrue(maskedDateTime.equals(originalDateTime));
+    // Should return original date - input date is too long ago
+    assertEquals(originalDateTime, maskedDateTime);
   }
 
   @Test
@@ -1420,13 +1419,14 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
+  // jra
   public void testMaskOverride_NotEnabled() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
 
     maskingConfiguration.setOverrideMask(false);
     maskingConfiguration.setOverrideYearsPassed(90);
-    maskingConfiguration.setOverrideValue(null);
+    maskingConfiguration.setOverrideValue("done anyway");
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     String originalDate = "1910-02-12 00:00:00";
