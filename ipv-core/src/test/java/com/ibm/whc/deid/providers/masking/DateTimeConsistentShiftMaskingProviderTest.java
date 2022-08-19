@@ -161,10 +161,22 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
 
     String[] abbreviations = getMonthAbrvs(); // 0-based indexing for month names
 
-    assertEquals("01-" + abbreviations[4] + "-1967",
-        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 2, null));
-    assertEquals("01-" + abbreviations[5] + "-1967",
-        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 33, null));
+    StringBuilder buffer = new StringBuilder(40);
+    buffer.append("29-").append(abbreviations[3]).append("-1967");
+    String original = buffer.toString();
+    buffer.setLength(0);
+    buffer.append("01-").append(abbreviations[4]).append("-1967");
+    String expected = buffer.toString();
+    assertEquals(expected, provider.applyOffsetAndReformat(original, 2, null));
+    assertEquals(expected, provider.applyOffsetAndReformat(original.toUpperCase(), 2, null));
+    assertEquals(expected, provider.applyOffsetAndReformat(original.toLowerCase(), 2, null));
+
+    buffer.setLength(0);
+    buffer.append("02-").append(abbreviations[5]).append("-1967");
+    expected = buffer.toString();
+    assertEquals(expected, provider.applyOffsetAndReformat(original, 34, null));
+    assertEquals(expected, provider.applyOffsetAndReformat(original.toUpperCase(), 34, null));
+    assertEquals(expected, provider.applyOffsetAndReformat(original.toLowerCase(), 34, null));
 
     assertEquals(badInputValue, provider.applyOffsetAndReformat("29-apx-1967", 33, null));
   }

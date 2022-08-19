@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -86,7 +86,8 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
   static {
     for (int i = 0; i < dateFormatStrings.length; i++) {
       dateFormaters[i] =
-          new DateTimeFormatterBuilder().appendPattern((dateFormatStrings[i])).toFormatter();
+          new DateTimeFormatterBuilder().parseCaseInsensitive()
+              .appendPattern((dateFormatStrings[i])).toFormatter();
       // .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
       // .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
       // .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
