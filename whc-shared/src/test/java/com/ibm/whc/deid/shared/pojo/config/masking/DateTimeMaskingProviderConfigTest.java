@@ -18,9 +18,6 @@ public class DateTimeMaskingProviderConfigTest {
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
-    config.validate(null);
-
     config.setFormatFixed("TTT");
     try {
       config.validate(null);
@@ -89,18 +86,6 @@ public class DateTimeMaskingProviderConfigTest {
     config.setMinutesRangeDown(-1);
     validateNegativeError(config, "minutesRangeDown");
     config.setMinutesRangeDown(0);
-
-    config.setGeneralizeNyearintervalvalue(-1);
-    validateNegativeError(config, "generalizeNyearintervalvalue");
-    config.setGeneralizeNyearintervalvalue(0);
-
-    config.setGeneralizeNyearintervalstart(-1);
-    validateNegativeError(config, "generalizeNyearintervalstart");
-    config.setGeneralizeNyearintervalstart(0);
-
-    config.setGeneralizeNyearintervalend(-1);
-    validateNegativeError(config, "generalizeNyearintervalend");
-    config.setGeneralizeNyearintervalend(0);
 
     config.setYearMaxYearsAgo(-1);
     validateNegativeError(config, "yearMaxYearsAgo");

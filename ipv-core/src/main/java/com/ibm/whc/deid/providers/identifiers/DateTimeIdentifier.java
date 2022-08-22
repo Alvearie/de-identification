@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -48,7 +47,8 @@ public class DateTimeIdentifier extends AbstractIdentifier {
 
   static {
     for (int i = 0; i < patterns.length; i++) {
-      dateFormats[i] = new DateTimeFormatterBuilder().appendPattern((patterns[i]))
+      dateFormats[i] = new DateTimeFormatterBuilder().parseCaseInsensitive()
+          .appendPattern((patterns[i]))
           .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
           .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
           .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
@@ -95,13 +95,6 @@ public class DateTimeIdentifier extends AbstractIdentifier {
       // nothing required here
     }
 
-    try {
-      TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(data);
-      return new DateTimeParseResult(DateTimeFormatter.ISO_INSTANT, temporalAccessor);
-    } catch (Exception e) {
-      // nothing required here
-    }
-
     for (int i = 0; i < datePatterns.length; i++) {
       if (datePatterns[i].matcher(data).matches()) {
         try {
@@ -139,13 +132,5 @@ public class DateTimeIdentifier extends AbstractIdentifier {
   @Override
   protected Collection<String> getAppropriateNames() {
     return Arrays.asList(appropriateNames);
-  }
-  
-  public static final void main(String[] args) {
-    DateTimeParseResult r = new DateTimeIdentifier().parse(args[0]);
-    System.out.println(r.getValue().getClass().getName());
-    System.out.println(r.getValue().query(TemporalQueries.offset()));
-    System.out.println(r.getValue().query(TemporalQueries.zoneId()));
-    System.out.println(r.getValue().query(TemporalQueries.zone()));
   }
 }

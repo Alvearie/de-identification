@@ -36,7 +36,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private int secondsRangeDown = 100;
   private int minutesRangeUp = 0;
   private boolean monthMask = true;
-  private boolean generalizeNyearinterval = false;
   private boolean secondsMask = true;
   private int hourRangeUp = 0;
   private String formatFixed = null;
@@ -44,11 +43,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean generalizeMonthyear = false;
   private boolean dayMask = true;
   private boolean generalizeQuarteryear = false;
-  private int generalizeNyearintervalvalue = 0;
-  private int generalizeNyearintervalstart = 0;
-  private int generalizeNyearintervalend = 0;
-  private boolean yearDeleteNinterval = false;
-  private String yearDeleteNointervalComparedateValue = null;
   private int monthRangeUp = 0;
   private int maskShiftSeconds = 0;
   private int minutesRangeDown = 100;
@@ -208,14 +202,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.monthMask = monthMask;
   }
 
-  public boolean isGeneralizeNyearinterval() {
-    return generalizeNyearinterval;
-  }
-
-  public void setGeneralizeNyearinterval(boolean generalizeNyearinterval) {
-    this.generalizeNyearinterval = generalizeNyearinterval;
-  }
-
   public boolean isSecondsMask() {
     return secondsMask;
   }
@@ -270,46 +256,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
 
   public void setGeneralizeQuarteryear(boolean generalizeQuarteryear) {
     this.generalizeQuarteryear = generalizeQuarteryear;
-  }
-
-  public int getGeneralizeNyearintervalvalue() {
-    return generalizeNyearintervalvalue;
-  }
-
-  public void setGeneralizeNyearintervalvalue(int generalizeNyearintervalvalue) {
-    this.generalizeNyearintervalvalue = generalizeNyearintervalvalue;
-  }
-
-  public int getGeneralizeNyearintervalstart() {
-    return generalizeNyearintervalstart;
-  }
-
-  public void setGeneralizeNyearintervalstart(int generalizeNyearintervalstart) {
-    this.generalizeNyearintervalstart = generalizeNyearintervalstart;
-  }
-
-  public int getGeneralizeNyearintervalend() {
-    return generalizeNyearintervalend;
-  }
-
-  public void setGeneralizeNyearintervalend(int generalizeNyearintervalend) {
-    this.generalizeNyearintervalend = generalizeNyearintervalend;
-  }
-
-  public boolean isYearDeleteNinterval() {
-    return yearDeleteNinterval;
-  }
-
-  public void setYearDeleteNinterval(boolean yearDeleteNinterval) {
-    this.yearDeleteNinterval = yearDeleteNinterval;
-  }
-
-  public String getYearDeleteNointervalComparedateValue() {
-    return yearDeleteNointervalComparedateValue;
-  }
-
-  public void setYearDeleteNointervalComparedateValue(String yearDeleteNointervalComparedateValue) {
-    this.yearDeleteNointervalComparedateValue = yearDeleteNointervalComparedateValue;
   }
 
   public int getMonthRangeUp() {
@@ -482,9 +428,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     validateNotNegative(hourRangeUp, "hourRangeUp");
     validateNotNegative(monthRangeUp, "monthRangeUp");
     validateNotNegative(minutesRangeDown, "minutesRangeDown");
-    validateNotNegative(generalizeNyearintervalvalue, "generalizeNyearintervalvalue");
-    validateNotNegative(generalizeNyearintervalstart, "generalizeNyearintervalstart");
-    validateNotNegative(generalizeNyearintervalend, "generalizeNyearintervalend");
     validateNotNegative(yearMaxYearsAgo, "yearMaxYearsAgo");
     validateNotNegative(yearShiftFromCurrentYear, "yearShiftFromCurrentYear");
     validateNotNegative(overrideYearsPassed, "overrideYearsPassed");
@@ -516,10 +459,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     result = prime * result + ((formatFixed == null) ? 0 : formatFixed.hashCode());
     result = prime * result + (generalizeMonthyear ? 1231 : 1237);
     result = prime * result + (generalizeMonthyearMaskAgeOver90 ? 1231 : 1237);
-    result = prime * result + (generalizeNyearinterval ? 1231 : 1237);
-    result = prime * result + generalizeNyearintervalend;
-    result = prime * result + generalizeNyearintervalstart;
-    result = prime * result + generalizeNyearintervalvalue;
     result = prime * result + (generalizeQuarteryear ? 1231 : 1237);
     result = prime * result + (generalizeWeekyear ? 1231 : 1237);
     result = prime * result + (generalizeYear ? 1231 : 1237);
@@ -544,9 +483,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     result = prime * result + (yearDelete ? 1231 : 1237);
     result = prime * result + (yearDeleteNdays ? 1231 : 1237);
     result = prime * result + yearDeleteNdaysValue;
-    result = prime * result + (yearDeleteNinterval ? 1231 : 1237);
-    result = prime * result + ((yearDeleteNointervalComparedateValue == null) ? 0
-        : yearDeleteNointervalComparedateValue.hashCode());
     result = prime * result + (yearMask ? 1231 : 1237);
     result = prime * result + yearMaxYearsAgo;
     result = prime * result + (yearMaxYearsAgoMask ? 1231 : 1237);
@@ -590,14 +526,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     if (generalizeMonthyear != other.generalizeMonthyear)
       return false;
     if (generalizeMonthyearMaskAgeOver90 != other.generalizeMonthyearMaskAgeOver90)
-      return false;
-    if (generalizeNyearinterval != other.generalizeNyearinterval)
-      return false;
-    if (generalizeNyearintervalend != other.generalizeNyearintervalend)
-      return false;
-    if (generalizeNyearintervalstart != other.generalizeNyearintervalstart)
-      return false;
-    if (generalizeNyearintervalvalue != other.generalizeNyearintervalvalue)
       return false;
     if (generalizeQuarteryear != other.generalizeQuarteryear)
       return false;
@@ -649,14 +577,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     if (yearDeleteNdays != other.yearDeleteNdays)
       return false;
     if (yearDeleteNdaysValue != other.yearDeleteNdaysValue)
-      return false;
-    if (yearDeleteNinterval != other.yearDeleteNinterval)
-      return false;
-    if (yearDeleteNointervalComparedateValue == null) {
-      if (other.yearDeleteNointervalComparedateValue != null)
-        return false;
-    } else if (!yearDeleteNointervalComparedateValue
-        .equals(other.yearDeleteNointervalComparedateValue))
       return false;
     if (yearMask != other.yearMask)
       return false;

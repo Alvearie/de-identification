@@ -347,6 +347,28 @@ This privacy provider supports these options:
 | datetimeYearDeleteNIntervalCompareDate          | String   | The FHIR element name of the date value that will be compared with the masked date                          | null              |
 | dateYearDeleteNDaysValue                        | Integer  | The maximum number of days separating the masked value and the comparison value for masking to occur        | 365               |
 
+
+The datetime formats recognized by the DATEDEPENDENCY privacy provider are:
+
+| **Format**                                   | **Examples**                          |
+|----------------------------------------------|---------------------------------------|
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+&#124;-hh:mm   | 2008-09-14T15:53:02.123456789+02:00   |
+| yyyy-MM-ddTHH:mm:ss+&#124;-hh:mm             | 2008-09-14T15:53:02-05:00             |
+| yyyy-MM-ddTHH:mm+&#124;-hh:mm                | 2008-09-14T15:53-06:00                |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ               | 2008-09-14T15:53:02.123456789Z        |
+| yyyy-MM-ddTHH:mm:ssZ                         | 2008-09-14T15:53:02Z                  |
+| yyyy-MM-ddTHH:mmZ                            | 2008-09-14T15:53Z                     |
+| dd-MMM-yyyy                                  | 24-DEC-2018                           |
+| yyyy-MM-dd                                   | 2018-12-24                            |
+| yyyy/MM/dd                                   | 2018/12/24                            |
+| yyyy-MM-dd HH:mm:ss                          | 2018-12-24 12:01:12                   |
+| yyyy/MM/dd HH:mm:ss                          | 2018/12/24 12:01:12                   |
+| dd-MM-yyyy                                   | 16-04-1967                            |
+| dd/MM/yyyy                                   | 16/04/1967                            |
+| dd-MM-yyyy HH:mm:ss                          | 16-04-1967 13:14:15                   |
+| dd/MM/yyyy HH:mm:ss                          | 16/04/1967 13:14:15                   |
+
+
    The following provides an example that illustrates the use of the
    DATEDEPENDENCY provider. Specifically, we consider the Patient FHIR
    Resource and the birthDate and deceaseDateTime FHIR data elements that it
@@ -417,17 +439,15 @@ These examples are for the 10th of January 2016:
 
 6.  Generalize to year, for example, 2016.
 
-7.  Generalize to N-year interval, for example, 2015-2019.
+7.  Generalize to year (for example, 1927) and mask any age over 90.
 
-8.  Generalize to year (for example, 1927) and mask any age over 90.
+8.  Generalize to month/year (for example, 02/1927) and mask any age over 90.
 
-9.  Generalize to month/year (for example, 02/1927) and mask any age over 90.
+9.  Add random offsets to year, month, day, hour, minutes, and seconds.
 
-10. Add random offsets to year, month, day, hour, minutes, and seconds.
+10. Apply maximum years ago.
 
-11. Apply maximum years ago.
-
-12. Apply maximum days ago.
+11. Apply maximum days ago.
 
 If the override option of the provider is set to **True**, then the override
 is processed first. If the rule criteria are met, all other options
@@ -436,18 +456,23 @@ of the DATETIME provider are ignored.
 
 The following formats are supported by the DATETIME masking provider by default:
 
-| **Supported date / datetime format**         | **Example of recognized input value** |
+| **Format**                                   | **Examples**                          |
 |----------------------------------------------|---------------------------------------|
-| yyyy-mm-ddThh:mm:ss+&#124;-(hh:mm&#124;Z)    | 2008-09-15T15:53:00Z (default)        |
-| dd-MM-yyyy                                   | 24-12-2018                            |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+&#124;-hh:mm   | 2008-09-14T15:53:02.123456789+02:00   |
+| yyyy-MM-ddTHH:mm:ss+&#124;-hh:mm             | 2008-09-14T15:53:02-05:00             |
+| yyyy-MM-ddTHH:mm+&#124;-hh:mm                | 2008-09-14T15:53-06:00                |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ               | 2008-09-14T15:53:02.123456789Z        |
+| yyyy-MM-ddTHH:mm:ssZ                         | 2008-09-14T15:53:02Z                  |
+| yyyy-MM-ddTHH:mmZ                            | 2008-09-14T15:53Z                     |
 | dd-MMM-yyyy                                  | 24-DEC-2018                           |
 | yyyy-MM-dd                                   | 2018-12-24                            |
-| dd/MM/yyyy                                   | 24/12/2018                            |
 | yyyy/MM/dd                                   | 2018/12/24                            |
-| dd-MM-yyyy[ HH:mm:ss ]                       | 24-12-2018 12:01:12                   |
-| yyyy-MM-dd[ HH:mm:ss ]                       | 2018-12-24 12:01:12                   |
-| dd/MM/yyyy[ HH:mm:ss ]                       | 24/12/2018 12:01:12                   |
-| yyyy/MM/dd[ HH:mm:ss ]                       | 2018/12/24 12:01:12                   |
+| yyyy-MM-dd HH:mm:ss                          | 2018-12-24 12:01:12                   |
+| yyyy/MM/dd HH:mm:ss                          | 2018/12/24 12:01:12                   |
+| dd-MM-yyyy                                   | 16-04-1967                            |
+| dd/MM/yyyy                                   | 16/04/1967                            |
+| dd-MM-yyyy HH:mm:ss                          | 16-04-1967 13:14:15                   |
+| dd/MM/yyyy HH:mm:ss                          | 16/04/1967 13:14:15                   |
 
 
  The DATETIME masking provider supports the following configuration options.
@@ -484,10 +509,6 @@ If a value for `formatFixed` is provided, it will be the only format the privacy
 | generalizeMonthyear                               | Boolean  | Generalize to mm/year                                                                                                                                                                                                                                            | false             |
 | generalizeQuarteryear                             | Boolean  | Generalize to quarter/year                                                                                                                                                                                                                                       | false             |
 | generalizeYear                                    | Boolean  | Generalize to year                                                                                                                                                                                                                                               | false             |
-| generalizeNyearinterval                           | Boolean  | Generalize to n-year interval                                                                                                                                                                                                                                    | false             |
-| generalizeNyearintervalvalue                      | Integer  | Value of for n-year interval generalization                                                                                                                                                                                                                      | 0                 |
-| generalizeNyearintervalstart                      | Integer  | Starting year for n-year interval generalization                                                                                                                                                                                                                 | 0                 |
-| generalizeNyearintervalend                        | Integer  | Ending year for n-year interval generalization                                                                                                                                                                                                                   | null              |
 | generalizeYearMaskAgeOver90                       | Boolean  | Generalize to year and mask any age of \>= 90 years old, by updating the date-of-birth to reflect 90 years from the current system date.                                                                                                                         | false             |
 | generalizeMonthyearMaskAgeOver90                  | Boolean  | Generalize to month/year, and mask any age \>= 90 by updating the date-of-birth to reflect 90 years from the current system date.                                                                                                                                 | false             |                                                                                                              | false             |
 
@@ -507,6 +528,7 @@ If a value for `formatFixed` is provided, it will be the only format the privacy
 | monthMask                                         | Boolean  | Mask month                                                                                                                                                                                                                                                       | true              |
 | monthRangeDown                                    | Integer  | Mask month range downwards                                                                                                                                                                                                                                       | 12                |
 | monthRangeUp                                      | Integer  | Mask month range upwards                                                                                                                                                                                                                                         | 0                 |
+
 **Options to mask a day**
 
 | **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
@@ -545,10 +567,10 @@ If a value for `formatFixed` is provided, it will be the only format the privacy
 
 | **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| yearMaxYearsAgoMask                               | Boolean  | Mask year if it exceeds the maximum years ago from the current year                                                                                                                                                                                              | false             |
+| yearMaxYearsAgoMask                               | Boolean  | Mask year if it is more than the maximum years ago from the current year                                                                                                                                                                                              | false             |
 | yearMaxYearsAgo                                   | Integer  | Maximum years ago from the current year                                                                                                                                                                                                                          | 0                 |
 | yearShiftFromCurrentYear                          | Integer  | Years to shift current year backwards                                                                                                                                                                                                                            | 0                 |
-| dayMaxDaysAgoMask                                 | Boolean  | Mask year if it exceeds the maximum days ago from the current day                                                                                                                                                                                                | false             |
+| dayMaxDaysAgoMask                                 | Boolean  | Mask year if it is more than the maximum days ago from the current day                                                                                                                                                                                                | false             |
 | dayMaxDaysAgo                                     | Integer  | Maximum days ago from the current day                                                                                                                                                                                                                            | 0                 |
 | dayShiftFromCurrentDay                            | Integer  | Days to shift current date backwards                                                                                                                                                                                                                             | 0                 |
 | yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the shifted year value, not including month/day, if the shift occurs                                                                                                                                                                                                | false             |
@@ -559,9 +581,7 @@ If a value for `formatFixed` is provided, it will be the only format the privacy
 |---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | yearDelete                                        | Boolean  | Remove the year and return only the day and month                                                                                                                                                                                                  | false             |
 | yearDeleteNdays                                   | Boolean  | Remove the year and return only the day and month, if the date and time is after the given number of days ago                                                                                                                                                                                                                       | false             |
-| yearDeleteNinterval                               | Boolean  | Remove the year and return only the day and month, if the date and time is within the given number of days from a given date and time                                                                                                                                                                                                                       | false             |
 | yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
-| yearDeleteNointervalComparedateValue              | String   | The date and time to compare to the value being masked                                                                                                                                                                                                                               | null              |
 
 #### DATETIME_CONSISTENT_SHIFT
 
@@ -600,23 +620,24 @@ handling of unexpected input values is applied.  See the **Handling unexpected i
 
 The provider supports input values in any of these formats.
 
-|**Format**                                | **Examples**                            |
-|------------------------------------------|-----------------------------------------|
-| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+hh:mm      | 2008-09-14T15:53:02.123456789+02:00     |
-| yyyy-MM-ddTHH:mm:ss+hh:mm                | 2008-09-14T15:53:02-05:00               |
-| yyyy-MM-ddTHH:mm+hh:mm                   | 2008-09-14T15:53-06:00                  |
-| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ           | 2008-09-14T15:53:02.123456789Z          |
-| yyyy-MM-ddTHH:mm:ssZ                     | 2008-09-14T15:53:02Z                    |
-| yyyy-MM-ddTHH:mmZ                        | 2008-09-14T15:53Z                       |
-| dd-MMM-yyyy                              | 24-DEC-2018                             |
-| yyyy-MM-dd                               | 2018-12-24                              |
-| yyyy/MM/dd                               | 2018/12/24                              |
-| yyyy-MM-dd HH:mm:ss                      | 2018-12-24 12:01:12                     |
-| yyyy/MM/dd HH:mm:ss                      | 2018/12/24 12:01:12                     |
-| dd-MM-yyyy                               | 16-04-1967                              |
-| dd/MM/yyyy                               | 16/04/1967                              |
-| dd-MM-yyyy HH:mm:ss                      | 16-04-1967 13:14:15                     |
-| dd/MM/yyyy HH:mm:ss                      | 16/04/1967 13:14:15                     |
+| **Format**                                   | **Examples**                          |
+|----------------------------------------------|---------------------------------------|
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnn+&#124;-hh:mm   | 2008-09-14T15:53:02.123456789+02:00   |
+| yyyy-MM-ddTHH:mm:ss+&#124;-hh:mm             | 2008-09-14T15:53:02-05:00             |
+| yyyy-MM-ddTHH:mm+&#124;-hh:mm                | 2008-09-14T15:53-06:00                |
+| yyyy-MM-ddTHH:mm:ss.nnnnnnnnnZ               | 2008-09-14T15:53:02.123456789Z        |
+| yyyy-MM-ddTHH:mm:ssZ                         | 2008-09-14T15:53:02Z                  |
+| yyyy-MM-ddTHH:mmZ                            | 2008-09-14T15:53Z                     |
+| dd-MMM-yyyy                                  | 24-DEC-2018                           |
+| yyyy-MM-dd                                   | 2018-12-24                            |
+| yyyy/MM/dd                                   | 2018/12/24                            |
+| yyyy-MM-dd HH:mm:ss                          | 2018-12-24 12:01:12                   |
+| yyyy/MM/dd HH:mm:ss                          | 2018/12/24 12:01:12                   |
+| dd-MM-yyyy                                   | 16-04-1967                            |
+| dd/MM/yyyy                                   | 16/04/1967                            |
+| dd-MM-yyyy HH:mm:ss                          | 16-04-1967 13:14:15                   |
+| dd/MM/yyyy HH:mm:ss                          | 16/04/1967 13:14:15                   |
+
 
 The provider formats the shifted date using the same pattern that matched the original input value.  
 Minor changes to precision and formatting between the original value and the shifted value can occur, however.

@@ -5,11 +5,8 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -19,15 +16,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
-import java.util.Calendar;
-import java.util.Date;
-import org.apache.commons.lang.StringUtils;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier.DateTimeParseResult;
-import com.ibm.whc.deid.shared.pojo.config.masking.DateDependencyMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
-import com.ibm.whc.deid.util.Tuple;
 
 /**
  * The type Date time masking provider.
@@ -38,10 +30,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private static final long serialVersionUID = -645486689214017719L;
 
   private static final DateTimeIdentifier dateTimeIdentifier = new DateTimeIdentifier();
-  private static final DateTimeFormatter defaultDateFormat = new DateTimeFormatterBuilder()
-      .appendPattern("dd/MM/yyyy").parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-      .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-      .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
 
   private final boolean shiftDate;
   private final int shiftSeconds;
@@ -50,10 +38,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final boolean generalizeMonthYear;
   private final boolean generalizeQuarterYear;
   private final boolean generalizeYear;
-  private final boolean generalizeNYearInterval;
-  private final int generalizeNYearIntervalValue;
-  private final int generalizeNYearIntervalStart;
-  private final int generalizeNYearIntervalEnd;
 
   private final boolean generalizeYearMaskAgeOver90;
   private final boolean generalizeMonthYearMaskAgeOver90;
@@ -84,14 +68,14 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final int secondsRangeUp;
   private final int secondsRangeDown;
 
-  private final boolean maxYearsAgoMask;
-  private final int maxYearsAgo;
-  private final boolean maxYearsAgoOnlyYear;
-  private final int shiftFromCurrentYear;
+  private final boolean yearMaxYearsAgoMask;
+  private final int yearMaxYearsAgo;
+  private final boolean yearMaxYearsAgoOnlyYear;
+  private final int yearShiftFromCurrentYear;
 
-  private final boolean maxDaysAgoMask;
-  private final int maxDaysAgo;
-  private final int shiftFromCurrentDay;
+  private final boolean dayMaxDaysAgoMask;
+  private final int dayMaxDaysAgo;
+  private final int dayShiftFromCurrentDay;
 
   private final boolean overrideMask;
   private final int overrideYearsPassed;
@@ -99,8 +83,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final boolean yearDelete;
   private final boolean yearDeleteNDays;
   private final int yearDeleteNDaysValue;
-  private final boolean yearDeleteNInterval;
-  private final String yearDeleteNointervalComparedateValue;
   private final String fixedFormatString;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
@@ -115,14 +97,9 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.generalizeMonthYear = configuration.isGeneralizeMonthyear();
     this.generalizeQuarterYear = configuration.isGeneralizeQuarteryear();
     this.generalizeYear = configuration.isGeneralizeYear();
-    this.generalizeNYearInterval = configuration.isGeneralizeNyearinterval();
-    this.generalizeNYearIntervalValue = configuration.getGeneralizeNyearintervalvalue();
 
     this.generalizeYearMaskAgeOver90 = configuration.isGeneralizeYearMaskAgeOver90();
     this.generalizeMonthYearMaskAgeOver90 = configuration.isGeneralizeMonthyearMaskAgeOver90();
-
-    this.generalizeNYearIntervalStart = configuration.getGeneralizeNyearintervalstart();
-    this.generalizeNYearIntervalEnd = configuration.getGeneralizeNyearintervalend();
 
     this.yearMask = configuration.isYearMask();
     this.yearRangeUp = configuration.getYearRangeUp();
@@ -150,13 +127,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.secondsRangeUp = configuration.getSecondsRangeUp();
     this.secondsRangeDown = configuration.getSecondsRangeDown();
 
-    this.maxYearsAgoMask = configuration.isYearMaxYearsAgoMask();
-    this.maxYearsAgo = configuration.getYearMaxYearsAgo();
-    this.maxYearsAgoOnlyYear = configuration.isYearMaxYearsAgoOnlyYear();
-    this.shiftFromCurrentYear = configuration.getYearShiftFromCurrentYear();
-    this.maxDaysAgoMask = configuration.isDayMaxDaysAgoMask();
-    this.maxDaysAgo = configuration.getDayMaxDaysAgo();
-    this.shiftFromCurrentDay = configuration.getDayShiftFromCurrentDay();
+    this.yearMaxYearsAgoMask = configuration.isYearMaxYearsAgoMask();
+    this.yearMaxYearsAgo = configuration.getYearMaxYearsAgo();
+    this.yearMaxYearsAgoOnlyYear = configuration.isYearMaxYearsAgoOnlyYear();
+    this.yearShiftFromCurrentYear = configuration.getYearShiftFromCurrentYear();
+    this.dayMaxDaysAgoMask = configuration.isDayMaxDaysAgoMask();
+    this.dayMaxDaysAgo = configuration.getDayMaxDaysAgo();
+    this.dayShiftFromCurrentDay = configuration.getDayShiftFromCurrentDay();
 
     this.overrideMask = configuration.isOverrideMask();
     this.overrideYearsPassed = configuration.getOverrideYearsPassed();
@@ -165,79 +142,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.yearDelete = configuration.isYearDelete();
     this.yearDeleteNDays = configuration.isYearDeleteNdays();
     this.yearDeleteNDaysValue = configuration.getYearDeleteNdaysValue();
-    this.yearDeleteNInterval = configuration.isYearDeleteNinterval();
-    this.yearDeleteNointervalComparedateValue = configuration.getYearDeleteNointervalComparedateValue();
-  }
-
-  public DateTimeMaskingProvider(DateDependencyMaskingProviderConfig dateDependencyConfig,
-      String compareDateValue) {
-    super(dateDependencyConfig);
-
-    // Set some default values needed for date dependency
-    this.yearDelete = false;
-    this.yearDeleteNDays = false;
-    this.yearDeleteNInterval = true;
-    this.yearMask = false;
-    this.monthMask = false;
-    this.dayMask = false;
-    this.hourMask = false;
-    this.minutesMask = false;
-    this.secondsMask = false;
-
-    this.yearDeleteNDaysValue = dateDependencyConfig.getDateYearDeleteNDaysValue();
-    this.yearDeleteNointervalComparedateValue = compareDateValue;
-
-    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-
-    this.fixedFormatString = configuration.getFormatFixed();
-
-    this.shiftDate = configuration.isMaskShiftDate();
-    this.shiftSeconds = configuration.getMaskShiftSeconds();
-
-    this.generalizeWeekYear = configuration.isGeneralizeWeekyear();
-    this.generalizeMonthYear = configuration.isGeneralizeMonthyear();
-    this.generalizeQuarterYear = configuration.isGeneralizeQuarteryear();
-    this.generalizeYear = configuration.isGeneralizeYear();
-    this.generalizeNYearInterval = configuration.isGeneralizeNyearinterval();
-    this.generalizeNYearIntervalValue = configuration.getGeneralizeNyearintervalvalue();
-
-    this.generalizeYearMaskAgeOver90 = configuration.isGeneralizeYearMaskAgeOver90();
-    this.generalizeMonthYearMaskAgeOver90 = configuration.isGeneralizeMonthyearMaskAgeOver90();
-
-    this.generalizeNYearIntervalStart = configuration.getGeneralizeNyearintervalstart();
-    this.generalizeNYearIntervalEnd = configuration.getGeneralizeNyearintervalend();
-
-    this.yearRangeUp = configuration.getYearRangeUp();
-    this.yearRangeDown = configuration.getYearRangeDown();
-
-    this.monthRangeUp = configuration.getMonthRangeUp();
-    this.monthRangeDown = configuration.getMonthRangeDown();
-
-    this.dayRangeUpMin = configuration.getDayRangeUpMin();
-    this.dayRangeUp = configuration.getDayRangeUp();
-    this.dayRangeDownMin = configuration.getDayRangeDownMin();
-    this.dayRangeDown = configuration.getDayRangeDown();
-
-    this.hourRangeUp = configuration.getHourRangeUp();
-    this.hourRangeDown = configuration.getHourRangeDown();
-
-    this.minutesRangeUp = configuration.getMinutesRangeUp();
-    this.minutesRangeDown = configuration.getMinutesRangeDown();
-
-    this.secondsRangeUp = configuration.getSecondsRangeUp();
-    this.secondsRangeDown = configuration.getSecondsRangeDown();
-
-    this.maxYearsAgoMask = configuration.isYearMaxYearsAgoMask();
-    this.maxYearsAgo = configuration.getYearMaxYearsAgo();
-    this.maxYearsAgoOnlyYear = configuration.isYearMaxYearsAgoOnlyYear();
-    this.shiftFromCurrentYear = configuration.getYearShiftFromCurrentYear();
-    this.maxDaysAgoMask = configuration.isDayMaxDaysAgoMask();
-    this.maxDaysAgo = configuration.getDayMaxDaysAgo();
-    this.shiftFromCurrentDay = configuration.getDayShiftFromCurrentDay();
-
-    this.overrideMask = configuration.isOverrideMask();
-    this.overrideYearsPassed = configuration.getOverrideYearsPassed();
-    this.overrideValue = configuration.getOverrideValue();
   }
 
   @Override
@@ -268,19 +172,19 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
           f = fixedFormatter;
         } catch (DateTimeParseException e) {
           return applyUnexpectedValueHandling(identifier,
-              () -> RandomGenerators.generateRandomDate(fixedFormatter.withZone(ZoneOffset.UTC)));
+              () -> RandomGenerators.generateRandomDate(fixedFormatter));
         }
       } catch (IllegalArgumentException e) {
         // thrown if the pattern is not a valid datetime pattern
         return applyUnexpectedValueHandling(identifier,
-            () -> RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
+            () -> RandomGenerators.generateRandomDate(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
       }
 
     } else {
       DateTimeParseResult parseResult = dateTimeIdentifier.parse(identifier);
       if (parseResult == null) {
         return applyUnexpectedValueHandling(identifier,
-            () -> RandomGenerators.generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
+            () -> RandomGenerators.generateRandomDate(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
       }
       f = parseResult.getFormatter();
       d = parseResult.getValue();
@@ -312,32 +216,37 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       }
     }
 
-    // If the input date occurred at least a given number of years ago, adjust the date so it
-    // is a given number of years before the current year. Return the updated date or just the
-    // year, as per configuration.
+    // If the input date occurred more than the given number of years ago, subtract the given
+    // number of years from the current date and change the input date to that year.
+    // Return the updated date or just the year, as per configuration.
     // Otherwise, continue processing.
-    if (maxYearsAgoMask) {
+    if (yearMaxYearsAgoMask) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.YEARS.between(datetime, now) >= maxYearsAgo) {
-        datetime = datetime.minus(shiftFromCurrentYear, ChronoUnit.YEARS);
-        if (maxYearsAgoOnlyYear) {
-          return String.format("%d", datetime.get(ChronoField.YEAR));
+      if (ChronoUnit.YEARS.between(datetime, now) > yearMaxYearsAgo) {
+        // Get the new year value by subtracting the configured amount from the current year
+        now = now.minus(yearShiftFromCurrentYear, ChronoUnit.YEARS);
+        int newyear = now.get(ChronoField.YEAR);
+        if (yearMaxYearsAgoOnlyYear) {
+          return String.format("%d", newyear);
         }
+        datetime = datetime.with(ChronoField.YEAR, newyear);
         return f.format(datetime);
       }
     }
 
-    // If the input date occurred at least a given number of days ago, adjust the date so it
-    // is the year a given number of days before the current year. Return the updated date or
-    // just the year, as per configuration.
+    // If the input date occurred more than the given number of days ago, subtract the given
+    // number of days from the current date and change the input date to the resulting year.
+    // Return the updated date or just the year, as per configuration.
     // Otherwise, continue processing.
-    if (maxDaysAgoMask) {
+    if (dayMaxDaysAgoMask) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.DAYS.between(datetime, now) >= maxDaysAgo) {
-        datetime = datetime.minus(shiftFromCurrentDay, ChronoUnit.DAYS);
-        if (maxYearsAgoOnlyYear) {
-          return String.format("%d", datetime.get(ChronoField.YEAR));
+      if (ChronoUnit.DAYS.between(datetime, now) > dayMaxDaysAgo) {
+        now = now.minus(dayShiftFromCurrentDay, ChronoUnit.DAYS);
+        int newyear = now.get(ChronoField.YEAR);
+        if (yearMaxYearsAgoOnlyYear) {
+          return String.format("%d", newyear);
         }
+        datetime = datetime.with(ChronoField.YEAR, newyear);
         return f.format(datetime);
       }
     }
@@ -360,7 +269,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the week and the year
     if (generalizeWeekYear) {
-      return String.format("%02d/%d", datetime.get(ChronoField.ALIGNED_DAY_OF_WEEK_IN_YEAR),
+      return String.format("%02d/%d", datetime.get(ChronoField.ALIGNED_WEEK_OF_YEAR),
           datetime.get(ChronoField.YEAR));
     }
 
@@ -372,7 +281,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the quarter and the year
     if (generalizeQuarterYear) {
-      int quarter = (datetime.get(ChronoField.MONTH_OF_YEAR) / 3) + 1;
+      int month = datetime.get(ChronoField.MONTH_OF_YEAR);
+      int quarter = (month / 3);
+      if (month % 3 > 0) {
+        quarter++;
+      }
       return String.format("%02d/%d", quarter, datetime.get(ChronoField.YEAR));
     }
 
@@ -460,36 +373,6 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     }
 
     return f.format(datetime);
-
-    // @formatter:off
-    /*
-    if (dateYearDeleteNInterval) {
-      if (dateYearDeleteComparedValue != null) {
-        LocalDateTime givenDate = LocalDateTime.ofInstant(cal.toInstant(), ZoneId.systemDefault());
-        LocalDateTime comparedDate = null;
-        try {
-          Instant compareInstant;
-          if (f == DateTimeFormatter.ISO_OFFSET_DATE_TIME) {
-            compareInstant = Instant.from(f.parse(dateYearDeleteComparedValue));
-          } else {
-            compareInstant =
-                Instant.from(f.withZone(ZoneId.systemDefault()).parse(dateYearDeleteComparedValue));
-          }
-          comparedDate = LocalDateTime.ofInstant(compareInstant, ZoneId.systemDefault());
-        } catch (Exception e) {
-          return applyUnexpectedValueHandling(identifier, () -> RandomGenerators
-              .generateRandomDate(defaultDateFormat.withZone(ZoneOffset.UTC)));
-        }
-        long daysBetween = Math.abs(ChronoUnit.DAYS.between(givenDate, comparedDate));
-        if (daysBetween <= dateYearDeleteNDaysValue) {
-          int originalMonth = cal.get(Calendar.MONTH);
-          int originalDay = cal.get(Calendar.DAY_OF_MONTH);
-          return String.format("%02d/%02d", originalDay, originalMonth + 1);
-        }
-      }
-    }
-    */
-    // @formatter:on
 
     // @formatter:off
     /*
