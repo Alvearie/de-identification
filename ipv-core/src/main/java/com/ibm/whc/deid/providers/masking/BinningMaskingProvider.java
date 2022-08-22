@@ -38,13 +38,13 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
     this.startValue = config.getStartValue();
     this.useStartValue = config.isUseStartValue();
     this.normalizedStartValue = normalizeStartValue();
-    this.singleBucketOverThresholdReplacement=config.getSingleBucketOverThresholdReplacement();
-    this.singleBucketOverThresholdValue=config.getSingleBucketOverThresholdValue();
-    this.singleBucketUnderThresholdReplacement=config.getSingleBucketUnderThresholdReplacement();
-    this.singleBucketUnderThresholdValue=config.getSingleBucketUnderThresholdValue();
-    this.useSingleBucketOverThreshold=config.isUseSingleBucketOverThreshold();
-    this.useSingleBucketUnderThreshold=config.isUseSingleBucketUnderThreshold();
-    
+    this.singleBucketOverThresholdReplacement = config.getSingleBucketOverThresholdReplacement();
+    this.singleBucketOverThresholdValue = config.getSingleBucketOverThresholdValue();
+    this.singleBucketUnderThresholdReplacement = config.getSingleBucketUnderThresholdReplacement();
+    this.singleBucketUnderThresholdValue = config.getSingleBucketUnderThresholdValue();
+    this.useSingleBucketOverThreshold = config.isUseSingleBucketOverThreshold();
+    this.useSingleBucketUnderThreshold = config.isUseSingleBucketUnderThreshold();
+
   }
 
   // normalize start value to lowest positive bin start value
@@ -68,27 +68,27 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
       debugFaultyInput("identifier");
       return null;
     }
-    
+
     double value;
     try {
       value = Double.parseDouble(identifier);
     } catch (NumberFormatException e) {
       // For this provider, we do not return a random value
       return applyUnexpectedValueHandling(identifier, null);
-    }  
+    }
 
-    if (this.useSingleBucketOverThreshold==true && this.useSingleBucketUnderThreshold==true) {
-    	
-        double upperRange=this.singleBucketOverThresholdValue;
-        double lowerRange=this.singleBucketUnderThresholdValue;
-        
-        if(value>=upperRange) {
-        	return this.singleBucketOverThresholdReplacement;
-        }
-         
-        else if(value<lowerRange) {
-        	return this.singleBucketUnderThresholdReplacement;
-        }   
+    if (this.useSingleBucketOverThreshold == true) {
+
+      if (value >= this.singleBucketOverThresholdValue) {
+        return this.singleBucketOverThresholdReplacement;
+      }
+    }
+
+    if (this.useSingleBucketUnderThreshold == true) {
+
+      if (value < this.singleBucketUnderThresholdValue) {
+        return this.singleBucketUnderThresholdReplacement;
+      }
     }
 
     double adjusted = value - this.normalizedStartValue;
@@ -101,5 +101,5 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
 
     return String.format(this.format, Long.valueOf(lowerBase), Long.valueOf(higherBase));
   }
- 
+
 }
