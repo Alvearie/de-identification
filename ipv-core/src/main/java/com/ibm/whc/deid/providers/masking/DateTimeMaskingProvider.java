@@ -22,8 +22,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig
 import com.ibm.whc.deid.util.RandomGenerators;
 
 /**
- * The type Date time masking provider.
- *
+ * Applies privacy protection to datetime values.
  */
 public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
@@ -220,13 +219,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       }
     }
 
-    // If the input date occurred more than the given number of years ago, subtract the given
-    // number of years from the current date and change the input date to that year.
+    // Subtract the given number of years from the current year and change the input date to that
+    // year, if the input date is at least a given number of years ago.
     // Return the updated date or just the year, as per configuration.
     // Otherwise, continue processing.
     if (yearMaxYearsAgoMask) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.YEARS.between(datetime, now) > yearMaxYearsAgo) {
+      if (ChronoUnit.YEARS.between(datetime, now) >= yearMaxYearsAgo) {
         // Get the new year value by subtracting the configured amount from the current year
         now = now.minus(yearShiftFromCurrentYear, ChronoUnit.YEARS);
         int newyear = now.get(ChronoField.YEAR);
@@ -240,13 +239,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       }
     }
 
-    // If the input date occurred more than the given number of days ago, subtract the given
-    // number of days from the current date and change the input date to the resulting year.
+    // Subtract the given number of days from the current date and change the input date the
+    // resulting year, if the input date is at least a given number of days ago.
     // Return the updated date or just the year, as per configuration.
     // Otherwise, continue processing.
     if (dayMaxDaysAgoMask) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.DAYS.between(datetime, now) > dayMaxDaysAgo) {
+      if (ChronoUnit.DAYS.between(datetime, now) >= dayMaxDaysAgo) {
         now = now.minus(dayShiftFromCurrentDay, ChronoUnit.DAYS);
         int newyear = now.get(ChronoField.YEAR);
         if (yearMaxYearsAgoOnlyYear) {

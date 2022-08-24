@@ -23,7 +23,7 @@ public class DateTimeMaskingProviderConfigTest {
       config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage().contains("`formatFixed` is not valid: "));
+      assertTrue(e.getMessage().contains("`formatFixed` does not contain a valid pattern: "));
     }
 
     config.setFormatFixed("yyyy-MM-dd");
@@ -110,6 +110,66 @@ public class DateTimeMaskingProviderConfigTest {
     config.setYearDeleteNdaysValue(-1);
     validateNegativeError(config, "yearDeleteNdaysValue");
     config.setYearDeleteNdaysValue(0);
+
+    config.setMaskShiftDate(true);
+    config.setGeneralizeWeekyear(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeWeekyear(false);
+    config.setGeneralizeMonthyear(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeMonthyear(false);
+    config.setGeneralizeQuarteryear(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeQuarteryear(false);
+    config.setGeneralizeYear(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeYear(false);
+    config.setYearDelete(true);
+    validateTooManyActive(config);
+
+    config.setYearDelete(false);
+    config.setGeneralizeYearMaskAgeOver90(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeYearMaskAgeOver90(false);
+    config.setGeneralizeMonthyearMaskAgeOver90(true);
+    validateTooManyActive(config);
+
+    config.setGeneralizeMonthyearMaskAgeOver90(false);
+    config.setYearMask(true);
+    validateTooManyActive(config);
+
+    config.setYearMask(false);
+    config.setMonthMask(true);
+    validateTooManyActive(config);
+
+    config.setMonthMask(false);
+    config.setDayMask(true);
+    validateTooManyActive(config);
+
+    config.setDayMask(false);
+    config.setHourMask(true);
+    validateTooManyActive(config);
+
+    config.setHourMask(false);
+    config.setMinutesMask(true);
+    validateTooManyActive(config);
+
+    config.setMinutesMask(false);
+    config.setSecondsMask(true);
+    validateTooManyActive(config);
+
+    config.setMaskShiftDate(false);
+    config.setYearMask(true);
+    config.setMonthMask(true);
+    config.setDayMask(true);
+    config.setHourMask(true);
+    config.setMinutesMask(true);
+    config.validate(null);
   }
 
   private void validateNegativeError(DateTimeMaskingProviderConfig config, String name) {
@@ -118,6 +178,15 @@ public class DateTimeMaskingProviderConfigTest {
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("`" + name + "` must be greater than or equal to 0", e.getMessage());
+    }
+  }
+
+  private void validateTooManyActive(DateTimeMaskingProviderConfig config) {
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      assertEquals(DateTimeMaskingProviderConfig.TOO_MANY_FINAL_OPTIONS_ERROR, e.getMessage());
     }
   }
 }

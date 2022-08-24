@@ -418,12 +418,63 @@ The datetime formats recognized by the DATEDEPENDENCY privacy provider are:
 
 #### DATETIME
 
-Masks datetime (timestamp) objects. There are several options supported,
-for example, shifting dates, generalizing to month, and generalizing to year.
-Additional options include adding random offsets to the various datetime
-elements, for example, years, months, days, hours, and seconds). If
-multiple options are set to true in the datetime masking algorithm, the
-following order is respected.
+Masks date and timestamp values.
+
+Several types of value manipulation are supported.  There are conditional manipulations
+that mask the input value only if the value meets a particular condition and there are 
+unconditional manipulations that always mask the input value.  
+
+Conditional manipulations are processed first and in a specified order.  If a conditional 
+manipulation is configured to be active and the input value meets its associated condition, 
+the input value is masked and processing for that input stops.  If the condition is not
+met, processing continues.  You may configure any number of conditional manipulations 
+to be active in a masking rule.  
+
+If no conditional manipulations are active or the input value has not met the condition
+of any active conditional manipulations, processing continues to the unconditional manipulations.
+Unlike conditional manipulations, only one unconditional manipulation may be active in any
+one masking rule.
+
+##### Conditional Manipulations
+
+Here are the supported conditional manipulations and the property values necessary to activate
+them.  They are presented in the order in which they are processed.
+
+
+**Replace the input with a constant value if the input date and time is at least at a given number of years ago**
+   
+| **Property name**                                 | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| overrideMask                                      | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                            | false             |
+| overrideYearsPassed                               | Integer  | Number of years that must have elapsed between the input value and the current date and time for the constant value to be returned  
+| 0                 |
+| overrideValue                                     | String   | (Optional) Value returned if the input value the number of years threshold.    | The `overrideYearsPassed` value followed by the plus sign ('+'), as in 90+ |
+
+
+**Replace the year with the given number of years before the current year if the input date and time is at least a given number of years ago**
+
+| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| yearMaxYearsAgoMask                               | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                    | false             |
+| yearMaxYearsAgo                                   | Integer  | Number of years that must have elapsed between the input value and the current date and time for the year to be replaced
+| 0                 |
+| yearShiftFromCurrentYear                          | Integer  | Number of years to subtract from the current year to get the replacement year
+| 0                 |
+| yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs
+| false             |
+
+
+**Replace the year with the year for the given number of days before the current date if the input date and time is at least a given number of days ago**
+
+| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| dayMaxDaysAgoMask                                 | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                   | false             |
+| dayMaxDaysAgo                                     | Integer  | Number of days that must have elapsed between the input value and the current date and time for the year to be replaced
+| 0                 |
+| dayShiftFromCurrentDay                            | Integer  | Number of days to subtract from the current date to get the replacement year
+| 0                 |
+| yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs                                                                                                                                     | false             |
+
 
 These examples are for the 10th of January 2016:
 
@@ -486,13 +537,6 @@ The following formats are supported by the DATETIME masking provider by default:
 If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  The format must at minimum include a year component.  The given value must be valid as per the java.time.format.DateTimeFormatter class.
 
 
-**Options to return a fixed value if the year is a given number of years ago**
-   
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| overrideMask                                      | Boolean  | Mask the datetime value with a fixed value if the datetime is from a year that is a given number of years ago or greater.                                                                                                                                                      | false             |
-| overrideYearsPassed                               | Integer  | Number of years between the year of the original value and current year for the fixed value to be returned                                                                                                                                                                                                                               | 0                 |
-| overrideValue                                     | String   | (optional) Value returned if the date and time meets the number of years threshold.  If not specified, the overrideYearsPassed value followed by the plus sign ('+') is returned (for example, 90+).  | null              |
 
 **Options to shift by a constant amount**
 
@@ -563,17 +607,6 @@ If a value for `formatFixed` is provided, it will be the only format the privacy
 | secondsRangeDown                                  | Integer  | Mask seconds range downwards                                                                                                                                                                                                                                     | 100               |
 | secondsRangeUp                                    | Integer  | Mask seconds range upwards                                                                                                                                                                                                                                       | 0                 |
 
-   **Options to shift the year if at a certain age**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| yearMaxYearsAgoMask                               | Boolean  | Mask year if it is more than the maximum years ago from the current year                                                                                                                                                                                              | false             |
-| yearMaxYearsAgo                                   | Integer  | Maximum years ago from the current year                                                                                                                                                                                                                          | 0                 |
-| yearShiftFromCurrentYear                          | Integer  | Years to shift current year backwards                                                                                                                                                                                                                            | 0                 |
-| dayMaxDaysAgoMask                                 | Boolean  | Mask year if it is more than the maximum days ago from the current day                                                                                                                                                                                                | false             |
-| dayMaxDaysAgo                                     | Integer  | Maximum days ago from the current day                                                                                                                                                                                                                            | 0                 |
-| dayShiftFromCurrentDay                            | Integer  | Days to shift current date backwards                                                                                                                                                                                                                             | 0                 |
-| yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the shifted year value, not including month/day, if the shift occurs                                                                                                                                                                                                | false             |
 
    **Options to delete the year**
 

@@ -86,17 +86,13 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
   @Test
   public void testMaskShiftDateNegative() throws Exception {
-
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
     config.setFormatFixed("  \t\n  "); // whitespace, so ignored
     config.setMaskShiftDate(true);
-    config.setMaskShiftSeconds(-120);
+    config.setMaskShiftSeconds(-121);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
 
-    // different values
-    String originalDateTime = "08-12-1981 00:04:00";
-    String maskedDateTime = maskingProvider.mask(originalDateTime);
-    assertEquals("08-12-1981 00:02:00", maskedDateTime);
+    assertEquals("1981-12-13T13:02:00-05:00", maskingProvider.mask("1981-12-13T13:04:01-05:00"));
   }
 
   @Test
@@ -1170,8 +1166,14 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     LocalDateTime currentDate = LocalDateTime.now();
     LocalDateTime subtractedDate = currentDate.minusYears(92);
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+
+    int expectedYear = currentDate.minusYears(50).getYear();
+
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertEquals(originalDate, maskedDateTime);
+
+    assertEquals(
+        originalDate.substring(0, 6) + String.valueOf(expectedYear) + originalDate.substring(10),
+        maskedDateTime);
   }
 
   @Test
@@ -1185,9 +1187,11 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusYears(92).minusDays(300);
+    LocalDateTime subtractedDate = currentDate.minusYears(92).plusDays(1);
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+
     String maskedDateTime = maskingProvider.mask(originalDate);
+
     assertEquals(originalDate, maskedDateTime);
   }
 
@@ -1284,10 +1288,29 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusDays(32850);
+    LocalDateTime subtractedDate = currentDate.minusDays(32850L);
+    int expectedMon = subtractedDate.getMonthValue();
+    int expectedDay = subtractedDate.getDayOfMonth();
+    // if the expected date is Feb 29, changing the year might change the date
+    boolean expectedLeapDay = expectedMon == 2 && expectedDay == 29;
+    int expectedHour = subtractedDate.getHour();
+    int expectedMin = subtractedDate.getMinute();
+    int expectedSec = subtractedDate.getSecond();
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+
+    int expectedYear = currentDate.minusDays(18250).getYear();
+
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertEquals(originalDate, maskedDateTime);
+
+    String expected = String.format("%02d-%02d-%d %02d:%02d:%02d", expectedDay, expectedMon,
+        expectedYear, expectedHour, expectedMin, expectedSec);
+    String expected2 =
+        expectedLeapDay
+            ? String.format("%02d-%02d-%d %02d:%02d:%02d", 28, expectedMon, expectedYear,
+                expectedHour, expectedMin, expectedSec)
+            : null;
+    assertTrue(
+        maskedDateTime.equals(expected) || (expected2 != null && maskedDateTime.equals(expected2)));
   }
 
   @Test
