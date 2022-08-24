@@ -255,24 +255,14 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
     config.setFormatFixed("TTT");
-    config.setYearMask(false);
-    config.setDayMask(false);
-    config.setHourMask(false);
-    config.setMinutesMask(false);
-    config.setSecondsMask(false);
-    config.setMonthMask(true);
-    config.setMonthRangeDown(0);
-    config.setMonthRangeUp(2);
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
-
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
 
     String originalDateTime = "18-22-1981";
-    Pattern pattern = Pattern.compile("\\d{2}/\\d{2}/\\d{4}$");
-    for (int i = 0; i < 100; i++) {
-      String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(maskedDateTime, pattern.matcher(maskedDateTime).matches());
-    }
+    String maskedDateTime = maskingProvider.mask(originalDateTime);
+    assertNotNull(maskedDateTime);
+    // no exceptions
+    System.out.println(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(maskedDateTime));
   }
 
   @Test
@@ -602,20 +592,19 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskAgeOver90_GeneralizeYear() {
+  public void testGeneralizeYearMaskAgeOver90_Over90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     configuration.setGeneralizeYearMaskAgeOver90(true);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String originalDateTime = "12-12-1900 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDateTime);
-    LocalDateTime currentDate = LocalDateTime.now();
-    Integer expectedMaskedYear = currentDate.minusYears(90).getYear();
-    assertTrue(maskedDateTime.equals(expectedMaskedYear.toString()));
+    int expectedYear = LocalDateTime.now().minusYears(90).getYear();
+    assertEquals(String.valueOf(expectedYear), maskedDateTime);
   }
 
   @Test
-  public void testMaskAgeOver90_GeneralizeMonthYear() {
+  public void testGeneralizeMonthyearMaskAgeOver90_Over90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     configuration.setGeneralizeMonthyearMaskAgeOver90(true);
 
@@ -624,68 +613,52 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String maskedDateTime = maskingProvider.mask(originalDateTime);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    Integer expectedMaskedYear = currentDate.minusYears(90).getYear();
-    Integer expectedMaskedMonth = currentDate.getMonthValue();
-    assertTrue(maskedDateTime.contains(expectedMaskedMonth + "/" + expectedMaskedYear));
+    int expectedMaskedYear = currentDate.minusYears(90).getYear();
+    int expectedMaskedMonth = currentDate.getMonthValue();
+    assertEquals(String.format("%02d/%d", expectedMaskedMonth, expectedMaskedYear), maskedDateTime);
   }
 
   @Test
-  public void testMaskAgeUnder90_GeneralizeMonthYear() {
+  public void testGeneralizeMonthyearMaskAgeOver90_Under90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     configuration.setGeneralizeMonthyearMaskAgeOver90(true);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String originalDateTime = "08-09-2010 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDateTime);
-    assertTrue(maskedDateTime.equals("09/2010"));
+    assertEquals("09/2010", maskedDateTime);
   }
 
   @Test
-  public void testMaskAgeEqual90_GeneralizeMonthYear() {
+  public void testGeneralizeMonthyearMaskAgeOver90_Equal90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     configuration.setGeneralizeMonthyearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusYears(88);
+    LocalDateTime subtractedDate = currentDate.minusYears(90);
     String originalDateTime =
         subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     String maskedDateTime = maskingProvider.mask(originalDateTime);
 
-    String expectedDateTime = subtractedDate.format(DateTimeFormatter.ofPattern("MM/yyyy"));
-    assertTrue(maskedDateTime.equals(expectedDateTime));
+    assertEquals(String.format("%02d/%d", subtractedDate.getMonthValue(), subtractedDate.getYear()),
+        maskedDateTime);
   }
 
-  @Ignore("Ignore for now as this test fails on March 1.  To be fixed later")
   @Test
-  public void testMaskAgeEqual90_GeneralizeMonthYear_WithOneDayOffset() {
+  public void testGeneralizeMonthyearMaskAge_OneDayShort() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     configuration.setGeneralizeMonthyearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusYears(89).minusDays(1);
+    LocalDateTime subtractedDate = currentDate.minusYears(90).plusDays(1);
     String originalDateTime =
         subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     String maskedDateTime = maskingProvider.mask(originalDateTime);
 
-    Integer expectedMaskedYear = currentDate.minusYears(90).getYear();
-    Integer expectedMaskedMonth = currentDate.getMonthValue();
-    assertTrue(maskedDateTime.contains(expectedMaskedMonth + "/" + expectedMaskedYear));
-  }
-
-  @Test
-  public void testMaskAgeOver90_GeneralizeMonthYear_LeapYear() {
-    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeMonthyearMaskAgeOver90(true);
-    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
-    String originalDateTime = "29-02-1920 00:00:00";
-    String maskedDateTime = maskingProvider.mask(originalDateTime);
-
-    LocalDateTime currentDate = LocalDateTime.now();
-    Integer expectedMaskedYear = currentDate.minusYears(90).getYear();
-    Integer expectedMaskedMonth = currentDate.getMonthValue();
-    assertTrue(maskedDateTime.contains(expectedMaskedMonth + "/" + expectedMaskedYear));
+    assertEquals(String.format("%02d/%d", subtractedDate.getMonthValue(), subtractedDate.getYear()),
+        maskedDateTime);
   }
 
   @Test

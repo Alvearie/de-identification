@@ -304,21 +304,25 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     // than 90 years before the current date
     if (generalizeYearMaskAgeOver90) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.YEARS.between(datetime, now) >= 90) {
-        datetime = datetime.minus(90, ChronoUnit.YEARS);
-      }
-      return String.format("%d", datetime.get(ChronoField.YEAR));
+      // @formatter:off
+      Temporal dateToReturn = ChronoUnit.YEARS.between(datetime, now) >= 90 
+              ? now.minus(90, ChronoUnit.YEARS)
+              : datetime;
+      // @formatter:on
+      return String.format("%d", dateToReturn.get(ChronoField.YEAR));
     }
 
     // Return the month and year from the input date modified so that it is not more
     // than 90 years before the current date
     if (generalizeMonthYearMaskAgeOver90) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      if (ChronoUnit.YEARS.between(datetime, now) >= 90) {
-        datetime = datetime.minus(90, ChronoUnit.YEARS);
-      }
-      return String.format("%02d/%d", datetime.get(ChronoField.MONTH_OF_YEAR),
-          datetime.get(ChronoField.YEAR));
+      // @formatter:off
+      Temporal dateToReturn = ChronoUnit.YEARS.between(datetime, now) >= 90 
+              ? now.minus(90, ChronoUnit.YEARS)
+              : datetime;
+      // @formatter:on
+      return String.format("%02d/%d", dateToReturn.get(ChronoField.MONTH_OF_YEAR),
+          dateToReturn.get(ChronoField.YEAR));
     }
 
     // Randomly modify the year within a given range and continue.
