@@ -89,13 +89,22 @@ options and their default values.
 >   The interval's width is configurable, but is constant across the domain of values.  The range
 >   is inclusive on the lower bound and exclusive on the upper bound. The format in which the interval is presented is 
 >   configurable.  For examples of valid formats, see the java documentation for java.util.Formatter.
+>   The provider also optionally supports grouping all values below a given threshold and/or all values above a given
+>   threshold into a single interval with a given, constant label. This is useful for age generalization, allowing replacement 
+>   values such as: <8, 5-10, 10-15, ..., 85-90, 90+
 
-| **Option name**       | **Type** | **Description**                         | **Default value** |
-|-----------------------|----------|-----------------------------------------|-------------------|
-| binSize               | Integer  | The range of the interval               | 5                 |
-| format                | String   | The format of the replacement range     | %s-%s             |
-| startValue            | Integer  | The lower bound of the range            | 0                 |
-| useStartValue         | Boolean  | Use the startValue as the lower bound   | false             |
+| **Option name**                      | **Type** | **Description**                         | **Default value** |
+|--------------------------------------|----------|-----------------------------------------|-------------------|
+| binSize                              | Integer  | The range of the interval               | 5                 |
+| format                               | String   | The format of the replacement range     | %s-%s             |
+| startValue                           | Integer  | The lower bound of the range            | 0                 |
+| useStartValue                        | Boolean  | Use the startValue as the lower bound   | false             |
+| useSingleBucketOverThreshold         | Boolean  | When this field is true, values greater than or equal to the given threshold are added to a single interval | false             |
+| singleBucketOverThresholdValue       | Double   | The input value must be greater than or equal than to this threshold to be added to the special interval | 90.0              |
+| singleBucketOverThresholdReplacement | String   | Label for the single interval for values at or above the threshold value | 90+               |
+| useSingleBucketUnderThreshold        | Boolean  | When this field is true, values less than the given threshold are added to a single interval | false             |
+| singleBucketUnderThresholdValue      | Double   | The input value must be less than this threshold to be added to the special interval | 10.0              |
+| singleBucketUnderThresholdReplacement| String   | Label for the single interval for values below the threshold value | <10               |
 
 #### CITY
 

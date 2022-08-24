@@ -19,6 +19,12 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
   private final int startValue;
   private final boolean useStartValue;
   private final int normalizedStartValue;
+  private final boolean useSingleBucketOverThreshold;
+  private final double singleBucketOverThresholdValue;
+  private final String singleBucketOverThresholdReplacement;
+  private final boolean useSingleBucketUnderThreshold;
+  private final double singleBucketUnderThresholdValue;
+  private final String singleBucketUnderThresholdReplacement;
 
   /**
    * Instantiates a new Binning masking provider.
@@ -32,6 +38,13 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
     this.startValue = config.getStartValue();
     this.useStartValue = config.isUseStartValue();
     this.normalizedStartValue = normalizeStartValue();
+    this.singleBucketOverThresholdReplacement = config.getSingleBucketOverThresholdReplacement();
+    this.singleBucketOverThresholdValue = config.getSingleBucketOverThresholdValue();
+    this.singleBucketUnderThresholdReplacement = config.getSingleBucketUnderThresholdReplacement();
+    this.singleBucketUnderThresholdValue = config.getSingleBucketUnderThresholdValue();
+    this.useSingleBucketOverThreshold = config.isUseSingleBucketOverThreshold();
+    this.useSingleBucketUnderThreshold = config.isUseSingleBucketUnderThreshold();
+
   }
 
   // normalize start value to lowest positive bin start value
@@ -64,6 +77,20 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
       return applyUnexpectedValueHandling(identifier, null);
     }
 
+    if (this.useSingleBucketOverThreshold == true) {
+
+      if (value >= this.singleBucketOverThresholdValue) {
+        return this.singleBucketOverThresholdReplacement;
+      }
+    }
+
+    if (this.useSingleBucketUnderThreshold == true) {
+
+      if (value < this.singleBucketUnderThresholdValue) {
+        return this.singleBucketUnderThresholdReplacement;
+      }
+    }
+
     double adjusted = value - this.normalizedStartValue;
     double binCount = adjusted / this.binSize;
     // if negative, move down to lower integer
@@ -74,4 +101,5 @@ public class BinningMaskingProvider extends AbstractMaskingProvider {
 
     return String.format(this.format, Long.valueOf(lowerBase), Long.valueOf(higherBase));
   }
+
 }
