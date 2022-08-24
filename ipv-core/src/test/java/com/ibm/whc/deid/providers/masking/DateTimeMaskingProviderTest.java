@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -10,17 +10,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
-import java.util.Date;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,8 +26,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class DateTimeMaskingProviderTest extends TestLogSetUp {
-  private static final String DATE_TIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
-  private static final int NUM_LOOP_NON_PERF_TEST = 10;
+  private static final int NUM_LOOP_NON_PERF_TEST = 20;
 
   /*
    * Tests all Datetime options. It tests various values for numerical and format options; however,
@@ -750,7 +745,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -762,7 +757,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
   }
 
@@ -791,7 +786,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -809,7 +804,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -827,7 +822,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -845,7 +840,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
   }
 
@@ -874,7 +869,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -887,12 +882,12 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     maskingProvider = new DateTimeMaskingProvider(configuration);
 
     originalDateTime = "31-05-2017 12:34:56";
-    startRange = "04-05-2017 12:34:56";
-    endRange = "04-05-2017 12:34:56";
+    startRange = "05-06-2017 12:34:56";
+    endRange = "05-06-2017 12:34:56";
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -910,7 +905,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -923,12 +918,12 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     maskingProvider = new DateTimeMaskingProvider(configuration);
 
     originalDateTime = "31-05-2017 12:34:56";
-    startRange = "13-05-2017 12:34:56";
-    endRange = "14-05-2017 12:34:56";
+    startRange = "14-06-2017 12:34:56";
+    endRange = "15-06-2017 12:34:56";
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRange, endRange));
+      isDateTimeInRange(maskedDateTime, startRange, endRange, "dd-MM-yyyy HH:mm:ss");
     }
   }
 
@@ -959,8 +954,11 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown)
-          || isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp));
+      try {
+        isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown, "dd-MM-yyyy HH:mm:ss");
+      } catch (RangeException e) {
+        isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp, "dd-MM-yyyy HH:mm:ss");
+      }
     }
 
     //
@@ -980,8 +978,11 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown)
-          || isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp));
+      try {
+        isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown, "dd-MM-yyyy HH:mm:ss");
+      } catch (RangeException e) {
+        isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp, "dd-MM-yyyy HH:mm:ss");
+      }
     }
 
     //
@@ -999,7 +1000,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRangeDown, endRangeUp));
+      isDateTimeInRange(maskedDateTime, startRangeDown, endRangeUp, "dd-MM-yyyy HH:mm:ss");
     }
 
     //
@@ -1019,34 +1020,56 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     for (int i = 0; i < NUM_LOOP_NON_PERF_TEST; ++i) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertTrue(isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown)
-          || isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp));
+      try {
+        isDateTimeInRange(maskedDateTime, startRangeDown, endRangeDown, "dd-MM-yyyy HH:mm:ss");
+      } catch (RangeException e) {
+        isDateTimeInRange(maskedDateTime, startRangeUp, endRangeUp, "dd-MM-yyyy HH:mm:ss");
+      }
     }
   }
 
+  private class RangeException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    public RangeException(String message) {
+      super(message);
+    }
+  }
+  
   /**
    * Determines if the specified datetime is contained (inclusive) in the specified datetime range.
    *
    * @param dateTime the datetime to check
    * @param startRange the start of the range, or null
    * @param endRange the end of the range, or null
+   * 
+   * @throws RangeException if the date is out of range
    */
-  private boolean isDateTimeInRange(String dateTime, String startRange, String endRange)
-      throws ParseException {
-    assertNotNull(dateTime);
-    Date dateTimeAsDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(dateTime);
+  private void isDateTimeInRange(String dateTime, String startRange, String endRange,
+      String formatPattern) throws RangeException {
+    DateTimeFormatter f = new DateTimeFormatterBuilder().parseCaseInsensitive()
+        .appendPattern(formatPattern).parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+        .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+        .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+
+    if (dateTime == null) {
+      throw new RangeException("datetime is null");
+    }
+    LocalDateTime dateTimeAsDate = LocalDateTime.from(f.parse(dateTime));
     assertNotNull(dateTimeAsDate);
     if (startRange != null) {
-      Date startRangeAsDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(startRange);
-      assertNotNull(startRangeAsDate);
-      return !dateTimeAsDate.before(startRangeAsDate);
+      LocalDateTime startRangeAsDate = LocalDateTime.from(f.parse(startRange));
+      if (dateTimeAsDate.isBefore(startRangeAsDate)) {
+        throw new RangeException(dateTime + " is before " + startRange);
+      }
     }
     if (endRange != null) {
-      Date endRangeAsDate = new SimpleDateFormat(DATE_TIME_FORMAT).parse(endRange);
-      assertNotNull(endRangeAsDate);
-      return !dateTimeAsDate.after(endRangeAsDate);
+      LocalDateTime endRangeAsDate = LocalDateTime.from(f.parse(endRange));
+      if (dateTimeAsDate.isAfter(endRangeAsDate)) {
+        throw new RangeException(dateTime + " is after " + endRange);
+      }
     }
-    return true;
   }
 
   @Test
