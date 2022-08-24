@@ -99,12 +99,12 @@ options and their default values.
 | format                               | String   | The format of the replacement range     | %s-%s             |
 | startValue                           | Integer  | The lower bound of the range            | 0                 |
 | useStartValue                        | Boolean  | Use the startValue as the lower bound   | false             |
-| useSingleBucketOverThreshold         | Boolean  | When this field is true, it checks for threshold value and group them | false             |
-| singleBucketOverThresholdValue       | Double   | The input value must be greater than or equal than to this threshold to be added to the special interval. | 90.0              |
-| singleBucketOverThresholdReplacement | String   | Default threshold value if input value is more | 90+               |
-| useSingleBucketUnderThreshold        | Boolean  | When this field is true, it checks for threshold value and group them| false             |
-| singleBucketUnderThresholdValue      | Double   | The input value must be less than this threshold to be added to the special interval.| 10.0              |
-| singleBucketUnderThresholdReplacement| String   | Default threshold value if input value is less | <10               |
+| useSingleBucketOverThreshold         | Boolean  | When this field is true, values greater than or equal to the given threshold are added to a single interval | false             |
+| singleBucketOverThresholdValue       | Double   | The input value must be greater than or equal than to this threshold to be added to the special interval | 90.0              |
+| singleBucketOverThresholdReplacement | String   | Label for the single interval for values at or above the threshold value | 90+               |
+| useSingleBucketUnderThreshold        | Boolean  | When this field is true, values less than the given threshold are added to a single interval | false             |
+| singleBucketUnderThresholdValue      | Double   | The input value must be less than this threshold to be added to the special interval | 10.0              |
+| singleBucketUnderThresholdReplacement| String   | Label for the single interval for values below the threshold value | <10               |
 
 #### CITY
 
