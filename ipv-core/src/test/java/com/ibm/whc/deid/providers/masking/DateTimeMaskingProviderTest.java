@@ -28,14 +28,6 @@ import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler
 public class DateTimeMaskingProviderTest extends TestLogSetUp {
   private static final int NUM_LOOP_NON_PERF_TEST = 20;
 
-  /*
-   * Tests all Datetime options. It tests various values for numerical and format options; however,
-   * it ignores the generalize weekYear option check because of Java inconsistencies in
-   * WEEK_OF_YEAR. The year, month, day...seconds mask boolean options, when set to true, are used
-   * to adjust the mask by the specified upward and downward values, these flags are not applicable
-   * when they are false and therefore no test case is defined for false value. It also tests for an
-   * compound masking and invalid value.
-   */
   @Test
   public void testMask() throws Exception {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
@@ -465,7 +457,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     assertEquals("01/2016", maskingProvider.mask("2016/02/28"));
     assertEquals("01/2016", maskingProvider.mask("2016-03-18"));
     assertEquals("02/2016", maskingProvider.mask("12-04-2016"));
-    String month = getMonthAbrvs()[4]; // May abbreviation in current locale
+    String month = getMonthAbbreviations()[4]; // May abbreviation in current locale
     assertEquals("02/2018", maskingProvider.mask("10-" + month + "-2018"));
     assertEquals("02/2017", maskingProvider.mask("12/06/2017"));
     assertEquals("03/2013", maskingProvider.mask("2013-07-04"));
@@ -1076,21 +1068,31 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testMaskMaxYears_OverMaxYears() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setYearMaxYearsAgoMask(true);
     maskingConfiguration.setYearMaxYearsAgo(90);
     maskingConfiguration.setYearShiftFromCurrentYear(52);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
-    LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusYears(100);
-    String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-
-    String expectedDateTime =
-        currentDate.minusYears(52).format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+    String originalDate = "16-04-1922 13:14:15";
+    int expectedYear = LocalDateTime.now().minusYears(52).getYear();
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertEquals(expectedDateTime, maskedDateTime);
+    assertEquals(
+        originalDate.substring(0, 6) + String.valueOf(expectedYear) + originalDate.substring(10),
+        maskedDateTime);
+
+    // check capitalization
+    String[] monthNames = getMonthAbbreviations();
+    String name = monthNames[1];
+    originalDate = "16-" + name + "-1921";
+    maskedDateTime = maskingProvider.mask(originalDate);
+    assertEquals(String.format("%02d-%s-%d", 16, name, expectedYear), maskedDateTime);
+
+    maskedDateTime = maskingProvider.mask(originalDate.toUpperCase());
+    assertEquals(String.format("%02d-%s-%d", 16, name.toUpperCase(), expectedYear), maskedDateTime);
+
+    maskedDateTime = maskingProvider.mask(originalDate.toLowerCase());
+    assertEquals(String.format("%02d-%s-%d", 16, name.toLowerCase(), expectedYear), maskedDateTime);
   }
 
   @Test
@@ -1206,30 +1208,56 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskMaxDays_OverMaxYears() throws Exception {
+  public void testDayMaxDaysAgoMask_Over() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setDayMaxDaysAgoMask(true);
     maskingConfiguration.setDayMaxDaysAgo(32850);
     maskingConfiguration.setDayShiftFromCurrentDay(18250);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusDays(33150);
+    LocalDateTime subtractedDate = currentDate.minusDays(32851L);
+    int expectedMon = subtractedDate.getMonthValue();
+    int expectedDay = subtractedDate.getDayOfMonth();
+    // if the expected date is Feb 29, changing the year might change the date -
+    // use one more day ago to avoid overly complicating the test
+    if (expectedMon == 2 && expectedDay == 29) {
+      subtractedDate = subtractedDate.minusDays(1L);
+      expectedDay = 28;
+    }
+    int expectedHour = subtractedDate.getHour();
+    int expectedMin = subtractedDate.getMinute();
+    int expectedSec = subtractedDate.getSecond();
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
 
-    Integer expectedMaskedYear = currentDate.minusDays(18250).getYear();
+    int expectedYear = currentDate.minusDays(18250).getYear();
+
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertFalse(maskedDateTime.equals(originalDate));
-    assertEquals(expectedMaskedYear.toString(), getYear(maskedDateTime));
+
+    assertEquals(String.format("%02d-%02d-%d %02d:%02d:%02d", expectedDay, expectedMon,
+        expectedYear, expectedHour, expectedMin, expectedSec), maskedDateTime);
+
+    // check capitalization
+    originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
+    maskedDateTime = maskingProvider.mask(originalDate);
+    String[] monthNames = getMonthAbbreviations();
+    String name = monthNames[expectedMon - 1];
+    assertEquals(String.format("%02d-%s-%d", expectedDay, name, expectedYear), maskedDateTime);
+
+    maskedDateTime = maskingProvider.mask(originalDate.toUpperCase());
+    assertEquals(String.format("%02d-%s-%d", expectedDay, name.toUpperCase(), expectedYear),
+        maskedDateTime);
+
+    maskedDateTime = maskingProvider.mask(originalDate.toLowerCase());
+    assertEquals(String.format("%02d-%s-%d", expectedDay, name.toLowerCase(), expectedYear),
+        maskedDateTime);
   }
 
   @Test
-  public void testMaskMaxDays_OverMaxYears_ReturnOnlyYear() throws Exception {
+  public void testDayMaxDaysAgoMask_Over_ReturnOnlyYear() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setDayMaxDaysAgoMask(true);
     maskingConfiguration.setDayMaxDaysAgo(32850);
     maskingConfiguration.setYearMaxYearsAgoOnlyYear(true);
@@ -1247,36 +1275,33 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskMaxDays_UnderMaxYears() throws Exception {
+  public void testDayMaxDaysAgoMask_Equal() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setDayMaxDaysAgoMask(true);
     maskingConfiguration.setDayMaxDaysAgo(32850);
     maskingConfiguration.setDayShiftFromCurrentDay(18250);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     LocalDateTime currentDate = LocalDateTime.now();
-    LocalDateTime subtractedDate = currentDate.minusDays(30850);
+    LocalDateTime subtractedDate = currentDate.minusDays(32850);
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertTrue(maskedDateTime.equals(originalDate));
+    assertEquals(originalDate, maskedDateTime);
   }
 
   @Test
-  public void testMaskMaxDays_NotEnabled() throws Exception {
+  public void testDayMaxDaysAgoMask_NotEnabled() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setDayMaxDaysAgoMask(false);
     maskingConfiguration.setDayMaxDaysAgo(32850);
     maskingConfiguration.setDayShiftFromCurrentDay(18250);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
-    String originalDate = "02-12-1924 00:00:00";
+    String originalDate = "02-12-1914 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertTrue(originalDate.equals(maskedDateTime));
-    assertEquals("1924", getYear(maskedDateTime));
+    assertEquals(originalDate, maskedDateTime);
   }
 
   @Test
@@ -1284,7 +1309,6 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testMaskOverride_NotEnabled() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(maskingConfiguration);
-
     maskingConfiguration.setOverrideMask(false);
     maskingConfiguration.setOverrideYearsPassed(90);
     maskingConfiguration.setOverrideValue("done anyway");
@@ -1292,7 +1316,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     String originalDate = "1910-02-12 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDate);
-    assertTrue(maskedDateTime.equals(originalDate));
+    assertEquals(originalDate, maskedDateTime);
   }
 
   @Test
@@ -1361,6 +1385,36 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String originalDate = subtractedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     String maskedDateTime = maskingProvider.mask(originalDate);
     assertTrue("OVER 70".equals(maskedDateTime));
+  }
+
+  @Test
+  public void testCapitalization() {
+    // task date components
+    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
+    setAllDateTimeMaskingToFalse(configuration);
+    configuration.setYearMask(true);
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
+
+    String[] names = getMonthAbbreviations();
+    assertTrue(maskingProvider.mask("05-" + names[9] + "-2016").startsWith("05-" + names[9] + "-"));
+    assertTrue(maskingProvider.mask("06-" + names[10].toLowerCase() + "-2016")
+        .startsWith("06-" + names[10].toLowerCase() + "-"));
+    assertTrue(maskingProvider.mask("07-" + names[11].toUpperCase() + "-2016")
+        .startsWith("07-" + names[11].toUpperCase() + "-"));
+    
+    // shift constant seconds
+    configuration = new DateTimeMaskingProviderConfig();
+    setAllDateTimeMaskingToFalse(configuration);
+    configuration.setMaskShiftDate(true);
+    configuration.setMaskShiftSeconds(-1);
+    maskingProvider = new DateTimeMaskingProvider(configuration);
+
+    // shifting one second back from the start of Aug 1, gives July 31
+    assertEquals("31-" + names[6] + "-2016", maskingProvider.mask("01-" + names[7] + "-2016"));
+    assertEquals("31-" + names[6].toLowerCase() + "-2016",
+        maskingProvider.mask("01-" + names[7].toLowerCase() + "-2016"));
+    assertEquals("31-" + names[6].toUpperCase() + "-2016",
+        maskingProvider.mask("01-" + names[7].toUpperCase() + "-2016"));
   }
 
   @Test
@@ -1483,7 +1537,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   /**
    * Gets the month abbreviations in the default locale, which can be different for each caller.
    */
-  private String[] getMonthAbrvs() {
+  private String[] getMonthAbbreviations() {
     String[] abrvs = new String[12];
     DateTimeFormatter f = new DateTimeFormatterBuilder().appendPattern("MMM").toFormatter();
     for (int i = 0; i < 12; i++) {

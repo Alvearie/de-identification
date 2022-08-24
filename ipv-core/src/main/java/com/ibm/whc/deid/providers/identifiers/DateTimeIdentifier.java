@@ -43,8 +43,12 @@ public class DateTimeIdentifier extends AbstractIdentifier {
           Pattern.compile("^\\d{2}/\\d{2}/\\d{4}( \\d{2}:\\d{2}:\\d{2})?$"),
           Pattern.compile("^\\d{4}/\\d{2}/\\d{2}( \\d{2}:\\d{2}:\\d{2})?$")};
 
-  private static final DateTimeFormatter dateFormats[] = new DateTimeFormatter[patterns.length];
+  // Indicates whether the pattern includes an alphabetic component that could benefit from
+  // character case awareness
+  private static final boolean[] patternHasVariableCaseComponent =
+      {false, true, false, false, false, false, false, false, false};
 
+  private static final DateTimeFormatter dateFormats[] = new DateTimeFormatter[patterns.length];
   static {
     for (int i = 0; i < patterns.length; i++) {
       dateFormats[i] = new DateTimeFormatterBuilder().parseCaseInsensitive()
@@ -59,10 +63,12 @@ public class DateTimeIdentifier extends AbstractIdentifier {
 
     private final DateTimeFormatter formatter;
     private final TemporalAccessor accessor;
+    private final boolean variableCase;
 
-    public DateTimeParseResult(DateTimeFormatter f, TemporalAccessor a) {
+    public DateTimeParseResult(DateTimeFormatter f, TemporalAccessor a, boolean vc) {
       accessor = a;
       formatter = f;
+      variableCase = vc;
     }
 
     public DateTimeFormatter getFormatter() {
@@ -71,6 +77,10 @@ public class DateTimeIdentifier extends AbstractIdentifier {
 
     public TemporalAccessor getValue() {
       return accessor;
+    }
+
+    public boolean isVariableCase() {
+      return variableCase;
     }
   }
 
@@ -90,7 +100,10 @@ public class DateTimeIdentifier extends AbstractIdentifier {
   public DateTimeParseResult parse(String data) {
     try {
       TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(data);
-      return new DateTimeParseResult(DateTimeFormatter.ISO_OFFSET_DATE_TIME, temporalAccessor);
+      // although this format does include some alphabetic components, values formatted from this
+      // pattern should always use the standard character case, so "variable case" is false
+      return new DateTimeParseResult(DateTimeFormatter.ISO_OFFSET_DATE_TIME, temporalAccessor,
+          false);
     } catch (Exception e) {
       // nothing required here
     }
@@ -100,7 +113,7 @@ public class DateTimeIdentifier extends AbstractIdentifier {
         try {
           DateTimeFormatter f = dateFormats[i];
           TemporalAccessor d = f.parse(data);
-          return new DateTimeParseResult(f, d);
+          return new DateTimeParseResult(f, d, patternHasVariableCaseComponent[i]);
         } catch (Exception e) {
           log.logError(LogCodes.WPH1012W, e);
         }

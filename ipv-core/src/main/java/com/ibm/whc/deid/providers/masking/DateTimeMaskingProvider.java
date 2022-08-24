@@ -31,8 +31,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
   private static final DateTimeIdentifier dateTimeIdentifier = new DateTimeIdentifier();
 
-  private final boolean shiftDate;
-  private final int shiftSeconds;
+  private final boolean maskShiftDate;
+  private final int maskShiftSeconds;
 
   private final boolean generalizeWeekYear;
   private final boolean generalizeMonthYear;
@@ -90,8 +90,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     this.fixedFormatString = configuration.getFormatFixed();
 
-    this.shiftDate = configuration.isMaskShiftDate();
-    this.shiftSeconds = configuration.getMaskShiftSeconds();
+    this.maskShiftDate = configuration.isMaskShiftDate();
+    this.maskShiftSeconds = configuration.getMaskShiftSeconds();
 
     this.generalizeWeekYear = configuration.isGeneralizeWeekyear();
     this.generalizeMonthYear = configuration.isGeneralizeMonthyear();
@@ -151,11 +151,12 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       return null;
     }
 
-    boolean isLowercase = identifier.equals(identifier.toLowerCase());
-    boolean isUppercase = identifier.equals(identifier.toUpperCase());
+    boolean isAllLowerCase = identifier.equals(identifier.toLowerCase());
+    boolean isAllUpperCase = identifier.equals(identifier.toUpperCase());
 
     DateTimeFormatter f = null;
     TemporalAccessor d = null;
+    boolean patternContainsCaseInsensitiveCharacters = false;
 
     if (this.fixedFormatString != null && !this.fixedFormatString.trim().isEmpty()) {
       try {
@@ -170,6 +171,8 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
         try {
           d = fixedFormatter.parse(identifier);
           f = fixedFormatter;
+          // don't apply character case alterations when using custom format
+          patternContainsCaseInsensitiveCharacters = false;
         } catch (DateTimeParseException e) {
           return applyUnexpectedValueHandling(identifier,
               () -> RandomGenerators.generateRandomDate(fixedFormatter));
@@ -188,6 +191,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       }
       f = parseResult.getFormatter();
       d = parseResult.getValue();
+      patternContainsCaseInsensitiveCharacters = parseResult.isVariableCase();
     }
 
     // keep as much time zone information as available from the original    
@@ -230,7 +234,9 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
           return String.format("%d", newyear);
         }
         datetime = datetime.with(ChronoField.YEAR, newyear);
-        return f.format(datetime);
+        String result = f.format(datetime);
+        return applyCharacterCase(patternContainsCaseInsensitiveCharacters, result, isAllUpperCase,
+            isAllLowerCase);
       }
     }
 
@@ -247,7 +253,9 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
           return String.format("%d", newyear);
         }
         datetime = datetime.with(ChronoField.YEAR, newyear);
-        return f.format(datetime);
+        String result = f.format(datetime);
+        return applyCharacterCase(patternContainsCaseInsensitiveCharacters, result, isAllUpperCase,
+            isAllLowerCase);
       }
     }
 
@@ -262,9 +270,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     }
 
     // Return the input date shifted a given, constant number of seconds
-    if (shiftDate) {
-      datetime = datetime.plus(shiftSeconds, ChronoUnit.SECONDS);
-      return f.format(datetime);
+    if (maskShiftDate) {
+      datetime = datetime.plus(maskShiftSeconds, ChronoUnit.SECONDS);
+      String result = f.format(datetime);
+      return applyCharacterCase(patternContainsCaseInsensitiveCharacters, result, isAllUpperCase,
+          isAllLowerCase);
     }
 
     // Return the week and the year
@@ -376,27 +386,21 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       datetime = datetime.plus(randomSeconds - second, ChronoUnit.SECONDS);
     }
 
-    return f.format(datetime);
+    String result = f.format(datetime);
+    return applyCharacterCase(patternContainsCaseInsensitiveCharacters, result, isAllUpperCase,
+        isAllLowerCase);
+  }
 
-    // @formatter:off
-    /*
-    String result = null;
-
-    if (f.toString().equals(DateTimeFormatter.ISO_OFFSET_DATE_TIME.toString())) {
-      result = f.withZone(ZoneOffset.UTC).format(cal.getTime().toInstant());
-    } else {
-      result = f.withZone(ZoneId.systemDefault()).format(cal.getTime().toInstant());
+  protected String applyCharacterCase(boolean patternContainsCaseInsensitveChars, String datetime,
+      boolean wasAllUpperCase, boolean wasAllLowerCase) {
+    String result = datetime;
+    if (patternContainsCaseInsensitveChars) {
+      if (wasAllUpperCase) {
+        result = datetime.toUpperCase();
+      } else if (wasAllLowerCase) {
+        result = datetime.toLowerCase();
+      }
     }
-
-    // solving the issues with cases
-    if (isLowercase) {
-      return result.toLowerCase();
-    } else if (isUppercase) {
-      return result.toUpperCase();
-    } else {
-      return result;
-    }
-    */
-    // @formatter:on
+    return result;
   }
 }
