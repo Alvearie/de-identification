@@ -89,8 +89,9 @@ options and their default values.
 >   The interval's width is configurable, but is constant across the domain of values.  The range
 >   is inclusive on the lower bound and exclusive on the upper bound. The format in which the interval is presented is 
 >   configurable.  For examples of valid formats, see the java documentation for java.util.Formatter.
->   For threshold values, it uses a constant values. For example if values is 3, its under threshold value would be >10.
->   Useful for age generalizations: <8, 5-10, 10-15, ..., 85-90, 90+.
+>   The provider also optionally supports grouping all values below a given threshold and/or all values above a given
+>   threshold into a single interval with a given, constant label. This is useful for age generalization, allowing replacement 
+>   values such as: <8, 5-10, 10-15, ..., 85-90, 90+
 
 | **Option name**                      | **Type** | **Description**                         | **Default value** |
 |--------------------------------------|----------|-----------------------------------------|-------------------|
@@ -98,12 +99,12 @@ options and their default values.
 | format                               | String   | The format of the replacement range     | %s-%s             |
 | startValue                           | Integer  | The lower bound of the range            | 0                 |
 | useStartValue                        | Boolean  | Use the startValue as the lower bound   | false             |
-| useSingleBucketOverThreshold         | Boolean  | Use the startValue as the lower bound   | false             |
-| singleBucketOverThresholdValue       | Double   | Use the startValue as the lower bound   | 90.0              |
-| singleBucketOverThresholdReplacement | String   | Use the startValue as the lower bound   | 90+               |
-| useSingleBucketUnderThreshold        | Boolean  | Use the startValue as the lower bound   | false             |
-| singleBucketUnderThresholdValue      | Double   | Use the startValue as the lower bound   | 10.0              |
-| singleBucketUnderThresholdReplacement| String   | Use the startValue as the lower bound   | >10               |
+| useSingleBucketOverThreshold         | Boolean  | When this field is true, it checks for threshold value and group them | false             |
+| singleBucketOverThresholdValue       | Double   | The input value must be greater than or equal than to this threshold to be added to the special interval. | 90.0              |
+| singleBucketOverThresholdReplacement | String   | Default threshold value if input value is more | 90+               |
+| useSingleBucketUnderThreshold        | Boolean  | When this field is true, it checks for threshold value and group them| false             |
+| singleBucketUnderThresholdValue      | Double   | The input value must be less than this threshold to be added to the special interval.| 10.0              |
+| singleBucketUnderThresholdReplacement| String   | Default threshold value if input value is less | <10               |
 
 #### CITY
 
