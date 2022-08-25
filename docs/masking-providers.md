@@ -447,8 +447,7 @@ these may be activated in a masking rule.
 | **Property name**                  | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | overrideMask                       | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                            | false             |
-| overrideYearsPassed                | Integer  | Number of years that must have elapsed between the input value and the current date and time for the constant value to be returned  
-| 0                 |
+| overrideYearsPassed                | Integer  | Number of years that must have elapsed between the input value and the current date and time for the constant value to be returned     | 0             |
 | overrideValue                      | String   | (Optional) Value returned if the input value the number of years threshold.    | The `overrideYearsPassed` value followed by the plus sign ('+'), as in 90+ |
 
 
@@ -457,12 +456,9 @@ these may be activated in a masking rule.
 | **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | yearMaxYearsAgoMask                | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                    | false             |
-| yearMaxYearsAgo                    | Integer  | Number of years that must have elapsed between the input value and the current date and time for the year to be replaced
-| 0                 |
-| yearShiftFromCurrentYear           | Integer  | Number of years to subtract from the current year to get the replacement year
-| 0                 |
-| yearMaxYearsAgoOnlyYear            | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs
-| false             |
+| yearMaxYearsAgo                    | Integer  | Number of years that must have elapsed between the input value and the current date and time for the year to be replaced | 0                 |
+| yearShiftFromCurrentYear           | Integer  | Number of years to subtract from the current year to get the replacement year | 0                 |
+| yearMaxYearsAgoOnlyYear            | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs  | false             |
 
 
 **Replace the year with the year for the given number of days before the current date if the input date and time is at least a given number of days ago**
@@ -470,10 +466,8 @@ these may be activated in a masking rule.
 | **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | dayMaxDaysAgoMask                  | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                   | false             |
-| dayMaxDaysAgo                      | Integer  | Number of days that must have elapsed between the input value and the current date and time for the year to be replaced
-| 0                 |
-| dayShiftFromCurrentDay             | Integer  | Number of days to subtract from the current date to get the replacement year
-| 0                 |
+| dayMaxDaysAgo                      | Integer  | Number of days that must have elapsed between the input value and the current date and time for the year to be replaced | 0                 |
+| dayShiftFromCurrentDay             | Integer  | Number of days to subtract from the current date to get the replacement year | 0                 |
 | dayMaxDaysAgoOnlyYear              | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs                                                                                                                                     | false             |
 
 
@@ -495,8 +489,7 @@ and configure them.  At most one of these may be activated in a masking rule.
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
 |------------------------------------|----------|--------------------------------------------------------|-------------------|
 | maskShiftDate                      | Boolean  | Whether this manipulation is to be used.               | false             |
-| maskShiftSeconds                   | Integer  | The number of seconds to shift the input date and time.  This value can be negative.
-| 0                 |
+| maskShiftSeconds                   | Integer  | The number of seconds to shift the input date and time.  This value can be negative. | 0                 |
 
 
 **Generalize to Week and Year**
