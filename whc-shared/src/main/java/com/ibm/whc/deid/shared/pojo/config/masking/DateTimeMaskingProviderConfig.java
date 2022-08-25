@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
@@ -28,6 +29,49 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
           + "generalizeYear, yearDelete, generalizeYearMaskAgeOver90, "
           + "generalizeMonthyearMaskAgeOver90, or one or more of these options: "
           + "yearMask, monthMask, dayMask, hourMask, minutesMask, secondsMask.";
+
+  private static final ConcurrentHashMap<String, DateTimeFormatter> dateTimeFormatterCache =
+      new ConcurrentHashMap<>();
+
+  public static DateTimeFormatter getCachedFormatter(String pattern) {
+    return dateTimeFormatterCache.get(pattern);
+  }
+
+  public static void addCachedFormatter(String pattern, DateTimeFormatter formatter) {
+    // limit the number of cached formatters
+    if (dateTimeFormatterCache.size() < 20) {
+      dateTimeFormatterCache.put(pattern, formatter);
+    }
+  }
+
+  /**
+   * Builds a DateTimeFormatter from the given pattern. The formatter supports case-insensitive
+   * parsing and defaults values for month, day, hour, minute, and second if not provided by the
+   * pattern.
+   * 
+   * @param pattern the format pattern
+   * 
+   * @return the formatter or <i>null</i> if the given pattern is null or empty
+   * 
+   * @throws IllegalArgumentException if the given pattern is invalid
+   */
+  public static DateTimeFormatter buildOverrideFormatter(String pattern)
+      throws IllegalArgumentException {
+    DateTimeFormatter formatter = null;
+    if (pattern != null && !pattern.trim().isEmpty()) {
+      formatter = getCachedFormatter(pattern);
+      if (formatter == null) {
+        formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern(pattern)
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+        addCachedFormatter(pattern, formatter);
+      }
+    }
+    return formatter;
+  }
 
   private int hourRangeDown = 100;
   private boolean minutesMask = true;
@@ -72,6 +116,11 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean yearDelete = false;
   private boolean yearDeleteNdays = false;
   private int yearDeleteNdaysValue = 365;
+  private String yearDeleteNdaysOutputFormat = null;
+  private String generalizeMonthYearOutputFormat = null;
+  private String generalizeQuarterYearOutputFormat = null;
+  private String yearDeleteOutputFormat = null;
+  private String generalizeMonthYearMaskAgeOver90OutputFormat = null;
 
   public DateTimeMaskingProviderConfig() {
     type = MaskingProviderType.DATETIME;
@@ -421,28 +470,46 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.dayMaxDaysAgoOnlyYear = dayMaxDaysAgoOnlyYear;
   }
 
-  /**
-   * Builds a DateTimeFormatter from the given pattern. The formatter supports case-insensitive
-   * parsing and defaults values for month, day, hour, minute, and second if not provided by the
-   * pattern.
-   * 
-   * @param pattern the format pattern
-   * 
-   * @return the formatter or <i>null</i> if the given pattern is null or empty
-   * 
-   * @throws IllegalArgumentException if the given pattern is invalid
-   */
-  public static DateTimeFormatter buildFormatter(String pattern)
-      throws IllegalArgumentException {
-    DateTimeFormatter formatter = null;
-    if (pattern != null && !pattern.trim().isEmpty()) {
-      formatter = new DateTimeFormatterBuilder().parseCaseInsensitive()
-          .appendPattern(pattern).parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-          .parseDefaulting(ChronoField.DAY_OF_MONTH, 1).parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-          .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-          .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
-    }
-    return formatter;
+  public String getYearDeleteNdaysOutputFormat() {
+    return yearDeleteNdaysOutputFormat;
+  }
+
+  public void setYearDeleteNdaysOutputFormat(String yearDeleteNdaysOutputFormat) {
+    this.yearDeleteNdaysOutputFormat = yearDeleteNdaysOutputFormat;
+  }
+
+  public String getGeneralizeMonthYearOutputFormat() {
+    return generalizeMonthYearOutputFormat;
+  }
+
+  public void setGeneralizeMonthYearOutputFormat(String generalizeMonthYearOutputFormat) {
+    this.generalizeMonthYearOutputFormat = generalizeMonthYearOutputFormat;
+  }
+
+  public String getGeneralizeQuarterYearOutputFormat() {
+    return generalizeQuarterYearOutputFormat;
+  }
+
+  public void setGeneralizeQuarterYearOutputFormat(String generalizeQuarterYearOutputFormat) {
+    this.generalizeQuarterYearOutputFormat = generalizeQuarterYearOutputFormat;
+  }
+
+  public String getYearDeleteOutputFormat() {
+    return yearDeleteOutputFormat;
+  }
+
+  public void setYearDeleteOutputFormat(String yearDeleteOutputFormat) {
+    this.yearDeleteOutputFormat = yearDeleteOutputFormat;
+  }
+
+  public String getGeneralizeMonthYearMaskAgeOver90OutputFormat() {
+    return generalizeMonthYearMaskAgeOver90OutputFormat;
+  }
+
+  public void setGeneralizeMonthYearMaskAgeOver90OutputFormat(
+      String generalizeMonthYearMaskAgeOver90OutputFormat) {
+    this.generalizeMonthYearMaskAgeOver90OutputFormat =
+        generalizeMonthYearMaskAgeOver90OutputFormat;
   }
 
   @Override
@@ -450,11 +517,50 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
       throws InvalidMaskingConfigurationException {
     super.validate(maskingConfig);
     try {
-      buildFormatter(formatFixed);
+      buildOverrideFormatter(formatFixed);
     } catch (IllegalArgumentException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`formatFixed` does not contain a valid pattern: " + e.getMessage(), e);
+    }
+    try {
+      buildOverrideFormatter(yearDeleteNdaysOutputFormat);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`yearDeleteNdaysOutputFormat` does not contain a valid pattern: " + e.getMessage(), e);
+    }
+    try {
+      buildOverrideFormatter(generalizeMonthYearOutputFormat);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`generalizeMonthYearOutputFormat` does not contain a valid pattern: " + e.getMessage(),
+          e);
+    }
+    try {
+      buildOverrideFormatter(generalizeQuarterYearOutputFormat);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`generalizeQuarterYearOutputFormat` does not contain a valid pattern: " + e.getMessage(),
+          e);
+    }
+    try {
+      buildOverrideFormatter(yearDeleteOutputFormat);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`yearDeleteOutputFormat` does not contain a valid pattern: " + e.getMessage(), e);
+    }
+    try {
+      buildOverrideFormatter(generalizeMonthYearMaskAgeOver90OutputFormat);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`generalizeMonthYearMaskAgeOver90OutputFormat` does not contain a valid pattern: "
+              + e.getMessage(),
+          e);
     }
     validateNotNegative(yearRangeDown, "yearRangeDown");
     validateNotNegative(yearRangeUp, "yearRangeUp");
@@ -523,12 +629,14 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     int result = super.hashCode();
     result = prime * result + Objects.hash(dayMask, dayMaxDaysAgo, dayMaxDaysAgoMask,
         dayMaxDaysAgoOnlyYear, dayRangeDown, dayRangeDownMin, dayRangeUp, dayRangeUpMin,
-        dayShiftFromCurrentDay, formatFixed, generalizeMonthyear, generalizeMonthyearMaskAgeOver90,
-        generalizeQuarteryear, generalizeWeekyear, generalizeYear, generalizeYearMaskAgeOver90,
-        hourMask, hourRangeDown, hourRangeUp, maskShiftDate, maskShiftSeconds, minutesMask,
-        minutesRangeDown, minutesRangeUp, monthMask, monthRangeDown, monthRangeUp, overrideMask,
-        overrideValue, overrideYearsPassed, secondsMask, secondsRangeDown, secondsRangeUp,
-        yearDelete, yearDeleteNdays, yearDeleteNdaysValue, yearMask, yearMaxYearsAgo,
+        dayShiftFromCurrentDay, formatFixed, generalizeMonthYearMaskAgeOver90OutputFormat,
+        generalizeMonthYearOutputFormat, generalizeMonthyear, generalizeMonthyearMaskAgeOver90,
+        generalizeQuarterYearOutputFormat, generalizeQuarteryear, generalizeWeekyear,
+        generalizeYear, generalizeYearMaskAgeOver90, hourMask, hourRangeDown, hourRangeUp,
+        maskShiftDate, maskShiftSeconds, minutesMask, minutesRangeDown, minutesRangeUp, monthMask,
+        monthRangeDown, monthRangeUp, overrideMask, overrideValue, overrideYearsPassed, secondsMask,
+        secondsRangeDown, secondsRangeUp, yearDelete, yearDeleteNdays, yearDeleteNdaysOutputFormat,
+        yearDeleteNdaysValue, yearDeleteOutputFormat, yearMask, yearMaxYearsAgo,
         yearMaxYearsAgoMask, yearMaxYearsAgoOnlyYear, yearRangeDown, yearRangeUp,
         yearShiftFromCurrentYear);
     return result;
@@ -553,8 +661,13 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         && dayRangeUp == other.dayRangeUp && dayRangeUpMin == other.dayRangeUpMin
         && dayShiftFromCurrentDay == other.dayShiftFromCurrentDay
         && Objects.equals(formatFixed, other.formatFixed)
+        && Objects.equals(generalizeMonthYearMaskAgeOver90OutputFormat,
+            other.generalizeMonthYearMaskAgeOver90OutputFormat)
+        && Objects.equals(generalizeMonthYearOutputFormat, other.generalizeMonthYearOutputFormat)
         && generalizeMonthyear == other.generalizeMonthyear
         && generalizeMonthyearMaskAgeOver90 == other.generalizeMonthyearMaskAgeOver90
+        && Objects.equals(generalizeQuarterYearOutputFormat,
+            other.generalizeQuarterYearOutputFormat)
         && generalizeQuarteryear == other.generalizeQuarteryear
         && generalizeWeekyear == other.generalizeWeekyear && generalizeYear == other.generalizeYear
         && generalizeYearMaskAgeOver90 == other.generalizeYearMaskAgeOver90
@@ -568,8 +681,10 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         && overrideYearsPassed == other.overrideYearsPassed && secondsMask == other.secondsMask
         && secondsRangeDown == other.secondsRangeDown && secondsRangeUp == other.secondsRangeUp
         && yearDelete == other.yearDelete && yearDeleteNdays == other.yearDeleteNdays
-        && yearDeleteNdaysValue == other.yearDeleteNdaysValue && yearMask == other.yearMask
-        && yearMaxYearsAgo == other.yearMaxYearsAgo
+        && Objects.equals(yearDeleteNdaysOutputFormat, other.yearDeleteNdaysOutputFormat)
+        && yearDeleteNdaysValue == other.yearDeleteNdaysValue
+        && Objects.equals(yearDeleteOutputFormat, other.yearDeleteOutputFormat)
+        && yearMask == other.yearMask && yearMaxYearsAgo == other.yearMaxYearsAgo
         && yearMaxYearsAgoMask == other.yearMaxYearsAgoMask
         && yearMaxYearsAgoOnlyYear == other.yearMaxYearsAgoOnlyYear
         && yearRangeDown == other.yearRangeDown && yearRangeUp == other.yearRangeUp

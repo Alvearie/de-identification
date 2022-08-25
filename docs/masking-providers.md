@@ -620,7 +620,9 @@ following property can be supplied to override the default formats:
 |------------------------------------|----------|--------------------------------------------------------|-----------|
 | formatFixed                        | String   | The date and time format to use                        | null      |
 
-If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  The format must at minimum include a year component.  The given value must be valid as per the java.time.format.DateTimeFormatter class.
+If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  
+The given value must be valid as per the java.time.format.DateTimeFormatter class.
+The format must at minimum include a year component.  
 
 
 #### DATETIME_CONSISTENT_SHIFT

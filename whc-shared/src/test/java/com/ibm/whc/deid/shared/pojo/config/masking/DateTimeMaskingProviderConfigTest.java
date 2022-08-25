@@ -23,6 +23,7 @@ public class DateTimeMaskingProviderConfigTest {
       config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
       assertTrue(e.getMessage().contains("`formatFixed` does not contain a valid pattern: "));
     }
 
@@ -30,6 +31,76 @@ public class DateTimeMaskingProviderConfigTest {
     config.validate(null);
 
     config.setFormatFixed(null);
+    config.setYearDeleteNdaysOutputFormat("TXT");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`yearDeleteNdaysOutputFormat` does not contain a valid pattern: "));
+    }
+
+    config.setYearDeleteNdaysOutputFormat("yy-MMM-dd");
+    config.validate(null);
+
+    config.setYearDeleteNdaysOutputFormat(null);
+    config.setGeneralizeMonthYearOutputFormat("TTXT");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`generalizeMonthYearOutputFormat` does not contain a valid pattern: "));
+    }
+
+    config.setGeneralizeMonthYearOutputFormat("yy-M-d");
+    config.validate(null);
+
+    config.setGeneralizeMonthYearOutputFormat(null);
+    config.setGeneralizeQuarterYearOutputFormat("KXT");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`generalizeQuarterYearOutputFormat` does not contain a valid pattern: "));
+    }
+
+    config.setGeneralizeQuarterYearOutputFormat("M-d-yy");
+    config.validate(null);
+
+    config.setGeneralizeQuarterYearOutputFormat(null);
+    config.setYearDeleteOutputFormat("TTD");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(
+          e.getMessage().contains("`yearDeleteOutputFormat` does not contain a valid pattern: "));
+    }
+
+    config.setYearDeleteOutputFormat("MM-yy-dd");
+    config.validate(null);
+
+    config.setYearDeleteOutputFormat(null);
+    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("XTTD");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().contains(
+          "`generalizeMonthYearMaskAgeOver90OutputFormat` does not contain a valid pattern: "));
+    }
+
+    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("MM-yyyy-dd");
+    config.validate(null);
+
+    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat(null);
 
     config.setHourRangeDown(-1);
     validateNegativeError(config, "hourRangeDown");

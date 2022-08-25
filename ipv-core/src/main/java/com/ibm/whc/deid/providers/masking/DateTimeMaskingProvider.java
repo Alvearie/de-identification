@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -21,7 +22,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig
 import com.ibm.whc.deid.util.RandomGenerators;
 
 /**
- * Applies privacy protection to datetime values.
+ * Applies privacy protection to date and timestamp values.
  */
 public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
@@ -162,7 +163,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     // note - this can throw IllegalArgumentException, but the pattern has already
     // been checked when the configuration was validated, so this should not occur
     final DateTimeFormatter fixedFormatter =
-        DateTimeMaskingProviderConfig.buildFormatter(formatFixed);
+        DateTimeMaskingProviderConfig.buildOverrideFormatter(formatFixed);
     if (fixedFormatter != null) {
       try {
         d = fixedFormatter.parse(identifier);
@@ -269,6 +270,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the week and the year
     if (generalizeWeekYear) {
+      // Note - DateTimeFormatter with pattern ww doesn't work as expected for week 53
       return String.format("%02d/%d", datetime.get(ChronoField.ALIGNED_WEEK_OF_YEAR),
           datetime.get(ChronoField.YEAR));
     }
@@ -281,12 +283,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the quarter and the year
     if (generalizeQuarterYear) {
-      int month = datetime.get(ChronoField.MONTH_OF_YEAR);
-      int quarter = (month / 3);
-      if (month % 3 > 0) {
-        quarter++;
+      final String PATTERN = "Q/yyyy";
+      DateTimeFormatter formatter = DateTimeMaskingProviderConfig.getCachedFormatter(PATTERN);
+      if (formatter == null) {
+        formatter = new DateTimeFormatterBuilder().appendPattern(PATTERN).toFormatter();
+        DateTimeMaskingProviderConfig.addCachedFormatter(PATTERN, formatter);
       }
-      return String.format("%02d/%d", quarter, datetime.get(ChronoField.YEAR));
+      return formatter.format(datetime);
     }
 
     // Return the year
