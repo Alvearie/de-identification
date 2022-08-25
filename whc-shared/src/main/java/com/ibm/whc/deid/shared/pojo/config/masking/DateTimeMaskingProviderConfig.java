@@ -5,16 +5,18 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Objects;
 
 /*
- * Provider for masking DateTime (timestamp) objects
+ * Configuration for the DATETIME privacy provider.
  */
 @JsonInclude(Include.NON_NULL)
 public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
@@ -419,17 +421,40 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.dayMaxDaysAgoOnlyYear = dayMaxDaysAgoOnlyYear;
   }
 
+  /**
+   * Builds a DateTimeFormatter from the given pattern. The formatter supports case-insensitive
+   * parsing and defaults values for month, day, hour, minute, and second if not provided by the
+   * pattern.
+   * 
+   * @param pattern the format pattern
+   * 
+   * @return the formatter or <i>null</i> if the given pattern is null or empty
+   * 
+   * @throws IllegalArgumentException if the given pattern is invalid
+   */
+  public static DateTimeFormatter buildFormatter(String pattern)
+      throws IllegalArgumentException {
+    DateTimeFormatter formatter = null;
+    if (pattern != null && !pattern.trim().isEmpty()) {
+      formatter = new DateTimeFormatterBuilder().parseCaseInsensitive()
+          .appendPattern(pattern).parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+          .parseDefaulting(ChronoField.DAY_OF_MONTH, 1).parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+          .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+          .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+    }
+    return formatter;
+  }
+
   @Override
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
     super.validate(maskingConfig);
-    if (formatFixed != null) {
-      try {
-        new DateTimeFormatterBuilder().appendPattern(formatFixed);
-      } catch (IllegalArgumentException e) {
-        throw new InvalidMaskingConfigurationException(
-            "`formatFixed` does not contain a valid pattern: " + e.getMessage(), e);
-      }
+    try {
+      buildFormatter(formatFixed);
+    } catch (IllegalArgumentException e) {
+      // thrown if the pattern is not a valid datetime pattern
+      throw new InvalidMaskingConfigurationException(
+          "`formatFixed` does not contain a valid pattern: " + e.getMessage(), e);
     }
     validateNotNegative(yearRangeDown, "yearRangeDown");
     validateNotNegative(yearRangeUp, "yearRangeUp");

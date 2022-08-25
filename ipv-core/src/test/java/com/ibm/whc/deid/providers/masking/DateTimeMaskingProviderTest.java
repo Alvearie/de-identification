@@ -111,13 +111,12 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
 
-    String originalDateTime = "08-22-1981";// 00:00:00";
+    String originalDateTime = "08-22-1981"; // 00:00:00
     boolean changed = false;
     for (int i = 0; i < 10; i++) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertNotNull(maskedDateTime);
-      assertTrue(maskedDateTime.equals("08-22-1981") || maskedDateTime.equals("09-22-1981")
-          || maskedDateTime.equals("10-22-1981"));
+      assertTrue("08-22-1981".equals(maskedDateTime) || "09-22-1981".equals(maskedDateTime)
+          || "10-22-1981".equals(maskedDateTime));
       if (!maskedDateTime.equals(originalDateTime)) {
         changed = true;
       }
@@ -204,6 +203,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     for (int i = 0; i < 100; i++) {
       String maskedDateTime = maskingProvider.mask(originalDateTime);
       assertNotNull(maskedDateTime);
+      assertEquals(originalDateTime.length(), maskedDateTime.length());
       int month = Integer.parseInt(maskedDateTime.substring(0, 2));
       assertTrue(Integer.toString(month), month >= 1 && month <= 12);
       assertEquals("-", maskedDateTime.substring(2, 3));

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -83,12 +82,12 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final boolean yearDelete;
   private final boolean yearDeleteNDays;
   private final int yearDeleteNDaysValue;
-  private final String fixedFormatString;
+  private final String formatFixed;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
     super(configuration);
 
-    this.fixedFormatString = configuration.getFormatFixed();
+    this.formatFixed = configuration.getFormatFixed();
 
     this.maskShiftDate = configuration.isMaskShiftDate();
     this.maskShiftSeconds = configuration.getMaskShiftSeconds();
@@ -160,31 +159,20 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     TemporalAccessor d = null;
     boolean patternContainsCaseInsensitiveCharacters = false;
 
-    if (this.fixedFormatString != null && !this.fixedFormatString.trim().isEmpty()) {
+    // note - this can throw IllegalArgumentException, but the pattern has already
+    // been checked when the configuration was validated, so this should not occur
+    final DateTimeFormatter fixedFormatter =
+        DateTimeMaskingProviderConfig.buildFormatter(formatFixed);
+    if (fixedFormatter != null) {
       try {
-        final DateTimeFormatter fixedFormatter =
-            new DateTimeFormatterBuilder().parseCaseInsensitive()
-                .appendPattern(this.fixedFormatString)
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
-        try {
-          d = fixedFormatter.parse(identifier);
-          f = fixedFormatter;
-          // don't apply character case alterations when using custom format
-          patternContainsCaseInsensitiveCharacters = false;
-        } catch (DateTimeParseException e) {
-          return applyUnexpectedValueHandling(identifier,
-              () -> RandomGenerators.generateRandomDate(fixedFormatter));
-        }
-      } catch (IllegalArgumentException e) {
-        // thrown if the pattern is not a valid datetime pattern
+        d = fixedFormatter.parse(identifier);
+        f = fixedFormatter;
+        // don't apply character case alterations when using custom format
+        patternContainsCaseInsensitiveCharacters = false;
+      } catch (DateTimeParseException e) {
         return applyUnexpectedValueHandling(identifier,
-            () -> RandomGenerators.generateRandomDate(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+            () -> RandomGenerators.generateRandomDate(fixedFormatter));
       }
-
     } else {
       DateTimeParseResult parseResult = dateTimeIdentifier.parse(identifier);
       if (parseResult == null) {
