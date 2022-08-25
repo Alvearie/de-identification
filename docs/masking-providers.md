@@ -427,85 +427,168 @@ unconditional manipulations that always mask the input value.
 Conditional manipulations are processed first and in a specified order.  If a conditional 
 manipulation is configured to be active and the input value meets its associated condition, 
 the input value is masked and processing for that input stops.  If the condition is not
-met, processing continues.  You may configure any number of conditional manipulations 
-to be active in a masking rule.  
+met, processing continues.  Any number of conditional manipulations may be activated in a
+masking rule.
 
 If no conditional manipulations are active or the input value has not met the condition
-of any active conditional manipulations, processing continues to the unconditional manipulations.
-Unlike conditional manipulations, only one unconditional manipulation may be active in any
+of any active conditional manipulation, processing continues to the unconditional manipulations.
+Unlike conditional manipulations, at most one unconditional manipulation may be active in any
 one masking rule.
+
 
 ##### Conditional Manipulations
 
 Here are the supported conditional manipulations and the property values necessary to activate
-them.  They are presented in the order in which they are processed.
-
+and configure them.  They are presented in the order in which they are processed.  Any number of
+these may be activated in a masking rule.
 
 **Replace the input with a constant value if the input date and time is at least at a given number of years ago**
    
-| **Property name**                                 | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| overrideMask                                      | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                            | false             |
-| overrideYearsPassed                               | Integer  | Number of years that must have elapsed between the input value and the current date and time for the constant value to be returned  
+| **Property name**                  | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| overrideMask                       | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                            | false             |
+| overrideYearsPassed                | Integer  | Number of years that must have elapsed between the input value and the current date and time for the constant value to be returned  
 | 0                 |
-| overrideValue                                     | String   | (Optional) Value returned if the input value the number of years threshold.    | The `overrideYearsPassed` value followed by the plus sign ('+'), as in 90+ |
+| overrideValue                      | String   | (Optional) Value returned if the input value the number of years threshold.    | The `overrideYearsPassed` value followed by the plus sign ('+'), as in 90+ |
 
 
 **Replace the year with the given number of years before the current year if the input date and time is at least a given number of years ago**
 
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| yearMaxYearsAgoMask                               | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                    | false             |
-| yearMaxYearsAgo                                   | Integer  | Number of years that must have elapsed between the input value and the current date and time for the year to be replaced
+| **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| yearMaxYearsAgoMask                | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                    | false             |
+| yearMaxYearsAgo                    | Integer  | Number of years that must have elapsed between the input value and the current date and time for the year to be replaced
 | 0                 |
-| yearShiftFromCurrentYear                          | Integer  | Number of years to subtract from the current year to get the replacement year
+| yearShiftFromCurrentYear           | Integer  | Number of years to subtract from the current year to get the replacement year
 | 0                 |
-| yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs
+| yearMaxYearsAgoOnlyYear            | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs
 | false             |
 
 
 **Replace the year with the year for the given number of days before the current date if the input date and time is at least a given number of days ago**
 
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| dayMaxDaysAgoMask                                 | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                   | false             |
-| dayMaxDaysAgo                                     | Integer  | Number of days that must have elapsed between the input value and the current date and time for the year to be replaced
+| **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| dayMaxDaysAgoMask                  | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                   | false             |
+| dayMaxDaysAgo                      | Integer  | Number of days that must have elapsed between the input value and the current date and time for the year to be replaced
 | 0                 |
-| dayShiftFromCurrentDay                            | Integer  | Number of days to subtract from the current date to get the replacement year
+| dayShiftFromCurrentDay             | Integer  | Number of days to subtract from the current date to get the replacement year
 | 0                 |
-| yearMaxYearsAgoOnlyYear                           | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs                                                                                                                                     | false             |
+| dayMaxDaysAgoOnlyYear              | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs                                                                                                                                     | false             |
 
 
-These examples are for the 10th of January 2016:
+**Replace the input with just its day and month if the input date occurred more recently than a given number of days ago**
 
-1.  Override with default or specified value, for example, **90+** or **Over 90 y.o.**.
-
-2.  Shift the date by constant amount.
-
-3.  Generalize to week number/year, for example, 02/2016.
-
-4.  Generalize to month/year, for example, 01/2016.
-
-5.  Generalize to quarter year, for example, 01/2016.
-
-6.  Generalize to year, for example, 2016.
-
-7.  Generalize to year (for example, 1927) and mask any age over 90.
-
-8.  Generalize to month/year (for example, 02/1927) and mask any age over 90.
-
-9.  Add random offsets to year, month, day, hour, minutes, and seconds.
-
-10. Apply maximum years ago.
-
-11. Apply maximum days ago.
-
-If the override option of the provider is set to **True**, then the override
-is processed first. If the rule criteria are met, all other options
-of the DATETIME provider are ignored.
+| **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
+|------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| yearDeleteNdays                    | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                                                                                                                                                                                                              | false             |
+| yearDeleteNdaysValue               | Integer  | The number of days ago.  The input must date must be more recent than this many days before the current date for the replacement to occur.                                                                                                                                                                                                  | 365               |
 
 
-The following formats are supported by the DATETIME masking provider by default:
+##### Unconditional Manipulations
+
+Here are the supported unconditional manipulations and the property values necessary to activate
+and configure them.  At most one of these may be activated in a masking rule.
+
+**Shift the date by a constant amount**
+
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| maskShiftDate                      | Boolean  | Whether this manipulation is to be used.               | false             |
+| maskShiftSeconds                   | Integer  | The number of seconds to shift the input date and time.  This value can be negative.
+| 0                 |
+
+
+**Generalize to Week and Year**
+The input date is replaced with the a two-digit week number, a slash, and the year, as in 02/2018.
+The first seven days of the year are considered week 1 regardless of which day of the week January 1 occurs.
+The next seven days are week 2 and so on.
+Note that December 31 (and in leap years December 30 as well) are considered to be week 53, even though traditionally
+a year is thought of as 52 weeks long.
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeWeekyear                 | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Generalize to Month and Year**
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeMonthyear                | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Generalize to Quarter and Year**
+The input date is replaced with the a two-digit quarter number, a slash, and the year, as in 02/2018.
+Any dates in the first three months of the year and considered quarter 1, the next three months quarter 2, and so on.
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeQuarteryear              | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Generalize to Year**
+The input date is replaced by its year number.
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeYear                     | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Generalize to Day and Month**
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| yearDelete                         | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Return the year from the input date adjusted so that it is not more than 90 years before the current year**
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeYearMaskAgeOver90        | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Return the month and year from the input date adjusted so that the year is not more than 90 years before the current year**
+   
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-------------------|
+| generalizeMonthyearMaskAgeOver90   | Boolean  | Whether this manipulation is to be used.               | false             |
+
+
+**Randomly shift the individual components of the date and time**
+Randomly determine an amount within a given range to shift the components of the date and time.
+Note that modifying a component of the date and time can cause the larger components to be modified as
+well, even if they are not configured to be randomly changed.  For example, if the date and time is
+2020-04-16 23:59:59, modifying the number of seconds to be 10 seconds higher will also change the 
+minute, hour, and day.
+
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-----------|
+| yearMask                           | Boolean  | Whether the year number should be modified             | true      |
+| yearRangeDown                      | Integer  | Maximum amount to shift the year number lower          | 10        |
+| yearRangeUp                        | Integer  | Maximum amount to shift the year number higher         | 0         |
+| monthMask                          | Boolean  | Whether the month number should be modified            | true      |
+| monthRangeDown                     | Integer  | Maximum amount to shift the month number lower         | 12        |
+| monthRangeUp                       | Integer  | Maximum amount to shift the month number higher        | 0         |
+| dayMask                            | Boolean  | Whether the day number should be modified              | true      |
+| dayRangeDownMin                    | Integer  | Minimum amount to shift the day number lower           | 0         |
+| dayRangeDown                       | Integer  | Maximum amount to shift the day number lower           | 7         |
+| dayRangeUpMin                      | Integer  | Minimum amount to shift the day number higher          | 0         |
+| dayRangeUp                         | Integer  | Maximum amount to shift the day number higher          | 0         |
+| hourMask                           | Boolean  | Whether the hour number should be modified             | true      |
+| hourRangeDown                      | Integer  | Maximum amount to shift the hour number lower          | 100       |
+| hourRangeUp                        | Integer  | Maximum amount to shift the hour number higher         | 0         |
+| minutesMask                        | Boolean  | Whether the minute number should be modified           | true      |
+| minutesRangeDown                   | Integer  | Maximum amount to shift the minute number lower        | 100       |
+| minutesRangeUp                     | Integer  | Maximum amount to shift the minute number higher       | 0         |
+| secondsMask                        | Boolean  | Whether the second number should be modified           | true      |
+| secondsRangeDown                   | Integer  | Maximum amount to shift the second number lower        | 100       |
+| secondsRangeUp                     | Integer  | Maximum amount to shift the second number higher       | 0         |
+
+
+##### Date and Time Formats
+The following date and time formats are recognized and supported by the DATETIME privacy provider by default:
 
 | **Format**                                   | **Examples**                          |
 |----------------------------------------------|---------------------------------------|
@@ -525,96 +608,27 @@ The following formats are supported by the DATETIME masking provider by default:
 | dd-MM-yyyy HH:mm:ss                          | 16-04-1967 13:14:15                   |
 | dd/MM/yyyy HH:mm:ss                          | 16/04/1967 13:14:15                   |
 
+Except where noted for specific manipulations, the privacy
+provider generates output values using the same pattern that matched the input value.  
+Minor changes to precision and formatting between the input value and output values can occur, however.
+For the `dd-MMM-yyyy` format which contains a textual value for the abbreviation for the month,
+the recognized values are based on the default locale of the system that is performing the masking.
+For example, the recognized abbreviation for January is **Jan** when 
+the default locale of the system is US English, **Jan.** when it is Canadian English, and **janv.** 
+when it is Canadian French.  The privacy provider performs case-insensitive processing when reading
+the abbreviations in input values.  If the input uses all upper case characters or all lower case
+characters, generated output values will also use all upper case or all lower case.  Otherwise,
+output values will be in the standard character case for the abbreviations as indicated by the locale.
 
- The DATETIME masking provider supports the following configuration options.
+If a datetime value to be protected is not in any of these default formats, the 
+following property can be supplied to override the default formats:
 
-**Options to change the recognized date and time formats**
-   
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| formatFixed                                       | String   | Datetime format                                                                                                                                                                                                                                                  | null              |
+| **Option name**                    | **Type** | **Description**                                        | **Default value** |
+|------------------------------------|----------|--------------------------------------------------------|-----------|
+| formatFixed                        | String   | The date and time format to use                        | null      |
 
 If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  The format must at minimum include a year component.  The given value must be valid as per the java.time.format.DateTimeFormatter class.
 
-
-
-**Options to shift by a constant amount**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| maskShiftDate                                     | Boolean  | Shift by a constant amount                                                                                                                                                                                                                                  | false             |
-| maskShiftSeconds                                  | Integer  | Number of seconds to shift                                                                                                                                                                                                                                          | 0                 |
-
-**Options to generalize a date and time**
-   
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| generalizeWeekyear                                | Boolean  | Generalize to week/year                                                                                                                                                                                                                                          | false             |
-| generalizeMonthyear                               | Boolean  | Generalize to mm/year                                                                                                                                                                                                                                            | false             |
-| generalizeQuarteryear                             | Boolean  | Generalize to quarter/year                                                                                                                                                                                                                                       | false             |
-| generalizeYear                                    | Boolean  | Generalize to year                                                                                                                                                                                                                                               | false             |
-| generalizeYearMaskAgeOver90                       | Boolean  | Generalize to year and mask any age of \>= 90 years old, by updating the date-of-birth to reflect 90 years from the current system date.                                                                                                                         | false             |
-| generalizeMonthyearMaskAgeOver90                  | Boolean  | Generalize to month/year, and mask any age \>= 90 by updating the date-of-birth to reflect 90 years from the current system date.                                                                                                                                 | false             |                                                                                                              | false             |
-
-  
-   **Options to mask a year**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| yearMask                                          | Boolean  | Mask year                                                                                                                                                                                                                                                        | true              |
-| yearRangeDown                                     | Integer  | Mask year range downwards                                                                                                                                                                                                                                        | 10                |
-| yearRangeUp                                       | Integer  | Mask year range upwards                                                                                                                                                                                                                                          | 0                 |
-
-   **Options to mask a month**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| monthMask                                         | Boolean  | Mask month                                                                                                                                                                                                                                                       | true              |
-| monthRangeDown                                    | Integer  | Mask month range downwards                                                                                                                                                                                                                                       | 12                |
-| monthRangeUp                                      | Integer  | Mask month range upwards                                                                                                                                                                                                                                         | 0                 |
-
-**Options to mask a day**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| dayMask                                           | Boolean  | Mask day                                                                                                                                                                                                                                                         | true              |
-| dayRangeDownMin                                   | Integer  | Mask day range downwards minimum                                                                                                                                                                                                                                 | 0                 |
-| dayRangeDown                                      | Integer  | Mask day range downwards maximum                                                                                                                                                                                                                                 | 7                 |
-| dayRangeUpMin                                     | Integer  | Mask day range upwards minimum                                                                                                                                                                                                                                   | 0                 |
-| dayRangeUp                                        | Integer  | Mask day range upwards maximum                                                                                                                                                                                                                                   | 0                 |
-   
-   **Options to mask an hour**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| hourMask                                          | Boolean  | Mask hour                                                                                                                                                                                                                                                        | true              |
-| hourRangeDown                                     | Integer  | Mask hour range downwards                                                                                                                                                                                                                                        | 100               |
-| hourRangeUp                                       | Integer  | Mask hour range upwards                                                                                                                                                                                                                                          | 0                 |
-
-   Options to mask a minute:
-	
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| minutesMask                                       | Boolean  | Mask minutes                                                                                                                                                                                                                                                     | true              |
-| minutesRangeDown                                  | Integer  | Mask minutes range downwards                                                                                                                                                                                                                                     | 100               |
-| minutesRangeUp                                    | Integer  | Mask minutes range upwards                                                                                                                                                                                                                                       | 0                 |
-
-   Options to mask a second:
-	
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| secondsMask                                       | Boolean  | Mask seconds                                                                                                                                                                                                                                                     | true              |
-| secondsRangeDown                                  | Integer  | Mask seconds range downwards                                                                                                                                                                                                                                     | 100               |
-| secondsRangeUp                                    | Integer  | Mask seconds range upwards                                                                                                                                                                                                                                       | 0                 |
-
-
-   **Options to delete the year**
-
-| **Option name**                                   | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
-|---------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
-| yearDelete                                        | Boolean  | Remove the year and return only the day and month                                                                                                                                                                                                  | false             |
-| yearDeleteNdays                                   | Boolean  | Remove the year and return only the day and month, if the date and time is after the given number of days ago                                                                                                                                                                                                                       | false             |
-| yearDeleteNdaysValue                              | Integer  | The number of days ago                                                                                                                                                                                                  | 365               |
 
 #### DATETIME_CONSISTENT_SHIFT
 
@@ -676,9 +690,24 @@ The provider formats the shifted date using the same pattern that matched the or
 Minor changes to precision and formatting between the original value and the shifted value can occur, however.
 For formats that include text, such dd-MMM-yyyy which contains the abbreviation for the month name,
 the recognized values for the text portions are based on the default locale of the system that is
-performing the masking.  For example, the recognized abbreviation for January might be **Jan** when 
+performing the protection.  For example, the recognized abbreviation for January might be **Jan** when 
 the default locale of the system is US English, **Jan.** when it is Canadian English, and **janv.** 
-when it is Canadian French.
+when it is Canadian French.  The privacy provider performs case-insensitive processing for the 
+abbreviation.
+
+Except where noted for specific manipulations, the privacy
+provider generates output values using the same pattern that matched the input value.  
+
+The provider formats the shifted date using the same pattern that matched the original input value.  
+Minor changes to precision and formatting between the input value and output values can occur, however.
+For the `dd-MMM-yyyy` format which contains a textual value for the abbreviation of the month,
+the recognized values are based on the default locale of the system that is performing the masking.
+For example, the recognized abbreviation for January is **Jan** when 
+the default locale of the system is US English, **Jan.** when it is Canadian English, and **janv.** 
+when it is Canadian French.  The privacy provider performs case-insensitive processing when reading
+the abbreviations in input values.  If the input uses all upper case characters or all lower case
+characters, generated output values will also use all upper case or all lower case.  Otherwise,
+output values will be in the standard character case for the abbreviations as indicated by the locale.
 
 If the input contains values to be protected that do not match any of these patterns, additional formats 
 can be added using the `customFormats` configuration parameter.  Input is matched to custom formats 

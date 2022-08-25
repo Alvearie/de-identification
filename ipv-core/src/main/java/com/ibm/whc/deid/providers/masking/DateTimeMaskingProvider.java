@@ -75,6 +75,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final boolean dayMaxDaysAgoMask;
   private final int dayMaxDaysAgo;
   private final int dayShiftFromCurrentDay;
+  private final boolean dayMaxDaysAgoOnlyYear;
 
   private final boolean overrideMask;
   private final int overrideYearsPassed;
@@ -130,9 +131,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.yearMaxYearsAgo = configuration.getYearMaxYearsAgo();
     this.yearMaxYearsAgoOnlyYear = configuration.isYearMaxYearsAgoOnlyYear();
     this.yearShiftFromCurrentYear = configuration.getYearShiftFromCurrentYear();
+
     this.dayMaxDaysAgoMask = configuration.isDayMaxDaysAgoMask();
     this.dayMaxDaysAgo = configuration.getDayMaxDaysAgo();
     this.dayShiftFromCurrentDay = configuration.getDayShiftFromCurrentDay();
+    this.dayMaxDaysAgoOnlyYear = configuration.isDayMaxDaysAgoOnlyYear();
 
     this.overrideMask = configuration.isOverrideMask();
     this.overrideYearsPassed = configuration.getOverrideYearsPassed();
@@ -248,7 +251,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       if (ChronoUnit.DAYS.between(datetime, now) >= dayMaxDaysAgo) {
         now = now.minus(dayShiftFromCurrentDay, ChronoUnit.DAYS);
         int newyear = now.get(ChronoField.YEAR);
-        if (yearMaxYearsAgoOnlyYear) {
+        if (dayMaxDaysAgoOnlyYear) {
           return String.format("%d", newyear);
         }
         datetime = datetime.with(ChronoField.YEAR, newyear);

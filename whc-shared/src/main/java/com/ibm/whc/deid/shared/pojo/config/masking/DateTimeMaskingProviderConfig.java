@@ -57,6 +57,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean yearMaxYearsAgoMask = false;
   private int yearMaxYearsAgo = 0;
   private boolean yearMaxYearsAgoOnlyYear = false;
+  private boolean dayMaxDaysAgoOnlyYear = false;
   private int yearShiftFromCurrentYear = 0;
   private boolean dayMaxDaysAgoMask = false;
   private int dayMaxDaysAgo = 0;
@@ -410,6 +411,14 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.yearDeleteNdaysValue = yearDeleteNdaysValue;
   }
 
+  public boolean isDayMaxDaysAgoOnlyYear() {
+    return dayMaxDaysAgoOnlyYear;
+  }
+
+  public void setDayMaxDaysAgoOnlyYear(boolean dayMaxDaysAgoOnlyYear) {
+    this.dayMaxDaysAgoOnlyYear = dayMaxDaysAgoOnlyYear;
+  }
+
   @Override
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
@@ -487,15 +496,16 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + Objects.hash(dayMask, dayMaxDaysAgo, dayMaxDaysAgoMask, dayRangeDown,
-        dayRangeDownMin, dayRangeUp, dayRangeUpMin, dayShiftFromCurrentDay, formatFixed,
-        generalizeMonthyear, generalizeMonthyearMaskAgeOver90, generalizeQuarteryear,
-        generalizeWeekyear, generalizeYear, generalizeYearMaskAgeOver90, hourMask, hourRangeDown,
-        hourRangeUp, maskShiftDate, maskShiftSeconds, minutesMask, minutesRangeDown, minutesRangeUp,
-        monthMask, monthRangeDown, monthRangeUp, overrideMask, overrideValue, overrideYearsPassed,
-        secondsMask, secondsRangeDown, secondsRangeUp, yearDelete, yearDeleteNdays,
-        yearDeleteNdaysValue, yearMask, yearMaxYearsAgo, yearMaxYearsAgoMask,
-        yearMaxYearsAgoOnlyYear, yearRangeDown, yearRangeUp, yearShiftFromCurrentYear);
+    result = prime * result + Objects.hash(dayMask, dayMaxDaysAgo, dayMaxDaysAgoMask,
+        dayMaxDaysAgoOnlyYear, dayRangeDown, dayRangeDownMin, dayRangeUp, dayRangeUpMin,
+        dayShiftFromCurrentDay, formatFixed, generalizeMonthyear, generalizeMonthyearMaskAgeOver90,
+        generalizeQuarteryear, generalizeWeekyear, generalizeYear, generalizeYearMaskAgeOver90,
+        hourMask, hourRangeDown, hourRangeUp, maskShiftDate, maskShiftSeconds, minutesMask,
+        minutesRangeDown, minutesRangeUp, monthMask, monthRangeDown, monthRangeUp, overrideMask,
+        overrideValue, overrideYearsPassed, secondsMask, secondsRangeDown, secondsRangeUp,
+        yearDelete, yearDeleteNdays, yearDeleteNdaysValue, yearMask, yearMaxYearsAgo,
+        yearMaxYearsAgoMask, yearMaxYearsAgoOnlyYear, yearRangeDown, yearRangeUp,
+        yearShiftFromCurrentYear);
     return result;
   }
 
@@ -512,9 +522,10 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     }
     DateTimeMaskingProviderConfig other = (DateTimeMaskingProviderConfig) obj;
     return dayMask == other.dayMask && dayMaxDaysAgo == other.dayMaxDaysAgo
-        && dayMaxDaysAgoMask == other.dayMaxDaysAgoMask && dayRangeDown == other.dayRangeDown
-        && dayRangeDownMin == other.dayRangeDownMin && dayRangeUp == other.dayRangeUp
-        && dayRangeUpMin == other.dayRangeUpMin
+        && dayMaxDaysAgoMask == other.dayMaxDaysAgoMask
+        && dayMaxDaysAgoOnlyYear == other.dayMaxDaysAgoOnlyYear
+        && dayRangeDown == other.dayRangeDown && dayRangeDownMin == other.dayRangeDownMin
+        && dayRangeUp == other.dayRangeUp && dayRangeUpMin == other.dayRangeUpMin
         && dayShiftFromCurrentDay == other.dayShiftFromCurrentDay
         && Objects.equals(formatFixed, other.formatFixed)
         && generalizeMonthyear == other.generalizeMonthyear

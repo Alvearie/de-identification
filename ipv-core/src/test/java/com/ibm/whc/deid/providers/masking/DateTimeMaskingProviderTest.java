@@ -1264,7 +1264,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     setAllDateTimeMaskingToFalse(maskingConfiguration);
     maskingConfiguration.setDayMaxDaysAgoMask(true);
     maskingConfiguration.setDayMaxDaysAgo(32850);
-    maskingConfiguration.setYearMaxYearsAgoOnlyYear(true);
+    maskingConfiguration.setDayMaxDaysAgoOnlyYear(true);
     maskingConfiguration.setDayShiftFromCurrentDay(18250);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
