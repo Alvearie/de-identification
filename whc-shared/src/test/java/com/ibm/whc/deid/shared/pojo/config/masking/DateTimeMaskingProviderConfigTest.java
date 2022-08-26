@@ -25,12 +25,13 @@ public class DateTimeMaskingProviderConfigTest {
     } catch (InvalidMaskingConfigurationException e) {
       System.out.println(e.getMessage());
       assertTrue(e.getMessage().contains("`formatFixed` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
     config.setFormatFixed("yyyy-MM-dd");
     config.validate(null);
-
     config.setFormatFixed(null);
+
+    // bad pattern
     config.setYearDeleteNdaysOutputFormat("TXT");
     try {
       config.validate(null);
@@ -39,12 +40,34 @@ public class DateTimeMaskingProviderConfigTest {
       System.out.println(e.getMessage());
       assertTrue(e.getMessage()
           .contains("`yearDeleteNdaysOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
-    config.setYearDeleteNdaysOutputFormat("yy-MMM-dd");
+    // unavailable fields in pattern
+    config.setYearDeleteNdaysOutputFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`yearDeleteNdaysOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: YearOfEra"));
+    }
+    // unavailable fields in pattern
+    config.setYearDeleteNdaysOutputFormat("MM-ddZ");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`yearDeleteNdaysOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: OffsetSeconds"));
+    }
+    config.setYearDeleteNdaysOutputFormat("MMM-dd");
     config.validate(null);
-
     config.setYearDeleteNdaysOutputFormat(null);
+
     config.setGeneralizeMonthYearOutputFormat("TTXT");
     try {
       config.validate(null);
@@ -53,12 +76,23 @@ public class DateTimeMaskingProviderConfigTest {
       System.out.println(e.getMessage());
       assertTrue(e.getMessage()
           .contains("`generalizeMonthYearOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
-    config.setGeneralizeMonthYearOutputFormat("yy-M-d");
+    // unavailable fields in pattern
+    config.setGeneralizeMonthYearOutputFormat("yyyy-MM'T'HH:mm:ssZ");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`generalizeMonthYearOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: HourOfDay"));
+    }
+    config.setGeneralizeMonthYearOutputFormat("yy-M");
     config.validate(null);
-
     config.setGeneralizeMonthYearOutputFormat(null);
+
     config.setGeneralizeQuarterYearOutputFormat("KXT");
     try {
       config.validate(null);
@@ -67,12 +101,23 @@ public class DateTimeMaskingProviderConfigTest {
       System.out.println(e.getMessage());
       assertTrue(e.getMessage()
           .contains("`generalizeQuarterYearOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
-    config.setGeneralizeQuarterYearOutputFormat("M-d-yy");
+    // unavailable fields in pattern
+    config.setGeneralizeQuarterYearOutputFormat("MM-yyyy:mm");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage()
+          .contains("`generalizeQuarterYearOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: MinuteOfHour"));
+    }
+    config.setGeneralizeQuarterYearOutputFormat("yyyy-Q'Q'");
     config.validate(null);
-
     config.setGeneralizeQuarterYearOutputFormat(null);
+
     config.setYearDeleteOutputFormat("TTD");
     try {
       config.validate(null);
@@ -81,12 +126,22 @@ public class DateTimeMaskingProviderConfigTest {
       System.out.println(e.getMessage());
       assertTrue(
           e.getMessage().contains("`yearDeleteOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
-    config.setYearDeleteOutputFormat("MM-yy-dd");
+    config.setYearDeleteOutputFormat("MM-dd-yy");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(
+          e.getMessage().contains("`yearDeleteOutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: YearOfEra"));
+    }
+    config.setYearDeleteOutputFormat("MM-dd");
     config.validate(null);
-
     config.setYearDeleteOutputFormat(null);
+
     config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("XTTD");
     try {
       config.validate(null);
@@ -95,11 +150,20 @@ public class DateTimeMaskingProviderConfigTest {
       System.out.println(e.getMessage());
       assertTrue(e.getMessage().contains(
           "`generalizeMonthYearMaskAgeOver90OutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-
-    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("MM-yyyy-dd");
+    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("MM-dd:yy");
+    try {
+      config.validate(null);
+      fail("expected exception");
+    } catch (InvalidMaskingConfigurationException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().contains(
+          "`generalizeMonthYearMaskAgeOver90OutputFormat` does not contain a valid pattern: "));
+      assertTrue(e.getMessage().contains("Unsupported field: DayOfMonth"));
+    }
+    config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("M/yy");
     config.validate(null);
-
     config.setGeneralizeMonthYearMaskAgeOver90OutputFormat(null);
 
     config.setHourRangeDown(-1);

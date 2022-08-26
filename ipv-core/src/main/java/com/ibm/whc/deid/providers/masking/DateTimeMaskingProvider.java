@@ -6,10 +6,11 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.time.LocalDateTime;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
+import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -35,11 +36,14 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
   private final boolean generalizeWeekYear;
   private final boolean generalizeMonthYear;
+  private final String generalizeMonthYearOutputFormat;
   private final boolean generalizeQuarterYear;
+  private final String generalizeQuarterYearOutputFormat;
   private final boolean generalizeYear;
 
   private final boolean generalizeYearMaskAgeOver90;
   private final boolean generalizeMonthYearMaskAgeOver90;
+  private final String generalizeMonthYearMaskAgeOver90OutputFormat;
 
   private final boolean yearMask;
   private final int yearRangeUp;
@@ -81,8 +85,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final int overrideYearsPassed;
   private final String overrideValue;
   private final boolean yearDelete;
+  private final String yearDeleteOutputFormat;
   private final boolean yearDeleteNDays;
   private final int yearDeleteNDaysValue;
+  private final String yearDeleteNdaysOutputFormat;
+
   private final String formatFixed;
 
   public DateTimeMaskingProvider(DateTimeMaskingProviderConfig configuration) {
@@ -95,11 +102,15 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     this.generalizeWeekYear = configuration.isGeneralizeWeekyear();
     this.generalizeMonthYear = configuration.isGeneralizeMonthyear();
+    this.generalizeMonthYearOutputFormat = configuration.getGeneralizeMonthYearOutputFormat();
     this.generalizeQuarterYear = configuration.isGeneralizeQuarteryear();
+    this.generalizeQuarterYearOutputFormat = configuration.getGeneralizeQuarterYearOutputFormat();
     this.generalizeYear = configuration.isGeneralizeYear();
 
     this.generalizeYearMaskAgeOver90 = configuration.isGeneralizeYearMaskAgeOver90();
     this.generalizeMonthYearMaskAgeOver90 = configuration.isGeneralizeMonthyearMaskAgeOver90();
+    this.generalizeMonthYearMaskAgeOver90OutputFormat =
+        configuration.getGeneralizeMonthYearMaskAgeOver90OutputFormat();
 
     this.yearMask = configuration.isYearMask();
     this.yearRangeUp = configuration.getYearRangeUp();
@@ -142,8 +153,10 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.overrideValue = configuration.getOverrideValue();
 
     this.yearDelete = configuration.isYearDelete();
+    this.yearDeleteOutputFormat = configuration.getYearDeleteOutputFormat();
     this.yearDeleteNDays = configuration.isYearDeleteNdays();
     this.yearDeleteNDaysValue = configuration.getYearDeleteNdaysValue();
+    this.yearDeleteNdaysOutputFormat = configuration.getYearDeleteNdaysOutputFormat();
   }
 
   @Override
@@ -163,7 +176,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     // note - this can throw IllegalArgumentException, but the pattern has already
     // been checked when the configuration was validated, so this should not occur
     final DateTimeFormatter fixedFormatter =
-        DateTimeMaskingProviderConfig.buildOverrideFormatter(formatFixed);
+        DateTimeMaskingProviderConfig.buildOverrideFormatter(formatFixed, null);
     if (fixedFormatter != null) {
       try {
         d = fixedFormatter.parse(identifier);
@@ -255,6 +268,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     if (yearDeleteNDays) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
       if (ChronoUnit.DAYS.between(datetime, now) < yearDeleteNDaysValue) {
+        MonthDay monthDay = MonthDay.of(datetime.get(ChronoField.MONTH_OF_YEAR),
+            datetime.get(ChronoField.DAY_OF_MONTH));
+        DateTimeFormatter outputFormatter = DateTimeMaskingProviderConfig
+            .buildOverrideFormatter(yearDeleteNdaysOutputFormat, monthDay);
+        if (outputFormatter != null) {
+          return outputFormatter.format(monthDay);
+        }
         return String.format("%02d/%02d", datetime.get(ChronoField.DAY_OF_MONTH),
             datetime.get(ChronoField.MONTH_OF_YEAR));
       }
@@ -277,19 +297,28 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the month and the year
     if (generalizeMonthYear) {
-      return String.format("%02d/%d", datetime.get(ChronoField.MONTH_OF_YEAR),
-          datetime.get(ChronoField.YEAR));
+      int year = datetime.get(ChronoField.YEAR);
+      int month = datetime.get(ChronoField.MONTH_OF_YEAR);
+      YearMonth yearMonth = YearMonth.of(year, month);
+      DateTimeFormatter outputFormatter = DateTimeMaskingProviderConfig
+          .buildOverrideFormatter(generalizeMonthYearOutputFormat, yearMonth);
+      if (outputFormatter != null) {
+        return outputFormatter.format(yearMonth);
+      }
+      return String.format("%02d/%d", month, year);
     }
 
     // Return the quarter and the year
     if (generalizeQuarterYear) {
-      final String PATTERN = "Q/yyyy";
-      DateTimeFormatter formatter = DateTimeMaskingProviderConfig.getCachedFormatter(PATTERN);
+      YearMonth yearMonth =
+          YearMonth.of(datetime.get(ChronoField.YEAR), datetime.get(ChronoField.MONTH_OF_YEAR));
+      DateTimeFormatter formatter = DateTimeMaskingProviderConfig
+          .buildOverrideFormatter(generalizeQuarterYearOutputFormat, yearMonth);
       if (formatter == null) {
-        formatter = new DateTimeFormatterBuilder().appendPattern(PATTERN).toFormatter();
-        DateTimeMaskingProviderConfig.addCachedFormatter(PATTERN, formatter);
+        final String PATTERN = "Q/yyyy";
+        formatter = DateTimeMaskingProviderConfig.buildOverrideFormatter(PATTERN, null);
       }
-      return formatter.format(datetime);
+      return formatter.format(yearMonth);
     }
 
     // Return the year
@@ -299,8 +328,15 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Return the day and month
     if (yearDelete) {
-      return String.format("%02d/%02d", datetime.get(ChronoField.DAY_OF_MONTH),
-          datetime.get(ChronoField.MONTH_OF_YEAR));
+      int month = datetime.get(ChronoField.MONTH_OF_YEAR);
+      int day = datetime.get(ChronoField.DAY_OF_MONTH);
+      MonthDay monthDay = MonthDay.of(month, day);
+      DateTimeFormatter outputFormatter =
+          DateTimeMaskingProviderConfig.buildOverrideFormatter(yearDeleteOutputFormat, monthDay);
+      if (outputFormatter != null) {
+        return outputFormatter.format(monthDay);
+      }
+      return String.format("%02d/%02d", day, month);
     }
 
     // Return the year from the input date modified so that it is not more
@@ -319,13 +355,17 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     // than 90 years before the current date
     if (generalizeMonthYearMaskAgeOver90) {
       Temporal now = datetimeHasOffset ? ZonedDateTime.now() : LocalDateTime.now();
-      // @formatter:off
-      Temporal dateToReturn = ChronoUnit.YEARS.between(datetime, now) >= 90 
-              ? now.minus(90, ChronoUnit.YEARS)
-              : datetime;
-      // @formatter:on
-      return String.format("%02d/%d", dateToReturn.get(ChronoField.MONTH_OF_YEAR),
-          dateToReturn.get(ChronoField.YEAR));
+      int year = ChronoUnit.YEARS.between(datetime, now) >= 90
+          ? now.minus(90, ChronoUnit.YEARS).get(ChronoField.YEAR)
+          : datetime.get(ChronoField.YEAR);
+      int month = datetime.get(ChronoField.MONTH_OF_YEAR);
+      YearMonth yearMonth = YearMonth.of(year, month);
+      DateTimeFormatter outputFormatter = DateTimeMaskingProviderConfig
+          .buildOverrideFormatter(generalizeMonthYearMaskAgeOver90OutputFormat, yearMonth);
+      if (outputFormatter != null) {
+        return outputFormatter.format(yearMonth);
+      }
+      return String.format("%02d/%d", month, year);
     }
 
     // Randomly modify the year within a given range and continue.

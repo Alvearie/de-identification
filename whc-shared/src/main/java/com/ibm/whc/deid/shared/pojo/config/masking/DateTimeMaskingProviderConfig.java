@@ -5,9 +5,13 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
+import java.time.MonthDay;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,15 +37,16 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private static final ConcurrentHashMap<String, DateTimeFormatter> dateTimeFormatterCache =
       new ConcurrentHashMap<>();
 
-  public static DateTimeFormatter getCachedFormatter(String pattern) {
+  private static DateTimeFormatter getCachedFormatter(String pattern) {
     return dateTimeFormatterCache.get(pattern);
   }
 
-  public static void addCachedFormatter(String pattern, DateTimeFormatter formatter) {
+  private static void addCachedFormatter(String pattern, DateTimeFormatter formatter) {
     // limit the number of cached formatters
-    if (dateTimeFormatterCache.size() < 20) {
-      dateTimeFormatterCache.put(pattern, formatter);
+    if (dateTimeFormatterCache.size() > 20) {
+      dateTimeFormatterCache.clear();
     }
+    dateTimeFormatterCache.put(pattern, formatter);
   }
 
   /**
@@ -51,12 +56,18 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
    * 
    * @param pattern the format pattern
    * 
+   * @param test an optional value used to test that the DateTimeFormatter is appropriate to format
+   *        a given value - for example, a formatter might demand more fields than the test value
+   *        can provide
+   * 
    * @return the formatter or <i>null</i> if the given pattern is null or empty
    * 
    * @throws IllegalArgumentException if the given pattern is invalid
+   * @throws UnsupportedTemporalTypeException if a test is provided and the formatter cannot format
+   *         it
    */
-  public static DateTimeFormatter buildOverrideFormatter(String pattern)
-      throws IllegalArgumentException {
+  public static DateTimeFormatter buildOverrideFormatter(String pattern, TemporalAccessor test)
+      throws IllegalArgumentException, UnsupportedTemporalTypeException {
     DateTimeFormatter formatter = null;
     if (pattern != null && !pattern.trim().isEmpty()) {
       formatter = getCachedFormatter(pattern);
@@ -67,6 +78,9 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
+        if (test != null) {
+          formatter.format(test);
+        }
         addCachedFormatter(pattern, formatter);
       }
     }
@@ -517,45 +531,45 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
       throws InvalidMaskingConfigurationException {
     super.validate(maskingConfig);
     try {
-      buildOverrideFormatter(formatFixed);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(formatFixed, null);
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`formatFixed` does not contain a valid pattern: " + e.getMessage(), e);
     }
     try {
-      buildOverrideFormatter(yearDeleteNdaysOutputFormat);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(yearDeleteNdaysOutputFormat, MonthDay.of(1, 1));
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`yearDeleteNdaysOutputFormat` does not contain a valid pattern: " + e.getMessage(), e);
     }
     try {
-      buildOverrideFormatter(generalizeMonthYearOutputFormat);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(generalizeMonthYearOutputFormat, YearMonth.of(1700, 1));
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`generalizeMonthYearOutputFormat` does not contain a valid pattern: " + e.getMessage(),
           e);
     }
     try {
-      buildOverrideFormatter(generalizeQuarterYearOutputFormat);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(generalizeQuarterYearOutputFormat, YearMonth.of(1700, 4));
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`generalizeQuarterYearOutputFormat` does not contain a valid pattern: " + e.getMessage(),
           e);
     }
     try {
-      buildOverrideFormatter(yearDeleteOutputFormat);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(yearDeleteOutputFormat, MonthDay.of(1, 1));
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`yearDeleteOutputFormat` does not contain a valid pattern: " + e.getMessage(), e);
     }
     try {
-      buildOverrideFormatter(generalizeMonthYearMaskAgeOver90OutputFormat);
-    } catch (IllegalArgumentException e) {
+      buildOverrideFormatter(generalizeMonthYearMaskAgeOver90OutputFormat, YearMonth.of(1700, 4));
+    } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
           "`generalizeMonthYearMaskAgeOver90OutputFormat` does not contain a valid pattern: "
