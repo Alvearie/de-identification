@@ -472,11 +472,13 @@ these may be activated in a masking rule.
 
 
 **Replace the input with just its day and month if the input date occurred more recently than a given number of days ago**
+This manipulation uses a specific output format as described below.
 
 | **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
 |------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|
 | yearDeleteNdays                    | Boolean  | Whether this conditional manipulation is to be used.                                                                                                                                                                                                                                                                                                                              | false             |
 | yearDeleteNdaysValue               | Integer  | The number of days ago.  The input must date must be more recent than this many days before the current date for the replacement to occur.                                                                                                                                                                                                  | 365               |
+| yearDeleteNdaysOutputFormat        | String   | The format pattern for the output day and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the day and month. | dd/MM  |
 
 
 ##### Unconditional Manipulations
@@ -505,19 +507,23 @@ a year is thought of as 52 weeks long.
 
 
 **Generalize to Month and Year**
+This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
 |------------------------------------|----------|--------------------------------------------------------|-------------------|
 | generalizeMonthyear                | Boolean  | Whether this manipulation is to be used.               | false             |
+| generalizeMonthYearOutputFormat    | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and month. | MM/yyyy |
 
 
 **Generalize to Quarter and Year**
-The input date is replaced with the a two-digit quarter number, a slash, and the year, as in 02/2018.
+The input date is replaced with a number for the quarter of the year and year number.  
+The format that controls how these values are presented is specified below.
 Any dates in the first three months of the year and considered quarter 1, the next three months quarter 2, and so on.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
 |------------------------------------|----------|--------------------------------------------------------|-------------------|
 | generalizeQuarteryear              | Boolean  | Whether this manipulation is to be used.               | false             |
+| generalizeQuarteryearOutputFormat  | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and quarter of the year.  | Q/yyyy |
 
 
 **Generalize to Year**
@@ -529,10 +535,12 @@ The input date is replaced by its year number.
 
 
 **Generalize to Day and Month**
+This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
 |------------------------------------|----------|--------------------------------------------------------|-------------------|
 | yearDelete                         | Boolean  | Whether this manipulation is to be used.               | false             |
+| yearDeleteOutputFormat             | String   | The format pattern for the output day and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the day and month. | dd/MM  |
 
 
 **Return the year from the input date adjusted so that it is not more than 90 years before the current year**
@@ -543,10 +551,12 @@ The input date is replaced by its year number.
 
 
 **Return the month and year from the input date adjusted so that the year is not more than 90 years before the current year**
+This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
 |------------------------------------|----------|--------------------------------------------------------|-------------------|
 | generalizeMonthyearMaskAgeOver90   | Boolean  | Whether this manipulation is to be used.               | false             |
+| generalizeMonthyearMaskAgeOver90OutputFormat    | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and month. | MM/yyyy |
 
 
 **Randomly shift the individual components of the date and time**
