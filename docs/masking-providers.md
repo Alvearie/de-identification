@@ -471,7 +471,7 @@ these may be activated in a masking rule.
 | dayMaxDaysAgoOnlyYear              | Boolean  | Return only the updated year value instead of the complete updated date and time, if the replacement occurs                                                                                                                                     | false             |
 
 
-**Replace the input with just its day and month if the input date occurred more recently than a given number of days ago**
+**Replace the input with just its day and month if the input date occurred more recently than a given number of days ago**<br/>
 This manipulation uses a specific output format as described below.
 
 | **Option name**                    | **Type** | **Description**                                                                                                                                                                                                                                                  | **Default value** |
@@ -494,7 +494,7 @@ and configure them.  At most one of these may be activated in a masking rule.
 | maskShiftSeconds                   | Integer  | The number of seconds to shift the input date and time.  This value can be negative. | 0                 |
 
 
-**Generalize to Week and Year**
+**Generalize to Week and Year**<br/>
 The input date is replaced with the a two-digit week number, a slash, and the year, as in 02/2018.
 The first seven days of the year are considered week 1 regardless of which day of the week January 1 occurs.
 The next seven days are week 2 and so on.
@@ -506,7 +506,7 @@ a year is thought of as 52 weeks long.
 | generalizeWeekyear                 | Boolean  | Whether this manipulation is to be used.               | false             |
 
 
-**Generalize to Month and Year**
+**Generalize to Month and Year**<br/>
 This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
@@ -515,7 +515,7 @@ This manipulation uses a specific output format as described below.
 | generalizeMonthYearOutputFormat    | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and month. | MM/yyyy |
 
 
-**Generalize to Quarter and Year**
+**Generalize to Quarter and Year**<br/>
 The input date is replaced with a number for the quarter of the year and year number.  
 The format that controls how these values are presented is specified below.
 Any dates in the first three months of the year and considered quarter 1, the next three months quarter 2, and so on.
@@ -526,7 +526,7 @@ Any dates in the first three months of the year and considered quarter 1, the ne
 | generalizeQuarteryearOutputFormat  | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and quarter of the year.  | Q/yyyy |
 
 
-**Generalize to Year**
+**Generalize to Year**<br/>
 The input date is replaced by its year number.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
@@ -534,7 +534,7 @@ The input date is replaced by its year number.
 | generalizeYear                     | Boolean  | Whether this manipulation is to be used.               | false             |
 
 
-**Generalize to Day and Month**
+**Generalize to Day and Month**<br/>
 This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
@@ -550,7 +550,7 @@ This manipulation uses a specific output format as described below.
 | generalizeYearMaskAgeOver90        | Boolean  | Whether this manipulation is to be used.               | false             |
 
 
-**Return the month and year from the input date adjusted so that the year is not more than 90 years before the current year**
+**Return the month and year from the input date adjusted so that the year is not more than 90 years before the current year**<br/>
 This manipulation uses a specific output format as described below.
    
 | **Option name**                    | **Type** | **Description**                                        | **Default value** |
@@ -559,7 +559,7 @@ This manipulation uses a specific output format as described below.
 | generalizeMonthyearMaskAgeOver90OutputFormat    | String   | The format pattern for the output year and month.  See the documentation for the Java *java.time.format.DateTimeFormatter* class for information about the syntax used to specify custom formats.  The format should only include tokens for the year and month. | MM/yyyy |
 
 
-**Randomly shift the individual components of the date and time**
+**Randomly shift the individual components of the date and time**<br/>
 Randomly determine an amount within a given range to shift the components of the date and time.
 Note that modifying a component of the date and time can cause the larger components to be modified as
 well, even if they are not configured to be randomly changed.  For example, if the date and time is
