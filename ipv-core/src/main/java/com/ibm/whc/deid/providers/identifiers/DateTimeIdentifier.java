@@ -62,17 +62,23 @@ public class DateTimeIdentifier extends AbstractIdentifier {
   public static class DateTimeParseResult {
 
     private final DateTimeFormatter formatter;
+    private final String pattern;
     private final TemporalAccessor accessor;
     private final boolean variableCase;
 
-    public DateTimeParseResult(DateTimeFormatter f, TemporalAccessor a, boolean vc) {
+    public DateTimeParseResult(DateTimeFormatter f, String p, TemporalAccessor a, boolean vc) {
       accessor = a;
       formatter = f;
+      pattern = p;
       variableCase = vc;
     }
 
     public DateTimeFormatter getFormatter() {
       return formatter;
+    }
+
+    public String getPattern() {
+      return pattern;
     }
 
     public TemporalAccessor getValue() {
@@ -102,10 +108,15 @@ public class DateTimeIdentifier extends AbstractIdentifier {
       TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(data);
       // although this format does include some alphabetic components, values formatted from this
       // pattern should always use the standard character case, so "variable case" is false
-      return new DateTimeParseResult(DateTimeFormatter.ISO_OFFSET_DATE_TIME, temporalAccessor,
-          false);
+      return new DateTimeParseResult(DateTimeFormatter.ISO_OFFSET_DATE_TIME, "ISO_DATE_TIME_OFFSET",
+          temporalAccessor, false);
     } catch (Exception e) {
-      // nothing required here
+      if (log.isDebugEnabled()) {
+        StringBuilder buffer = new StringBuilder(120);
+        buffer.append("could not parse with ISO format: ").append(e.getMessage())
+            .append(" - trying other formats");
+        log.logDebug(LogCodes.WPH1000I, buffer.toString());
+      }
     }
 
     for (int i = 0; i < datePatterns.length; i++) {
@@ -113,9 +124,15 @@ public class DateTimeIdentifier extends AbstractIdentifier {
         try {
           DateTimeFormatter f = dateFormats[i];
           TemporalAccessor d = f.parse(data);
-          return new DateTimeParseResult(f, d, patternHasVariableCaseComponent[i]);
+          return new DateTimeParseResult(f, datePatterns[i].pattern(), d,
+              patternHasVariableCaseComponent[i]);
         } catch (Exception e) {
-          log.logError(LogCodes.WPH1012W, e);
+          if (log.isDebugEnabled()) {
+            StringBuilder buffer = new StringBuilder(120);
+            buffer.append("could not parse with format `").append(patterns[i]).append("`: ")
+                .append(e.getMessage()).append(" - trying other formats");
+            log.logDebug(LogCodes.WPH1000I, buffer.toString());
+          }
         }
       }
     }

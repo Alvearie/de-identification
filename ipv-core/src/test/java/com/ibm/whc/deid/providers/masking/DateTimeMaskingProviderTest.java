@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +26,7 @@ import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
+import com.ibm.whc.deid.utils.log.LogCodes;
 
 public class DateTimeMaskingProviderTest extends TestLogSetUp {
   private static final int NUM_LOOP_NON_PERF_TEST = 20;
@@ -126,33 +128,33 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskFixedFormat_year() throws Exception {
+  public void testMaskFixedFormat_not_enough_data() throws Exception {
 
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
     config.setFormatFixed("yyyy");
     config.setYearMask(true);
-    config.setDayMask(false);
-    config.setHourMask(false);
-    config.setMinutesMask(false);
-    config.setSecondsMask(false);
-    config.setMonthMask(false);
-    config.setYearRangeDown(2);
-    config.setYearRangeUp(2);
-
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(config);
 
-    String originalDateTime = "1981";
-    boolean changed = false;
-    for (int i = 0; i < 20; i++) {
-      String maskedDateTime = maskingProvider.mask(originalDateTime);
-      assertNotNull(maskedDateTime);
-      int year = Integer.parseInt(maskedDateTime);
-      assertTrue(1979 <= year && year <= 1983);
-      if (!maskedDateTime.equals(originalDateTime)) {
-        changed = true;
-      }
+    try {
+      maskingProvider.mask("1981");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().startsWith(LogCodes.WPH1025W));
+      assertTrue(e.getMessage().contains("`yyyy`"));
     }
-    assertTrue(changed);
+
+    config.setFormatFixed("yyyy-MM");
+    maskingProvider = new DateTimeMaskingProvider(config);
+
+    try {
+      maskingProvider.mask("1981-04");
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().startsWith(LogCodes.WPH1025W));
+      assertTrue(e.getMessage().contains("`yyyy-MM`"));
+    }
   }
 
   @Test

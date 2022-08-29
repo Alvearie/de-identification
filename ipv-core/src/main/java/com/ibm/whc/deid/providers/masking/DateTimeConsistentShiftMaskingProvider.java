@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
@@ -20,18 +19,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 import org.apache.commons.lang.NotImplementedException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.JSONPath;
+import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
+import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier.DateTimeParseResult;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
+import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.util.HashUtils;
 import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.utils.log.LogManager;
+import com.ibm.whc.deid.utils.log.Messages;
 
 public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvider {
 
@@ -39,60 +41,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
   protected static final LogManager logger = LogManager.getInstance();
 
-  protected class ParseResponse {
-
-    private DateTimeFormatter formatter;
-    private String format;
-    private TemporalAccessor temporal;
-
-    protected ParseResponse(DateTimeFormatter formatter, String format, TemporalAccessor temporal) {
-      this.formatter = formatter;
-      this.format = format;
-      this.temporal = temporal;
-    }
-
-    public DateTimeFormatter getFormatter() {
-      return formatter;
-    }
-
-    public String getFormat() {
-      return format;
-    }
-
-    public TemporalAccessor getTemporalAccessor() {
-      return temporal;
-    }
-  }
-
-  // used to "test" input for suitability for a formatter before attempting to
-  // parse with that formatter - reduces the expense of creating exceptions related
-  // to input-to-pattern mismatches
-  private static final Pattern[] datePatterns =
-      new Pattern[] {Pattern.compile("^\\d{2}-.{3,}-\\d{4}$"),
-          Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$"), Pattern.compile("^\\d{4}/\\d{2}/\\d{2}$"),
-          Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"),
-          Pattern.compile("^\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}$"),
-          Pattern.compile("^\\d{2}-\\d{2}-\\d{4}$"), Pattern.compile("^\\d{2}/\\d{2}/\\d{4}$"),
-          Pattern.compile("^\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}:\\d{2}$"),
-          Pattern.compile("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}$")};
-
-  private static final String[] dateFormatStrings =
-      {"dd-MMM-yyyy", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss",
-          "dd-MM-yyyy", "dd/MM/yyyy", "dd-MM-yyyy HH:mm:ss", "dd/MM/yyyy HH:mm:ss"};
-
-  private static final DateTimeFormatter dateFormaters[] =
-      new DateTimeFormatter[dateFormatStrings.length];
-
-  static {
-    for (int i = 0; i < dateFormatStrings.length; i++) {
-      dateFormaters[i] =
-          new DateTimeFormatterBuilder().parseCaseInsensitive()
-              .appendPattern((dateFormatStrings[i])).toFormatter();
-      // .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-      // .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-      // .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();
-    }
-  }
+  private static final DateTimeIdentifier dateTimeIdentifier = new DateTimeIdentifier();
 
   private final int dateShiftMinimumDays;
   private final int dateShiftMaximumDays;
@@ -151,8 +100,8 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     List<DateTimeFormatter> customFormatters = null;
     if (this.customFormats != null && !this.customFormats.isEmpty()) {
       customFormatters = new ArrayList<>(this.customFormats.size());
-      for (String format : this.customFormats) {
-        customFormatters.add(new DateTimeFormatterBuilder().appendPattern(format).toFormatter());
+      for (String format : this.customFormats) {        
+        customFormatters.add(DateTimeMaskingProviderConfig.buildOverrideFormatter(format, null));
       }
     }
     return customFormatters;
@@ -304,22 +253,40 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    */
   protected String applyOffsetAndReformat(String originalValue, int offsetDays, List<DateTimeFormatter> customFormatters) {
 
-    ParseResponse parseResponse = parse(originalValue, customFormatters);
+    DateTimeParseResult parseResponse = parse(originalValue, customFormatters);
     if (parseResponse == null) {
       return applyUnexpectedValueHandling(originalValue, null);
     }
     DateTimeFormatter formatter = parseResponse.getFormatter();
-    TemporalAccessor parsedOriginal = parseResponse.getTemporalAccessor();
+    TemporalAccessor parsedOriginal = parseResponse.getValue();
 
     Temporal adjustedTemporal = adjust(parsedOriginal, offsetDays);
     if (adjustedTemporal == null) {
-      // should only happen for custom formatters
-      // log the format that matched the input, but didn't yield date information
-      logger.logWarn(LogCodes.WPH1025W, parseResponse.getFormat());
-      return applyUnexpectedValueHandling(originalValue, null);
+      // Should only happen for custom formatters.
+      // The incoming data has been parsed according to one of the formats, but
+      // it was not possible to obtain a LocalDateTime from it. Since a time
+      // component is defaulted when all the formatters are built, the most
+      // likely cause is a custom format did not provide enough information
+      // to obtain a year, month, and date. This should be considered an
+      // invalid configuration and processing should not have started. However,
+      // there is no feasible way to test a custom input pattern without trying
+      // real input data to catch these errors earlier. The best alternative
+      // is to stop processing now.
+      String msg = Messages.getMessage(LogCodes.WPH1025W, parseResponse.getPattern());
+      StringBuilder buffer = new StringBuilder(msg.length() + LogCodes.WPH1025W.length() + 1);
+      buffer.append(LogCodes.WPH1025W).append(' ').append(msg);
+      throw new IllegalArgumentException(buffer.toString());
     }
 
     String replacement = formatter.format(adjustedTemporal);
+
+    if (parseResponse.isVariableCase()) {
+      if (originalValue.equals(originalValue.toUpperCase())) {
+        replacement = replacement.toUpperCase();
+      } else if (originalValue.equals(originalValue.toLowerCase())) {
+        replacement = replacement.toLowerCase();
+      }
+    }
     return replacement;
   }
 
@@ -334,18 +301,24 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
    *         the pattern string (null if a builtin formatter recognized the value), and the temporal
    *         object created by parsing the string
    */
-  protected ParseResponse parse(String originalValue,
+  protected DateTimeParseResult parse(String originalValue,
       List<DateTimeFormatter> customFormatters) {
-    ParseResponse parseResponse = null;
+    DateTimeParseResult parseResponse = null;
 
     if (customFormatters != null) {
       int index = 0;
       for (DateTimeFormatter formatter : customFormatters) {
         try {
           TemporalAccessor accessor = formatter.parse(originalValue);
-          parseResponse = new ParseResponse(formatter, this.customFormats.get(index), accessor);
+          parseResponse =
+              new DateTimeParseResult(formatter, customFormats.get(index), accessor, false);
           break;
         } catch (Exception e) {
+          StringBuilder buffer = new StringBuilder(120);
+          buffer.append("could not parse with custom format `")
+              .append(customFormats.get(index)).append("`: ").append(e.getMessage())
+              .append(" - trying other formats");
+          log.logInfo(LogCodes.WPH1000I, buffer.toString());
           // continue processing
         }
         index++;
@@ -353,30 +326,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
     }
 
     if (parseResponse == null) {
-      // try the ISO date-time with offset format first
-      try {
-        TemporalAccessor accessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(originalValue);
-        parseResponse = new ParseResponse(DateTimeFormatter.ISO_OFFSET_DATE_TIME, null, accessor);
-      } catch (Exception e) {
-        // continue processing
-      }
-    }
-
-    // try the builtin formats that do not include time zones next
-    if (parseResponse == null) {
-      for (int i = 0; i < datePatterns.length; i++) {
-        Pattern p = datePatterns[i];
-        if (p.matcher(originalValue).matches()) {
-          try {
-            DateTimeFormatter f = dateFormaters[i];
-            TemporalAccessor d = f.parse(originalValue);
-            parseResponse = new ParseResponse(f, null, d);
-            break;
-          } catch (Exception e2) {
-            log.logError(LogCodes.WPH1013E, e2);
-          }
-        }
-      }
+      parseResponse = dateTimeIdentifier.parse(originalValue);
     }
 
     return parseResponse;

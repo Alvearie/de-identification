@@ -51,8 +51,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
 
   /**
    * Builds a DateTimeFormatter from the given pattern. The formatter supports case-insensitive
-   * parsing and defaults values for month, day, hour, minute, and second if not provided by the
-   * pattern.
+   * parsing and defaults values for the time.
    * 
    * @param pattern the format pattern
    * 
@@ -73,8 +72,6 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
       formatter = getCachedFormatter(pattern);
       if (formatter == null) {
         formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern(pattern)
-            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).toFormatter();

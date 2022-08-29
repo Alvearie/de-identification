@@ -630,9 +630,11 @@ following property can be supplied to override the default formats:
 |------------------------------------|----------|--------------------------------------------------------|-----------|
 | formatFixed                        | String   | The date and time format to use                        | null      |
 
-If a value for `formatFixed` is provided, it will be the only format the privacy provider will recognize.  
+If a value for `formatFixed` is provided, it will be the **only** format the privacy provider will recognize.  
 The given value must be valid as per the java.time.format.DateTimeFormatter class.
-The format must at minimum include a year component.  
+Time components and time zone name or offset 
+components are optional.  The format must capture enough information about the date, however, for the 
+provider to be able to calculate a year, month, and day.
 
 
 #### DATETIME_CONSISTENT_SHIFT
@@ -690,19 +692,6 @@ The provider supports input values in any of these formats.
 | dd-MM-yyyy HH:mm:ss                          | 16-04-1967 13:14:15                   |
 | dd/MM/yyyy HH:mm:ss                          | 16/04/1967 13:14:15                   |
 
-
-The provider formats the shifted date using the same pattern that matched the original input value.  
-Minor changes to precision and formatting between the original value and the shifted value can occur, however.
-For formats that include text, such dd-MMM-yyyy which contains the abbreviation for the month name,
-the recognized values for the text portions are based on the default locale of the system that is
-performing the protection.  For example, the recognized abbreviation for January might be **Jan** when 
-the default locale of the system is US English, **Jan.** when it is Canadian English, and **janv.** 
-when it is Canadian French.  The privacy provider performs case-insensitive processing for the 
-abbreviation.
-
-Except where noted for specific manipulations, the privacy
-provider generates output values using the same pattern that matched the input value.  
-
 The provider formats the shifted date using the same pattern that matched the original input value.  
 Minor changes to precision and formatting between the input value and output values can occur, however.
 For the `dd-MMM-yyyy` format which contains a textual value for the abbreviation of the month,
@@ -725,9 +714,8 @@ day of year) is a valid pattern because the provider can calculate the informati
 _MMdd_ (month and day) or _HHmm_ (hour and minute) are not adequate as the year, month, and day cannot 
 be calculated.
 
-If an input value does not match any of the available formats or is matched to a custom format that does not 
-capture sufficient date information, the configured handling of unexpected input values is applied.  See the 
-**Handling unexpected input values** section below.
+If an input value does not match any of the available formats, the configured handling of unexpected 
+input values is applied.  See the **Handling unexpected input values** section below.
 
 **Principle identifier fields and ordering of rule assignments**
 

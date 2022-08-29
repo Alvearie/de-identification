@@ -5,6 +5,7 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
@@ -21,6 +22,8 @@ import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier.DateTimeParseResult;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig;
 import com.ibm.whc.deid.util.RandomGenerators;
+import com.ibm.whc.deid.utils.log.LogCodes;
+import com.ibm.whc.deid.utils.log.Messages;
 
 /**
  * Applies privacy protection to date and timestamp values.
@@ -171,6 +174,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     DateTimeFormatter f = null;
     TemporalAccessor d = null;
+    String matchedPattern = null;
     boolean patternContainsCaseInsensitiveCharacters = false;
 
     // note - this can throw IllegalArgumentException, but the pattern has already
@@ -181,6 +185,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       try {
         d = fixedFormatter.parse(identifier);
         f = fixedFormatter;
+        matchedPattern = formatFixed;
         // don't apply character case alterations when using custom format
         patternContainsCaseInsensitiveCharacters = false;
       } catch (DateTimeParseException e) {
@@ -195,21 +200,40 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
       }
       f = parseResult.getFormatter();
       d = parseResult.getValue();
+      matchedPattern = parseResult.getPattern();
       patternContainsCaseInsensitiveCharacters = parseResult.isVariableCase();
     }
 
     // keep as much time zone information as available from the original    
     Temporal datetime;
     boolean datetimeHasOffset;
-    if (d.query(TemporalQueries.zoneId()) != null) {
-      datetime = d.query(ZonedDateTime::from);
-      datetimeHasOffset = true;
-    } else if (d.query(TemporalQueries.offset()) != null) {
-      datetime = d.query(OffsetDateTime::from);
-      datetimeHasOffset = true;
-    } else {
-      datetime = d.query(LocalDateTime::from);
-      datetimeHasOffset = false;
+    try {
+      if (d.query(TemporalQueries.zoneId()) != null) {
+        datetime = d.query(ZonedDateTime::from);
+        datetimeHasOffset = true;
+      } else if (d.query(TemporalQueries.offset()) != null) {
+        datetime = d.query(OffsetDateTime::from);
+        datetimeHasOffset = true;
+      } else {
+        datetime = d.query(LocalDateTime::from);
+        datetimeHasOffset = false;
+      }
+    } catch (DateTimeException e) {
+      // The incoming data has been parsed according to one of the formats, but
+      // it was not possible to obtain a LocalDateTime from it. Since a time
+      // component is defaulted when all the formatters are built, the most
+      // likely cause is a custom format did not provide enough information
+      // to obtain a year, month, and date. This should be considered an
+      // invalid configuration and processing should not have started. However,
+      // there is no feasible way to test a custom input pattern without trying
+      // real input data to catch these errors earlier. The best alternative
+      // is to stop processing now.
+      // NOTE - the DateTimeException probably contains data from the input
+      // and should not be logged
+      String msg = Messages.getMessage(LogCodes.WPH1025W, matchedPattern);
+      StringBuilder buffer = new StringBuilder(msg.length() + LogCodes.WPH1025W.length() + 1);
+      buffer.append(LogCodes.WPH1025W).append(' ').append(msg);
+      throw new IllegalArgumentException(buffer.toString());
     }
 
     // Return a given, constant value if the input date is at least a given number of years ago.
