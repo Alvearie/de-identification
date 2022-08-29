@@ -1,14 +1,16 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.util;
 
 import java.security.SecureRandom;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.time.temporal.ChronoField;
 import org.apache.commons.lang3.StringUtils;
 import com.ibm.whc.deid.models.CreditCardType;
 import com.ibm.whc.deid.models.LatitudeLongitude;
@@ -260,23 +262,40 @@ public class RandomGenerators {
   }
 
   /**
-   * Random date milliseconds long.
-   *
-   * @return the long
+   * @return a random date before the current year
    */
-  public static long randomDateMilliseconds() {
-    long currentMillis = System.currentTimeMillis();
-    return currentMillis - (long) random.nextInt(100) * 365 * 24 * 60 * 60 * 1000;
-  }
-
-  /**
-   * Generate random date string.
-   *
-   * @return the string
-   */
-  public static String generateRandomDate() {
-    Date date = new Date(randomDateMilliseconds());
-    return date.toString();
+  public static OffsetDateTime generateRandomDate() {
+    LocalDateTime now = LocalDateTime.now();
+    int yearRange = now.get(ChronoField.YEAR) - 1900;
+    int month = random.nextInt(12) + 1;
+    int dayRange;
+    switch (month) {
+      case 1:
+      case 3:
+      case 5:
+      case 7:
+      case 8:
+      case 10:
+      case 12:
+        dayRange = 31;
+        break;
+      case 4:
+      case 6:
+      case 9:
+      case 11:
+        dayRange = 30;
+        break;
+      case 2:
+        dayRange = 28;
+        break;
+      default:
+        // should never occur
+        throw new IllegalArgumentException(String.valueOf(month));
+    }
+    LocalDateTime randomLocal =
+        LocalDateTime.of(random.nextInt(yearRange) + 1900, month, random.nextInt(dayRange) + 1,
+            random.nextInt(24), random.nextInt(60), random.nextInt(60));
+    return OffsetDateTime.of(randomLocal, ZoneOffset.UTC);
   }
 
   /**
@@ -286,7 +305,7 @@ public class RandomGenerators {
    * @return the string
    */
   public static String generateRandomDate(DateTimeFormatter dateFormat) {
-    return dateFormat.format(Instant.ofEpochMilli(randomDateMilliseconds()));
+    return dateFormat.format(generateRandomDate());
   }
 
   /**

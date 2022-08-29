@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -11,9 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.LatitudeLongitude;
@@ -199,16 +197,13 @@ public class RandomGeneratorsTest {
 
   @Test
   public void testRandomDate() throws Exception {
-    DateTimeFormatter dateFormat =
-        DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").withZone(ZoneOffset.UTC);
-    String date = RandomGenerators.generateRandomDate(dateFormat);
-    Date randomDate = Date.from(Instant.from(dateFormat.parse(date)));
-    assertTrue(randomDate.before(new Date()));
-  }
-
-  @Test
-  public void testRandomDate2() throws Exception {
-    assertNotNull(RandomGenerators.generateRandomDate());
+    Instant now = Instant.now();
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ssZ");
+    for (int i=0; i < 1000; i++) {
+      String date = RandomGenerators.generateRandomDate(dateFormat);
+      Instant random = Instant.from(dateFormat.parse(date));
+      assertTrue(random.isBefore(now));
+    }
   }
 
   @Test

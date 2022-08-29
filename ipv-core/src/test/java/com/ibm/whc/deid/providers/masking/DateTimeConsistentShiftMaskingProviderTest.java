@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2021
+ * (C) Copyright IBM Corp. 2021,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,6 +22,7 @@ import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeConsistentShiftMaskingProviderConfig.DateShiftDirection;
+import com.ibm.whc.deid.utils.log.LogCodes;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProviderTest {
@@ -161,10 +162,26 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
 
     String[] abbreviations = getMonthAbrvs(); // 0-based indexing for month names
 
-    assertEquals("01-" + abbreviations[4] + "-1967",
-        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 2, null));
-    assertEquals("01-" + abbreviations[5] + "-1967",
-        provider.applyOffsetAndReformat("29-" + abbreviations[3] + "-1967", 33, null));
+    StringBuilder buffer = new StringBuilder(40);
+    buffer.append("29-").append(abbreviations[3]).append("-1967");
+    String original = buffer.toString();
+    buffer.setLength(0);
+    buffer.append("01-").append(abbreviations[4]).append("-1967");
+    String expected = buffer.toString();
+    assertEquals(expected, provider.applyOffsetAndReformat(original, 2, null));
+    assertEquals(expected.toUpperCase(),
+        provider.applyOffsetAndReformat(original.toUpperCase(), 2, null));
+    assertEquals(expected.toLowerCase(),
+        provider.applyOffsetAndReformat(original.toLowerCase(), 2, null));
+
+    buffer.setLength(0);
+    buffer.append("02-").append(abbreviations[5]).append("-1967");
+    expected = buffer.toString();
+    assertEquals(expected, provider.applyOffsetAndReformat(original, 34, null));
+    assertEquals(expected.toUpperCase(),
+        provider.applyOffsetAndReformat(original.toUpperCase(), 34, null));
+    assertEquals(expected.toLowerCase(),
+        provider.applyOffsetAndReformat(original.toLowerCase(), 34, null));
 
     assertEquals(badInputValue, provider.applyOffsetAndReformat("29-apx-1967", 33, null));
   }
@@ -256,18 +273,14 @@ public class DateTimeConsistentShiftMaskingProviderTest implements MaskingProvid
     verifyStandardReplacements(provider, badInputValue);
 
     List<DateTimeFormatter> customFormatters = provider.buildCustomFormatters();
-    assertEquals(badInputValue, provider.applyOffsetAndReformat("10333", -1, customFormatters));
-
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
-    provider = new DateTimeConsistentShiftMaskingProvider(config, null);
-    provider.setName("rule2");
 
     try {
       provider.applyOffsetAndReformat("10333", -1, customFormatters);
       fail("expected exception");
-    } catch (PrivacyProviderInvalidInputException e) {
-      assertFalse(e.getMessage(), e.getMessage().contains("10333"));
-      assertTrue(e.getMessage(), e.getMessage().contains("rule2"));
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().startsWith(LogCodes.WPH1025W));
+      assertTrue(e.getMessage().contains("`MMDDD`"));
     }
   }
 

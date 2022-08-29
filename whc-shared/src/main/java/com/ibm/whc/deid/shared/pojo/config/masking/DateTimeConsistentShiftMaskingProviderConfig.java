@@ -5,12 +5,12 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
-import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
@@ -139,8 +139,9 @@ public class DateTimeConsistentShiftMaskingProviderConfig extends MaskingProvide
               "format at offset " + offset + " in `customFormats` is missing");
         }
         try {
-          new DateTimeFormatterBuilder().appendPattern(format).toFormatter();
-        } catch (IllegalArgumentException e) {
+          DateTimeMaskingProviderConfig.buildOverrideFormatter(format, null);
+        } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
+          // thrown if the pattern is not a valid datetime pattern
           throw new InvalidMaskingConfigurationException(
               "format at offset " + offset + " in `customFormats` is not valid: " + e.getMessage(),
               e);

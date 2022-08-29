@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -125,7 +125,7 @@ public class DateDependencyMaskingProviderTest {
     maskingProvider.maskIdentifierBatch(maskingInputs);
     JsonNode maskedNode = getParentNodeFromMaskingInputs(maskingInputs);
 
-    assertEquals("2005-09-23T05:02:00Z", maskedNode.get("birthDate").asText());
+    assertEquals("2005-09-23T00:02:00-05:00", maskedNode.get("birthDate").asText());
   }
 
   @Test
