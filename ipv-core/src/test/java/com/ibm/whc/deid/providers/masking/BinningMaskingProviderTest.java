@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.BinningMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class BinningMaskingProviderTest extends TestLogSetUp {
   @Test
@@ -43,7 +44,7 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testInvalidValue() {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
-    config.setUnspecifiedValueHandling(1);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new BinningMaskingProvider(config);
 
     String originalValue = "abc";
@@ -51,22 +52,22 @@ public class BinningMaskingProviderTest extends TestLogSetUp {
     assertNull(maskedValue);
 
     config = new BinningMaskingProviderConfig();
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     maskingProvider = new BinningMaskingProvider(config);
 
     maskedValue = maskingProvider.mask(originalValue);
     assertNull(maskedValue);
 
     config = new BinningMaskingProviderConfig();
-    config.setUnspecifiedValueHandling(3);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     maskingProvider = new BinningMaskingProvider(config);
 
     maskedValue = maskingProvider.mask(originalValue);
-    assertEquals(MaskingProviderConfig.UNSPECIFIED_VALUE_RETURN_MESSAGE_OTHER, maskedValue);
+    assertEquals(MaskingProviderConfig.UNEXPECTED_INPUT_RETURN_MESSAGE_OTHER, maskedValue);
 
     config = new BinningMaskingProviderConfig();
-    config.setUnspecifiedValueHandling(3);
-    config.setUnspecifiedValueReturnMessage("message");
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    config.setUnexpectedInputReturnMessage("message");
     maskingProvider = new BinningMaskingProvider(config);
 
     maskedValue = maskingProvider.mask(originalValue);

@@ -5,12 +5,18 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
 import java.util.List;
+import com.ibm.whc.deid.providers.masking.fhir.MaskingActionInputIdentifier;
+import com.ibm.whc.deid.shared.pojo.config.masking.MaintainMaskingProviderConfig;
 
 public class MaintainMaskingProvider extends AbstractMaskingProvider {
 
+
   private static final long serialVersionUID = -1799896601470556794L;
+
+  public MaintainMaskingProvider() {
+    super(new MaintainMaskingProviderConfig());
+  }
 
   @Override
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {

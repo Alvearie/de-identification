@@ -204,7 +204,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskInvalidAddressInputValidHandlingReturnNull() throws Exception {
     AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(1);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
 
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
@@ -216,23 +216,6 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
 
     assertEquals(null, randomAddress);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidAddressInputValidHandlingReturnRandom() throws Exception {
-    AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(2);
-    AddressMaskingProvider addressMaskingProvider =
-        (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
-            MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            localizationProperty);
-    Identifier identifier = new AddressIdentifier();
-
-    String invalidAddress = "PA BOX 1234";
-    String randomAddress = addressMaskingProvider.mask(invalidAddress);
-
-    assertFalse(randomAddress.equals(invalidAddress));
-    assertTrue(identifier.isOfThisType(randomAddress));
   }
 
   @Test
@@ -255,7 +238,7 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
   @Test
   public void testMaskInvalidAddressInputValidHandlingReturnDefaultCustomValue() throws Exception {
     AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     AddressMaskingProvider addressMaskingProvider =
         (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
             MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
@@ -265,40 +248,6 @@ public class AddressMaskingProviderTest extends TestLogSetUp implements MaskingP
     String randomAddress = addressMaskingProvider.mask(invalidAddress);
 
     assertEquals("OTHER", randomAddress);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidAddressInputValidHandlingReturnNonDefaultCustomValue()
-      throws Exception {
-    AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
-    maskingConfiguration.setUnspecifiedValueReturnMessage("Test Address");
-    AddressMaskingProvider addressMaskingProvider =
-        (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
-            MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            localizationProperty);
-
-    String invalidAddress = "PA BOX 1234";
-    String randomAddress = addressMaskingProvider.mask(invalidAddress);
-
-    assertEquals("Test Address", randomAddress);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidAddressInputInvalidHandlingReturnNull() throws Exception {
-    AddressMaskingProviderConfig maskingConfiguration = new AddressMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(4);
-    AddressMaskingProvider addressMaskingProvider =
-        (AddressMaskingProvider) getMaskingProviderFactory().getProviderFromType(
-            MaskingProviderType.ADDRESS, null, maskingConfiguration, tenantId,
-            localizationProperty);
-
-    String invalidAddress = "PA BOX 1234";
-    String randomAddress = addressMaskingProvider.mask(invalidAddress);
-
-    assertEquals(null, randomAddress);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

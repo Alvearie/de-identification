@@ -5,10 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.config.masking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Test;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class FHIRMortalityDependencyMaskingProviderConfigTest {
 
@@ -18,14 +15,7 @@ public class FHIRMortalityDependencyMaskingProviderConfigTest {
         new FHIRMortalityDependencyMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-4);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(3);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     config.validate(null);
   }
 }

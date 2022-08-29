@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
@@ -53,7 +52,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidEmailInputValidHandlingReturnNull() throws Exception {
     EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
 
     String invalidEmail = "Invalid Email";
@@ -64,25 +63,9 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskInvalidEmailInputValidHandlingReturnRandom() throws Exception {
-    EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
-    Identifier identifier = new EmailIdentifier();
-
-    String invalidEmail = "Invalid Email";
-    String maskedEmail = maskingProvider.mask(invalidEmail);
-
-    assertFalse(maskedEmail.equals(invalidEmail));
-    assertTrue(identifier.isOfThisType(maskedEmail));
-    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
-  }
-
-  @Test
   public void testMaskInvalidEmailInputValidHandlingReturnRandomNew() throws Exception {
     EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
-    configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
     Identifier identifier = new EmailIdentifier();
 
@@ -98,7 +81,7 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidEmailInputValidHandlingReturnDefaultCustomValue() throws Exception {
     EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
 
     String invalidEmail = "Invalid Email";
@@ -111,27 +94,14 @@ public class EmailMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidEmailInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test Email");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test Email");
     MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
 
     String invalidEmail = "Invalid Email";
     String maskedEmail = maskingProvider.mask(invalidEmail);
 
     assertEquals("Test Email", maskedEmail);
-    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidEmailInputInvalidHandlingReturnNull() throws Exception {
-    EmailMaskingProviderConfig configuration = new EmailMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new EmailMaskingProvider(configuration);
-
-    String invalidEmail = "Invalid Email";
-    String maskedEmail = maskingProvider.mask(invalidEmail);
-
-    assertEquals(null, maskedEmail);
     assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 

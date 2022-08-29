@@ -29,6 +29,7 @@ import com.ibm.whc.deid.shared.pojo.config.masking.DateTimeMaskingProviderConfig
 import com.ibm.whc.deid.shared.pojo.config.masking.MaintainMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.NullMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.masking.MaskingProviderType;
 import com.ibm.whc.deid.shared.util.ConfigGenerator;
 
@@ -112,7 +113,7 @@ public class MaskingProviderBuilderTest {
     MaskingProviderConfig cityConfig =
         MaskingProviderConfig.getDefaultMaskingProviderConfig(MaskingProviderType.CITY);
     Rule cityRule = createRuleWithOneProvider(cityRuleName, cityConfig);
-    cityConfig.setUnspecifiedValueHandling(1);
+    cityConfig.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
 
     DateTimeMaskingProviderConfig datetimeConfig =
         (DateTimeMaskingProviderConfig) MaskingProviderConfig

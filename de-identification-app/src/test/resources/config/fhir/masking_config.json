@@ -29,7 +29,7 @@
 			"maskingProviders": [
 				{
 					"type": "CONTINENT",
-					"unspecifiedValueHandling": 2
+					"unexpectedInputHandling":"RANDOM"
 				}
 			]
 		}

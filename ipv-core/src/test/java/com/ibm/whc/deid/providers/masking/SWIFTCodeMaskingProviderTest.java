@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.SWIFTMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSetup {
 
@@ -33,7 +34,7 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
   public void testPreserveCountry_null() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(true);
-    maskingConfiguration.setUnspecifiedValueHandling(1);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -53,7 +54,7 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
   public void testPreserveCountry_random() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(true);
-    maskingConfiguration.setUnspecifiedValueHandling(2);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -72,8 +73,8 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
   public void testPreserveCountry_other() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(true);
-    maskingConfiguration.setUnspecifiedValueHandling(3);
-    maskingConfiguration.setUnspecifiedValueReturnMessage("slow");
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    maskingConfiguration.setUnexpectedInputReturnMessage("slow");
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -135,7 +136,7 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
   public void testValuesLoaded_random() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(true);
-    maskingConfiguration.setUnspecifiedValueHandling(2);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);
 
@@ -156,7 +157,7 @@ public class SWIFTCodeMaskingProviderTest extends SWIFTCodeMaskingProviderTestSe
   public void testValuesLoaded_other() {
     SWIFTMaskingProviderConfig maskingConfiguration = new SWIFTMaskingProviderConfig();
     maskingConfiguration.setPreserveCountry(true);
-    maskingConfiguration.setUnspecifiedValueHandling(3);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     // allow message to default
     SWIFTCodeMaskingProvider maskingProvider =
         new SWIFTCodeMaskingProvider(maskingConfiguration, tenantId, TEST_LOCALIZATION_PROPERTIES);

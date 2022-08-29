@@ -7,8 +7,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class IPAddressMaskingProviderConfigTest {
 
@@ -17,14 +17,7 @@ public class IPAddressMaskingProviderConfigTest {
     IPAddressMaskingProviderConfig config = new IPAddressMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     config.setSubnetsPreserve(-1);

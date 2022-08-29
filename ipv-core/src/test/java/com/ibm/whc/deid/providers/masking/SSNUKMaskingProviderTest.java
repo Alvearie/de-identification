@@ -19,8 +19,8 @@ import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler
 public class SSNUKMaskingProviderTest extends TestLogSetUp {
 
   /*
-   * Tests for prefix preservation option and its boolean values (true and
-   * false). Also tests for an invalid value.
+   * Tests for prefix preservation option and its boolean values (true and false). Also tests for an
+   * invalid value.
    */
 
   @Test
@@ -89,7 +89,7 @@ public class SSNUKMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidSSNUKInputValidHandlingReturnNull() throws Exception {
     SSNUKMaskingProviderConfig configuration = new SSNUKMaskingProviderConfig();
     configuration.setMaskPreservePrefix(true);
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new SSNUKMaskingProvider(configuration);
 
     String invalidSSNUK = "Invalid SSNUK";
@@ -120,7 +120,7 @@ public class SSNUKMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidSSNUKInputValidHandlingReturnDefaultCustomValue() throws Exception {
     SSNUKMaskingProviderConfig configuration = new SSNUKMaskingProviderConfig();
     configuration.setMaskPreservePrefix(true);
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new SSNUKMaskingProvider(configuration);
 
     String invalidSSNUK = "Invalid SSNUK";
@@ -136,27 +136,12 @@ public class SSNUKMaskingProviderTest extends TestLogSetUp {
     configuration.setMaskPreservePrefix(true);
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     configuration.setUnexpectedInputReturnMessage("Test SSNUK");
-    configuration.setUnspecifiedValueReturnMessage("Test X SSNUK");
     MaskingProvider maskingProvider = new SSNUKMaskingProvider(configuration);
 
     String invalidSSNUK = "Invalid SSNUK";
     String maskedSSNUK = maskingProvider.mask(invalidSSNUK);
 
     assertEquals("Test SSNUK", maskedSSNUK);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidSSNUKInputInvalidHandlingReturnNull() throws Exception {
-    SSNUKMaskingProviderConfig configuration = new SSNUKMaskingProviderConfig();
-    configuration.setMaskPreservePrefix(true);
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new SSNUKMaskingProvider(configuration);
-
-    String invalidSSNUK = "Invalid SSNUK";
-    String maskedSSNUK = maskingProvider.mask(invalidSSNUK);
-
-    assertNull(maskedSSNUK);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 }

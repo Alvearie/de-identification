@@ -28,6 +28,7 @@ public class NullMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public NullMaskingProvider(NullMaskingProviderConfig maskingConfiguration) {
+    super(maskingConfiguration);
     maskReturnNull = maskingConfiguration.isMaskReturnNull();
   }
 

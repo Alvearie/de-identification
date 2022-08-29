@@ -16,7 +16,6 @@ import com.ibm.whc.deid.models.ICDFormat;
 import com.ibm.whc.deid.providers.identifiers.ICDv9Identifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
-import com.ibm.whc.deid.shared.pojo.config.masking.ICDv10MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.ICDv9MaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -164,7 +163,7 @@ public class ICDv9MaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskInvalidICDv9InputValidHandlingReturnRandom() throws Exception {
     ICDv9MaskingProviderConfig configuration = new ICDv9MaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     ICDv9MaskingProvider maskingProvider =
         new ICDv9MaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new ICDv9Identifier(tenantId, localizationProperty);

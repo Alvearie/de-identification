@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.ReplaceMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class ReplaceMaskingProviderConfigTest {
@@ -18,14 +18,7 @@ public class ReplaceMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     ReplaceMaskingProviderConfig config = new ReplaceMaskingProviderConfig();
     config.validate(null);
-    config.setUnspecifiedValueHandling(4);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(3);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     config.validate(null);
     config.setMaskOffset(-1);
     try {

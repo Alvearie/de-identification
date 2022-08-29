@@ -19,14 +19,7 @@ public class DateDependencyMaskingProviderConfigTest {
     config.setDateYearDeleteNDaysValue(0);
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(1);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     config.setDatetimeYearDeleteNIntervalCompareDate(null);

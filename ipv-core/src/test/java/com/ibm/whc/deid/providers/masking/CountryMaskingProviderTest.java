@@ -5,12 +5,10 @@
  */
 package com.ibm.whc.deid.providers.masking;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,7 +18,7 @@ import com.ibm.whc.deid.models.Country;
 import com.ibm.whc.deid.providers.identifiers.CountryIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.CountryMaskingProviderConfig;
-import com.ibm.whc.deid.util.CountryManager;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.util.CountryNameSpecification;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
@@ -118,10 +116,9 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
     String originalCountry = "Greece";
-    HashSet<String> neighbors =
-        new HashSet<>(Arrays.asList("CYPRUS", "MALTA", "TURKEY", "SERBIA", "BOSNIA AND HERZEGOVINA",
-            "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE", "HUNGARY",
-            "MACEDONIA (THE FORMER YUGOSLAV REPUBLIC OF)"));
+    HashSet<String> neighbors = new HashSet<>(Arrays.asList("CYPRUS", "MALTA", "TURKEY", "SERBIA",
+        "BOSNIA AND HERZEGOVINA", "ROMANIA", "MONTENEGRO", "BULGARIA", "ALBANIA", "GREECE",
+        "HUNGARY", "MACEDONIA (THE FORMER YUGOSLAV REPUBLIC OF)"));
     for (int i = 0; i < 30; i++) {
       String randomCountry = countryMaskingProvider.mask(originalCountry);
       assertNotNull(randomCountry);
@@ -137,9 +134,8 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
     }
 
     originalCountry = "GrC";
-    neighbors = new HashSet<>(
-        Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR", "ALB", "GRC", "HUN",
-            "MKD"));
+    neighbors = new HashSet<>(Arrays.asList("CYP", "MLT", "TUR", "SRB", "BIH", "ROU", "MNE", "BGR",
+        "ALB", "GRC", "HUN", "MKD"));
     for (int i = 0; i < 30; i++) {
       String randomCountry = countryMaskingProvider.mask(originalCountry);
       assertTrue(neighbors.contains(randomCountry.toUpperCase()));
@@ -159,7 +155,7 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
   @Test
   public void testMaskInvalidCountryInputValidHandlingReturnNull() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(1);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     maskingConfiguration.setMaskClosest(true);
     MaskingProvider maskingProvider =
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
@@ -174,7 +170,7 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
   public void testMaskInvalidCountryInputValidHandlingReturnRandom() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setMaskClosest(true);
-    maskingConfiguration.setUnspecifiedValueHandling(2);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
     Identifier identifier = new CountryIdentifier(tenantId, localizationProperty);
@@ -190,7 +186,7 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
   public void testMaskInvalidCountryInputValidHandlingReturnDefaultCustomValue() throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setMaskClosest(true);
-    maskingConfiguration.setUnspecifiedValueHandling(3);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -205,8 +201,8 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
       throws Exception {
     CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
     maskingConfiguration.setMaskClosest(true);
-    maskingConfiguration.setUnspecifiedValueHandling(3);
-    maskingConfiguration.setUnspecifiedValueReturnMessage("Test Country");
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    maskingConfiguration.setUnexpectedInputReturnMessage("Test Country");
     MaskingProvider maskingProvider =
         new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -214,20 +210,6 @@ public class CountryMaskingProviderTest implements MaskingProviderTest {
     String maskedCountry = maskingProvider.mask(invalidCountry);
 
     assertEquals("Test Country", maskedCountry);
-  }
-
-  @Test
-  public void testMaskInvalidCountryInputInvalidHandlingReturnNull() throws Exception {
-    CountryMaskingProviderConfig maskingConfiguration = new CountryMaskingProviderConfig();
-    maskingConfiguration.setMaskClosest(true);
-    maskingConfiguration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new CountryMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-
-    String invalidCountry = "Invalid Country";
-    String maskedCountry = maskingProvider.mask(invalidCountry);
-
-    assertEquals(null, maskedCountry);
   }
 
   @Test

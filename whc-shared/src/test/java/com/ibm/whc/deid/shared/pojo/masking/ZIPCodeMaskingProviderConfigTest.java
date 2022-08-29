@@ -5,10 +5,10 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.config.masking.ZIPCodeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
@@ -18,14 +18,7 @@ public class ZIPCodeMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     ZIPCodeMaskingProviderConfig config = new ZIPCodeMaskingProviderConfig();
     config.validate(null);
-    config.setUnspecifiedValueHandling(-2);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(3);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     config.validate(null);
     config.setMaskCountryCode(null);
     try {

@@ -516,7 +516,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidDateTimeInputValidHandlingReturnNull() throws Exception {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     String invalidDateTime = "Invalid Date Time";
@@ -529,7 +529,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidDateTimeInputValidHandlingReturnRandom() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(2);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
     Identifier identifier = new DateTimeIdentifier();
 
@@ -560,27 +560,14 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidDateTimeInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
-    maskingConfiguration.setUnspecifiedValueReturnMessage("Test Date Time");
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    maskingConfiguration.setUnexpectedInputReturnMessage("Test Date Time");
     MaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
 
     String invalidDateTime = "Invalid Date Time";
     String maskedDateTime = maskingProvider.mask(invalidDateTime);
 
     assertEquals("Test Date Time", maskedDateTime);
-    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidDateTimeInputInvalidHandlingReturnNull() throws Exception {
-    DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
-
-    String invalidDateTime = "Invalid Date Time";
-    String maskedDateTime = maskingProvider.mask(invalidDateTime);
-
-    assertEquals(null, maskedDateTime);
     assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 

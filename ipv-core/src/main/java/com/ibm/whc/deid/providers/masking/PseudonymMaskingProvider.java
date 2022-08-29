@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.security.SecureRandom;
-
 import com.ibm.whc.deid.models.ReversePatternGenerator;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.PseudonymMaskingProviderConfig;
@@ -42,6 +41,7 @@ public class PseudonymMaskingProvider extends AbstractMaskingProvider {
   }
 
   public PseudonymMaskingProvider(PseudonymMaskingProviderConfig configuration) {
+    super(configuration);
     this.random = new SecureRandom();
     this.generateViaOptions = configuration.isGenerateViaOptionsEnabled();
     this.minLength = configuration.getGenerateViaOptionsMinLength();

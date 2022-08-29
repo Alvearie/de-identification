@@ -340,7 +340,6 @@ public class ZIPCodeMaskingProviderTest extends TestLogSetUp implements MaskingP
     ZIPCodeMaskingProviderConfig configuration = new ZIPCodeMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     configuration.setUnexpectedInputReturnMessage("00000");
-    configuration.setUnspecifiedValueReturnMessage("xxxxx");
     MaskingProvider maskingProvider =
         new ZIPCodeMaskingProvider(configuration, tenantId, localizationProperty);
 

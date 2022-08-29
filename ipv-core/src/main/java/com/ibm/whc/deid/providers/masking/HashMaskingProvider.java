@@ -36,6 +36,7 @@ public class HashMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public HashMaskingProvider(HashMaskingProviderConfig config) {
+    super(config);
     this.algorithm = config.getAlgorithmDefault();
     this.hashingOffsetOffsetMask = config.isOffsetOffsetMask();
     this.hashingOffsetOffsetMaskDelete = config.isOffsetOffsetMaskDelete();
