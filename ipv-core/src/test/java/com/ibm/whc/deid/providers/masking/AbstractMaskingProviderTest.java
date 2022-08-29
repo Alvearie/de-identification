@@ -35,17 +35,13 @@ public class AbstractMaskingProviderTest {
 
   @Test
   public void testApplyUnexpectedValueHandling() {
-    
-    // no config
-    TestAbstractMaskingProvider provider = new TestAbstractMaskingProvider(null);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-    
+
     // new NULL
     MaskingProviderConfig config = new MaintainMaskingProviderConfig();
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
-    provider = new TestAbstractMaskingProvider(config);
+    TestAbstractMaskingProvider provider = new TestAbstractMaskingProvider(config);
     assertNull(provider.applyUnexpectedValueHandling("input", null));
-    
+
     // new RANDOM, not supported
     config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     provider = new TestAbstractMaskingProvider(config);
@@ -88,79 +84,15 @@ public class AbstractMaskingProviderTest {
       assertTrue(e.getMessage(), e.getMessage().contains("theRuleName"));
     }
 
-    // old default
-    config.setUnexpectedInputHandling(null);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-
-    // old NULL
-    config.setUnspecifiedValueHandling(1);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-
-    // old out of range negative
-    config.setUnspecifiedValueHandling(-1);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-
-    // old out of range 4
-    config.setUnspecifiedValueHandling(4);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-
-    // old RANDOM, not supported
-    config.setUnspecifiedValueHandling(2);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", null));
-
-    // old RANDOM, supported
-    config.setUnspecifiedValueHandling(2);
-    provider = new TestAbstractMaskingProvider(config);
-    assertEquals("old random", provider.applyUnexpectedValueHandling("input", () -> "old random"));
-
-    // old MESSAGE, no message set
-    config.setUnspecifiedValueHandling(3);
-    provider = new TestAbstractMaskingProvider(config);
-    assertEquals("OTHER", provider.applyUnexpectedValueHandling("input", () -> "random-value"));
-
-    // old MESSAGE, custom message
-    config.setUnspecifiedValueReturnMessage("msg2");
-    provider = new TestAbstractMaskingProvider(config);
-    assertEquals("msg2", provider.applyUnexpectedValueHandling("input", () -> "random-value"));
-
-    // old MESSAGE, empty string
-    config.setUnspecifiedValueReturnMessage("");
-    provider = new TestAbstractMaskingProvider(config);
-    assertEquals("", provider.applyUnexpectedValueHandling("input", () -> "random-value"));
-
-    // old MESSAGE, null
-    config.setUnspecifiedValueReturnMessage(null);
-    provider = new TestAbstractMaskingProvider(config);
-    assertNull(provider.applyUnexpectedValueHandling("input", () -> "random-value"));
   }
 
   @Test
   public void testIsUnexpectedValueHandlingRandom() {
 
-    // no config
-    TestAbstractMaskingProvider provider = new TestAbstractMaskingProvider(null);
-    assertFalse(provider.isUnexpectedValueHandlingRandom());
-
-    // with config
+    TestAbstractMaskingProvider provider;
     MaskingProviderConfig config = new MaintainMaskingProviderConfig();
-
-    for (int i = -1; i < 5; i++) {
-      config.setUnspecifiedValueHandling(i);
-      provider = new TestAbstractMaskingProvider(config);
-      boolean random = provider.isUnexpectedValueHandlingRandom();
-      if (i == 2) {
-        assertTrue(random);
-      } else {
-        assertFalse(random);
-      }
-    }
-    // even though old says random, new enum takes precedence
-    config.setUnspecifiedValueHandling(2);
+    provider = new TestAbstractMaskingProvider(config);
+    assertFalse(provider.isUnexpectedValueHandlingRandom());
 
     for (UnexpectedMaskingInputHandler handler : UnexpectedMaskingInputHandler.values()) {
       config.setUnexpectedInputHandling(handler);
@@ -172,11 +104,5 @@ public class AbstractMaskingProviderTest {
         assertFalse(random);
       }
     }
-
-    // verify random still returns true even when old value is not 2
-    config.setUnspecifiedValueHandling(2);
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
-    provider = new TestAbstractMaskingProvider(config);
-    assertTrue(provider.isUnexpectedValueHandlingRandom());
   }
 }

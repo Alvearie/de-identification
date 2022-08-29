@@ -25,6 +25,7 @@ public class RedactMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public RedactMaskingProvider(RedactMaskingProviderConfig configuration) {
+    super(configuration);
     this.preserveLength = configuration.isPreserveLength();
     this.replacementCharacter = configuration.getReplaceCharacter();
   }

@@ -56,7 +56,7 @@ public class HospitalMaskingProviderTest implements MaskingProviderTest {
       maskingProvider.getHospitalManager().isValidKey(maskedValue);
     }
   }
-  
+
   @Test
   public void testMask_multiCountry() {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
@@ -154,24 +154,23 @@ public class HospitalMaskingProviderTest implements MaskingProviderTest {
   }
 
   @Test
-  public void testMaskInvalidHospitalInputValidHandlingReturnDefaultCustomValue()
-      throws Exception {
+  public void testMaskInvalidHospitalInputValidHandlingReturnDefaultCustomValue() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
-    configuration.setUnspecifiedValueReturnMessage("Test Hospital");
+    configuration.setUnexpectedInputReturnMessage("Test Hospital");
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 
     String invalidHospital = "Invalid Hospital";
     String maskedHospital = maskingProvider.mask(invalidHospital);
-    assertEquals("OTHER", maskedHospital);
+    assertEquals("Test Hospital", maskedHospital);
   }
 
   @Test
   public void testMaskInvalidHospitalInputValidHandlingExit() throws Exception {
     HospitalMaskingProviderConfig configuration = new HospitalMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);
-    configuration.setUnspecifiedValueReturnMessage("Test Hospital");
+    configuration.setUnexpectedInputReturnMessage("Test Hospital");
     MaskingProvider maskingProvider =
         new HospitalMaskingProvider(configuration, tenantId, localizationProperty);
 

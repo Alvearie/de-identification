@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.IPAddressIdentifier;
@@ -136,7 +135,7 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidIPAddressInputValidHandlingReturnNull() throws Exception {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
 
     String invalidIPAddress = "Invalid IP Address";
@@ -150,7 +149,6 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidIPAddressInputValidHandlingReturnRandom() throws Exception {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
-    configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
     Identifier identifier = new IPAddressIdentifier();
 
@@ -167,7 +165,7 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidIPAddressInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
 
     String invalidIPAddress = "Invalid IP Address";
@@ -183,27 +181,12 @@ public class IPAddressMaskingProviderTest extends TestLogSetUp {
     IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     configuration.setUnexpectedInputReturnMessage("Test IP Address");
-    configuration.setUnspecifiedValueHandling(2);
-    configuration.setUnspecifiedValueReturnMessage("XTest IP Address");
     MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
 
     String invalidIPAddress = "Invalid IP Address";
     String maskedIPAddress = maskingProvider.mask(invalidIPAddress);
 
     assertEquals("Test IP Address", maskedIPAddress);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidIPAddressInputInvalidHandlingReturnNull() throws Exception {
-    IPAddressMaskingProviderConfig configuration = new IPAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new IPAddressMaskingProvider(configuration);
-
-    String invalidIPAddress = "Invalid IP Address";
-    String maskedIPAddress = maskingProvider.mask(invalidIPAddress);
-
-    assertEquals(null, maskedIPAddress);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 }

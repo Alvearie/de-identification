@@ -29,17 +29,17 @@ public class IMEIMaskingProviderConfigTest {
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     assertFalse(config.equals(other));
     assertNotEquals(config.hashCode(), other.hashCode());
-    other.setUnspecifiedValueHandling(2);
+    other.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setUnspecifiedValueReturnMessage("x");
+    config.setUnexpectedInputReturnMessage("x");
     assertFalse(config.equals(other));
     assertNotEquals(config.hashCode(), other.hashCode());
-    other.setUnspecifiedValueReturnMessage("x");
+    other.setUnexpectedInputReturnMessage("x");
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 

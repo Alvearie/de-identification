@@ -28,6 +28,7 @@ public class ReplaceMaskingProvider extends AbstractMaskingProvider {
    * @param configuration the configuration
    */
   public ReplaceMaskingProvider(ReplaceMaskingProviderConfig configuration) {
+    super(configuration);
     this.offset = configuration.getMaskOffset();
     this.preservedCharacters = configuration.getMaskPreserve();
     this.replaceWithRandom = configuration.isMaskReplaceWithRandom();

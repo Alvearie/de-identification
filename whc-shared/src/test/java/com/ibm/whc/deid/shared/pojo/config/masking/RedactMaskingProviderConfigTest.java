@@ -7,8 +7,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class RedactMaskingProviderConfigTest {
 
@@ -17,14 +17,7 @@ public class RedactMaskingProviderConfigTest {
     RedactMaskingProviderConfig config = new RedactMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     config.setReplaceCharacter("");
@@ -39,7 +32,7 @@ public class RedactMaskingProviderConfigTest {
     config.validate(null);
     config.setReplaceCharacter(".");
     config.validate(null);
-    
+
     config.setReplaceCharacter("ab");
     try {
       config.validate(null);
@@ -48,8 +41,8 @@ public class RedactMaskingProviderConfigTest {
       assertEquals("`replaceCharacter` must be a single character", e.getMessage());
     }
 
-    config.setReplaceCharacter(null);  // uses default
+    config.setReplaceCharacter(null); // uses default
     config.validate(null);
     assertEquals("X", config.getReplaceCharacter());
-  }  
+  }
 }

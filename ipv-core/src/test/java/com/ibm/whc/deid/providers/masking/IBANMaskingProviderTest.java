@@ -12,12 +12,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.IBANIdentifier;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.IBANMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
-import org.junit.Test;
 
 public class IBANMaskingProviderTest extends TestLogSetUp {
 
@@ -82,7 +81,7 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidIBANInputValidHandlingReturnNull() throws Exception {
     IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
 
     String invalidIBAN = "Invalid IBAN";
@@ -93,25 +92,9 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
   }
 
   @Test
-  public void testMaskInvalidIBANInputValidHandlingReturnRandom() throws Exception {
-    IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
-    MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
-    Identifier identifier = new IBANIdentifier();
-
-    String invalidIBAN = "Invalid IBAN";
-    String maskedIBAN = maskingProvider.mask(invalidIBAN);
-
-    assertFalse(maskedIBAN.equals(invalidIBAN));
-    assertTrue(identifier.isOfThisType(maskedIBAN));
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
   public void testMaskInvalidIBANInputValidHandlingReturnRandomNew() throws Exception {
     IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
-    configuration.setUnspecifiedValueHandling(1);
     MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
     Identifier identifier = new IBANIdentifier();
 
@@ -127,7 +110,7 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidIBANInputValidHandlingReturnDefaultCustomValue() throws Exception {
     IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
 
     String invalidIBAN = "Invalid IBAN";
@@ -140,27 +123,14 @@ public class IBANMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidIBANInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test IBAN");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test IBAN");
     MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
 
     String invalidIBAN = "Invalid IBAN";
     String maskedIBAN = maskingProvider.mask(invalidIBAN);
 
     assertEquals("Test IBAN", maskedIBAN);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidIBANInputInvalidHandlingReturnNull() throws Exception {
-    IBANMaskingProviderConfig configuration = new IBANMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new IBANMaskingProvider(configuration);
-
-    String invalidIBAN = "Invalid IBAN";
-    String maskedIBAN = maskingProvider.mask(invalidIBAN);
-
-    assertEquals(null, maskedIBAN);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 }

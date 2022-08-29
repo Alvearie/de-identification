@@ -7,6 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import com.ibm.whc.deid.models.CreditCardType;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.pojo.config.masking.CreditCardMaskingProviderConfig;
 import com.ibm.whc.deid.util.CreditCardTypeManager;
 import com.ibm.whc.deid.util.ManagerFactory;
 
@@ -23,7 +24,7 @@ public class CreditCardTypeMaskingProvider extends AbstractMaskingProvider {
    * @paramlocalizationProperty location of the localization property file
    */
   public CreditCardTypeMaskingProvider(String tenantId, String localizationProperty) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, new CreditCardMaskingProviderConfig());
   }
 
   protected CreditCardTypeManager getCreditCardTypeManager() {

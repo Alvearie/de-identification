@@ -109,7 +109,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
   @Test
   public void testMaskInvalidCreditCardInputValidHandlingReturnNull() throws Exception {
     CreditCardMaskingProviderConfig maskingConfiguration = new CreditCardMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(1);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new CreditCardMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -140,7 +140,7 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskInvalidCreditCardInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     CreditCardMaskingProviderConfig maskingConfiguration = new CreditCardMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new CreditCardMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -155,8 +155,8 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
   public void testMaskInvalidCreditCardInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     CreditCardMaskingProviderConfig maskingConfiguration = new CreditCardMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(3);
-    maskingConfiguration.setUnspecifiedValueReturnMessage("Test Credit Card");
+    maskingConfiguration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    maskingConfiguration.setUnexpectedInputReturnMessage("Test Credit Card");
     MaskingProvider maskingProvider =
         new CreditCardMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
 
@@ -164,20 +164,6 @@ public class CreditCardMaskingProviderTest extends TestLogSetUp implements Maski
     String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
 
     assertEquals("Test Credit Card", maskedCreditCard);
-    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidCreditCardInputInvalidHandlingReturnNull() throws Exception {
-    CreditCardMaskingProviderConfig maskingConfiguration = new CreditCardMaskingProviderConfig();
-    maskingConfiguration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new CreditCardMaskingProvider(maskingConfiguration, tenantId, localizationProperty);
-
-    String invalidCreditCard = "Invalid Credit Card";
-    String maskedCreditCard = maskingProvider.mask(invalidCreditCard);
-
-    assertEquals(null, maskedCreditCard);
     assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 

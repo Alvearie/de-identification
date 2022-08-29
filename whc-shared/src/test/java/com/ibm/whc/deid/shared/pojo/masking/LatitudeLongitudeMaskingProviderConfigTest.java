@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.LatitudeLongitudeMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class LatitudeLongitudeMaskingProviderConfigTest {
@@ -18,14 +18,8 @@ public class LatitudeLongitudeMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     LatitudeLongitudeMaskingProviderConfig config = new LatitudeLongitudeMaskingProviderConfig();
     config.validate(null);
-    config.setUnspecifiedValueHandling(4);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(2);
+
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     config.validate(null);
     config.setOffsetMaximumRadius(10);
     try {

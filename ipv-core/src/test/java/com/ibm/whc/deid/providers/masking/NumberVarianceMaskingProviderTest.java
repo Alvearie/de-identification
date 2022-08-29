@@ -364,7 +364,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidNumberVarianceInputValidHandlingReturnNull() throws Exception {
     NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
     String invalidNumberVariance = "Invalid NumberVariance";
@@ -377,7 +377,7 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidNumberVarianceInputValidHandlingReturnRandom() throws Exception {
     NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
     String invalidNumberVariance = "Invalid NumberVariance";
@@ -406,27 +406,14 @@ public class NumberVarianceMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidNumberVarianceInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test NumberVariance");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test NumberVariance");
     MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
 
     String invalidNumberVariance = "Invalid NumberVariance";
     String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
 
     assertEquals("Test NumberVariance", maskedNumberVariance);
-    assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidNumberVarianceInputInvalidHandlingReturnNull() throws Exception {
-    NumberVarianceMaskingProviderConfig configuration = new NumberVarianceMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new NumberVarianceMaskingProvider(configuration);
-
-    String invalidNumberVariance = "Invalid NumberVariance";
-    String maskedNumberVariance = maskingProvider.mask(invalidNumberVariance);
-
-    assertEquals(null, maskedNumberVariance);
     assertTrue(outContent.toString().contains("DEBUG - WPH1015D"));
   }
 }

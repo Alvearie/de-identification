@@ -10,12 +10,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.pojo.config.masking.conditional.Condition;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class ConditionalMaskingProviderConfigTest {
 
@@ -70,14 +70,7 @@ public class ConditionalMaskingProviderConfigTest {
     provider.setBinSize(10);
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(5);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(1);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     maskRuleSet.add(null);
@@ -103,17 +96,17 @@ public class ConditionalMaskingProviderConfigTest {
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     assertFalse(config.equals(other));
     assertNotEquals(config.hashCode(), other.hashCode());
-    other.setUnspecifiedValueHandling(2);
+    other.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 
-    config.setUnspecifiedValueReturnMessage("x");
+    config.setUnexpectedInputReturnMessage("x");
     assertFalse(config.equals(other));
     assertNotEquals(config.hashCode(), other.hashCode());
-    other.setUnspecifiedValueReturnMessage("x");
+    other.setUnexpectedInputReturnMessage("x");
     assertTrue(config.equals(other));
     assertEquals(config.hashCode(), other.hashCode());
 

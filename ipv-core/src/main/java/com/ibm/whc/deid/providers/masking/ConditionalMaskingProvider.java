@@ -36,7 +36,7 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
   public ConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration, String tenantId,
       DeidMaskingConfig deidMaskingConfig, String localizationProperty,
       MaskingProviderFactory maskingProviderFactory) {
-    super(tenantId, localizationProperty);
+    super(tenantId, localizationProperty, configuration);
     this.deidMaskingConfig = deidMaskingConfig;
     this.maskRuleSet = configuration.getMaskRuleSet();
     this.maskingProviderFactory = maskingProviderFactory;

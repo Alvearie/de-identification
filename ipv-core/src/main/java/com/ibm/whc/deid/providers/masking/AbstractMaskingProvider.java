@@ -36,33 +36,20 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
 
   protected final UnexpectedMaskingInputHandler unexpectedInputHandler;
   protected final String unexpectedInputReturnMessage;
-  protected final int unspecifiedValueHandling;
-  protected final String unspecifiedValueReturnMessage;
 
   private String name = "";
 
-  public AbstractMaskingProvider() {
-    this(null, null, null);
-  }
-
   public AbstractMaskingProvider(MaskingProviderConfig config) {
     this(null, null, config);
-  }
-
-  public AbstractMaskingProvider(String tenantId, String localizationProperty) {
-    this(tenantId, localizationProperty, null);
   }
 
   public AbstractMaskingProvider(String tenantId, String localizationProperty,
       MaskingProviderConfig config) {
     this.tenantId = tenantId;
     this.localizationProperty = localizationProperty;
-    this.unexpectedInputHandler = config == null ? null : config.getUnexpectedInputHandling();
-    this.unexpectedInputReturnMessage =
-        config == null ? null : config.getUnexpectedInputReturnMessage();
-    this.unspecifiedValueHandling = config == null ? 1 : config.getUnspecifiedValueHandling();
-    this.unspecifiedValueReturnMessage =
-        config == null ? null : config.getUnspecifiedValueReturnMessage();
+    UnexpectedMaskingInputHandler handler = config.getUnexpectedInputHandling();
+    this.unexpectedInputHandler = handler == null ? UnexpectedMaskingInputHandler.NULL : handler;
+    this.unexpectedInputReturnMessage = config.getUnexpectedInputReturnMessage();
   }
 
   @Override
@@ -164,39 +151,26 @@ public abstract class AbstractMaskingProvider implements MaskingProvider {
     debugFaultyInput("input");
     String response;
 
-    if (unexpectedInputHandler != null) {
-      switch (unexpectedInputHandler) {
-        case NULL:
-          response = null;
-          break;
-        case RANDOM:
-          response = randomGenerator == null ? null : randomGenerator.get();
-          break;
-        case MESSAGE:
-          response = unexpectedInputReturnMessage;
-          break;
-        case ERROR_EXIT:
-          throw new PrivacyProviderInvalidInputException(input, getName());
-        default:
-          response = null;
-      }
-    } else {
-      if (unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_RANDOM) {
-        response = randomGenerator == null ? null : randomGenerator.get();
-      } else if (unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_MESSAGE) {
-        response = unspecifiedValueReturnMessage;
-      } else {
+    switch (unexpectedInputHandler) {
+      case NULL:
         response = null;
-      }
+        break;
+      case RANDOM:
+        response = randomGenerator == null ? null : randomGenerator.get();
+        break;
+      case MESSAGE:
+        response = unexpectedInputReturnMessage;
+        break;
+      case ERROR_EXIT:
+        throw new PrivacyProviderInvalidInputException(input, getName());
+      default:
+        response = null;
     }
 
     return response;
   }
 
   protected boolean isUnexpectedValueHandlingRandom() {
-    // unexpectedInputHandler has priority
-    return unexpectedInputHandler == null
-        ? unspecifiedValueHandling == MaskingProviderConfig.UNSPECIFIED_VALUE_HANDLING_RANDOM
-        : unexpectedInputHandler == UnexpectedMaskingInputHandler.RANDOM;
+    return unexpectedInputHandler == UnexpectedMaskingInputHandler.RANDOM;
   }
 }

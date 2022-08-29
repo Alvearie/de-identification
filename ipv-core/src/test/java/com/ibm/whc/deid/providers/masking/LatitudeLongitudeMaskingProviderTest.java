@@ -206,7 +206,6 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
-    configuration.setUnspecifiedValueHandling(3);
     MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
 
     String invalidLatitudeLongitude = "Invalid Latitude Longitude";
@@ -220,7 +219,7 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidLatitudeLongitudeInputValidHandlingReturnRandom() throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
     Identifier identifier = new LatitudeLongitudeIdentifier();
 
@@ -237,7 +236,7 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
       throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
 
     String invalidLatitudeLongitude = "Invalid Latitude Longitude";
@@ -252,28 +251,14 @@ public class LatitudeLongitudeMaskingProviderTest extends TestLogSetUp {
       throws Exception {
     LatitudeLongitudeMaskingProviderConfig configuration =
         new LatitudeLongitudeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test Latitude Longitude");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test Latitude Longitude");
     MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
 
     String invalidLatitudeLongitude = "Invalid Latitude Longitude";
     String maskedLatitudeLongitude = maskingProvider.mask(invalidLatitudeLongitude);
 
     assertEquals("Test Latitude Longitude", maskedLatitudeLongitude);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidLatitudeLongitudeInputInvalidHandlingReturnNull() throws Exception {
-    LatitudeLongitudeMaskingProviderConfig configuration =
-        new LatitudeLongitudeMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new LatitudeLongitudeMaskingProvider(configuration);
-
-    String invalidLatitudeLongitude = "Invalid Latitude Longitude";
-    String maskedLatitudeLongitude = maskingProvider.mask(invalidLatitudeLongitude);
-
-    assertEquals(null, maskedLatitudeLongitude);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

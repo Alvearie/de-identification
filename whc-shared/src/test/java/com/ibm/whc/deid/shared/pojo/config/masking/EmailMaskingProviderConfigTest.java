@@ -7,8 +7,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class EmailMaskingProviderConfigTest {
 
@@ -17,14 +17,7 @@ public class EmailMaskingProviderConfigTest {
     EmailMaskingProviderConfig config = new EmailMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(4);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     config.validate(null);
 
     config.setNameLength(-2);

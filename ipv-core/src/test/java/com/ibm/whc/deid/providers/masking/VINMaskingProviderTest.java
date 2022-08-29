@@ -10,13 +10,12 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.VINIdentifier;
 import com.ibm.whc.deid.shared.localization.Resource;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.pojo.config.masking.VINMaskingProviderConfig;
 import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.VINManager;
@@ -137,7 +136,7 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskInvalidVINInputValidHandlingReturnNull() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -151,7 +150,7 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskInvalidVINInputValidHandlingReturnRandom() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new VINMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new VINIdentifier(tenantId, localizationProperty);
@@ -167,7 +166,7 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskInvalidVINInputValidHandlingReturnDefaultCustomValue() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -181,8 +180,8 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
   @Test
   public void testMaskInvalidVINInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test VIN");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test VIN");
     MaskingProvider maskingProvider =
         new VINMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -190,20 +189,6 @@ public class VINMaskingProviderTest extends TestLogSetUp implements MaskingProvi
     String maskedVIN = maskingProvider.mask(invalidVIN);
 
     assertEquals("Test VIN", maskedVIN);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidVINInputInvalidHandlingReturnNull() throws Exception {
-    VINMaskingProviderConfig configuration = new VINMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new VINMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidVIN = "Invalid VIN";
-    String maskedVIN = maskingProvider.mask(invalidVIN);
-
-    assertEquals(null, maskedVIN);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

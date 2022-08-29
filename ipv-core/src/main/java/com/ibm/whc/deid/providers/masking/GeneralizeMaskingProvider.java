@@ -6,7 +6,6 @@
 package com.ibm.whc.deid.providers.masking;
 
 import java.util.List;
-
 import com.ibm.whc.deid.shared.pojo.config.masking.GeneralizeMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.GeneralizeMaskingProviderConfig.GeneralizeRule;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -43,6 +42,7 @@ public class GeneralizeMaskingProvider extends AbstractMaskingProvider {
   }
 
   public GeneralizeMaskingProvider(GeneralizeMaskingProviderConfig configuration) {
+    super(configuration);
     try {
       generalizeRuleSet = configuration.parseMaskRuleSet(configuration.getMaskRuleSet());
     } catch (Exception e) {

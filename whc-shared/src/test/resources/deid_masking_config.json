@@ -28,8 +28,8 @@
 			"maskingProviders": [
 				{
 					"type": "GENDER",
-					"unspecifiedValueHandling": 0,
-					"unspecifiedValueReturnMessage": "OTHER"
+					"unexpectedInputHandling":"NULL",
+					"unexpectedInputReturnMessage": "OTHER"
 				}
 			]
 		}

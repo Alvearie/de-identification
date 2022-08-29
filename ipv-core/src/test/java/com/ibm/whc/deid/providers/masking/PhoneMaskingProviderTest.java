@@ -22,6 +22,7 @@ import com.ibm.whc.deid.models.PhoneNumber;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.PhoneIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingProviderTest {
@@ -143,7 +144,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskInvalidPhoneInputValidHandlingReturnNull() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -157,7 +158,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskInvalidPhoneInputValidHandlingReturnRandom() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
     Identifier identifier = new PhoneIdentifier(null, tenantId, localizationProperty);
@@ -174,7 +175,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandling_ValidNumber_InvalidNumDigits()
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     // Cuba country code
     configuration.setInvNdigitsReplaceWith("53");
     PhoneMaskingProvider maskingProvider =
@@ -194,7 +195,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandling_InvalidNumDigitsValidReplacement()
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     // Spain country code
     configuration.setInvNdigitsReplaceWith("34");
     PhoneMaskingProvider maskingProvider =
@@ -215,7 +216,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   public void testMaskInvalidPhoneInputValidHandling_InvalidNumDigitsInvalidReplacement()
       throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     // Invalid country code
     configuration.setInvNdigitsReplaceWith("538");
     PhoneMaskingProvider maskingProvider =
@@ -237,7 +238,7 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskInvalidPhoneInputValidHandlingReturnDefaultCustomValue() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -251,8 +252,8 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
   @Test
   public void testMaskInvalidPhoneInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test Phone");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test Phone");
     MaskingProvider maskingProvider =
         new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -260,20 +261,6 @@ public class PhoneMaskingProviderTest extends TestLogSetUp implements MaskingPro
     String maskedPhone = maskingProvider.mask(invalidPhone);
 
     assertEquals("Test Phone", maskedPhone);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidPhoneInputInvalidHandlingReturnNull() throws Exception {
-    PhoneMaskingProviderConfig configuration = new PhoneMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider =
-        new PhoneMaskingProvider(configuration, tenantId, localizationProperty);
-
-    String invalidPhone = "Invalid Phone";
-    String maskedPhone = maskingProvider.mask(invalidPhone);
-
-    assertEquals(null, maskedPhone);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

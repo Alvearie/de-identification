@@ -18,14 +18,7 @@ public class BinningMaskingProviderConfigTest {
     BinningMaskingProviderConfig config = new BinningMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     config.validate(null);
 
     config.setBinSize(0);

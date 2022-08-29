@@ -12,18 +12,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 import com.ibm.whc.deid.models.SSNUS;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.SSNUSIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.SSNUSMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
-import org.junit.Test;
 
 public class SSNUSMaskingProviderTest extends TestLogSetUp {
 
   /*
-   * Tests for both preserve area number and group options and their boolean
-   * values (true and false). Also tests for an invalid value.
+   * Tests for both preserve area number and group options and their boolean values (true and
+   * false). Also tests for an invalid value.
    */
 
   @Test
@@ -124,7 +124,7 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
     configuration.setMaskPreserveAreaNumber(false);
     configuration.setMaskPreserveGroup(true);
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
     String invalidSSNUS = "Invalid SSNUS";
@@ -139,7 +139,7 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
     configuration.setMaskPreserveAreaNumber(true);
     configuration.setMaskPreserveGroup(false);
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
     Identifier identifier = new SSNUSIdentifier();
 
@@ -156,7 +156,7 @@ public class SSNUSMaskingProviderTest extends TestLogSetUp {
     SSNUSMaskingProviderConfig configuration = new SSNUSMaskingProviderConfig();
     configuration.setMaskPreserveAreaNumber(true);
     configuration.setMaskPreserveGroup(true);
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new SSNUSMaskingProvider(configuration);
 
     String invalidSSNUS = "Invalid SSNUS";

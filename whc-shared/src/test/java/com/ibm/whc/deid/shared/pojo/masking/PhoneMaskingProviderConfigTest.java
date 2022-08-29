@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.PhoneMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class PhoneMaskingProviderConfigTest {
@@ -21,14 +22,7 @@ public class PhoneMaskingProviderConfigTest {
     PhoneMaskingProviderConfig config = new PhoneMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     config.setInvNdigitsReplaceWith(null);

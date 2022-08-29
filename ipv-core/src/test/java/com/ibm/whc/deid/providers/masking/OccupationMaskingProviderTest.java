@@ -111,7 +111,6 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
     configuration.setMaskGeneralize(true);
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     configuration.setUnexpectedInputReturnMessage("Test Occupation");
-    configuration.setUnspecifiedValueReturnMessage("XTest Occupation");
     MaskingProvider maskingProvider =
         new OccupationMaskingProvider(configuration, tenantId, localizationProperty);
 
@@ -123,7 +122,7 @@ public class OccupationMaskingProviderTest extends TestLogSetUp implements Maski
   }
 
   @Test
-  public void testMaskInvalidOccupationInputValidHandlingExit()      throws Exception {
+  public void testMaskInvalidOccupationInputValidHandlingExit() throws Exception {
     OccupationMaskingProviderConfig configuration = new OccupationMaskingProviderConfig();
     configuration.setMaskGeneralize(true);
     configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.ERROR_EXIT);

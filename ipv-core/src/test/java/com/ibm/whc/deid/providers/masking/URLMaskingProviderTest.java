@@ -331,7 +331,7 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidURLInputValidHandlingReturnNull() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
         deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
@@ -345,7 +345,7 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidURLInputValidHandlingReturnRandom() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
         deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
@@ -374,8 +374,8 @@ public class URLMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidURLInputValidHandlingReturnNonDefaultCustomValue() throws Exception {
     URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test URL");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test URL");
     MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
         deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
 
@@ -383,20 +383,6 @@ public class URLMaskingProviderTest extends TestLogSetUp {
     String maskedURL = maskingProvider.mask(invalidURL);
 
     assertEquals("Test URL", maskedURL);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidURLInputInvalidHandlingReturnNull() throws Exception {
-    URLMaskingProviderConfig configuration = new URLMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new URLMaskingProvider(configuration, tenantId,
-        deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
-
-    String invalidURL = "Invalid URL";
-    String maskedURL = maskingProvider.mask(invalidURL);
-
-    assertEquals(null, maskedURL);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

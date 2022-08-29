@@ -5,11 +5,11 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import com.ibm.whc.deid.shared.pojo.config.masking.PseudonymMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class PseudonymMaskingProviderConfigTest {
@@ -18,14 +18,7 @@ public class PseudonymMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     PseudonymMaskingProviderConfig config = new PseudonymMaskingProviderConfig();
     config.validate(null);
-    config.setUnspecifiedValueHandling(-4);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(1);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
     config.setGenerateViaPatternLanguageCode(null);
     try {
@@ -59,13 +52,12 @@ public class PseudonymMaskingProviderConfigTest {
       config.validate(null);
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
-      assertTrue(e.getMessage()
-          .contains(
-              "`generateViaOptionsMaxLength` must be greater than or equal to `generateViaOptionsMinLength`"));
+      assertTrue(e.getMessage().contains(
+          "`generateViaOptionsMaxLength` must be greater than or equal to `generateViaOptionsMinLength`"));
     }
     config.setGenerateViaOptionsMaxLength(2);
     config.validate(null);
     config.setGenerateViaOptionsMaxLength(3);
-    config.validate(null);    
+    config.validate(null);
   }
 }

@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.Identifier;
 import com.ibm.whc.deid.providers.identifiers.MACAddressIdentifier;
 import com.ibm.whc.deid.shared.pojo.config.masking.MACAddressMaskingProviderConfig;
+import com.ibm.whc.deid.shared.pojo.config.masking.UnexpectedMaskingInputHandler;
 
 public class MACAddressMaskingProviderTest extends TestLogSetUp {
   /*
@@ -67,7 +68,7 @@ public class MACAddressMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidMACAddressInputValidHandlingReturnNull() throws Exception {
     MACAddressMaskingProviderConfig configuration = new MACAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(1);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     MaskingProvider maskingProvider = new MACAddressMaskingProvider(configuration);
 
     String invalidMACAddress = "Invalid MAC Address";
@@ -80,7 +81,7 @@ public class MACAddressMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testMaskInvalidMACAddressInputValidHandlingReturnRandom() throws Exception {
     MACAddressMaskingProviderConfig configuration = new MACAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(2);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     MaskingProvider maskingProvider = new MACAddressMaskingProvider(configuration);
     Identifier identifier = new MACAddressIdentifier();
 
@@ -96,7 +97,7 @@ public class MACAddressMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidMACAddressInputValidHandlingReturnDefaultCustomValue()
       throws Exception {
     MACAddressMaskingProviderConfig configuration = new MACAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     MaskingProvider maskingProvider = new MACAddressMaskingProvider(configuration);
     String invalidMACAddress = "Invalid MAC Address";
     String maskedMACAddress = maskingProvider.mask(invalidMACAddress);
@@ -109,27 +110,14 @@ public class MACAddressMaskingProviderTest extends TestLogSetUp {
   public void testMaskInvalidMACAddressInputValidHandlingReturnNonDefaultCustomValue()
       throws Exception {
     MACAddressMaskingProviderConfig configuration = new MACAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(3);
-    configuration.setUnspecifiedValueReturnMessage("Test MAC Address");
+    configuration.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
+    configuration.setUnexpectedInputReturnMessage("Test MAC Address");
     MaskingProvider maskingProvider = new MACAddressMaskingProvider(configuration);
 
     String invalidMACAddress = "Invalid MAC Address";
     String maskedMACAddress = maskingProvider.mask(invalidMACAddress);
 
     assertEquals("Test MAC Address", maskedMACAddress);
-    assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
-  }
-
-  @Test
-  public void testMaskInvalidMACAddressInputInvalidHandlingReturnNull() throws Exception {
-    MACAddressMaskingProviderConfig configuration = new MACAddressMaskingProviderConfig();
-    configuration.setUnspecifiedValueHandling(4);
-    MaskingProvider maskingProvider = new MACAddressMaskingProvider(configuration);
-
-    String invalidMACAddress = "Invalid MAC Address";
-    String maskedMACAddress = maskingProvider.mask(invalidMACAddress);
-
-    assertEquals(null, maskedMACAddress);
     assertThat(outContent.toString(), containsString("DEBUG - WPH1015D"));
   }
 

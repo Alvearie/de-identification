@@ -29,6 +29,7 @@ public class DateDependencyMaskingProvider extends AbstractMaskingProvider {
 
   public DateDependencyMaskingProvider(DateDependencyMaskingProviderConfig maskingConfiguration,
       DeidMaskingConfig deidMaskingConfig) {
+    super(maskingConfiguration);
     this.dateToCompare = maskingConfiguration.getDatetimeYearDeleteNIntervalCompareDate();
     this.dateDependencyMaskingProviderConfig = maskingConfiguration;
   }

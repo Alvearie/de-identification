@@ -8,8 +8,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class DateTimeMaskingProviderConfigTest {
 
@@ -17,15 +17,8 @@ public class DateTimeMaskingProviderConfigTest {
   public void testValidate() throws Exception {
     DateTimeMaskingProviderConfig config = new DateTimeMaskingProviderConfig();
     config.validate(null);
-    
-    config.setUnspecifiedValueHandling(7);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
+
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
 
     config.setFormatFixed("TTT");

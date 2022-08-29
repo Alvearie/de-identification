@@ -92,6 +92,7 @@ public class FHIRMortalityDependencyMaskingProvider extends AbstractMaskingProvi
 
   public FHIRMortalityDependencyMaskingProvider(
       FHIRMortalityDependencyMaskingProviderConfig maskingConfiguration) {
+    super(maskingConfiguration);
     this.minYears = maskingConfiguration.getMortalityIndicatorMinYears();
   }
 
@@ -105,15 +106,17 @@ public class FHIRMortalityDependencyMaskingProvider extends AbstractMaskingProvi
   @Override
   public void maskIdentifierBatch(List<MaskingActionInputIdentifier> identifiers) {
     for (MaskingActionInputIdentifier i : identifiers) {
-      
+
       String path = i.getPath();
       if (!DATE_TIME_FIELD.equals(path) && !BOOLEAN_FIELD.equals(path)) {
         StringBuilder buffer = new StringBuilder(80);
-        buffer.append("Target property for rule ").append(getName()).append(" must be ").append(DATE_TIME_FIELD).append(" or ").append(BOOLEAN_FIELD).append(" but was ").append(path);
-        logger.logError(LogCodes.WPH1013E, buffer.toString());        
+        buffer.append("Target property for rule ").append(getName()).append(" must be ")
+            .append(DATE_TIME_FIELD).append(" or ").append(BOOLEAN_FIELD).append(" but was ")
+            .append(path);
+        logger.logError(LogCodes.WPH1013E, buffer.toString());
         throw new IllegalArgumentException(Messages.getMessage(LogCodes.WPH1028E, path, getName()));
       }
-      
+
       // Parent should always be ObjectNode by this point.
       // ArrayNode parents would generate path values like deceasedBoolean[0] that wouldn't match
       // the allowed paths.

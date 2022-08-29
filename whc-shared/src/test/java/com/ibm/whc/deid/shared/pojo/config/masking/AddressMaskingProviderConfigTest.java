@@ -7,8 +7,8 @@ package com.ibm.whc.deid.shared.pojo.config.masking;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import org.junit.Test;
+import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class AddressMaskingProviderConfigTest {
 
@@ -17,30 +17,13 @@ public class AddressMaskingProviderConfigTest {
     AddressMaskingProviderConfig config = new AddressMaskingProviderConfig();
     config.validate(null);
 
-    config.setUnspecifiedValueHandling(-1);
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
     config.validate(null);
-    config.setUnspecifiedValueHandling(1);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.RANDOM);
     config.validate(null);
-    config.setUnspecifiedValueHandling(2);
+    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.MESSAGE);
     config.validate(null);
-    config.setUnspecifiedValueHandling(3);
-    config.validate(null);
-    config.setUnspecifiedValueHandling(4);    
-    try {
-      config.validate(null);
-      fail("expected exception");
-    } catch (InvalidMaskingConfigurationException e) {
-      assertEquals("`unspecifiedValueHandling` must be [0..3]", e.getMessage());
-    }
-    config.setUnspecifiedValueHandling(0);
-    
+
     config.setPostalCodeNearestK(0);
     try {
       config.validate(null);
