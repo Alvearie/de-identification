@@ -198,17 +198,17 @@ public class DateTimeMaskingProviderConfigTest {
     validateNegativeError(config, "yearRangeUp");
     config.setYearRangeUp(0);
 
-    config.setSecondsRangeUp(-1);
-    validateNegativeError(config, "secondsRangeUp");
-    config.setSecondsRangeUp(0);
+    config.setSecondRangeUp(-1);
+    validateNegativeError(config, "secondRangeUp");
+    config.setSecondRangeUp(0);
 
-    config.setSecondsRangeDown(-1);
-    validateNegativeError(config, "secondsRangeDown");
-    config.setSecondsRangeDown(0);
+    config.setSecondRangeDown(-1);
+    validateNegativeError(config, "secondRangeDown");
+    config.setSecondRangeDown(0);
 
-    config.setMinutesRangeUp(-1);
-    validateNegativeError(config, "minutesRangeUp");
-    config.setMinutesRangeUp(0);
+    config.setMinuteRangeUp(-1);
+    validateNegativeError(config, "minuteRangeUp");
+    config.setMinuteRangeUp(0);
 
     config.setHourRangeUp(-1);
     validateNegativeError(config, "hourRangeUp");
@@ -218,9 +218,9 @@ public class DateTimeMaskingProviderConfigTest {
     validateNegativeError(config, "monthRangeUp");
     config.setMonthRangeUp(0);
 
-    config.setMinutesRangeDown(-1);
-    validateNegativeError(config, "minutesRangeDown");
-    config.setMinutesRangeDown(0);
+    config.setMinuteRangeDown(-1);
+    validateNegativeError(config, "minuteRangeDown");
+    config.setMinuteRangeDown(0);
 
     config.setYearMaxYearsAgo(-1);
     validateNegativeError(config, "yearMaxYearsAgo");
@@ -291,11 +291,11 @@ public class DateTimeMaskingProviderConfigTest {
     validateTooManyActive(config);
 
     config.setHourMask(false);
-    config.setMinutesMask(true);
+    config.setMinuteMask(true);
     validateTooManyActive(config);
 
-    config.setMinutesMask(false);
-    config.setSecondsMask(true);
+    config.setMinuteMask(false);
+    config.setSecondMask(true);
     validateTooManyActive(config);
 
     config.setMaskShiftDate(false);
@@ -303,7 +303,7 @@ public class DateTimeMaskingProviderConfigTest {
     config.setMonthMask(true);
     config.setDayMask(true);
     config.setHourMask(true);
-    config.setMinutesMask(true);
+    config.setMinuteMask(true);
     config.validate(null);
   }
 

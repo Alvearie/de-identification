@@ -32,7 +32,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
           + "generalizeWeekyear, generalizeMonthyear, generalizeQuarteryear, "
           + "generalizeYear, yearDelete, generalizeYearMaskAgeOver90, "
           + "generalizeMonthyearMaskAgeOver90, or one or more of these options: "
-          + "yearMask, monthMask, dayMask, hourMask, minutesMask, secondsMask.";
+          + "yearMask, monthMask, dayMask, hourMask, minuteMask, secondMask.";
 
   private static final ConcurrentHashMap<String, DateTimeFormatter> dateTimeFormatterCache =
       new ConcurrentHashMap<>();
@@ -85,7 +85,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   }
 
   private int hourRangeDown = 100;
-  private boolean minutesMask = true;
+  private boolean minuteMask = true;
   private int dayRangeUpMin = 0;
   private int dayRangeUp = 0;
   private boolean hourMask = true;
@@ -96,12 +96,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean yearMask = true;
   private int yearRangeUp = 0;
   private boolean generalizeYear = false;
-  private int secondsRangeUp = 0;
+  private int secondRangeUp = 0;
   private boolean maskShiftDate = false;
-  private int secondsRangeDown = 100;
-  private int minutesRangeUp = 0;
+  private int secondRangeDown = 100;
+  private int minuteRangeUp = 0;
   private boolean monthMask = true;
-  private boolean secondsMask = true;
+  private boolean secondMask = true;
   private int hourRangeUp = 0;
   private String formatFixed = null;
   private boolean generalizeWeekyear = false;
@@ -110,7 +110,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean generalizeQuarteryear = false;
   private int monthRangeUp = 0;
   private int maskShiftSeconds = 0;
-  private int minutesRangeDown = 100;
+  private int minuteRangeDown = 100;
   private boolean yearMaxYearsAgoMask = false;
   private int yearMaxYearsAgo = 0;
   private boolean yearMaxYearsAgoOnlyYear = false;
@@ -145,12 +145,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.hourRangeDown = hourRangeDown;
   }
 
-  public boolean isMinutesMask() {
-    return minutesMask;
+  public boolean isMinuteMask() {
+    return minuteMask;
   }
 
-  public void setMinutesMask(boolean minutesMask) {
-    this.minutesMask = minutesMask;
+  public void setMinuteMask(boolean minutesMask) {
+    this.minuteMask = minutesMask;
   }
 
   public int getDayRangeUpMin() {
@@ -233,12 +233,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.generalizeYear = generalizeYear;
   }
 
-  public int getSecondsRangeUp() {
-    return secondsRangeUp;
+  public int getSecondRangeUp() {
+    return secondRangeUp;
   }
 
-  public void setSecondsRangeUp(int secondsRangeUp) {
-    this.secondsRangeUp = secondsRangeUp;
+  public void setSecondRangeUp(int secondsRangeUp) {
+    this.secondRangeUp = secondsRangeUp;
   }
 
   public boolean isMaskShiftDate() {
@@ -249,20 +249,20 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.maskShiftDate = maskShiftDate;
   }
 
-  public int getSecondsRangeDown() {
-    return secondsRangeDown;
+  public int getSecondRangeDown() {
+    return secondRangeDown;
   }
 
-  public void setSecondsRangeDown(int secondsRangeDown) {
-    this.secondsRangeDown = secondsRangeDown;
+  public void setSecondRangeDown(int secondsRangeDown) {
+    this.secondRangeDown = secondsRangeDown;
   }
 
-  public int getMinutesRangeUp() {
-    return minutesRangeUp;
+  public int getMinuteRangeUp() {
+    return minuteRangeUp;
   }
 
-  public void setMinutesRangeUp(int minutesRangeUp) {
-    this.minutesRangeUp = minutesRangeUp;
+  public void setMinuteRangeUp(int minutesRangeUp) {
+    this.minuteRangeUp = minutesRangeUp;
   }
 
   public boolean isMonthMask() {
@@ -273,12 +273,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.monthMask = monthMask;
   }
 
-  public boolean isSecondsMask() {
-    return secondsMask;
+  public boolean isSecondMask() {
+    return secondMask;
   }
 
-  public void setSecondsMask(boolean secondsMask) {
-    this.secondsMask = secondsMask;
+  public void setSecondMask(boolean secondsMask) {
+    this.secondMask = secondsMask;
   }
 
   public int getHourRangeUp() {
@@ -345,12 +345,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.maskShiftSeconds = maskShiftSeconds;
   }
 
-  public int getMinutesRangeDown() {
-    return minutesRangeDown;
+  public int getMinuteRangeDown() {
+    return minuteRangeDown;
   }
 
-  public void setMinutesRangeDown(int minutesRangeDown) {
-    this.minutesRangeDown = minutesRangeDown;
+  public void setMinuteRangeDown(int minutesRangeDown) {
+    this.minuteRangeDown = minutesRangeDown;
   }
 
   public boolean isYearMaxYearsAgoMask() {
@@ -583,10 +583,10 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     validateNotNegative(dayRangeUpMin, "dayRangeUpMin");
     validateNotNegative(hourRangeDown, "hourRangeDown");
     validateNotNegative(hourRangeUp, "hourRangeUp");
-    validateNotNegative(minutesRangeDown, "minutesRangeDown");
-    validateNotNegative(minutesRangeUp, "minutesRangeUp");
-    validateNotNegative(secondsRangeDown, "secondsRangeDown");
-    validateNotNegative(secondsRangeUp, "secondsRangeUp");
+    validateNotNegative(minuteRangeDown, "minuteRangeDown");
+    validateNotNegative(minuteRangeUp, "minuteRangeUp");
+    validateNotNegative(secondRangeDown, "secondRangeDown");
+    validateNotNegative(secondRangeUp, "secondRangeUp");
     validateNotNegative(yearMaxYearsAgo, "yearMaxYearsAgo");
     validateNotNegative(yearShiftFromCurrentYear, "yearShiftFromCurrentYear");
     validateNotNegative(overrideYearsPassed, "overrideYearsPassed");
@@ -618,7 +618,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     if (generalizeMonthyearMaskAgeOver90) {
       activeFinalProcessing++;
     }
-    if (yearMask || monthMask || dayMask || hourMask || minutesMask || secondsMask) {
+    if (yearMask || monthMask || dayMask || hourMask || minuteMask || secondMask) {
       activeFinalProcessing++;
     }
     if (activeFinalProcessing > 1) {
@@ -644,9 +644,9 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         generalizeMonthYearOutputFormat, generalizeMonthyear, generalizeMonthyearMaskAgeOver90,
         generalizeQuarterYearOutputFormat, generalizeQuarteryear, generalizeWeekyear,
         generalizeYear, generalizeYearMaskAgeOver90, hourMask, hourRangeDown, hourRangeUp,
-        maskShiftDate, maskShiftSeconds, minutesMask, minutesRangeDown, minutesRangeUp, monthMask,
-        monthRangeDown, monthRangeUp, overrideMask, overrideValue, overrideYearsPassed, secondsMask,
-        secondsRangeDown, secondsRangeUp, yearDelete, yearDeleteNdays, yearDeleteNdaysOutputFormat,
+        maskShiftDate, maskShiftSeconds, minuteMask, minuteRangeDown, minuteRangeUp, monthMask,
+        monthRangeDown, monthRangeUp, overrideMask, overrideValue, overrideYearsPassed, secondMask,
+        secondRangeDown, secondRangeUp, yearDelete, yearDeleteNdays, yearDeleteNdaysOutputFormat,
         yearDeleteNdaysValue, yearDeleteOutputFormat, yearMask, yearMaxYearsAgo,
         yearMaxYearsAgoMask, yearMaxYearsAgoOnlyYear, yearRangeDown, yearRangeUp,
         yearShiftFromCurrentYear);
@@ -684,13 +684,13 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         && generalizeYearMaskAgeOver90 == other.generalizeYearMaskAgeOver90
         && hourMask == other.hourMask && hourRangeDown == other.hourRangeDown
         && hourRangeUp == other.hourRangeUp && maskShiftDate == other.maskShiftDate
-        && maskShiftSeconds == other.maskShiftSeconds && minutesMask == other.minutesMask
-        && minutesRangeDown == other.minutesRangeDown && minutesRangeUp == other.minutesRangeUp
+        && maskShiftSeconds == other.maskShiftSeconds && minuteMask == other.minuteMask
+        && minuteRangeDown == other.minuteRangeDown && minuteRangeUp == other.minuteRangeUp
         && monthMask == other.monthMask && monthRangeDown == other.monthRangeDown
         && monthRangeUp == other.monthRangeUp && overrideMask == other.overrideMask
         && Objects.equals(overrideValue, other.overrideValue)
-        && overrideYearsPassed == other.overrideYearsPassed && secondsMask == other.secondsMask
-        && secondsRangeDown == other.secondsRangeDown && secondsRangeUp == other.secondsRangeUp
+        && overrideYearsPassed == other.overrideYearsPassed && secondMask == other.secondMask
+        && secondRangeDown == other.secondRangeDown && secondRangeUp == other.secondRangeUp
         && yearDelete == other.yearDelete && yearDeleteNdays == other.yearDeleteNdays
         && Objects.equals(yearDeleteNdaysOutputFormat, other.yearDeleteNdaysOutputFormat)
         && yearDeleteNdaysValue == other.yearDeleteNdaysValue

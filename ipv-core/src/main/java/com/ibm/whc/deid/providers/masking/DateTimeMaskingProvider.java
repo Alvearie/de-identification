@@ -66,13 +66,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final int hourRangeUp;
   private final int hourRangeDown;
 
-  private final boolean minutesMask;
-  private final int minutesRangeUp;
-  private final int minutesRangeDown;
+  private final boolean minuteMask;
+  private final int minuteRangeUp;
+  private final int minuteRangeDown;
 
-  private final boolean secondsMask;
-  private final int secondsRangeUp;
-  private final int secondsRangeDown;
+  private final boolean secondMask;
+  private final int secondRangeUp;
+  private final int secondRangeDown;
 
   private final boolean yearMaxYearsAgoMask;
   private final int yearMaxYearsAgo;
@@ -133,13 +133,13 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.hourRangeUp = configuration.getHourRangeUp();
     this.hourRangeDown = configuration.getHourRangeDown();
 
-    this.minutesMask = configuration.isMinutesMask();
-    this.minutesRangeUp = configuration.getMinutesRangeUp();
-    this.minutesRangeDown = configuration.getMinutesRangeDown();
+    this.minuteMask = configuration.isMinuteMask();
+    this.minuteRangeUp = configuration.getMinuteRangeUp();
+    this.minuteRangeDown = configuration.getMinuteRangeDown();
 
-    this.secondsMask = configuration.isSecondsMask();
-    this.secondsRangeUp = configuration.getSecondsRangeUp();
-    this.secondsRangeDown = configuration.getSecondsRangeDown();
+    this.secondMask = configuration.isSecondMask();
+    this.secondRangeUp = configuration.getSecondRangeUp();
+    this.secondRangeDown = configuration.getSecondRangeDown();
 
     this.yearMaxYearsAgoMask = configuration.isYearMaxYearsAgoMask();
     this.yearMaxYearsAgo = configuration.getYearMaxYearsAgo();
@@ -427,19 +427,19 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
 
     // Randomly modify the minute within a given range and continue.
     // This might cause changes to other components of the datetime.
-    if (minutesMask) {
+    if (minuteMask) {
       int minute = datetime.get(ChronoField.MINUTE_OF_HOUR);
       int randomMinutes =
-          RandomGenerators.randomWithinRange(minute, minutesRangeDown, minutesRangeUp);
+          RandomGenerators.randomWithinRange(minute, minuteRangeDown, minuteRangeUp);
       datetime = datetime.plus(randomMinutes - minute, ChronoUnit.MINUTES);
     }
 
     // Randomly modify the second within a given range and continue.
     // This might cause changes to other components of the datetime.
-    if (secondsMask) {
+    if (secondMask) {
       int second = datetime.get(ChronoField.SECOND_OF_MINUTE);
       int randomSeconds =
-          RandomGenerators.randomWithinRange(second, secondsRangeDown, secondsRangeUp);
+          RandomGenerators.randomWithinRange(second, secondRangeDown, secondRangeUp);
       datetime = datetime.plus(randomSeconds - second, ChronoUnit.SECONDS);
     }
 

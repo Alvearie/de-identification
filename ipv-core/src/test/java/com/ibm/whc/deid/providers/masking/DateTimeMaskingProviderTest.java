@@ -106,8 +106,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     config.setYearMask(false);
     config.setDayMask(false);
     config.setHourMask(false);
-    config.setMinutesMask(false);
-    config.setSecondsMask(false);
+    config.setMinuteMask(false);
+    config.setSecondMask(false);
     config.setMonthMask(true);
     config.setMonthRangeDown(0);
     config.setMonthRangeUp(2);
@@ -165,8 +165,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     config.setYearMask(false);
     config.setDayMask(false);
     config.setHourMask(false);
-    config.setMinutesMask(false);
-    config.setSecondsMask(false);
+    config.setMinuteMask(false);
+    config.setSecondMask(false);
     config.setMonthMask(true);
     config.setMonthRangeDown(0);
     config.setMonthRangeUp(2);
@@ -193,8 +193,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     config.setYearMask(false);
     config.setDayMask(false);
     config.setHourMask(false);
-    config.setMinutesMask(false);
-    config.setSecondsMask(false);
+    config.setMinuteMask(false);
+    config.setSecondMask(false);
     config.setMonthMask(true);
     config.setMonthRangeDown(0);
     config.setMonthRangeUp(2);
@@ -411,8 +411,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(false);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String originalDateTime = "19-05-2017 12:34:56";
@@ -707,8 +707,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(true);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
@@ -744,8 +744,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(true);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
 
     //
     // Specific number of days; Within month
@@ -827,8 +827,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(true);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
 
     //
     // Specific number of days; Within month
@@ -910,8 +910,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(true);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
 
     //
     // Specific number of days; Within month
@@ -1478,9 +1478,9 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testMinuteMask() throws Exception {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setMinutesMask(true);
-    configuration.setMinutesRangeDown(30);
-    configuration.setMinutesRangeUp(12);
+    configuration.setMinuteMask(true);
+    configuration.setMinuteRangeDown(30);
+    configuration.setMinuteRangeUp(12);
     maskComponent("21-05-2016 18:46:33", "21-05-2016 18:xx:33", ChronoField.MINUTE_OF_HOUR, 46, 16,
         58, true, configuration);
   }
@@ -1489,9 +1489,9 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testSecondMask() throws Exception {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setSecondsMask(true);
-    configuration.setSecondsRangeDown(20);
-    configuration.setSecondsRangeUp(15);
+    configuration.setSecondMask(true);
+    configuration.setSecondRangeDown(20);
+    configuration.setSecondRangeUp(15);
     maskComponent("21-05-2016 18:46:33", "21-05-2016 18:46:xx", ChronoField.SECOND_OF_MINUTE, 33,
         13, 48, true, configuration);
   }
@@ -1541,8 +1541,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setMonthMask(false);
     configuration.setDayMask(false);
     configuration.setHourMask(false);
-    configuration.setMinutesMask(false);
-    configuration.setSecondsMask(false);
+    configuration.setMinuteMask(false);
+    configuration.setSecondMask(false);
     configuration.setMaskShiftDate(false);
     configuration.setOverrideMask(false);
   }

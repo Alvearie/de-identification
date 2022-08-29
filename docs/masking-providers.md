@@ -582,12 +582,12 @@ minute, hour, and day.
 | hourMask                           | Boolean  | Whether the hour number should be modified             | true      |
 | hourRangeDown                      | Integer  | Maximum amount to shift the hour number lower          | 100       |
 | hourRangeUp                        | Integer  | Maximum amount to shift the hour number higher         | 0         |
-| minutesMask                        | Boolean  | Whether the minute number should be modified           | true      |
-| minutesRangeDown                   | Integer  | Maximum amount to shift the minute number lower        | 100       |
-| minutesRangeUp                     | Integer  | Maximum amount to shift the minute number higher       | 0         |
-| secondsMask                        | Boolean  | Whether the second number should be modified           | true      |
-| secondsRangeDown                   | Integer  | Maximum amount to shift the second number lower        | 100       |
-| secondsRangeUp                     | Integer  | Maximum amount to shift the second number higher       | 0         |
+| minuteMask                         | Boolean  | Whether the minute number should be modified           | true      |
+| minuteRangeDown                    | Integer  | Maximum amount to shift the minute number lower        | 100       |
+| minuteRangeUp                      | Integer  | Maximum amount to shift the minute number higher       | 0         |
+| secondMask                         | Boolean  | Whether the second number should be modified           | true      |
+| secondRangeDown                    | Integer  | Maximum amount to shift the second number lower        | 100       |
+| secondRangeUp                      | Integer  | Maximum amount to shift the second number higher       | 0         |
 
 
 ##### Date and Time Formats
