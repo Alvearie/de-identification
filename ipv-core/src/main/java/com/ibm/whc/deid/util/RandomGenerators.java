@@ -7,8 +7,8 @@ package com.ibm.whc.deid.util;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import org.apache.commons.lang3.StringUtils;
@@ -264,12 +264,13 @@ public class RandomGenerators {
   /**
    * @return a random date before the current year
    */
-  public static OffsetDateTime generateRandomDate() {
+  public static LocalDateTime generateRandomDate() {
     LocalDateTime now = LocalDateTime.now();
     int yearRange = now.get(ChronoField.YEAR) - 1900;
-    int month = random.nextInt(12) + 1;
+    int randomYear = random.nextInt(yearRange) + 1900;
+    int randomMonth = random.nextInt(12) + 1;
     int dayRange;
-    switch (month) {
+    switch (randomMonth) {
       case 1:
       case 3:
       case 5:
@@ -287,25 +288,35 @@ public class RandomGenerators {
         break;
       case 2:
         dayRange = 28;
+        if (isLeapYear(randomYear)) {
+          dayRange++;
+        }
         break;
       default:
         // should never occur
-        throw new IllegalArgumentException(String.valueOf(month));
+        throw new IllegalArgumentException(String.valueOf(randomMonth));
     }
-    LocalDateTime randomLocal =
-        LocalDateTime.of(random.nextInt(yearRange) + 1900, month, random.nextInt(dayRange) + 1,
+    LocalDateTime randomLocalDateTime =
+        LocalDateTime.of(randomYear, randomMonth, random.nextInt(dayRange) + 1,
             random.nextInt(24), random.nextInt(60), random.nextInt(60));
-    return OffsetDateTime.of(randomLocal, ZoneOffset.UTC);
+    return randomLocalDateTime;
+  }
+
+  public static boolean isLeapYear(int year) {
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
   }
 
   /**
-   * Generate random date string.
+   * Generate random datetime string.
    *
-   * @param dateFormat the date format
-   * @return the string
+   * @param dateFormat the datetime format - it can be assumed the random datetime object will
+   *        include time zone information
+   * 
+   * @return a random date before the current year in string format
    */
   public static String generateRandomDate(DateTimeFormatter dateFormat) {
-    return dateFormat.format(generateRandomDate());
+    ZonedDateTime randomZonedDateTime = generateRandomDate().atZone(ZoneId.systemDefault());
+    return dateFormat.format(randomZonedDateTime);
   }
 
   /**

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -197,14 +197,35 @@ public class RandomGeneratorsTest {
 
   @Test
   public void testRandomDate() throws Exception {
-    Instant now = Instant.now();
     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ssZ");
+    int currentYear = ZonedDateTime.now().getYear();
     for (int i=0; i < 1000; i++) {
-      String date = RandomGenerators.generateRandomDate(dateFormat);
-      Instant random = Instant.from(dateFormat.parse(date));
-      assertTrue(random.isBefore(now));
+      String datestring = RandomGenerators.generateRandomDate(dateFormat);
+      // verify the string contains a time zone by parsing into ZonedDateTime
+      // verify the year is in the expected range
+      ZonedDateTime datetime = ZonedDateTime.parse(datestring, dateFormat);
+      assertTrue(datetime.getYear() < currentYear);
+      assertTrue(datetime.getYear() >= 1900);
     }
   }
+
+  @Test
+  public void testIsLeapYear() {
+    assertTrue(RandomGenerators.isLeapYear(1600));
+    assertFalse(RandomGenerators.isLeapYear(1700));
+    assertFalse(RandomGenerators.isLeapYear(1800));
+    assertFalse(RandomGenerators.isLeapYear(1900));
+    assertTrue(RandomGenerators.isLeapYear(2000));
+    assertTrue(RandomGenerators.isLeapYear(2020));
+    assertFalse(RandomGenerators.isLeapYear(2021));
+    assertFalse(RandomGenerators.isLeapYear(2022));
+    assertFalse(RandomGenerators.isLeapYear(2023));
+    assertTrue(RandomGenerators.isLeapYear(2024));
+    assertFalse(RandomGenerators.isLeapYear(2100));
+  }
+
+  DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ssZ");
+
 
   @Test
   public void testRandomReplacement() throws Exception {
