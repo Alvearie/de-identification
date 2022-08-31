@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.time.temporal.UnsupportedTemporalTypeException;
+import java.util.Locale;
 import java.util.TreeMap;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
@@ -1437,6 +1438,50 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setYearRangeUp(10);
     maskComponent("21-12-2016 18:46:33", "21-12-xx 18:46:33", ChronoField.YEAR, 2016, 2011, 2026,
         true, configuration);
+  }
+
+  @Test
+  public void testMask_offsets() throws Exception {
+    DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
+    setAllDateTimeMaskingToFalse(configuration);
+    configuration.setYearMask(true);
+    configuration.setYearRangeDown(1);
+    configuration.setYearRangeUp(1);
+    DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
+
+    assertNull(maskingProvider.mask("2011-12-03T10:15:30X"));
+
+    String maskedDateTime = maskingProvider.mask("2011-12-03T10:15:30Z");
+    System.out.println(maskedDateTime);
+    assertTrue("2010-12-03T10:15:30Z".equals(maskedDateTime)
+        || "2011-12-03T10:15:30Z".equals(maskedDateTime)
+        || "2012-12-03T10:15:30Z".equals(maskedDateTime));
+
+    maskedDateTime = maskingProvider.mask("2011-12-03T10:15:30+01:00");
+    System.out.println(maskedDateTime);
+    assertTrue("2010-12-03T10:15:30+01:00".equals(maskedDateTime)
+        || "2011-12-03T10:15:30+01:00".equals(maskedDateTime)
+        || "2012-12-03T10:15:30+01:00".equals(maskedDateTime));
+
+    configuration.setFormatFixed("yyyy-MM-dd'T'HH:mm:ss VV");
+    maskingProvider = new DateTimeMaskingProvider(configuration);
+    maskedDateTime = maskingProvider.mask("2011-12-03T10:15:30 Europe/Paris");
+    System.out.println(maskedDateTime);
+    assertTrue("2010-12-03T10:15:30 Europe/Paris".equals(maskedDateTime)
+        || "2011-12-03T10:15:30 Europe/Paris".equals(maskedDateTime)
+        || "2012-12-03T10:15:30 Europe/Paris".equals(maskedDateTime));
+
+    String lang = Locale.getDefault().getLanguage();
+    String region = Locale.getDefault().getCountry();
+    if ("en".equals(lang) && ("US".equals(region) || "CA".equals(region))) {
+      configuration.setFormatFixed("yyyy-MM-dd'T'HH:mm:ss z");
+      maskingProvider = new DateTimeMaskingProvider(configuration);
+      maskedDateTime = maskingProvider.mask("2011-12-03T10:15:30 CST");
+      System.out.println(maskedDateTime);
+      assertTrue("2010-12-03T10:15:30 CST".equals(maskedDateTime)
+          || "2011-12-03T10:15:30 CST".equals(maskedDateTime)
+          || "2012-12-03T10:15:30 CST".equals(maskedDateTime));
+    }
   }
 
   @Test
