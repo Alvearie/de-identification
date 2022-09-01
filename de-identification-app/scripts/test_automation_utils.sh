@@ -6,6 +6,20 @@
 # set -x
 
 #
+# Gets the pattern for the executable jar name
+# 
+# Sets global variable deid_exec_jar_pattern
+# 
+function getJarPattern() {
+	if [ ! -z "$JAVA_COMPILER_RELEASE" ]; then
+		javarel="*-java${JAVA_COMPILER_RELEASE}-"
+	else 
+		javarel=
+	fi
+	deid_exec_jar_pattern="de-id.${javarel}*exec"
+}
+
+#
 # Starts the De-Identification Endpoint upon given the path to the endpoint jar
 #
 # Params:
@@ -17,8 +31,8 @@ function startEndpoint() {
 	# locate jar in the specified directory
 	path=$1
 	
-	# Get jar name
-	jarName=`ls -la ../target | grep 'de-id.*exec' | awk '{ print $9 }'`
+	getJarPattern	
+	jarName=`ls -la ../target | grep $deid_exec_jar_pattern | awk '{ print $9 }'`
 	
 	if [ -z "$jarName" ]; then
         echo -e "\n##### Test Failed !!!!!!!!!!!! #####\n"
@@ -41,9 +55,9 @@ function stopEndpoint() {
 	echo -e  "\n########### Stopping Endpoint ###########"
 	echo ""
 	
-	# Get process De-Identification Endpoint PID
 	echo "Getting De-Identification Endpoint PID"
-	processId=`ps -ef | grep 'de-id.*exec'|grep -v grep | awk 'NR==1 { print $2 }'`
+	getJarPattern
+	processId=`ps -ef | grep $deid_exec_jar_pattern | grep -v grep | awk 'NR==1 { print $2 }'`
 	
 	if [ -z "$processId" ]; then
        echo "Unable to find the application process id"
