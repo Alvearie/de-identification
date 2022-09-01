@@ -36,8 +36,6 @@ jobs:
       id: job_info
       run: |
         set -x
-        echo ${{ github.event_name }}
-        echo ${{ github.repository }}
         # get branch name
         # github.event.inputs.tagOrRef is only present if manually launched
         if [ ! -z ${{ github.event.inputs.target-branch }} ]; then
