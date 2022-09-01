@@ -41,8 +41,7 @@ jobs:
         if [ ! -z ${{ github.event.inputs.target-branch }} ]; then
            branch=${{ github.event.inputs.target-branch }}
         elif [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
-           fullbranch=${{ github.head_ref }}
-           branch=${fullbranch#refs/heads/}
+           branch=${{ github.head_ref }}
         else
            branch=${GITHUB_REF_NAME}
         fi        
