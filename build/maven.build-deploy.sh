@@ -46,7 +46,8 @@ cat .mvn/maven.config
 #########################################################
 # Main build                                            #
 #########################################################
-mvn --no-transfer-progress -s build/maven.settings.xml -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install 
+# -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+mvn -B -s build/maven.settings.xml clean install 
 
 #########################################################
 # Deploy the binaries to Artifactory                    #
