@@ -39,13 +39,12 @@ jobs:
         # get branch name
         # github.event.inputs.tagOrRef is only present if manually launched
         if [ ! -z ${{ github.event.inputs.target-branch }} ]; then
-           branch=${{ github.event.inputs.target-branch }}
-        elif [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
-           branch=${{ github.head_ref }}
+           checkout_branch=${{ github.event.inputs.target-branch }}
         else
-           branch=${GITHUB_REF_NAME}
+           # use event source branch (default)
+           checkout_branch=''
         fi        
-        echo ::set-output name=GIT_BRANCH::${branch}
+        echo ::set-output name=CHECKOUT_BRANCH::${checkout_branch}
         # check for jar publish
         if [ ! -z ${{ github.event.inputs.save-jars }} ]; then
            deploy=${{ github.event.inputs.save-jars }}
@@ -67,7 +66,7 @@ jobs:
                 
     - uses: actions/checkout@v2
       with:
-        ref: ${{ steps.job_info.outputs.GIT_BRANCH }}
+        ref: ${{ steps.job_info.outputs.CHECKOUT_BRANCH }}
         submodules: 'recursive'
 
     - name: Set up JDK 11
