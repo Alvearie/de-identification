@@ -1,26 +1,97 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# GitHub Actions: https://docs.github.com/en/actions
 
 name: Java CI with Maven
 
 on:
+  workflow_dispatch:
+    inputs:
+      target-branch:
+        description: 'Branch name'
+        required: true
+      save-jars: 
+        description: 'Publish jars to Artifactory'
+        required: true
+      java8:
+        description: 'Perform additional Java 8 build'
+        required: true            
   push:
-    branches: [ master ]
+    branches: [ master, release* ]
   pull_request:
-    branches: [ master ]
 
+env:
+  ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+  ARTIFACTORY_KEY: ${{ secrets.ARTIFACTORY_KEY }}
+  
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    # do not run on pushes on forks unless explicitly dispatched
+    if: ${{ github.event_name != 'push' || github.repository == 'Alvearie/de-identification' }}
+    
     steps:
+    # Setup some useful vars
+    - name: Get Job Info
+      id: job_info
+      run: |
+        set -x
+        echo ${{ github.event_name }}
+        echo ${{ github.repository }}
+        # get branch name
+        # github.event.inputs.tagOrRef is only present if manually launched
+        if [ ! -z ${{ github.event.inputs.target-branch }} ]; then
+           branch=${{ github.event.inputs.target-branch }}
+        else
+           branch=${GITHUB_REF_NAME}
+        fi        
+        echo ::set-output name=GIT_BRANCH::${branch}
+        # check for jar publish
+        if [ ! -z ${{ github.event.inputs.save-jars }} ]; then
+           deploy=${{ github.event.inputs.save-jars }}
+        elif [[ $GITHUB_EVENT_NAME != 'pull_request' ]]; then
+           deploy="true"
+        else
+           deploy="false"
+        fi           
+        echo ::set-output name=DEPLOY::${deploy}
+        # check for Java 8 build
+        if [ ! -z ${{ github.event.inputs.java8 }} ]; then
+           java8=${{ github.event.inputs.java8 }}
+        elif [[ "${branch}" == "release"* ]]; then        
+           java8="true"
+        else
+           java8="false"
+        fi           
+        echo ::set-output name=JAVA8::${java8}
+                
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.job_info.outputs.GIT_BRANCH }}
+        submodules: 'recursive'
+
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build with Maven
-      run: git submodule update --init --recursive && mvn -B package --file pom.xml
+   
+    - name: Maven Build and Deploy
+      env:
+         DEPLOY: ${{ steps.job_info.outputs.DEPLOY }}
+      run: chmod u+x build/maven.build-deploy.sh && build/maven.build-deploy.sh
+
     - name: Sanity Test
-      run: cd de-identification-app/scripts && ./sanity_test.sh
+      run: cd de-identification-app/scripts && ./sanity_test.sh && cd ../..
+
+    - name: Maven Build and Deploy Java 8
+      if: ${{ steps.job_info.outputs.JAVA8 == 'true' }}
+      env:
+         DEPLOY: ${{ steps.job_info.outputs.DEPLOY }}
+         JAVA_COMPILER_RELEASE: 8
+      run: chmod u+x build/maven.build-deploy.sh && build/maven.build-deploy.sh
+      
+    - name: Sanity Test Java 8
+      if: ${{ steps.job_info.outputs.JAVA8 == 'true' }}
+      env:
+         JAVA_COMPILER_RELEASE: 8      
+      run: cd de-identification-app/scripts && ./sanity_test.sh && cd ../..
