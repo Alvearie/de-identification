@@ -51,9 +51,6 @@ public class DateTimeConsistentShiftMaskingProviderConfigTest {
     config.setPatientIdentifierPath("path1");
     config.validate(null);
 
-    config.setUnexpectedInputHandling(UnexpectedMaskingInputHandler.NULL);
-    config.validate(null);
-
     config.setDateShiftMinimumDays(-1);
     try {
       config.validate(null);
