@@ -112,6 +112,9 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     }
     boolean conditionMatch = false;
     String conditionValue = condition.getValue();
+	if ((valueSet == null || valueSet.isEmpty()) && conditionValue == null) {
+		return true;
+	}
 
     for (String value : valueSet) {
       switch (condition.getOperator()) {
@@ -180,10 +183,11 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       // elementNode.toString());
       if (elementNode.isValueNode()) {
         Object value = getValue(elementNode);
-        if (value == null) {
-          throw new RuntimeException(ERROR_MESSAGE);
-        }
-        valueSet.add(value.toString());
+		if (value == null) {
+			return valueSet;
+		} else {
+			valueSet.add(value.toString());
+		}
       } else {
         Iterator<Entry<String, JsonNode>> dataNodeList = elementNode.fields();
         while (dataNodeList.hasNext()) {
@@ -315,12 +319,12 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
               // System.out.println(" NextNode=======> key : " +
               // key + " valuNode: " + valueNode.toString());
 
-              Object value = getValue(valueNode);
-              if (value == null) {
-                throw new RuntimeException(ERROR_MESSAGE);
-              }
-              valueSet.add(value.toString());
-
+				Object value = getValue(valueNode);
+				if (value == null) {
+					return valueSet;
+				} else {
+					valueSet.add(value.toString());
+				}
               return valueSet;
             }
           }

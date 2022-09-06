@@ -62,10 +62,14 @@ public class Condition {
           "`" + String.valueOf(parentName) + ".operator` is missing");
     }
     // conditionType is not currently used
-    if (value == null) {
-      throw new InvalidMaskingConfigurationException(
-          "`" + String.valueOf(parentName) + ".value` is missing");
-    }
+    
+	/**
+	 * WHD-1930 commenting below code for supporting null value in CONDITIONAL
+	 */
+//    if (value == null) {
+//      throw new InvalidMaskingConfigurationException(
+//          "`" + String.valueOf(parentName) + ".value` is missing");
+//    }
   }
 
   @Override
