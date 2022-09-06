@@ -6,6 +6,10 @@ name: Java CI with Maven
 on:
   pull_request:
 
+env:
+  ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+  ARTIFACTORY_KEY: ${{ secrets.ARTIFACTORY_KEY }}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +25,7 @@ jobs:
         java-version: 11
         
     - name: Build with Maven
-      run: mvn -B -s build/maven.settings.xml -s build/maven.settings.xml clean package      
+      run: mvn -B -s build/maven.settings.xml clean package      
       
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh && cd ../..
