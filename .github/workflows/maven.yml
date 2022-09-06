@@ -4,23 +4,25 @@
 name: Java CI with Maven
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, release* ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'    
+    
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
+        
     - name: Build with Maven
-      run: git submodule update --init --recursive && mvn -B package --file pom.xml
+      run: mvn -B clean package      
+      
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
