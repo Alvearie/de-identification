@@ -27,5 +27,5 @@ jobs:
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
       
-    - name: Sanity Test
-      run: cd de-identification-app/scripts && ./fvt_test.sh
+    - name: FVT Test
+      run: cd de-identification-app/scripts && chmod u+x fvt_test.sh && ./fvt_test.sh
