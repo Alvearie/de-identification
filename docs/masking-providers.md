@@ -247,7 +247,7 @@ options and their default values.
    to mask the **status** data element of FHIR Device resources using the
    PSEUDONYM masking provider if the input document contains an **extension** element
    that contains an array of objects that have fields **valueString** and **url** and at least
-   one of those has a **url** value of **http://www.ibm.com/watsonhealth/fhir/extensions/whc-lsf/r1/resourceName**
+   one of those has a **url** value of **http://www.ibm.com/watsonhealth/fhir/extensions/test-data/r1/resourceName**
    and a **valueString** value of **Asthma-Inhaler**.  If the input document does not meet that condition,
    the **status** data element is maintained as-is.
 

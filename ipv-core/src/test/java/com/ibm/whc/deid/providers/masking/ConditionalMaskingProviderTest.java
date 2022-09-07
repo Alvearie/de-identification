@@ -40,7 +40,7 @@ public class ConditionalMaskingProviderTest {
 
     private static final long serialVersionUID = 1L;
 
-    public final List<Set<String>> valueSets = new ArrayList<>();
+    public final List<List<JsonNode>> valueSets = new ArrayList<>();
 
     public TestConditionalMaskingProvider(ConditionalMaskingProviderConfig configuration,
         String tenantId, DeidMaskingConfig deidMaskingConfig, String localizationProperty,
@@ -50,10 +50,9 @@ public class ConditionalMaskingProviderTest {
     }
 
     @Override
-    protected Set<String> getConditionRegularFieldValues(Condition condition, JsonNode root,
-        String resourceType) {
-      Set<String> vs = super.getConditionRegularFieldValues(condition, root, resourceType);
-      valueSets.add(vs);
+    protected List<JsonNode> getConditionRegularFieldValues(Condition condition, JsonNode root) {
+      List<JsonNode> vs = super.getConditionRegularFieldValues(condition, root);
+      valueSets.add(new ArrayList<>(vs));
       return vs;
     }
   }
@@ -444,20 +443,22 @@ public class ConditionalMaskingProviderTest {
 
     String maskedValue = maii.getRoot().get("text").asText();
     assertEquals("XXXXXXXXXXXXXXXXX", maskedValue);
-    Set<String> vs = maskingProvider.valueSets.get(0);
-    assertTrue(vs.contains("101"));
-    assertTrue(vs.contains("301"));
-    assertTrue(vs.contains("201"));
-    assertEquals(3, vs.size());
+    List<JsonNode> vs = maskingProvider.valueSets.get(0);
+    assertEquals("101", vs.get(0).asText());
+    assertEquals("301", vs.get(1).asText());
+    assertTrue(vs.get(2).isNull());
+    assertEquals("201", vs.get(3).asText());
+    assertEquals(4, vs.size());
 
     maskedValue = maii2.getRoot().get("text").asText();
     assertEquals("second procedure", maskedValue);
     vs = maskingProvider.valueSets.get(1);
-    assertTrue(vs.contains("701"));
-    assertTrue(vs.contains("911"));
-    assertTrue(vs.contains("abc"));
-    assertTrue(vs.contains(""));
-    assertEquals(4, vs.size());
+    assertEquals("701", vs.get(0).asText());
+    assertEquals("911", vs.get(1).asText());
+    assertEquals("abc", vs.get(2).asText());
+    assertEquals("", vs.get(3).asText());
+    assertTrue(vs.get(4).isNull());
+    assertEquals(5, vs.size());
   }
 
   /*
@@ -536,22 +537,26 @@ public class ConditionalMaskingProviderTest {
             deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
 
-    Set<String> vs = maskingProvider.valueSets.get(0);
-    assertTrue(vs.contains("201"));
-    assertTrue(vs.contains("202"));
-    assertTrue(vs.contains("203"));
-    assertEquals(3, vs.size());
     String maskedValue = maii.getRoot().get("text").asText();
     assertEquals("medical procedure", maskedValue);
 
-    vs = maskingProvider.valueSets.get(1);
-    assertTrue(vs.contains("701"));
-    assertTrue(vs.contains("911"));
-    assertTrue(vs.contains("abc"));
-    assertTrue(vs.contains(""));
-    assertEquals(4, vs.size());
     maskedValue = maii2.getRoot().get("text").asText();
     assertEquals("XXXXXXXXXXXXXXXX", maskedValue);
+
+    List<JsonNode> vs = maskingProvider.valueSets.get(0);
+    assertEquals("202", vs.get(0).asText());
+    assertEquals("203", vs.get(1).asText());
+    assertTrue(vs.get(2).isNull());
+    assertEquals("201", vs.get(3).asText());
+    assertEquals(4, vs.size());
+
+    vs = maskingProvider.valueSets.get(1);
+    assertEquals("701", vs.get(0).asText());
+    assertEquals("911", vs.get(1).asText());
+    assertEquals("abc", vs.get(2).asText());
+    assertEquals("", vs.get(3).asText());
+    assertTrue(vs.get(4).isNull());
+    assertEquals(5, vs.size());
   }
 
   /*
@@ -632,20 +637,24 @@ public class ConditionalMaskingProviderTest {
 
     String maskedValue = maii.getRoot().get("text").asText();
     assertEquals("medical procedure", maskedValue);
-    Set<String> vs = maskingProvider.valueSets.get(0);
-    assertTrue(vs.contains("101"));
-    assertTrue(vs.contains("301"));
-    assertTrue(vs.contains("201"));
-    assertEquals(3, vs.size());
 
     maskedValue = maii2.getRoot().get("text").asText();
     assertEquals("XXXXXXXXXXXXXXXX", maskedValue);
-    vs = maskingProvider.valueSets.get(1);
-    assertTrue(vs.contains("701"));
-    assertTrue(vs.contains("911"));
-    assertTrue(vs.contains("abc"));
-    assertTrue(vs.contains(""));
+
+    List<JsonNode> vs = maskingProvider.valueSets.get(0);
+    assertEquals("101", vs.get(0).asText());
+    assertEquals("301", vs.get(1).asText());
+    assertTrue(vs.get(2).isNull());
+    assertEquals("201", vs.get(3).asText());
     assertEquals(4, vs.size());
+
+    vs = maskingProvider.valueSets.get(1);
+    assertEquals("701", vs.get(0).asText());
+    assertEquals("911", vs.get(1).asText());
+    assertEquals("abc", vs.get(2).asText());
+    assertEquals("", vs.get(3).asText());
+    assertTrue(vs.get(4).isNull());
+    assertEquals(5, vs.size());
   }
 
   /*
@@ -724,21 +733,25 @@ public class ConditionalMaskingProviderTest {
             deidMaskingConfig, localizationProperty, new BasicMaskingProviderFactory());
     maskingProvider.maskIdentifierBatch(Arrays.asList(maii, maii2));
 
-    Set<String> vs = maskingProvider.valueSets.get(0);
-    assertTrue(vs.contains("1ABC")); // value that causes the match on not any of
-    assertTrue(vs.contains("202"));
-    assertTrue(vs.contains("Def"));
-    assertEquals(3, vs.size());
     String maskedValue = maii.getRoot().get("text").asText();
     assertEquals("XXXXXXXXXXXXXXXXX", maskedValue);
 
-    vs = maskingProvider.valueSets.get(1);
-    assertTrue(vs.contains("ABC"));
-    assertTrue(vs.contains("def"));
-    assertTrue(vs.contains("202"));
-    assertEquals(3, vs.size());
     maskedValue = maii2.getRoot().get("text").asText();
     assertEquals("second procedure", maskedValue);
+
+    List<JsonNode> vs = maskingProvider.valueSets.get(0);
+    assertEquals("1ABC", vs.get(0).asText());
+    assertEquals("202", vs.get(1).asText());
+    assertTrue(vs.get(2).isNull());
+    assertEquals("Def", vs.get(3).asText());
+    assertEquals(4, vs.size());
+
+    vs = maskingProvider.valueSets.get(1);
+    assertEquals("ABC", vs.get(0).asText());
+    assertEquals("def", vs.get(1).asText());
+    assertEquals("202", vs.get(2).asText());
+    assertTrue(vs.get(3).isNull());
+    assertEquals(4, vs.size());
   }
 
   /*
@@ -1084,10 +1097,11 @@ public class ConditionalMaskingProviderTest {
     
     ConditionalMaskingProvider provider = new ConditionalMaskingProvider(new ConditionalMaskingProviderConfig(), null, null, null, null);
     
-    Set<String> valueSet = provider.getConditionArrayFieldValue(condition, root, null);
+    List<JsonNode> valueSet = provider.getConditionArrayFieldValue(condition, root);
     assertNotNull(valueSet);
-    assertTrue(valueSet.toString(), valueSet.contains("yarg1"));
-    assertTrue(valueSet.contains("male"));
-    assertEquals(2, valueSet.size());
+    assertEquals(3, valueSet.size());
+    assertEquals("yarg1", valueSet.get(0).asText());
+    assertTrue(valueSet.get(1).isNull());
+    assertEquals("male", valueSet.get(2).asText());
   }
 }
