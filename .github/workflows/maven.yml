@@ -26,3 +26,6 @@ jobs:
       
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
+      
+    - name: Sanity Test
+      run: cd de-identification-app/scripts && ./fvt_test.sh
