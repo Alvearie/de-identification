@@ -13,7 +13,7 @@ startEndpoint $path
 checkEndpointStarted
 
 # Calling De-Identification Endpoint to Mask data
-mvn test -Dtest=AllMaskingProviderTest
+mvn test -Dtest=AllMaskingProviderTest --file ../pom.xml
 
 # Teardown
 teardown
