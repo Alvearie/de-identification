@@ -27,7 +27,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # do not run on pushes on forks unless explicitly dispatched
-    if: ${{ github.repository == 'Alvearie/de-identification' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (github.repository == 'Alvearie/de-identification') || (github.event_name == 'workflow_dispatch') }}
     
     steps:
     # Setup some useful vars
