@@ -3,8 +3,6 @@
 # Test automation Utils script to keep functions that can be
 # used to expand the testing of De-Identifcation
 
-# set -x
-
 #
 # Gets the pattern for the executable jar name
 # 
@@ -30,6 +28,9 @@ function startEndpoint() {
 	echo ""
 	# locate jar in the specified directory
 	path=$1
+	
+	# temp
+	ls -la
 	
 	getJarPattern	
 	jarName=`ls -la ../target | grep $deid_exec_jar_pattern | awk '{ print $9 }'`

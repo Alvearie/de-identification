@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xe
 
 # Path to De-Identification Endpoint jar
 path=../target
