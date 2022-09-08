@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
-import org.apache.commons.lang.NotImplementedException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ibm.whc.deid.jsonpath.JSONPath;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
@@ -76,7 +75,7 @@ public class DateTimeConsistentShiftMaskingProvider extends AbstractMaskingProvi
 
   @Override
   public String mask(String identifier) {
-    throw new NotImplementedException();
+    throw new IllegalStateException("should not be reached");
   }
 
   @Override

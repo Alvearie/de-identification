@@ -165,10 +165,7 @@ public abstract class MaskingProviderConfig implements Serializable {
    */
   public void validate(DeidMaskingConfig maskingConfig)
       throws InvalidMaskingConfigurationException {
-    // check new handling property first - if not provided, validate the old one
-    if (unexpectedInputHandling == null) {
-
-    }
+    // nothing required for this level
   }
 
   /**

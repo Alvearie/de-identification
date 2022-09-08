@@ -1,0 +1,26 @@
+{
+"certificateId": "jra2",
+		"rules": [
+			{
+				"name": "bin",
+				"maskingProviders": [
+					{
+						"type": "BINNING"
+					}
+				]
+			}
+		],
+		"json": {
+			"schemaType": "GEN",
+			"maskingRules": [
+				{
+					"jsonPath": "/gen/default/c/b",
+					"rule": "bin"
+				},
+                                {
+					"jsonPath": "/gen/default/c/k",
+					"rule": "bin"
+				}
+			]
+		}
+}

@@ -20,7 +20,6 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Locale;
 import java.util.TreeMap;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.providers.identifiers.DateTimeIdentifier;
@@ -1197,7 +1196,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     String originalDate = "02-12-1924 00:00:00";
     String maskedDateTime = maskingProvider.mask(originalDate);
     assertEquals(originalDate, maskedDateTime);
-    assertEquals("1924", getYear(maskedDateTime));
+    assertEquals("1924", maskedDateTime.substring(6, 10));
   }
 
   @Test
@@ -1590,10 +1589,6 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     configuration.setSecondMask(false);
     configuration.setMaskShiftDate(false);
     configuration.setOverrideMask(false);
-  }
-
-  private String getYear(String originalDate) {
-    return StringUtils.substring(originalDate, 6, 10);
   }
 
   /**

@@ -7,7 +7,7 @@ package com.ibm.whc.deid.providers.masking;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.ibm.whc.deid.shared.pojo.config.masking.HashMaskingProviderConfig;
 
 /** The type Hash masking provider. */
