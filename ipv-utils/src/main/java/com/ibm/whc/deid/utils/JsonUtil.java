@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 public class JsonUtil {
@@ -64,5 +65,48 @@ public class JsonUtil {
       pathToAdd = StringUtils.stripStart(pathToAdd, pathSeparator);
     if (!StringUtils.isEmpty(pathToAdd) && !pathList.contains(pathToAdd))
       pathList.add(pathToAdd);
+  }
+
+  /**
+   * Returns the value of the given JSON Value (leaf) node.
+   *
+   * @param node the node from which the value is extracted
+   * 
+   * @return <i>Null</i> if the given node is <i>null</i> or
+   * is not a Value node (leaf node), an Optional containing 
+   * an object that represents the value contained in the node or
+   * an empty Optional if the node contains an explicit <i>null</i>
+   * value.
+   */
+  public static Optional<Object> getValue(JsonNode node) {
+    Optional<Object> value = null;
+    if (node != null && node.isValueNode()) {
+      if (node.isNull()) {
+        value = Optional.empty();
+      } else if (node.isBoolean()) {
+        value = Optional.of(node.booleanValue());
+      } else if (node.isShort()) {
+        value = Optional.of(node.shortValue());        
+      } else if (node.isInt()) {
+        value = Optional.of(node.intValue());
+      } else if (node.isLong()) {
+        value = Optional.of(node.longValue());
+      } else if (node.isFloat()) {
+        value = Optional.of(node.floatValue());
+      } else if (node.isDouble()) {
+        value = Optional.of(node.doubleValue());
+      } else if (node.isBigInteger()) {
+        value = Optional.of(node.bigIntegerValue());
+      } else if (node.isBigDecimal()) {
+        value = Optional.of(node.decimalValue());
+      } else {
+        value = Optional.of(node.asText());
+      }
+    }
+    return value;
+  }
+
+  private JsonUtil() {
+    // no need to instantiate
   }
 }

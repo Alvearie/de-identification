@@ -1,10 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.shared.pojo.config.masking.conditional;
 
+import java.util.List;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
@@ -19,6 +21,7 @@ public class Condition {
   private ConditionOperator operator;
   private ConditionType type;
   private String value;
+  private List<String> valueList;
 
   public String getField() {
     return field;
@@ -52,6 +55,14 @@ public class Condition {
     this.value = value;
   }
 
+  public List<String> getValueList() {
+    return valueList;
+  }
+
+  public void setValueList(List<String> valueList) {
+    this.valueList = valueList;
+  }
+
   public void validate(String parentName) throws InvalidMaskingConfigurationException {
     if (field == null || field.trim().isEmpty()) {
       throw new InvalidMaskingConfigurationException(
@@ -62,38 +73,44 @@ public class Condition {
           "`" + String.valueOf(parentName) + ".operator` is missing");
     }
     // conditionType is not currently used
-    if (value == null) {
-      throw new InvalidMaskingConfigurationException(
-          "`" + String.valueOf(parentName) + ".value` is missing");
+    if (operator.usesList()) {
+      if (valueList == null || valueList.isEmpty()) {
+        throw new InvalidMaskingConfigurationException(
+            "`" + String.valueOf(parentName) + ".valueList` is missing");
+      }
+      int offset = 0;
+      for (String v : valueList) {
+        if (v == null) {
+          throw new InvalidMaskingConfigurationException(
+              "`" + String.valueOf(parentName) + ".valueList[" + offset + "]` is missing");
+        }
+        offset++;
+      }
+    } else {
+      if (value == null) {
+        throw new InvalidMaskingConfigurationException(
+            "`" + String.valueOf(parentName) + ".value` is missing");
+      }
     }
   }
 
+  // generated code
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = prime + (field == null ? 0 : field.hashCode());
-    result = prime * result + (operator == null ? 0 : operator.hashCode());
-    result = prime * result + (type == null ? 0 : type.hashCode());
-    result = prime * result + (value == null ? 0 : value.hashCode());
-    return result;
+    return Objects.hash(field, operator, type, value, valueList);
   }
 
+  // generated code
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (!(obj instanceof Condition)) {
       return false;
     }
     Condition other = (Condition) obj;
-    return (field == null ? other.field == null : field.equals(other.field))
-        && (operator == null ? other.operator == null : operator.equals(other.operator))
-        && (type == null ? other.type == null : type.equals(other.type))
-        && (value == null ? other.value == null : value.equals(other.value));
+    return Objects.equals(field, other.field) && operator == other.operator && type == other.type
+        && Objects.equals(value, other.value) && Objects.equals(valueList, other.valueList);
   }
-
 }
