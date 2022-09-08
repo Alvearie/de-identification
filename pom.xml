@@ -34,6 +34,7 @@
 		<module>ipv-core</module>
 		<module>de-identification-app</module>
 		<module>de-identification-entry</module>
+		<module>de-identification-entry-spark</module>
 	</modules>
 
 	<dependencyManagement>
@@ -51,25 +52,12 @@
 
 	<dependencies>
 		<!-- common -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-		</dependency>
-		<!-- Allow all child modules to make use of the slf4j interface.            -->
-		<!-- The actual slf4j implementation is pulled in by de-identification-app  -->
-		<!-- which has dependencies on the spring starter bundles.                  -->
+		<!-- Allow all child modules to make use of the slf4j interface.        -->
+		<!-- The slf4j concrete implementation is set by de-identification-app  -->
+		<!-- which has dependencies on the spring starter bundles.              -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- common test -->

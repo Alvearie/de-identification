@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.external.api.test;
+package com.ibm.whc.deid.entry.api.test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
