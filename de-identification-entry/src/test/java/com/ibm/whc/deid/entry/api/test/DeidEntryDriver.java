@@ -25,10 +25,11 @@ public class DeidEntryDriver {
     
     List<String> out = proc.process(data);
 
-    System.out.println("--------------------------------------------------------");
-    for (String s : data) {
-      System.out.println(s);
-    }
+    // uncomment if echoing input is desired and safe
+    // System.out.println("--------------------------------------------------------");
+    // for (String s : data) {
+    // System.out.println(s);
+    // }
 
     System.out.println("--------------------------------------------------------");
     for (String s : out) {
