@@ -10,9 +10,9 @@
 # 
 function getJarPattern() {
 	if [ -z "$JAVA_COMPILER_RELEASE" ]; then
-		deid_exec_jar_pattern="de-identification-app-*-exec.jar"
+		deid_exec_jar_pattern="de-identification-app-.*-exec.jar"
 	else
-		deid_exec_jar_pattern="de-identification-app-*-java8*-exec.jar"
+		deid_exec_jar_pattern="de-identification-app-.*-java8*-exec.jar"
 	fi
 }
 
