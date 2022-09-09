@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -15,11 +15,11 @@ import com.ibm.whc.deid.utils.log.LogManager;
 
 public class ComplexMaskingProviderFactoryUtil {
 
-  private static DeidConfig deidConfig = null;
+  private static transient DeidConfig deidConfig = null;
 
-  private static ComplexMaskingProviderFactory complexMaskingProviderFactory = null;
+  private static transient ComplexMaskingProviderFactory complexMaskingProviderFactory = null;
 
-  private static LogManager log = LogManager.getInstance();
+  private static final LogManager log = LogManager.getInstance();
 
   // get the static config object for the environment
   private static DeidConfig getDeidConfig() throws DeidException {
@@ -30,15 +30,12 @@ public class ComplexMaskingProviderFactoryUtil {
   }
 
   public static ComplexMaskingProviderFactory getComplexMaskingProviderFactory() {
-
     if (complexMaskingProviderFactory == null) {
       try {
-        DeidConfig deidConfig = getDeidConfig();
-
         @SuppressWarnings("unchecked")
         Constructor<? extends ComplexMaskingProviderFactory> constructor =
             (Constructor<? extends ComplexMaskingProviderFactory>) Class
-                .forName(deidConfig.getComplexMaskingProviderFactoryClass()).getConstructor();
+                .forName(getDeidConfig().getComplexMaskingProviderFactoryClass()).getConstructor();
         complexMaskingProviderFactory = constructor.newInstance();
       } catch (NoSuchMethodException | ClassNotFoundException | IllegalAccessException
           | InstantiationException | InvocationTargetException | DeidException e) {
@@ -48,5 +45,4 @@ public class ComplexMaskingProviderFactoryUtil {
     }
     return complexMaskingProviderFactory;
   }
-
 }
