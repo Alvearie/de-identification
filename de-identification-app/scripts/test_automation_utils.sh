@@ -9,12 +9,11 @@
 # Sets global variable deid_exec_jar_pattern
 # 
 function getJarPattern() {
-	if [ ! -z "$JAVA_COMPILER_RELEASE" ]; then
-		javarel="*-java${JAVA_COMPILER_RELEASE}-"
-	else 
-		javarel=
+	if [ -z "$JAVA_COMPILER_RELEASE" ]; then
+		deid_exec_jar_pattern="de-identification-app-*-exec.jar"
+	else
+		deid_exec_jar_pattern="de-identification-app-*-java8*-exec.jar"
 	fi
-	deid_exec_jar_pattern="de-id.${javarel}*exec"
 }
 
 #
