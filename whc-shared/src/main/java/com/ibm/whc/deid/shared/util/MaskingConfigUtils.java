@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -69,10 +69,18 @@ public class MaskingConfigUtils {
       throw new InvalidMaskingConfigurationException("invalid configuration: " + e.getMessage(), e);
     }
 
-    validateRules(deidMaskingConfig);
-    validateJsonConfig(deidMaskingConfig, false);
+    validateConfigObject(deidMaskingConfig);
 
     return deidMaskingConfig;
+  }
+
+  public void validateConfigObject(DeidMaskingConfig deidMaskingConfig)
+      throws InvalidMaskingConfigurationException {
+    if (deidMaskingConfig == null) {
+      throw new InvalidMaskingConfigurationException("no masking configuration data");
+    }
+    validateRules(deidMaskingConfig);
+    validateJsonConfig(deidMaskingConfig, false);
   }
 
   /**

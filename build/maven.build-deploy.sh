@@ -59,4 +59,6 @@ if [[ "${DEPLOY}" == "true" ]]; then
 	    MAVEN_REPO=snapshots::default::https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-snapshot-maven-local
 	fi
 	mvn --no-transfer-progress -s build/maven.settings.xml deploy -DaltDeploymentRepository=${MAVEN_REPO} -DskipTests=true
+else
+    echo "upload of jars not requested"
 fi

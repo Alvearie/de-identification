@@ -8,11 +8,11 @@
 		<!-- see org.springframework.boot:spring-boot-dependencies for additional managed dependency versions -->
 		<mockito.version>1.10.19</mockito.version>
 		<commons-csv.version>1.8</commons-csv.version>
-		<commons-lang.version>2.6</commons-lang.version>
 		<commons-cli.version>1.2</commons-cli.version>
 		<iban4j.version>3.2.0</iban4j.version>
-		<guava.version>16.0.1</guava.version>
 		<springdoc-openapi-ui.version>1.6.8</springdoc-openapi-ui.version>
+		<!-- this should be the version used by the current version of springdoc-openapi-ui -->
+		<swagger-annotations.version>2.2.0</swagger-annotations.version>
 		<!-- used by maven compiler plugin -->
 		<maven.compiler.release>11</maven.compiler.release>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,6 +33,8 @@
 		<module>ipv-jsonpath</module>
 		<module>ipv-core</module>
 		<module>de-identification-app</module>
+		<module>de-identification-entry</module>
+		<module>de-identification-entry-spark</module>
 	</modules>
 
 	<dependencyManagement>
@@ -50,25 +52,12 @@
 
 	<dependencies>
 		<!-- common -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-		</dependency>
-		<!-- Allow all child modules to make use of the slf4j interface.            -->
-		<!-- The actual slf4j implementation is pulled in by de-identification-app  -->
-		<!-- which has dependencies on the spring starter bundles.                  -->
+		<!-- Allow all child modules to make use of the slf4j interface.        -->
+		<!-- The slf4j concrete implementation is set by de-identification-app  -->
+		<!-- which has dependencies on the spring starter bundles.              -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- common test -->
@@ -146,7 +135,12 @@
                             <arg>-Werror</arg>
                         </compilerArgs>
                     </configuration>
-                </plugin>				
+                </plugin>
+                <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>                
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>flatten-maven-plugin</artifactId>
