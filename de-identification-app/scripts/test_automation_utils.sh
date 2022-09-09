@@ -12,7 +12,7 @@ function getJarPattern() {
 	if [ -z "$JAVA_COMPILER_RELEASE" ]; then
 		deid_exec_jar_pattern="de-identification-app-.*-exec.jar"
 	else
-		deid_exec_jar_pattern="de-identification-app-.*-java8*-exec.jar"
+		deid_exec_jar_pattern="de-identification-app-.*-java8.*-exec.jar"
 	fi
 }
 
@@ -27,9 +27,6 @@ function startEndpoint() {
 	echo ""
 	# locate jar in the specified directory
 	path=$1
-	
-	# temp
-	ls -la
 	
 	getJarPattern	
 	jarName=`ls -la ../target | grep $deid_exec_jar_pattern | awk '{ print $9 }'`
