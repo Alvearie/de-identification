@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.entry.spark.udf;
+package com.ibm.whc.deid.external.spark.udf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
 import com.ibm.whc.deid.entry.api.DeidProcessor;
+import com.ibm.whc.deid.external.spark.udf.DeIdUDF;
 import com.ibm.whc.deid.shared.exception.KeyedIllegalArgumentException;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.utils.log.LogCodes;

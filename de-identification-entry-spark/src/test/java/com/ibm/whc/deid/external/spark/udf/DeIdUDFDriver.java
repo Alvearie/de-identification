@@ -3,7 +3,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.entry.spark.udf;
+package com.ibm.whc.deid.external.spark.udf;
+
+import com.ibm.whc.deid.external.spark.udf.DeIdUDF;
 
 public class DeIdUDFDriver {
 

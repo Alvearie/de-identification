@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.entry.spark.udf;
+package com.ibm.whc.deid.external.spark.udf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import org.junit.Test;
+import com.ibm.whc.deid.external.spark.udf.DeIdSynapseUDF;
+import com.ibm.whc.deid.external.spark.udf.DeIdUDF;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class DeIdSynapseUDFTest {
