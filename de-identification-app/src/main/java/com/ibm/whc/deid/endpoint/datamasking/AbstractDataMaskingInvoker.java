@@ -10,10 +10,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.shared.exception.InvalidInputException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
-import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 
 public abstract class AbstractDataMaskingInvoker {
 
@@ -29,23 +27,6 @@ public abstract class AbstractDataMaskingInvoker {
       }
       i++;
     }
-  }
-
-  // validates the global (a.k.a. document-level) configuration and returns it as a Java object
-  protected GlobalProcessorConfig validateGlobalConfig(String gpConfigString)
-      throws InvalidInputException {
-    GlobalProcessorConfig gpConfig = null;
-    // global processor config is optional
-    if (gpConfigString != null && !gpConfigString.trim().isEmpty()) {
-      try {
-        gpConfig = ObjectMapperFactory.getObjectMapper().readValue(gpConfigString,
-            GlobalProcessorConfig.class);
-      } catch (IOException e) {
-        throw new InvalidInputException("could not parse global configuration: " + e.getMessage());
-      }
-      gpConfig.validate();
-    }
-    return gpConfig;
   }
 
   // validates the schemaType is non-null

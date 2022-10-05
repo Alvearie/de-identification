@@ -19,7 +19,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
-import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaType;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
@@ -57,7 +56,7 @@ public class DataMaskingCoreTest {
   }
 
   @Test
-  public void testMaskPatient() throws IOException, DeidException {
+  public void testMaskPatient() throws IOException {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String patientData = null;
@@ -68,7 +67,7 @@ public class DataMaskingCoreTest {
       patientData = scanner.useDelimiter("\\A").next();
     }
     inputList.add(patientData);
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf, null,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
     String maskedData = maskedDataList.get(0).getData();
     ObjectMapper objectMapper = new ObjectMapper();
@@ -81,7 +80,7 @@ public class DataMaskingCoreTest {
   }
 
   @Test
-  public void testMaskDevice() throws IOException, DeidException {
+  public void testMaskDevice() throws IOException {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String deviceData = null;
@@ -95,7 +94,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf, null,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.FHIR);
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -113,7 +112,7 @@ public class DataMaskingCoreTest {
   }
 
   @Test
-  public void testMaskPatient_Generic() throws IOException, DeidException {
+  public void testMaskPatient_Generic() throws IOException {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String patientData = null;
@@ -125,7 +124,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(patientData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic, null,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -136,7 +135,7 @@ public class DataMaskingCoreTest {
   }
 
   @Test
-  public void testMaskDevice_Generic() throws IOException, DeidException {
+  public void testMaskDevice_Generic() throws IOException {
     DataMaskingCore dataMask = new DataMaskingCore();
 
     String deviceData = null;
@@ -148,7 +147,7 @@ public class DataMaskingCoreTest {
     }
     inputList.add(deviceData);
 
-    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic, null,
+    List<ReferableData> maskedDataList = dataMask.maskData(maskingConf_generic,
         DataMaskingCoreTest.convertList(inputList), ConfigSchemaType.GEN);
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode maskedNode = objectMapper.readTree(maskedDataList.get(0).getData());
