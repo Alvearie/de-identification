@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.app.endpoint.datamasking;
+package com.ibm.whc.deid.app.endpoint.metadata;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.ibm.whc.deid.app.endpoint.Application;
-import com.ibm.whc.deid.shared.exception.DeidException;
 
 @RunWith(SpringRunner.class)
 // force using a test profile to avoid using any other active profile
@@ -35,20 +34,14 @@ public class HealthControllerTest {
   private MockMvc mockMvc;
 
   @Before
-  public void setup() throws DeidException {
-
-    this.mockMvc =
-				MockMvcBuilders.standaloneSetup(new HealthController()).build();
+  public void setup() {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(new HealthController()).build();
   }
 
   @Test
 	public void testGetStatus() throws Exception {
-
-    this.mockMvc
-				.perform(get(basePath + "/health"))
-        .andExpect(status().isOk()).andDo(MockMvcResultHandlers.print())
-				.andExpect(jsonPath("$.status").value(containsString("UP")));
+      this.mockMvc.perform(get(basePath + "/health")).andExpect(status().isOk())
+          .andDo(MockMvcResultHandlers.print())
+          .andExpect(jsonPath("$.status").value(containsString("UP")));
   }
-
-
 }
