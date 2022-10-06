@@ -51,15 +51,15 @@ curl -X POST --header 'Content-Type: application/json' --header 'Accept: applica
 
 Table: Required parameters for the API
 
-| **Parameter name**      | **Type**         | **Description**                                                   | **Default value** |
-|-------------------------|------------------|-------------------------------------------------------------------|-------------------|
-| config                  | String           | Masking configuration                                             | N/A               |
-| data                    | Array of strings | Messages to de-identify                                           | N/A               |
-| schemaType              | String           | One of `FHIR` for FHIR over JSON, `GEN` for generic JSON         | N/A               |
+| **Parameter name**      | **Type**         | **Description**                                                   |
+|-------------------------|------------------|-------------------------------------------------------------------|
+| config                  | String           | Masking configuration - see [masking-config-overview.md](masking-config-overview.md) |                                           
+| data                    | Array of strings | Messages to de-identify                                           |
+| schemaType              | String           | One of `FHIR` for FHIR over JSON, `GEN` for generic JSON         |
 
 
 ### API variation for single input documents
-If you only need to process a single input document, there is a version of the de-identification API that uses a more natural input structure might be easier to use. The URI for this version is api/v1/deidentification/single.  Instead of supplying the masking configuration and the data to protect as serialized JSON strings within another JSON document, this version includes all the information in a single JSON document.  
+If you only need to process a single input document, there is a version of the de-identification API that uses a more natural input structure and might be easier to use. The URI for this version is api/v1/deidentification/single.  Instead of supplying the masking configuration and the data to protect as serialized JSON strings within another JSON document, this version includes all the information in a single JSON document.  
 
 Here is a simple example to demonstrate the difference.  This call to api/v1/deidentification:
 ```
