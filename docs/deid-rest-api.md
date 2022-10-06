@@ -55,9 +55,62 @@ Table: Required parameters for the API
 |-------------------------|------------------|-------------------------------------------------------------------|-------------------|
 | config                  | String           | Masking configuration                                             | N/A               |
 | data                    | Array of strings | Messages to de-identify                                           | N/A               |
-| schemaType              | String           | One of `FHIR` for FHIR over JSON, `GEN` for generic JSON          | N/A               |
+| schemaType              | String           | One of `FHIR` for FHIR over JSON, `GEN` for generic JSON         | N/A               |
 
-> **Note:** These APIs are not fully-hardened and finalized. Subject to change.
+
+### API variation for single input documents
+If you only need to process a single input document, there is a version of the de-identification API that uses a more natural input structure might be easier to use. The URI for this version is api/v1/deidentification/single.  Instead of supplying the masking configuration and the data to protect as serialized JSON strings within another JSON document, this version includes all the information in a single JSON document.  
+
+Here is a simple example to demonstrate the difference.  This call to api/v1/deidentification:
+```
+{
+   "config": "{\"rules\": [{\"name\": \"bin\",\"maskingProviders\": [{\"type\": \"BINNING\"}]}],\"json\": {\"schemaType\": \"GEN\",\"maskingRules\": [{\"jsonPath\": \"/gen/default/a\",\"rule\": \"bin\"}]}}",
+   "data": ["{\"a\": 4}"],
+   "schemaType": "GEN"
+}
+```
+
+could be replaced by this call to /api/v1/deidentification/single:
+```
+{
+   "config": {
+      "rules": [
+         {
+            "name": "bin",
+            "maskingProviders": [
+               {
+                  "type": "BINNING"
+               }
+            ]
+         }
+      ],
+      "json": {
+         "schemaType": "GEN",
+         "maskingRules": [
+            {
+               "jsonPath": "/gen/default/a",
+               "rule": "bin"
+            }
+         ]
+      }
+   },
+   "data": {
+      "a": 4
+   },
+   "schemaType": "GEN"
+}
+```
+
+The response format is slightly different.  Using this example, the /api/v1/deidentification call would return this:
+```
+{"data":[{"a":"0-5"}]}
+```
+
+and the /api/v1/deidentification/single call would return this:
+```
+{"data":{"a":"0-5"}}
+```
+
 
 ## Next steps
 
