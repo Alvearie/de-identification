@@ -86,20 +86,18 @@ public class DataMaskingControllerErrorPathTest {
   @Test
   public void testMaskEmptyInput() throws Exception {
     String noContent = "";
-    String emptyObject = "{}";
-    log.info(noContent);
     this.mockMvc
         .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(noContent))
-        .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
+        .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string(startsWith("Required request body is missing")));
 
-    log.info(emptyObject);
+    String emptyObject = "{}";
     this.mockMvc
         .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(emptyObject))
-        .andDo(print()).andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print())
-        .andExpect(content().string("no configuration data"));
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string("Invalid input error data"));
   }
 
   @Test
