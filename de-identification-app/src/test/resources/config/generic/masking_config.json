@@ -16,6 +16,15 @@
 			]
 		},
 		{
+			"name": "REDACT",
+			"maskingProviders": [
+				{
+					"type": "REDACT",
+					"replaceCharacter": "-"
+				}
+			]
+		},				
+		{
 			"name": "NULL",
 			"maskingProviders": [
 				{
@@ -104,7 +113,7 @@
 			},
 			{
 				"jsonPath": "/gen/Device/patient/display",
-				"rule": "HASH"
+				"rule": "REDACT"
 			}
 		]
 	}
