@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.endpoint.datamasking.AbstractDataMaskingInvoker;
 import com.ibm.whc.deid.endpoint.exception.BadRequestException;
@@ -67,16 +66,6 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
   public ResponseEntity<?> maskSingleJson(@RequestBody DataMaskingObjectModel maskingRequest)
       throws BadRequestException, DeidException, InvalidInputException {
     try {
-      DeidMaskingConfig config = maskingRequest.getConfig();
-      if (config == null) {
-        throw new InvalidInputException("no masking configuration data");
-      }
-      // remove rule assignments that do not name a rule
-      if (config.getJson() != null && config.getJson().getMaskingRules() != null) {
-        config.getJson().setMaskingRules(removeNullRules(config.getJson().getMaskingRules()));
-      }
-      MaskingConfigUtils.getInstance().validateConfigObject(config);
-
       JsonNode data = maskingRequest.getData();
       if (data == null || data.isNull()) {
         throw new InvalidInputException("no input to de-identify");
@@ -90,6 +79,16 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       String dataString = ObjectMapperFactory.getObjectMapper().writeValueAsString(data);
       List<String> dataList = new ArrayList<>(1);
       dataList.add(dataString);
+
+      DeidMaskingConfig config = maskingRequest.getConfig();
+      // remove rule assignments that do not name a rule
+      if (config != null && config.getJson() != null
+          && config.getJson().getMaskingRules() != null) {
+        config.getJson().setMaskingRules(removeNullRules(config.getJson().getMaskingRules()));
+      }
+      MaskingConfigUtils.getInstance().validateConfigObject(config);
+
+      validateSchemaType(maskingRequest.getSchemaType());
 
       return maskJsonMethod(dataList, maskingRequest.getSchemaType(), config, dataMaskingService);
 
@@ -111,27 +110,26 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       throws BadRequestException, DeidException, InvalidInputException {
     try {
       validateData(maskRequest.getData());
-      return maskJsonMethod(maskRequest.getData(), maskRequest.getSchemaType(),
-          MaskingConfigUtils.validateConfig(maskRequest.getConfig()), dataMaskingService);
+      DeidMaskingConfig maskingConfig = MaskingConfigUtils.validateConfig(maskRequest.getConfig());
+      validateSchemaType(maskRequest.getSchemaType());
+
+      return maskJsonMethod(maskRequest.getData(), maskRequest.getSchemaType(), maskingConfig,
+          dataMaskingService);
+
     } catch (InvalidMaskingConfigurationException e) {
       throw new BadRequestException(e.getMessage());
     }
   }
 
   protected ResponseEntity<?> maskJsonMethod(List<String> data, ConfigSchemaTypes schemaType,
-      DeidMaskingConfig maskingConfig, DataMaskingService service)
-      throws DeidException, InvalidInputException {
-    List<String> maskedData;
+      DeidMaskingConfig maskingConfig, DataMaskingService service) throws DeidException {
     try {
-      validateSchemaType(schemaType);
-      // masking config is already validated
+      List<String> maskedData = service.maskData(maskingConfig, data, schemaType);
 
-      maskedData = service.maskData(maskingConfig, data, schemaType);
-
-      ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
-      String maskedOutput = getString(objectMapper, maskedData);
+      String maskedOutput = getString(ObjectMapperFactory.getObjectMapper(), maskedData);
 
       return new ResponseEntity<>(maskedOutput, HttpStatus.OK);
+
     } catch (IOException e) {
       log.logError(LogCodes.WPH6000E, e, "Unable to mask data");
       throw new DeidException(e.getMessage());
