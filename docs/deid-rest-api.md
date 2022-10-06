@@ -54,7 +54,7 @@ Table: Required parameters for the API
 | **Parameter name**      | **Type**         | **Description**                                                   |
 |-------------------------|------------------|-------------------------------------------------------------------|
 | config                  | String           | Masking configuration - see [masking-config-overview.md](masking-config-overview.md) |                                           
-| data                    | Array of strings | Messages to de-identify                                           |
+| data                    | Array of strings | JSON documents to de-identify                                     |
 | schemaType              | String           | One of `FHIR` for FHIR over JSON, `GEN` for generic JSON         |
 
 
