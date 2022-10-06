@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.endpoint.datamasking.AbstractDataMaskingInvoker;
 import com.ibm.whc.deid.endpoint.exception.BadRequestException;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.exception.InvalidInputException;
-import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.pojo.masking.DataMaskingModel;
@@ -64,17 +64,11 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       content = @Content(schema = @Schema(implementation = DataMaskingObjectModel.class)))})
   @PostMapping(path = "/deidentification/single")
   public ResponseEntity<?> maskSingleJson(@RequestBody DataMaskingObjectModel maskingRequest)
-      throws BadRequestException, DeidException, InvalidInputException {
+      throws BadRequestException, InvalidInputException {
     try {
-      JsonNode data = maskingRequest.getData();
-      if (data == null || data.isNull()) {
+      ObjectNode data = maskingRequest.getData();
+      if (data == null || data.size() == 0) {
         throw new InvalidInputException("no input to de-identify");
-      }
-      if (data.isArray()) {
-        throw new InvalidInputException("invalid input data format - array not supported");
-      }
-      if (!data.isObject()) {
-        throw new InvalidInputException("invalid input data format - data must be JSON object");
       }
       String dataString = ObjectMapperFactory.getObjectMapper().writeValueAsString(data);
       List<String> dataList = new ArrayList<>(1);
@@ -90,7 +84,18 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
 
       validateSchemaType(maskingRequest.getSchemaType());
 
-      return maskJsonMethod(dataList, maskingRequest.getSchemaType(), config, dataMaskingService);
+      List<String> maskedData =
+          dataMaskingService.maskData(config, dataList, maskingRequest.getSchemaType());
+
+      String maskedOutput = null;
+      if (!maskedData.isEmpty()) {
+        ObjectMapper mapper = ObjectMapperFactory.getObjectMapper();
+        ObjectNode maskedNode = (ObjectNode) mapper.readTree(maskedData.get(0));
+        ObjectNode outputNode = mapper.createObjectNode();
+        outputNode.set("data", maskedNode);
+        maskedOutput = mapper.writeValueAsString(outputNode);
+      }
+      return new ResponseEntity<>(maskedOutput, HttpStatus.OK);
 
     } catch (JsonProcessingException e) {
       throw new BadRequestException(e.getMessage());
@@ -113,19 +118,8 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
       DeidMaskingConfig maskingConfig = MaskingConfigUtils.validateConfig(maskRequest.getConfig());
       validateSchemaType(maskRequest.getSchemaType());
 
-      return maskJsonMethod(maskRequest.getData(), maskRequest.getSchemaType(), maskingConfig,
-          dataMaskingService);
-
-    } catch (InvalidMaskingConfigurationException e) {
-      throw new BadRequestException(e.getMessage());
-    }
-  }
-
-  protected ResponseEntity<?> maskJsonMethod(List<String> data, ConfigSchemaTypes schemaType,
-      DeidMaskingConfig maskingConfig, DataMaskingService service) throws DeidException {
-    try {
-      List<String> maskedData = service.maskData(maskingConfig, data, schemaType);
-
+      List<String> maskedData = dataMaskingService.maskData(maskingConfig, maskRequest.getData(),
+          maskRequest.getSchemaType());
       String maskedOutput = getString(ObjectMapperFactory.getObjectMapper(), maskedData);
 
       return new ResponseEntity<>(maskedOutput, HttpStatus.OK);
@@ -133,6 +127,8 @@ public class DataMaskingController extends AbstractDataMaskingInvoker {
     } catch (IOException e) {
       log.logError(LogCodes.WPH6000E, e, "Unable to mask data");
       throw new DeidException(e.getMessage());
+    } catch (InvalidMaskingConfigurationException e) {
+      throw new BadRequestException(e.getMessage());
     }
   }
 

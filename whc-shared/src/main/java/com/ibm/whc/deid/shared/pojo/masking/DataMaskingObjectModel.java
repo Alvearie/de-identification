@@ -5,7 +5,7 @@
  */
 package com.ibm.whc.deid.shared.pojo.masking;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ibm.whc.deid.shared.pojo.config.ConfigSchemaTypes;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,7 @@ public class DataMaskingObjectModel {
   private DeidMaskingConfig config;
 
   @Schema(description = "The data to be masked")
-  private JsonNode data;
+  private ObjectNode data;
 
   /**
    * @return the schemaType
@@ -55,14 +55,14 @@ public class DataMaskingObjectModel {
   /**
    * @return the data
    */
-  public JsonNode getData() {
+  public ObjectNode getData() {
     return data;
   }
   
   /**
    * @param data the data to set
    */
-  public void setData(JsonNode data) {
+  public void setData(ObjectNode data) {
     this.data = data;
   }
 }

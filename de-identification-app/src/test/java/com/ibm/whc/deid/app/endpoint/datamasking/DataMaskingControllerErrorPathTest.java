@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * (C) Copyright IBM Corp. 2016,2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,8 +21,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,9 +55,6 @@ import com.ibm.whc.deid.shared.pojo.masking.DataMaskingObjectModel;
 @AutoConfigureMockMvc
 @SpringBootTest(classes = Application.class)
 public class DataMaskingControllerErrorPathTest {
-
-  private static final Logger log =
-      LoggerFactory.getLogger(DataMaskingControllerErrorPathTest.class);
 
   private static final String basePath = "/api/v1";
 
@@ -173,6 +167,42 @@ public class DataMaskingControllerErrorPathTest {
             .content(request))
         .andDo(print()).andExpect(status().isBadRequest())
         .andExpect(content().string("Invalid input error data"));
+  }
+
+  @Test
+  public void testMaskData_invalidInputDocument() throws Exception {
+    String dataBad =
+        "{\"id\":\"1234\", \"resourceType\": \"Device\", \"patient\":{ \"display\":\"Patient Zero\" \"reference\":\"1234\"}}";
+    List<String> inputList = new ArrayList<>();
+    inputList.add(TEST_DATA);
+    inputList.add(dataBad);
+    DataMaskingModel dataMaskingModel =
+        new DataMaskingModel(TEST_CONFIG, inputList, ConfigSchemaType.FHIR);
+    String request = mapper.writeValueAsString(dataMaskingModel);
+
+    System.out.println(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(request))
+        .andDo(print()).andExpect(status().isBadRequest()).andExpect(content().string(startsWith(
+            "Could not create valid JSON structure from input message with identifier `1`")));
+  }
+
+  @Test
+  public void testNonObjectInput() throws Exception {
+    DataMaskingObjectModel model = new DataMaskingObjectModel();
+    model.setConfig(TEST_CONFIG_OBJECT);
+    model.setSchemaType(ConfigSchemaType.FHIR);
+    model.setData(mapper.createObjectNode());
+    String request = mapper.writeValueAsString(model).replace("{}", "[]");
+
+    System.out.println(request);
+    this.mockMvc
+        .perform(post(basePath + "/deidentification/single")
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(request))
+        .andDo(print()).andExpect(status().isBadRequest())
+        .andExpect(content().string(containsString("JSON parse error")))
+        .andExpect(content().string(containsString("Array")));
   }
 
   @Test
