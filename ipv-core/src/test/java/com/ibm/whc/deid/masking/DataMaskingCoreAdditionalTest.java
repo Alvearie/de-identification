@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2022
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -35,7 +35,7 @@ public class DataMaskingCoreAdditionalTest {
     inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(config, null, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(config, convertList(inputList), ConfigSchemaType.FHIR);
 
     String result = readStringResource("/result/ruleOrderMaintained.result.json");
     assertEquals(1, maskedDataList.size());
@@ -56,7 +56,7 @@ public class DataMaskingCoreAdditionalTest {
     inputList.add(readStringResource("/data/ruleOrderMaintained.data.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, convertList(inputList), ConfigSchemaType.FHIR);
 
     String result = readStringResource("/result/ruleOrderMaintained.norule.result.json");
     assertEquals(1, maskedDataList.size());
@@ -75,7 +75,7 @@ public class DataMaskingCoreAdditionalTest {
     inputList.add(readStringResource("/data/identical-array.json"));
 
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.GEN);
+        dataMask.maskData(maskingConfig, convertList(inputList), ConfigSchemaType.GEN);
 
     assertEquals(1, maskedDataList.size());
     assertEquals(
@@ -104,7 +104,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, convertList(inputList), ConfigSchemaType.FHIR);
 
     assertEquals(5, maskedDataList.size());
     assertEquals(resultLeaf, maskedDataList.get(0).getData());
@@ -137,7 +137,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertList(inputList), ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, convertList(inputList), ConfigSchemaType.FHIR);
 
     assertEquals(5, maskedDataList.size());
     assertEquals(resultLeaf, maskedDataList.get(0).getData());
@@ -167,7 +167,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertedList, ConfigSchemaType.FHIR);
+        dataMask.maskData(maskingConfig, convertedList, ConfigSchemaType.FHIR);
 
     assertEquals(3, maskedDataList.size());
     boolean foundListed = false;
@@ -205,7 +205,7 @@ public class DataMaskingCoreAdditionalTest {
 
     DataMaskingCore dataMask = new DataMaskingCore();
     List<ReferableData> maskedDataList =
-        dataMask.maskData(maskingConfig, null, convertedList, ConfigSchemaType.GEN);
+        dataMask.maskData(maskingConfig, convertedList, ConfigSchemaType.GEN);
 
     assertEquals(1, maskedDataList.size());
     assertEquals(resultList, maskedDataList.get(0).getData());

@@ -1,9 +1,9 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * © Merative US L.P. 2016, 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.ibm.whc.deid.app.endpoint.datamasking;
+package com.ibm.whc.deid.app.endpoint.metadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

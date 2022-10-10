@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2022
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -20,11 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.whc.deid.ObjectMapperFactory;
 import com.ibm.whc.deid.providers.masking.ComplexMaskingProvider;
 import com.ibm.whc.deid.providers.masking.MaskingProviderFactory;
-import com.ibm.whc.deid.pruners.GlobalProcessorFactory;
 import com.ibm.whc.deid.shared.exception.KeyedIllegalArgumentException;
 import com.ibm.whc.deid.shared.exception.KeyedRuntimeException;
 import com.ibm.whc.deid.shared.pojo.config.DeidMaskingConfig;
-import com.ibm.whc.deid.shared.pojo.config.GlobalProcessorConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonConfig;
 import com.ibm.whc.deid.shared.pojo.config.json.JsonMaskingRule;
 import com.ibm.whc.deid.shared.pojo.masking.ReferableData;
@@ -38,28 +36,17 @@ public class FHIRMaskingProvider implements ComplexMaskingProvider, Serializable
 
   public static final String DISABLE_TYPES_VALUE = "default";
 
-  private final GlobalProcessorConfig gpConfig;
   private final Map<String, MaskingProviderBuilder> maskingProviderMap = new HashMap<>();
   private String keyForType;
 
   public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
       MaskingProviderFactory maskingProviderFactory, String tenantId) {
     this(maskingConfiguration, maskingConfiguration.isDefaultNoRuleResolution(),
-        maskingProviderFactory, "/fhir/", null, tenantId);
-  }
-
-  public FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration,
-      MaskingProviderFactory maskingProviderFactory, GlobalProcessorConfig gpConfig,
-      String tenantId) {
-    this(maskingConfiguration, maskingConfiguration.isDefaultNoRuleResolution(),
-        maskingProviderFactory, "/fhir/", gpConfig, tenantId);
+        maskingProviderFactory, "/fhir/", tenantId);
   }
 
   protected FHIRMaskingProvider(DeidMaskingConfig maskingConfiguration, boolean defNoRuleRes,
-      MaskingProviderFactory maskingProviderFactory, String basePathPrefix,
-      GlobalProcessorConfig gpConfig, String tenantId) {
-
-    this.gpConfig = gpConfig;
+      MaskingProviderFactory maskingProviderFactory, String basePathPrefix, String tenantId) {
 
     this.keyForType = maskingConfiguration.getJson().getMessageTypeKey();
     // if no Key is being passed into json.messageTypeKey then set to default
@@ -132,12 +119,6 @@ public class FHIRMaskingProvider implements ComplexMaskingProvider, Serializable
       }
       return new ReferableNode(input.getIdentifier(), node);
     }).collect(Collectors.toList());
-
-    // call the global processor, if configured
-    if (!toMask.isEmpty() && this.gpConfig != null
-        && GlobalProcessorConfig.DEFAULT_RULE_SET.equals(this.gpConfig.getRuleSet())) {
-      toMask = new GlobalProcessorFactory().getGlobalProcessor().processBatch(toMask);
-    }
 
     // mask each JSON document
     List<ReferableNode> haveMasked = maskResources(toMask);
