@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2022
+ * © Merative US L.P. 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
 import com.ibm.whc.deid.entry.api.DeidProcessor;
-import com.ibm.whc.deid.external.spark.udf.DeIdUDF;
 import com.ibm.whc.deid.shared.exception.KeyedIllegalArgumentException;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 import com.ibm.whc.deid.utils.log.LogCodes;
@@ -28,7 +27,7 @@ public class DeIdUDFTest {
       private static final long serialVersionUID = 1L;
 
       @Override
-      protected String getConfigString(String fileName) throws IOException {
+      protected String getFileContentAsString(String fileName) throws IOException {
         assertNotNull(fileName);
         String out = "";
         if ("/home/spark/shared/deid.masking.config.json".equals(fileName)) {
@@ -75,7 +74,7 @@ public class DeIdUDFTest {
       }
 
       @Override
-      protected String getConfigString(String fileName) throws IOException {
+      protected String getFileContentAsString(String fileName) throws IOException {
         assertNotNull(fileName);
         String out = null;
         if ("/home/spark/shared/deid.masking.config.json".equals(fileName)) {
@@ -120,7 +119,7 @@ public class DeIdUDFTest {
       private static final long serialVersionUID = 1L;
 
       @Override
-      protected String getConfigString(String fileName) throws IOException {
+      protected String getFileContentAsString(String fileName) throws IOException {
         String out = null;
         assertNotNull(fileName);
         switch (fileName) {
