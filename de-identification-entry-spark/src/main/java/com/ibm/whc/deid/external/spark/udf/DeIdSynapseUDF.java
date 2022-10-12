@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2022
+ * © Merative US L.P. 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -57,7 +57,7 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
   // FileSystem will not be closed
   @SuppressWarnings("resource")
   @Override
-  protected String getConfigDirectory() throws IOException, InvalidMaskingConfigurationException {
+  protected String getMaskingConfig() throws IOException, InvalidMaskingConfigurationException {
     // do not call fileSystem.close() - not strictly required and supported on all operating systems
     FileSystem fileSystem = FileSystems.getDefault();
 
@@ -97,11 +97,32 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
       throw new InvalidMaskingConfigurationException(
           "directory " + targetDir + " not found within " + getSynapseMountPoint());
     }
-    if (targets.size() > 1) {
-      throw new InvalidMaskingConfigurationException(
-          "multiple possible config directories found: " + targets.toString());
+    
+    String maskingConfig = null;
+    for (Path targetPath : targets) {
+      String configPath = targetPath.toString();
+      if (!configPath.endsWith("/")) {
+        configPath += "/";
+      }
+      String maskingPath = configPath + MASKING_CONFIG_FILENAME;
+      
+      String config = getFileContentAsString(maskingPath);
+      
+      if (config != null) {
+        if (maskingConfig == null) {
+          maskingConfig = config;
+        } else if (!maskingConfig.equals(config)) {
+            throw new InvalidMaskingConfigurationException(
+                "multiple possible config directories found: " + targets.toString());
+        }
+      }
     }
-    return targets.get(0).toString();
+
+    if (maskingConfig == null) {
+      throw new InvalidMaskingConfigurationException(
+          "masking configuration not found in " + getSynapseMountPoint());
+    }
+    return maskingConfig;
   }
 
   protected String getSynapseMountPoint() {

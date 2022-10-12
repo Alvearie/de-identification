@@ -54,10 +54,8 @@ jobs:
         # check for Java 8 build
         if [ ! -z ${{ github.event.inputs.java8 }} ]; then
            java8=${{ github.event.inputs.java8 }}
-        elif [[ "${branch}" == "release"* ]]; then        
-           java8="true"
         else
-           java8="false"
+           java8="true"
         fi           
         echo ::set-output name=JAVA8::${java8}
                 

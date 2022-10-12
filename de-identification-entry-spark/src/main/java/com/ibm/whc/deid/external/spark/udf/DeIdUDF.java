@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2022
+ * © Merative US L.P. 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -70,16 +70,7 @@ public class DeIdUDF implements UDF1<String, String> {
   protected DeidProcessor getDeidProcessor() {
     if (processor == null) {
       try {
-        String configPath = getConfigDirectory();
-        if (!configPath.endsWith("/")) {
-          configPath += "/";
-        }
-
-        String maskingPath = configPath + MASKING_CONFIG_FILENAME;
-        String config = getConfigString(maskingPath);
-        if (config == null) {
-          throw new InvalidMaskingConfigurationException("masking configuration not found at " + maskingPath);
-        }
+        String config = getMaskingConfig();
 
         processor = getProcessor(config);
 
@@ -90,7 +81,21 @@ public class DeIdUDF implements UDF1<String, String> {
     return processor;
   }
 
-  protected String getConfigString(String fileName) throws IOException {
+  protected String getMaskingConfig() throws IOException, InvalidMaskingConfigurationException {
+    String configPath = getConfigDirectory();
+    if (!configPath.endsWith("/")) {
+      configPath += "/";
+    }
+    String maskingPath = configPath + MASKING_CONFIG_FILENAME;
+    String config = getFileContentAsString(maskingPath);
+    if (config == null) {
+      throw new InvalidMaskingConfigurationException(
+          "masking configuration not found at " + maskingPath);
+    }
+    return config;
+  }
+
+  protected String getFileContentAsString(String fileName) throws IOException {
     String out = null;
     File file = new File(fileName);
     if (file.exists()) {

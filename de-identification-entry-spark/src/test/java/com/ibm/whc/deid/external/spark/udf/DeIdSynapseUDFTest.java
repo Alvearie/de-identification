@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2022
+ * © Merative US L.P. 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,13 +8,12 @@ package com.ibm.whc.deid.external.spark.udf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import java.io.BufferedWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import org.junit.Test;
-import com.ibm.whc.deid.external.spark.udf.DeIdSynapseUDF;
-import com.ibm.whc.deid.external.spark.udf.DeIdUDF;
 import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
 
 public class DeIdSynapseUDFTest {
@@ -36,12 +35,12 @@ public class DeIdSynapseUDFTest {
   }
 
   @Test
-  public void testGetConfigDirectory_noEnvVars() throws Exception {
+  public void testGetMaskingConfig_noEnvVars() throws Exception {
 
     TestDeIdSynapseUDF udf = new TestDeIdSynapseUDF();
 
     try {
-      udf.getConfigDirectory();
+      udf.getMaskingConfig();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("environment variable " + DeIdUDF.CONFIG_PATH_ENV_VAR + " is required",
@@ -51,7 +50,7 @@ public class DeIdSynapseUDFTest {
     udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR, "   ");
 
     try {
-      udf.getConfigDirectory();
+      udf.getMaskingConfig();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("environment variable " + DeIdUDF.CONFIG_PATH_ENV_VAR + " is required",
@@ -61,7 +60,7 @@ public class DeIdSynapseUDFTest {
     udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR, "\t");
 
     try {
-      udf.getConfigDirectory();
+      udf.getMaskingConfig();
       fail("expected exception");
     } catch (InvalidMaskingConfigurationException e) {
       assertEquals("environment variable " + DeIdUDF.CONFIG_PATH_ENV_VAR + " is required",
@@ -70,7 +69,7 @@ public class DeIdSynapseUDFTest {
   }
 
   @Test
-  public void testGetConfigDirectory() throws Exception {
+  public void testGetMaskingConfig() throws Exception {
     TestDeIdSynapseUDF udf = new TestDeIdSynapseUDF();
 
     Path path1 = null;
@@ -79,12 +78,15 @@ public class DeIdSynapseUDFTest {
     Path path2c = null;
     Path path2r = null;
     Path subpath = null;
+    Path path1tfile = null;
+    Path path2rfile = null;
+    Path subpathfile = null;
 
     try {
       // no mounted job directories
       udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR, "DeIdSynapseUDFTest4");
       try {
-        udf.getConfigDirectory();
+        udf.getMaskingConfig();
         fail("expected exception");
       } catch (InvalidMaskingConfigurationException e) {
         assertEquals("directory DeIdSynapseUDFTest4 not found within /tmp", e.getMessage());
@@ -94,22 +96,27 @@ public class DeIdSynapseUDFTest {
       path1 = Paths.get("/tmp", "1");
       Files.createDirectories(path1);
       try {
-        udf.getConfigDirectory();
+        udf.getMaskingConfig();
         fail("expected exception");
       } catch (InvalidMaskingConfigurationException e) {
         assertEquals("directory DeIdSynapseUDFTest4 not found within /tmp", e.getMessage());
       }
 
-      // target found
+      // target found - no file
       path1t = Paths.get("/tmp", "1", "DeIdSynapseUDFTest4");
       Files.createDirectories(path1t);
-      assertEquals(path1t.toString(), udf.getConfigDirectory());
+      try {
+        udf.getMaskingConfig();
+        fail("expected exception");
+      } catch (InvalidMaskingConfigurationException e) {
+        assertEquals("masking configuration not found in /tmp", e.getMessage());
+      }
 
-      // target in subdirectory - not found
+      // target is subdirectory that is not found
       udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR,
           "DeIdSynapseUDFTestCustomer/DeIdSynapseUDFTestRequest");
       try {
-        udf.getConfigDirectory();
+        udf.getMaskingConfig();
         fail("expected exception");
       } catch (InvalidMaskingConfigurationException e) {
         assertEquals(
@@ -123,12 +130,26 @@ public class DeIdSynapseUDFTest {
       subpath = Paths.get("/tmp", "2", "DeIdSynapseUDFTestCustomer", "DeIdSynapseUDFTestRequest",
           "DeIdSynapseUDFTest4");
       Files.createDirectories(subpath);
+      path2rfile = Files.createFile(Paths.get(path2r.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+      try (BufferedWriter w = Files.newBufferedWriter(path2rfile)) {
+        w.write("path2r content");
+      }
+      subpathfile =
+          Files.createFile(Paths.get(subpath.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+      try (BufferedWriter w = Files.newBufferedWriter(subpathfile)) {
+        w.write("subpath content");
+      }
       // should return path2r, not subpath
-      assertEquals(path2r.toString(), udf.getConfigDirectory());
+      assertEquals("path2r content", udf.getMaskingConfig());
 
+      // multiple paths contain a file - different content
       udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR, "DeIdSynapseUDFTest4");
+      path1tfile = Files.createFile(Paths.get(path1t.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+      try (BufferedWriter w = Files.newBufferedWriter(path1tfile)) {
+        w.write("path1t content");
+      }
       try {
-        udf.getConfigDirectory();
+        udf.getMaskingConfig();
         fail("expected exception");
       } catch (InvalidMaskingConfigurationException e) {
         System.out.println(e.getMessage());
@@ -137,7 +158,16 @@ public class DeIdSynapseUDFTest {
         assertTrue(e.getMessage().contains(subpath.toString()));
       }
 
+      // multiple paths contain a file - same content
+      try (BufferedWriter w = Files.newBufferedWriter(subpathfile)) {
+        w.write("path1t content");
+      }
+      assertEquals("path1t content", udf.getMaskingConfig());
+
     } finally {
+      delete(path1tfile);
+      delete(path2rfile);
+      delete(subpathfile);
       delete(path1t);
       delete(path1);
       delete(subpath);
@@ -155,5 +185,11 @@ public class DeIdSynapseUDFTest {
         e.printStackTrace();
       }
     }
+  }
+
+  @Test
+  public void testMountPoint() {
+    DeIdSynapseUDF udf = new DeIdSynapseUDF();
+    assertEquals("/synfs", udf.getSynapseMountPoint());
   }
 }
