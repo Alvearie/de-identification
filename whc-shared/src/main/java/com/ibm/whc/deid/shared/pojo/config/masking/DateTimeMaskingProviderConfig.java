@@ -104,10 +104,10 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private boolean secondMask = true;
   private int hourRangeUp = 0;
   private String formatFixed = null;
-  private boolean generalizeWeekyear = false;
-  private boolean generalizeMonthyear = false;
+  private boolean generalizeWeekYear = false;
+  private boolean generalizeMonthYear = false;
   private boolean dayMask = true;
-  private boolean generalizeQuarteryear = false;
+  private boolean generalizeQuarterYear = false;
   private int monthRangeUp = 0;
   private int maskShiftSeconds = 0;
   private int minuteRangeDown = 100;
@@ -123,14 +123,14 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private int overrideYearsPassed = 0;
   private String overrideValue = null;
   private boolean generalizeYearMaskAgeOver90 = false;
-  private boolean generalizeMonthyearMaskAgeOver90 = false;
-  private boolean yearDelete = false;
-  private boolean yearDeleteNdays = false;
-  private int yearDeleteNdaysValue = 365;
-  private String yearDeleteNdaysOutputFormat = null;
+  private boolean generalizeMonthYearMaskAgeOver90 = false;
+  private boolean generalizeDayMonth = false;
+  private boolean yearDeleteNDays = false;
+  private int yearDeleteNDaysValue = 365;
+  private String yearDeleteNDaysOutputFormat = null;
   private String generalizeMonthYearOutputFormat = null;
   private String generalizeQuarterYearOutputFormat = null;
-  private String yearDeleteOutputFormat = null;
+  private String generalizeDayMonthOutputFormat = null;
   private String generalizeMonthYearMaskAgeOver90OutputFormat = null;
 
   public DateTimeMaskingProviderConfig() {
@@ -297,20 +297,20 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.formatFixed = formatFixed;
   }
 
-  public boolean isGeneralizeWeekyear() {
-    return generalizeWeekyear;
+  public boolean isGeneralizeWeekYear() {
+    return generalizeWeekYear;
   }
 
-  public void setGeneralizeWeekyear(boolean generalizeWeekyear) {
-    this.generalizeWeekyear = generalizeWeekyear;
+  public void setGeneralizeWeekYear(boolean generalizeWeekyear) {
+    this.generalizeWeekYear = generalizeWeekyear;
   }
 
-  public boolean isGeneralizeMonthyear() {
-    return generalizeMonthyear;
+  public boolean isGeneralizeMonthYear() {
+    return generalizeMonthYear;
   }
 
-  public void setGeneralizeMonthyear(boolean generalizeMonthyear) {
-    this.generalizeMonthyear = generalizeMonthyear;
+  public void setGeneralizeMonthYear(boolean generalizeMonthyear) {
+    this.generalizeMonthYear = generalizeMonthyear;
   }
 
   public boolean isDayMask() {
@@ -321,12 +321,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.dayMask = dayMask;
   }
 
-  public boolean isGeneralizeQuarteryear() {
-    return generalizeQuarteryear;
+  public boolean isGeneralizeQuarterYear() {
+    return generalizeQuarterYear;
   }
 
-  public void setGeneralizeQuarteryear(boolean generalizeQuarteryear) {
-    this.generalizeQuarteryear = generalizeQuarteryear;
+  public void setGeneralizeQuarterYear(boolean generalizeQuarteryear) {
+    this.generalizeQuarterYear = generalizeQuarteryear;
   }
 
   public int getMonthRangeUp() {
@@ -441,36 +441,36 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.generalizeYearMaskAgeOver90 = generalizeYearMaskAgeOver90;
   }
 
-  public boolean isGeneralizeMonthyearMaskAgeOver90() {
-    return generalizeMonthyearMaskAgeOver90;
+  public boolean isGeneralizeMonthYearMaskAgeOver90() {
+    return generalizeMonthYearMaskAgeOver90;
   }
 
-  public void setGeneralizeMonthyearMaskAgeOver90(boolean generalizeMonthyearMaskAgeOver90) {
-    this.generalizeMonthyearMaskAgeOver90 = generalizeMonthyearMaskAgeOver90;
+  public void setGeneralizeMonthYearMaskAgeOver90(boolean generalizeMonthyearMaskAgeOver90) {
+    this.generalizeMonthYearMaskAgeOver90 = generalizeMonthyearMaskAgeOver90;
   }
 
-  public boolean isYearDelete() {
-    return yearDelete;
+  public boolean isGeneralizeDayMonth() {
+    return generalizeDayMonth;
   }
 
-  public void setYearDelete(boolean yearDelete) {
-    this.yearDelete = yearDelete;
+  public void setGeneralizeDayMonth(boolean yearDelete) {
+    this.generalizeDayMonth = yearDelete;
   }
 
-  public boolean isYearDeleteNdays() {
-    return yearDeleteNdays;
+  public boolean isYearDeleteNDays() {
+    return yearDeleteNDays;
   }
 
-  public void setYearDeleteNdays(boolean yearDeleteNdays) {
-    this.yearDeleteNdays = yearDeleteNdays;
+  public void setYearDeleteNDays(boolean yearDeleteNdays) {
+    this.yearDeleteNDays = yearDeleteNdays;
   }
 
-  public int getYearDeleteNdaysValue() {
-    return yearDeleteNdaysValue;
+  public int getYearDeleteNDaysValue() {
+    return yearDeleteNDaysValue;
   }
 
-  public void setYearDeleteNdaysValue(int yearDeleteNdaysValue) {
-    this.yearDeleteNdaysValue = yearDeleteNdaysValue;
+  public void setYearDeleteNDaysValue(int yearDeleteNdaysValue) {
+    this.yearDeleteNDaysValue = yearDeleteNdaysValue;
   }
 
   public boolean isDayMaxDaysAgoOnlyYear() {
@@ -481,12 +481,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.dayMaxDaysAgoOnlyYear = dayMaxDaysAgoOnlyYear;
   }
 
-  public String getYearDeleteNdaysOutputFormat() {
-    return yearDeleteNdaysOutputFormat;
+  public String getYearDeleteNDaysOutputFormat() {
+    return yearDeleteNDaysOutputFormat;
   }
 
-  public void setYearDeleteNdaysOutputFormat(String yearDeleteNdaysOutputFormat) {
-    this.yearDeleteNdaysOutputFormat = yearDeleteNdaysOutputFormat;
+  public void setYearDeleteNDaysOutputFormat(String yearDeleteNdaysOutputFormat) {
+    this.yearDeleteNDaysOutputFormat = yearDeleteNdaysOutputFormat;
   }
 
   public String getGeneralizeMonthYearOutputFormat() {
@@ -505,12 +505,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     this.generalizeQuarterYearOutputFormat = generalizeQuarterYearOutputFormat;
   }
 
-  public String getYearDeleteOutputFormat() {
-    return yearDeleteOutputFormat;
+  public String getGeneralizeDayMonthOutputFormat() {
+    return generalizeDayMonthOutputFormat;
   }
 
-  public void setYearDeleteOutputFormat(String yearDeleteOutputFormat) {
-    this.yearDeleteOutputFormat = yearDeleteOutputFormat;
+  public void setGeneralizeDayMonthOutputFormat(String yearDeleteOutputFormat) {
+    this.generalizeDayMonthOutputFormat = yearDeleteOutputFormat;
   }
 
   public String getGeneralizeMonthYearMaskAgeOver90OutputFormat() {
@@ -535,7 +535,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
           "`formatFixed` does not contain a valid pattern: " + e.getMessage(), e);
     }
     try {
-      buildOverrideFormatter(yearDeleteNdaysOutputFormat, MonthDay.of(1, 1));
+      buildOverrideFormatter(yearDeleteNDaysOutputFormat, MonthDay.of(1, 1));
     } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
@@ -558,7 +558,7 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
           e);
     }
     try {
-      buildOverrideFormatter(yearDeleteOutputFormat, MonthDay.of(1, 1));
+      buildOverrideFormatter(generalizeDayMonthOutputFormat, MonthDay.of(1, 1));
     } catch (IllegalArgumentException | UnsupportedTemporalTypeException e) {
       // thrown if the pattern is not a valid datetime pattern
       throw new InvalidMaskingConfigurationException(
@@ -592,30 +592,30 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     validateNotNegative(overrideYearsPassed, "overrideYearsPassed");
     validateNotNegative(dayMaxDaysAgo, "dayMaxDaysAgo");
     validateNotNegative(dayShiftFromCurrentDay, "dayShiftFromCurrentDay");
-    validateNotNegative(yearDeleteNdaysValue, "yearDeleteNdaysValue");
+    validateNotNegative(yearDeleteNDaysValue, "yearDeleteNdaysValue");
     int activeFinalProcessing = 0;
     if (maskShiftDate) {
       activeFinalProcessing++;
     }
-    if (generalizeWeekyear) {
+    if (generalizeWeekYear) {
       activeFinalProcessing++;
     }
-    if (generalizeMonthyear) {
+    if (generalizeMonthYear) {
       activeFinalProcessing++;
     }
-    if (generalizeQuarteryear) {
+    if (generalizeQuarterYear) {
       activeFinalProcessing++;
     }
     if (generalizeYear) {
       activeFinalProcessing++;
     }
-    if (yearDelete) {
+    if (generalizeDayMonth) {
       activeFinalProcessing++;
     }
     if (generalizeYearMaskAgeOver90) {
       activeFinalProcessing++;
     }
-    if (generalizeMonthyearMaskAgeOver90) {
+    if (generalizeMonthYearMaskAgeOver90) {
       activeFinalProcessing++;
     }
     if (yearMask || monthMask || dayMask || hourMask || minuteMask || secondMask) {
@@ -641,13 +641,13 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
     result = prime * result + Objects.hash(dayMask, dayMaxDaysAgo, dayMaxDaysAgoMask,
         dayMaxDaysAgoOnlyYear, dayRangeDown, dayRangeDownMin, dayRangeUp, dayRangeUpMin,
         dayShiftFromCurrentDay, formatFixed, generalizeMonthYearMaskAgeOver90OutputFormat,
-        generalizeMonthYearOutputFormat, generalizeMonthyear, generalizeMonthyearMaskAgeOver90,
-        generalizeQuarterYearOutputFormat, generalizeQuarteryear, generalizeWeekyear,
+        generalizeMonthYearOutputFormat, generalizeMonthYear, generalizeMonthYearMaskAgeOver90,
+        generalizeQuarterYearOutputFormat, generalizeQuarterYear, generalizeWeekYear,
         generalizeYear, generalizeYearMaskAgeOver90, hourMask, hourRangeDown, hourRangeUp,
         maskShiftDate, maskShiftSeconds, minuteMask, minuteRangeDown, minuteRangeUp, monthMask,
         monthRangeDown, monthRangeUp, overrideMask, overrideValue, overrideYearsPassed, secondMask,
-        secondRangeDown, secondRangeUp, yearDelete, yearDeleteNdays, yearDeleteNdaysOutputFormat,
-        yearDeleteNdaysValue, yearDeleteOutputFormat, yearMask, yearMaxYearsAgo,
+        secondRangeDown, secondRangeUp, generalizeDayMonth, yearDeleteNDays, yearDeleteNDaysOutputFormat,
+        yearDeleteNDaysValue, generalizeDayMonthOutputFormat, yearMask, yearMaxYearsAgo,
         yearMaxYearsAgoMask, yearMaxYearsAgoOnlyYear, yearRangeDown, yearRangeUp,
         yearShiftFromCurrentYear);
     return result;
@@ -675,12 +675,12 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         && Objects.equals(generalizeMonthYearMaskAgeOver90OutputFormat,
             other.generalizeMonthYearMaskAgeOver90OutputFormat)
         && Objects.equals(generalizeMonthYearOutputFormat, other.generalizeMonthYearOutputFormat)
-        && generalizeMonthyear == other.generalizeMonthyear
-        && generalizeMonthyearMaskAgeOver90 == other.generalizeMonthyearMaskAgeOver90
+        && generalizeMonthYear == other.generalizeMonthYear
+        && generalizeMonthYearMaskAgeOver90 == other.generalizeMonthYearMaskAgeOver90
         && Objects.equals(generalizeQuarterYearOutputFormat,
             other.generalizeQuarterYearOutputFormat)
-        && generalizeQuarteryear == other.generalizeQuarteryear
-        && generalizeWeekyear == other.generalizeWeekyear && generalizeYear == other.generalizeYear
+        && generalizeQuarterYear == other.generalizeQuarterYear
+        && generalizeWeekYear == other.generalizeWeekYear && generalizeYear == other.generalizeYear
         && generalizeYearMaskAgeOver90 == other.generalizeYearMaskAgeOver90
         && hourMask == other.hourMask && hourRangeDown == other.hourRangeDown
         && hourRangeUp == other.hourRangeUp && maskShiftDate == other.maskShiftDate
@@ -691,10 +691,10 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
         && Objects.equals(overrideValue, other.overrideValue)
         && overrideYearsPassed == other.overrideYearsPassed && secondMask == other.secondMask
         && secondRangeDown == other.secondRangeDown && secondRangeUp == other.secondRangeUp
-        && yearDelete == other.yearDelete && yearDeleteNdays == other.yearDeleteNdays
-        && Objects.equals(yearDeleteNdaysOutputFormat, other.yearDeleteNdaysOutputFormat)
-        && yearDeleteNdaysValue == other.yearDeleteNdaysValue
-        && Objects.equals(yearDeleteOutputFormat, other.yearDeleteOutputFormat)
+        && generalizeDayMonth == other.generalizeDayMonth && yearDeleteNDays == other.yearDeleteNDays
+        && Objects.equals(yearDeleteNDaysOutputFormat, other.yearDeleteNDaysOutputFormat)
+        && yearDeleteNDaysValue == other.yearDeleteNDaysValue
+        && Objects.equals(generalizeDayMonthOutputFormat, other.generalizeDayMonthOutputFormat)
         && yearMask == other.yearMask && yearMaxYearsAgo == other.yearMaxYearsAgo
         && yearMaxYearsAgoMask == other.yearMaxYearsAgoMask
         && yearMaxYearsAgoOnlyYear == other.yearMaxYearsAgoOnlyYear

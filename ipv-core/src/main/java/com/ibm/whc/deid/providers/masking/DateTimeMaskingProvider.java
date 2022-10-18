@@ -87,11 +87,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
   private final boolean overrideMask;
   private final int overrideYearsPassed;
   private final String overrideValue;
-  private final boolean yearDelete;
-  private final String yearDeleteOutputFormat;
+  private final boolean generalizeDayMonth;
+  private final String generalizeDayMonthOutputFormat;
   private final boolean yearDeleteNDays;
   private final int yearDeleteNDaysValue;
-  private final String yearDeleteNdaysOutputFormat;
+  private final String yearDeleteNDaysOutputFormat;
 
   private final String formatFixed;
 
@@ -103,15 +103,15 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.maskShiftDate = configuration.isMaskShiftDate();
     this.maskShiftSeconds = configuration.getMaskShiftSeconds();
 
-    this.generalizeWeekYear = configuration.isGeneralizeWeekyear();
-    this.generalizeMonthYear = configuration.isGeneralizeMonthyear();
+    this.generalizeWeekYear = configuration.isGeneralizeWeekYear();
+    this.generalizeMonthYear = configuration.isGeneralizeMonthYear();
     this.generalizeMonthYearOutputFormat = configuration.getGeneralizeMonthYearOutputFormat();
-    this.generalizeQuarterYear = configuration.isGeneralizeQuarteryear();
+    this.generalizeQuarterYear = configuration.isGeneralizeQuarterYear();
     this.generalizeQuarterYearOutputFormat = configuration.getGeneralizeQuarterYearOutputFormat();
     this.generalizeYear = configuration.isGeneralizeYear();
 
     this.generalizeYearMaskAgeOver90 = configuration.isGeneralizeYearMaskAgeOver90();
-    this.generalizeMonthYearMaskAgeOver90 = configuration.isGeneralizeMonthyearMaskAgeOver90();
+    this.generalizeMonthYearMaskAgeOver90 = configuration.isGeneralizeMonthYearMaskAgeOver90();
     this.generalizeMonthYearMaskAgeOver90OutputFormat =
         configuration.getGeneralizeMonthYearMaskAgeOver90OutputFormat();
 
@@ -155,11 +155,11 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     this.overrideYearsPassed = configuration.getOverrideYearsPassed();
     this.overrideValue = configuration.getOverrideValue();
 
-    this.yearDelete = configuration.isYearDelete();
-    this.yearDeleteOutputFormat = configuration.getYearDeleteOutputFormat();
-    this.yearDeleteNDays = configuration.isYearDeleteNdays();
-    this.yearDeleteNDaysValue = configuration.getYearDeleteNdaysValue();
-    this.yearDeleteNdaysOutputFormat = configuration.getYearDeleteNdaysOutputFormat();
+    this.generalizeDayMonth = configuration.isGeneralizeDayMonth();
+    this.generalizeDayMonthOutputFormat = configuration.getGeneralizeDayMonthOutputFormat();
+    this.yearDeleteNDays = configuration.isYearDeleteNDays();
+    this.yearDeleteNDaysValue = configuration.getYearDeleteNDaysValue();
+    this.yearDeleteNDaysOutputFormat = configuration.getYearDeleteNDaysOutputFormat();
   }
 
   @Override
@@ -295,7 +295,7 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
         MonthDay monthDay = MonthDay.of(datetime.get(ChronoField.MONTH_OF_YEAR),
             datetime.get(ChronoField.DAY_OF_MONTH));
         DateTimeFormatter outputFormatter = DateTimeMaskingProviderConfig
-            .buildOverrideFormatter(yearDeleteNdaysOutputFormat, monthDay);
+            .buildOverrideFormatter(yearDeleteNDaysOutputFormat, monthDay);
         if (outputFormatter != null) {
           return outputFormatter.format(monthDay);
         }
@@ -351,12 +351,12 @@ public class DateTimeMaskingProvider extends AbstractMaskingProvider {
     }
 
     // Return the day and month
-    if (yearDelete) {
+    if (generalizeDayMonth) {
       int month = datetime.get(ChronoField.MONTH_OF_YEAR);
       int day = datetime.get(ChronoField.DAY_OF_MONTH);
       MonthDay monthDay = MonthDay.of(month, day);
       DateTimeFormatter outputFormatter =
-          DateTimeMaskingProviderConfig.buildOverrideFormatter(yearDeleteOutputFormat, monthDay);
+          DateTimeMaskingProviderConfig.buildOverrideFormatter(generalizeDayMonthOutputFormat, monthDay);
       if (outputFormatter != null) {
         return outputFormatter.format(monthDay);
       }

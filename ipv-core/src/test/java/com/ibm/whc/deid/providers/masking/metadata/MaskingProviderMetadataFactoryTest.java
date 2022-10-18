@@ -86,7 +86,7 @@ public class MaskingProviderMetadataFactoryTest {
           verifyOptions(model, true, 2, null);
           break;
         case DATETIME:
-          verifyOptions(model, true, 1, new int[] {3, 2, 10, 3, 3, 5, 3, 3, 3, 7, 5});
+          verifyOptions(model, true, 1, new int[] {3, 8, 3, 2, 11, 3, 3, 5, 3, 3, 3});
           break;
         case DATETIME_CONSISTENT_SHIFT:
           verifyOptions(model, true, 6, null);

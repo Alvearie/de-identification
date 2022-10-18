@@ -32,7 +32,7 @@ public class DateTimeMaskingProviderConfigTest {
     config.setFormatFixed(null);
 
     // bad pattern
-    config.setYearDeleteNdaysOutputFormat("TXT");
+    config.setYearDeleteNDaysOutputFormat("TXT");
     try {
       config.validate(null);
       fail("expected exception");
@@ -43,7 +43,7 @@ public class DateTimeMaskingProviderConfigTest {
       assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
     // unavailable fields in pattern
-    config.setYearDeleteNdaysOutputFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    config.setYearDeleteNDaysOutputFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     try {
       config.validate(null);
       fail("expected exception");
@@ -54,7 +54,7 @@ public class DateTimeMaskingProviderConfigTest {
       assertTrue(e.getMessage().contains("Unsupported field: YearOfEra"));
     }
     // unavailable fields in pattern
-    config.setYearDeleteNdaysOutputFormat("MM-ddZ");
+    config.setYearDeleteNDaysOutputFormat("MM-ddZ");
     try {
       config.validate(null);
       fail("expected exception");
@@ -64,9 +64,9 @@ public class DateTimeMaskingProviderConfigTest {
           .contains("`yearDeleteNdaysOutputFormat` does not contain a valid pattern: "));
       assertTrue(e.getMessage().contains("Unsupported field: OffsetSeconds"));
     }
-    config.setYearDeleteNdaysOutputFormat("MMM-dd");
+    config.setYearDeleteNDaysOutputFormat("MMM-dd");
     config.validate(null);
-    config.setYearDeleteNdaysOutputFormat(null);
+    config.setYearDeleteNDaysOutputFormat(null);
 
     config.setGeneralizeMonthYearOutputFormat("TTXT");
     try {
@@ -118,7 +118,7 @@ public class DateTimeMaskingProviderConfigTest {
     config.validate(null);
     config.setGeneralizeQuarterYearOutputFormat(null);
 
-    config.setYearDeleteOutputFormat("TTD");
+    config.setGeneralizeDayMonthOutputFormat("TTD");
     try {
       config.validate(null);
       fail("expected exception");
@@ -128,7 +128,7 @@ public class DateTimeMaskingProviderConfigTest {
           e.getMessage().contains("`yearDeleteOutputFormat` does not contain a valid pattern: "));
       assertTrue(e.getMessage().contains("Unknown pattern letter: T"));
     }
-    config.setYearDeleteOutputFormat("MM-dd-yy");
+    config.setGeneralizeDayMonthOutputFormat("MM-dd-yy");
     try {
       config.validate(null);
       fail("expected exception");
@@ -138,9 +138,9 @@ public class DateTimeMaskingProviderConfigTest {
           e.getMessage().contains("`yearDeleteOutputFormat` does not contain a valid pattern: "));
       assertTrue(e.getMessage().contains("Unsupported field: YearOfEra"));
     }
-    config.setYearDeleteOutputFormat("MM-dd");
+    config.setGeneralizeDayMonthOutputFormat("MM-dd");
     config.validate(null);
-    config.setYearDeleteOutputFormat(null);
+    config.setGeneralizeDayMonthOutputFormat(null);
 
     config.setGeneralizeMonthYearMaskAgeOver90OutputFormat("XTTD");
     try {
@@ -242,39 +242,39 @@ public class DateTimeMaskingProviderConfigTest {
     validateNegativeError(config, "dayShiftFromCurrentDay");
     config.setDayShiftFromCurrentDay(0);
 
-    config.setYearDeleteNdaysValue(-1);
+    config.setYearDeleteNDaysValue(-1);
     validateNegativeError(config, "yearDeleteNdaysValue");
-    config.setYearDeleteNdaysValue(0);
+    config.setYearDeleteNDaysValue(0);
 
     config.setMaskShiftDate(true);
-    config.setGeneralizeWeekyear(true);
+    config.setGeneralizeWeekYear(true);
     validateTooManyActive(config);
 
-    config.setGeneralizeWeekyear(false);
-    config.setGeneralizeMonthyear(true);
+    config.setGeneralizeWeekYear(false);
+    config.setGeneralizeMonthYear(true);
     validateTooManyActive(config);
 
-    config.setGeneralizeMonthyear(false);
-    config.setGeneralizeQuarteryear(true);
+    config.setGeneralizeMonthYear(false);
+    config.setGeneralizeQuarterYear(true);
     validateTooManyActive(config);
 
-    config.setGeneralizeQuarteryear(false);
+    config.setGeneralizeQuarterYear(false);
     config.setGeneralizeYear(true);
     validateTooManyActive(config);
 
     config.setGeneralizeYear(false);
-    config.setYearDelete(true);
+    config.setGeneralizeDayMonth(true);
     validateTooManyActive(config);
 
-    config.setYearDelete(false);
+    config.setGeneralizeDayMonth(false);
     config.setGeneralizeYearMaskAgeOver90(true);
     validateTooManyActive(config);
 
     config.setGeneralizeYearMaskAgeOver90(false);
-    config.setGeneralizeMonthyearMaskAgeOver90(true);
+    config.setGeneralizeMonthYearMaskAgeOver90(true);
     validateTooManyActive(config);
 
-    config.setGeneralizeMonthyearMaskAgeOver90(false);
+    config.setGeneralizeMonthYearMaskAgeOver90(false);
     config.setYearMask(true);
     validateTooManyActive(config);
 

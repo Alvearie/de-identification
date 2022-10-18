@@ -246,7 +246,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeWeekYear() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeWeekyear(true);
+    configuration.setGeneralizeWeekYear(true);
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
@@ -267,7 +267,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testGeneralizeMonthYear_allDateFormats() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setGeneralizeMonthyear(true);
+    configuration.setGeneralizeMonthYear(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String[] months = getMonthAbbreviations();
 
@@ -284,7 +284,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testGeneralizeMonthYear_outputFormat() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setGeneralizeMonthyear(true);
+    configuration.setGeneralizeMonthYear(true);
     configuration.setGeneralizeMonthYearOutputFormat("yyyy-MMM");
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String[] months = getMonthAbbreviations();
@@ -302,7 +302,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testGeneralizeMonthYear_testAllDateFormatsMidnight() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setGeneralizeMonthyear(true);
+    configuration.setGeneralizeMonthYear(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String[] months = getMonthAbbreviations();
 
@@ -319,7 +319,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testGeneralizeMonthYear_testAllDateFormatsLate() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setGeneralizeMonthyear(true);
+    configuration.setGeneralizeMonthYear(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     String[] months = getMonthAbbreviations();
 
@@ -351,7 +351,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeQuarterYear() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeQuarteryear(true);
+    configuration.setGeneralizeQuarterYear(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     assertEquals("1/2016", maskingProvider.mask("12-01-2016 00:00:00"));
@@ -372,7 +372,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeQuarterYear_outputFormat() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeQuarteryear(true);
+    configuration.setGeneralizeQuarterYear(true);
     configuration.setGeneralizeQuarterYearOutputFormat("Q'Q'yyyy");
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
@@ -516,7 +516,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeMonthyearMaskAgeOver90_Over90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeMonthyearMaskAgeOver90(true);
+    configuration.setGeneralizeMonthYearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     String originalDateTime = "12-12-1900 00:00:00";
@@ -541,7 +541,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeMonthyearMaskAgeOver90_Under90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeMonthyearMaskAgeOver90(true);
+    configuration.setGeneralizeMonthYearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
     
     String originalDateTime = "08-09-2010 00:00:00";
@@ -561,7 +561,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeMonthyearMaskAgeOver90_Equal90() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeMonthyearMaskAgeOver90(true);
+    configuration.setGeneralizeMonthYearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -577,7 +577,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   @Test
   public void testGeneralizeMonthyearMaskAge_OneDayShort() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
-    configuration.setGeneralizeMonthyearMaskAgeOver90(true);
+    configuration.setGeneralizeMonthYearMaskAgeOver90(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -594,7 +594,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testDateYearDelete() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setYearDelete(true);
+    configuration.setGeneralizeDayMonth(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     String originalDateTime = "13-04-2016 00:00:00";
@@ -603,7 +603,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     assertEquals("13/04", maskedDateTime);
 
     // output format override
-    configuration.setYearDeleteOutputFormat("MMM-dd");
+    configuration.setGeneralizeDayMonthOutputFormat("MMM-dd");
     maskingProvider = new DateTimeMaskingProvider(configuration);
 
     maskedDateTime = maskingProvider.mask(originalDateTime);
@@ -615,7 +615,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testYearDeleteNDays_before() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setYearDeleteNdays(true);
+    configuration.setYearDeleteNDays(true);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -632,8 +632,8 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testYearDeleteNDays_custom_after() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setYearDeleteNdays(true);
-    configuration.setYearDeleteNdaysValue(800);
+    configuration.setYearDeleteNDays(true);
+    configuration.setYearDeleteNDaysValue(800);
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -651,9 +651,9 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testYearDeleteNDays_pattern_bad() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setYearDeleteNdays(true);
+    configuration.setYearDeleteNDays(true);
     // unexpected format - too many values
-    configuration.setYearDeleteNdaysOutputFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    configuration.setYearDeleteNDaysOutputFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -667,7 +667,7 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
       System.out.println(e.getMessage());
     }
 
-    configuration.setYearDeleteNdaysOutputFormat("MM-ddZ");
+    configuration.setYearDeleteNDaysOutputFormat("MM-ddZ");
     maskingProvider = new DateTimeMaskingProvider(configuration);
     try {
       maskingProvider.mask(originalDateTime);
@@ -681,9 +681,9 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   public void testYearDeleteNDays_pattern() {
     DateTimeMaskingProviderConfig configuration = new DateTimeMaskingProviderConfig();
     setAllDateTimeMaskingToFalse(configuration);
-    configuration.setYearDeleteNdays(true);
+    configuration.setYearDeleteNDays(true);
     // unexpected format - too many values
-    configuration.setYearDeleteNdaysOutputFormat("'Month='MM'Day='dd");
+    configuration.setYearDeleteNDaysOutputFormat("'Month='MM'Day='dd");
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(configuration);
 
     LocalDateTime currentDate = LocalDateTime.now();
@@ -1571,16 +1571,16 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
   }
 
   private void setAllDateTimeMaskingToFalse(DateTimeMaskingProviderConfig configuration) {
-    configuration.setGeneralizeWeekyear(false);
-    configuration.setGeneralizeMonthyear(false);
-    configuration.setGeneralizeQuarteryear(false);
+    configuration.setGeneralizeWeekYear(false);
+    configuration.setGeneralizeMonthYear(false);
+    configuration.setGeneralizeQuarterYear(false);
     configuration.setGeneralizeYear(false);
     configuration.setYearMaxYearsAgoMask(false);
     configuration.setDayMaxDaysAgoMask(false);
-    configuration.setGeneralizeMonthyearMaskAgeOver90(false);
+    configuration.setGeneralizeMonthYearMaskAgeOver90(false);
     configuration.setGeneralizeYearMaskAgeOver90(false);
-    configuration.setYearDelete(false);
-    configuration.setYearDeleteNdays(false);
+    configuration.setGeneralizeDayMonth(false);
+    configuration.setYearDeleteNDays(false);
     configuration.setYearMask(false);
     configuration.setMonthMask(false);
     configuration.setDayMask(false);
