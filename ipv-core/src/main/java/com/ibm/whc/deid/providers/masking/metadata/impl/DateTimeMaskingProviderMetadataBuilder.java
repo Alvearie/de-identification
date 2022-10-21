@@ -34,6 +34,7 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
       Locale locale) {
     ResourceBundle bundle = getMetadataResourceBundle(locale);
     List<ConfigurationOptionGroupModel> groups = new ArrayList<>();
+
     ConfigurationOptionGroupModel group =
         buildOptionGroup(provider.getIdentifier(), "yearOverride", bundle);
     List<ConfigurationOptionModel> options = new ArrayList<>();
@@ -45,7 +46,40 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         buildOption(provider.getIdentifier(), "overrideValue", bundle, OptionType.String, null));
     group.setGroupOptions(options);
     groups.add(group);
-    group = buildOptionGroup(provider.getIdentifier(), "shift", bundle);
+
+    group = buildOptionGroup(provider.getIdentifier(), "maxYearsAgoGroup", bundle);
+    options = new ArrayList<>();
+    options.add(buildOption(provider.getIdentifier(), "yearMaxYearsAgoMask", bundle,
+        OptionType.Boolean, Boolean.FALSE.toString()));
+    options.add(
+        buildOption(provider.getIdentifier(), "yearMaxYearsAgo", bundle, OptionType.Integer, "0"));
+    options.add(buildOption(provider.getIdentifier(), "yearShiftFromCurrentYear", bundle,
+        OptionType.Integer, "0"));
+    options.add(buildOption(provider.getIdentifier(), "yearMaxYearsAgoOnlyYear", bundle,
+        OptionType.Boolean, Boolean.FALSE.toString()));
+    options.add(buildOption(provider.getIdentifier(), "dayMaxDaysAgoMask", bundle,
+        OptionType.Boolean, Boolean.FALSE.toString()));
+    options.add(
+        buildOption(provider.getIdentifier(), "dayMaxDaysAgo", bundle, OptionType.Integer, "0"));
+    options.add(buildOption(provider.getIdentifier(), "dayShiftFromCurrentDay", bundle,
+        OptionType.Integer, "0"));
+    options.add(buildOption(provider.getIdentifier(), "dayMaxDaysAgoOnlyYear", bundle,
+        OptionType.Boolean, Boolean.FALSE.toString()));
+    group.setGroupOptions(options);
+    groups.add(group);
+
+    group = buildOptionGroup(provider.getIdentifier(), "deleteYearOldGroup", bundle);
+    options = new ArrayList<>();
+    options.add(buildOption(provider.getIdentifier(), "yearDeleteNDays", bundle, OptionType.Boolean,
+        Boolean.FALSE.toString()));
+    options.add(buildOption(provider.getIdentifier(), "yearDeleteNDaysValue", bundle,
+        OptionType.Integer, "365"));
+    options.add(buildOption(provider.getIdentifier(), "yearDeleteNDaysOutputFormat", bundle,
+        OptionType.String, "dd/MM"));
+    group.setGroupOptions(options);
+    groups.add(group);
+
+    group = buildOptionGroup(provider.getIdentifier(), "shiftGroup", bundle);
     options = new ArrayList<>();
     options.add(buildOption(provider.getIdentifier(), "maskShiftDate", bundle, OptionType.Boolean,
         Boolean.FALSE.toString()));
@@ -53,30 +87,34 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         buildOption(provider.getIdentifier(), "maskShiftSeconds", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
-    group = buildOptionGroup(provider.getIdentifier(), "generalization", bundle);
+
+    group = buildOptionGroup(provider.getIdentifier(), "generalizationGroup", bundle);
     options = new ArrayList<>();
-    options.add(buildOption(provider.getIdentifier(), "generalizeWeekyear", bundle,
+    options.add(buildOption(provider.getIdentifier(), "generalizeWeekYear", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "generalizeMonthyear", bundle,
+    options.add(buildOption(provider.getIdentifier(), "generalizeMonthYear", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "generalizeQuarteryear", bundle,
+    options.add(buildOption(provider.getIdentifier(), "generalizeMonthYearOutputFormat", bundle,
+        OptionType.String, "MM/yyyy"));
+    options.add(buildOption(provider.getIdentifier(), "generalizeQuarterYear", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
+    options.add(buildOption(provider.getIdentifier(), "generalizeQuarterYearOutputFormat", bundle,
+        OptionType.String, "Q/yyyy"));
     options.add(buildOption(provider.getIdentifier(), "generalizeYear", bundle, OptionType.Boolean,
         Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "generalizeNyearinterval", bundle,
+    options.add(buildOption(provider.getIdentifier(), "generalizeDayMonth", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "generalizeNyearintervalvalue", bundle,
-        OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "generalizeNyearintervalstart", bundle,
-        OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "generalizeNyearintervalend", bundle,
-        OptionType.Integer, null));
+    options.add(buildOption(provider.getIdentifier(), "generalizeDayMonthOutputFormat", bundle,
+        OptionType.String, "dd/MM"));
     options.add(buildOption(provider.getIdentifier(), "generalizeYearMaskAgeOver90", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "generalizeMonthyearMaskAgeOver90", bundle,
+    options.add(buildOption(provider.getIdentifier(), "generalizeMonthYearMaskAgeOver90", bundle,
         OptionType.Boolean, Boolean.FALSE.toString()));
+    options.add(buildOption(provider.getIdentifier(),
+        "generalizeMonthYearMaskAgeOver90OutputFormat", bundle, OptionType.String, "MM/yyyy"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "year", bundle);
     options = new ArrayList<>();
     options.add(buildOption(provider.getIdentifier(), "yearMask", bundle, OptionType.Boolean,
@@ -87,6 +125,7 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         .add(buildOption(provider.getIdentifier(), "yearRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "month", bundle);
     options = new ArrayList<>();
     options.add(buildOption(provider.getIdentifier(), "monthMask", bundle, OptionType.Boolean,
@@ -97,6 +136,7 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         buildOption(provider.getIdentifier(), "monthRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "day", bundle);
     options = new ArrayList<>();
     options.add(buildOption(provider.getIdentifier(), "dayMask", bundle, OptionType.Boolean,
@@ -111,6 +151,7 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         .add(buildOption(provider.getIdentifier(), "dayRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "hour", bundle);
     options = new ArrayList<>();
     options.add(buildOption(provider.getIdentifier(), "hourMask", bundle, OptionType.Boolean,
@@ -121,59 +162,29 @@ public class DateTimeMaskingProviderMetadataBuilder extends MaskingProviderMetad
         .add(buildOption(provider.getIdentifier(), "hourRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "minute", bundle);
     options = new ArrayList<>();
-    options.add(buildOption(provider.getIdentifier(), "minutesMask", bundle, OptionType.Boolean,
+    options.add(buildOption(provider.getIdentifier(), "minuteMask", bundle, OptionType.Boolean,
         Boolean.TRUE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "minutesRangeDown", bundle,
+    options.add(buildOption(provider.getIdentifier(), "minuteRangeDown", bundle,
         OptionType.Integer, "100"));
     options.add(
-        buildOption(provider.getIdentifier(), "minutesRangeUp", bundle, OptionType.Integer, "0"));
+        buildOption(provider.getIdentifier(), "minuteRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
+
     group = buildOptionGroup(provider.getIdentifier(), "second", bundle);
     options = new ArrayList<>();
-    options.add(buildOption(provider.getIdentifier(), "secondsMask", bundle, OptionType.Boolean,
+    options.add(buildOption(provider.getIdentifier(), "secondMask", bundle, OptionType.Boolean,
         Boolean.TRUE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "secondsRangeDown", bundle,
+    options.add(buildOption(provider.getIdentifier(), "secondRangeDown", bundle,
         OptionType.Integer, "100"));
     options.add(
-        buildOption(provider.getIdentifier(), "secondsRangeUp", bundle, OptionType.Integer, "0"));
+        buildOption(provider.getIdentifier(), "secondRangeUp", bundle, OptionType.Integer, "0"));
     group.setGroupOptions(options);
     groups.add(group);
-    group = buildOptionGroup(provider.getIdentifier(), "maxYearsAgoGroup", bundle);
-    options = new ArrayList<>();
-    options.add(buildOption(provider.getIdentifier(), "yearMaxYearsAgoMask", bundle,
-        OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(
-        buildOption(provider.getIdentifier(), "yearMaxYearsAgo", bundle, OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "yearShiftFromCurrentYear", bundle,
-        OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "dayMaxDaysAgoMask", bundle,
-        OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(
-        buildOption(provider.getIdentifier(), "dayMaxDaysAgo", bundle, OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "dayShiftFromCurrentDay", bundle,
-        OptionType.Integer, "0"));
-    options.add(buildOption(provider.getIdentifier(), "yearMaxYearsAgoOnlyYear", bundle,
-        OptionType.Boolean, Boolean.FALSE.toString()));
-    group.setGroupOptions(options);
-    groups.add(group);
-    group = buildOptionGroup(provider.getIdentifier(), "deleteYear", bundle);
-    options = new ArrayList<>();
-    options.add(buildOption(provider.getIdentifier(), "yearDelete", bundle, OptionType.Boolean,
-        Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "yearDeleteNdays", bundle, OptionType.Boolean,
-        Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "yearDeleteNinterval", bundle,
-        OptionType.Boolean, Boolean.FALSE.toString()));
-    options.add(buildOption(provider.getIdentifier(), "yearDeleteNdaysValue", bundle,
-        OptionType.Integer, "365"));
-    options.add(buildOption(provider.getIdentifier(), "yearDeleteNointervalComparedateValue",
-        bundle, OptionType.String, null));
-    group.setGroupOptions(options);
-    groups.add(group);
+
     return groups;
   }
-
 }

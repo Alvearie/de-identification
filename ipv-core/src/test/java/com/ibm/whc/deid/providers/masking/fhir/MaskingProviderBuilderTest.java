@@ -118,7 +118,7 @@ public class MaskingProviderBuilderTest {
     DateTimeMaskingProviderConfig datetimeConfig =
         (DateTimeMaskingProviderConfig) MaskingProviderConfig
             .getDefaultMaskingProviderConfig(MaskingProviderType.DATETIME);
-    datetimeConfig.setGeneralizeMonthyear(true);
+    datetimeConfig.setGeneralizeMonthYear(true);
     Rule datetimeRule = createRuleWithOneProvider(datetimeRuleName, datetimeConfig);
 
     NullMaskingProviderConfig deleteConfig = (NullMaskingProviderConfig) MaskingProviderConfig
