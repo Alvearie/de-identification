@@ -23,15 +23,19 @@ import com.ibm.whc.deid.shared.util.InvalidMaskingConfigurationException;
  * 
  * <p>
  * The configuration of the de-identification operation is read from the file system the first time
- * the UDF is called. Configuration is only read once. For security purposes, the database password
- * and NLP provider API key can be supplied by environment variables. If the environment variable is
- * found and has a value, its value replaces the value in the configuration file.
+ * the UDF is called. Configuration is only read once.
  */
 // Including "implements" of an inherited interface is redundant,
 // but required for pyspark in Azure Synapse.
 public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
 
   private static final long serialVersionUID = 8991156671414592197L;
+
+  /**
+   * Environment variable that contains the name of the masking configuration file. This value is
+   * required.
+   */
+  public static final String MASKING_CONFIG_FILE_ENV_VAR = "DEID_UDF_MASKING_CONFIG_FILE";
 
   protected static final String AZURE_SYNAPSE_STORAGE_ACCOUNT_MOUNT_POINT = "/synfs";
   protected static final Pattern jobIdPattern = Pattern.compile("\\d+");
@@ -51,8 +55,15 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
    * filesystem was mounted. Finally, the rest of the path is the path to the target directory
    * within the Storage Account filesystem itself.
    * 
-   * @return The absolute path name of the directory that should contain the configuration
-   *         information for the De-ID UDF.
+   * If multiple masking configurations are found because multiple mounted file systems are found to
+   * contain the target path and file name an exception is thrown unless the content of all such
+   * files is exactly the same. In that case, the system continues using that configuration data.
+   * 
+   * @return the masking configuration as a string in JSON format
+   * 
+   * @throws InvalidMaskingConfigurationException if a required environment variable does not have a
+   *         valid value, if the masking configuration cannot be found, or multiple, different
+   *         masking configurations are found.
    */
   // FileSystem will not be closed
   @SuppressWarnings("resource")
@@ -98,14 +109,20 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
           "directory " + targetDir + " not found within " + getSynapseMountPoint());
     }
     
+    String maskingConfigFileName = getEnvVar(MASKING_CONFIG_FILE_ENV_VAR);
+    if (maskingConfigFileName == null || maskingConfigFileName.trim().isEmpty()) {
+      throw new InvalidMaskingConfigurationException(
+          "environment variable " + MASKING_CONFIG_FILE_ENV_VAR + " is required");
+    }
+
     String maskingConfig = null;
     for (Path targetPath : targets) {
       String configPath = targetPath.toString();
       if (!configPath.endsWith("/")) {
         configPath += "/";
       }
-      String maskingPath = configPath + MASKING_CONFIG_FILENAME;
-      
+      String maskingPath = configPath + maskingConfigFileName;
+
       String config = getFileContentAsString(maskingPath);
       
       if (config != null) {
