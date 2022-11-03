@@ -102,9 +102,38 @@ public class DeIdSynapseUDFTest {
         assertEquals("directory DeIdSynapseUDFTest4 not found within /tmp", e.getMessage());
       }
 
-      // target found - no file
+      // target found - no masking file environment variable
       path1t = Paths.get("/tmp", "1", "DeIdSynapseUDFTest4");
       Files.createDirectories(path1t);
+      try {
+        udf.getMaskingConfig();
+        fail("expected exception");
+      } catch (InvalidMaskingConfigurationException e) {
+        assertEquals(
+            "environment variable " + DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR + " is required",
+            e.getMessage());
+      }
+      udf.envVars.put(DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR, "");
+      try {
+        udf.getMaskingConfig();
+        fail("expected exception");
+      } catch (InvalidMaskingConfigurationException e) {
+        assertEquals(
+            "environment variable " + DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR + " is required",
+            e.getMessage());
+      }
+      udf.envVars.put(DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR, "   ");
+      try {
+        udf.getMaskingConfig();
+        fail("expected exception");
+      } catch (InvalidMaskingConfigurationException e) {
+        assertEquals(
+            "environment variable " + DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR + " is required",
+            e.getMessage());
+      }
+
+      // target found - no file
+      udf.envVars.put(DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR, DeIdUDF.MASKING_CONFIG_FILENAME);
       try {
         udf.getMaskingConfig();
         fail("expected exception");
@@ -130,21 +159,23 @@ public class DeIdSynapseUDFTest {
       subpath = Paths.get("/tmp", "2", "DeIdSynapseUDFTestCustomer", "DeIdSynapseUDFTestRequest",
           "DeIdSynapseUDFTest4");
       Files.createDirectories(subpath);
-      path2rfile = Files.createFile(Paths.get(path2r.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+      path2rfile = Files.createFile(Paths.get(path2r.toString(), "masking.x.json"));
       try (BufferedWriter w = Files.newBufferedWriter(path2rfile)) {
         w.write("path2r content");
       }
       subpathfile =
-          Files.createFile(Paths.get(subpath.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+          Files.createFile(Paths.get(subpath.toString(), "masking.x.json"));
       try (BufferedWriter w = Files.newBufferedWriter(subpathfile)) {
         w.write("subpath content");
       }
+      udf.envVars.put(DeIdSynapseUDF.MASKING_CONFIG_FILE_ENV_VAR, "masking.x.json");
+
       // should return path2r, not subpath
       assertEquals("path2r content", udf.getMaskingConfig());
 
       // multiple paths contain a file - different content
       udf.envVars.put(DeIdUDF.CONFIG_PATH_ENV_VAR, "DeIdSynapseUDFTest4");
-      path1tfile = Files.createFile(Paths.get(path1t.toString(), DeIdUDF.MASKING_CONFIG_FILENAME));
+      path1tfile = Files.createFile(Paths.get(path1t.toString(), "masking.x.json"));
       try (BufferedWriter w = Files.newBufferedWriter(path1tfile)) {
         w.write("path1t content");
       }
