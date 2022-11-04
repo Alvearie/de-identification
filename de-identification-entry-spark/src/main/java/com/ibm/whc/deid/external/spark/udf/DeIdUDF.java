@@ -104,6 +104,13 @@ public class DeIdUDF implements UDF1<String, String> {
     return out;
   }
 
+  /**
+   * Gets environment variable value.
+   * 
+   * @param name the name of the environment variable
+   * 
+   * @return the value of the variable or <i>null</i> if the variable is not defined
+   */
   protected String getEnvVar(String name) {
     return System.getenv(name);
   }
