@@ -1,4 +1,0 @@
-[submodule "ipv-core/submodules/java-fpe"]
-	path = ipv-core/submodules/java-fpe
-	url = https://github.com/Alvearie/deid-java-fpe
-	branch = main
