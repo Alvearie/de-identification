@@ -872,4 +872,43 @@ public class FPEMaskingProviderTest {
     System.out.println("last = " + original + " <-> " + result);
     System.out.println(set.size() + " values");
   }
+
+  @Test
+  @Ignore("Long running test, not routinely required")
+  public void testEngine2() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.LETTERS_UPPER);
+    config.setKey("aaaabbbbccccdddd11111111222222223333333344444444aaaabbbbccccdddd");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setPadding(Pad.NONE);
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    HashSet<String> set = new HashSet<>(1600000);
+    int originalLength = 7;
+    StringBuilder original = new StringBuilder("AAAAAAA");
+    String result = null;
+
+    long start = System.currentTimeMillis();
+    for (int i = 0; i < 1000000; i++) {
+      inc(original, 0);
+      result = provider.mask(original.toString());
+      // expected length
+      assertEquals(originalLength, result.length());
+      // unique
+      assertTrue(set.add(result));
+    }
+    long end = System.currentTimeMillis();
+    System.out.println("duration = " + ((end - start) / 1000.0) + " sec");
+    System.out.println("last = " + original + " <-> " + result);
+    System.out.println(set.size() + " values");
+  }
+
+  private void inc(StringBuilder original, int position) {
+    char ch = original.charAt(position);
+    if (ch == 'Z') {
+      original.setCharAt(position, 'A');
+      inc(original, position + 1);
+    } else {
+      original.setCharAt(position, (char) (ch + 1));
+    }
+  }
 }
