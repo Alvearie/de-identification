@@ -19,12 +19,22 @@ public enum Radix {
   /**
    * lower case letters a-z
    */
-  LOWER("0123456789abcdefghijklmnop", 5, 40, 'a'),
+  LOWER("abcdefghijklmnopqrstuvwxyz", 5, 40, 'a'),
 
   /**
    * Digits 0-9 and lower case letters a-z
    */
-  DIGITS_LOWER("0123456789abcdefghijklmnopqrstuvwxyz", 4, 36, 'a');
+  DIGITS_LOWER("0123456789abcdefghijklmnopqrstuvwxyz", 4, 36, 'a'),
+
+  /**
+   * lower case letters A-Z
+   */
+  UPPER("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 5, 40, 'A'),
+
+  /**
+   * Digits 0-9 and upper case letters A-Z
+   */
+  DIGITS_UPPER("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 4, 36, 'a');
 
   private final String value;
   private final int minchars;

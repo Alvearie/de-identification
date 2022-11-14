@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.ibm.whc.deid.providers.masking.fpe.FPEDriverBase;
 import com.ibm.whc.deid.providers.masking.fpe.Radix;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
@@ -147,8 +146,7 @@ public class FPEMaskingProviderTest {
     }
     // verify reversible
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
-    assertEquals(original, FPEDriverBase
-        .shiftBase26ToLetters(cipher.decrypt(FPEDriverBase.shiftLettersToBase26(result))));
+    assertEquals(original, cipher.decrypt(result));
   }
 
   @Test
@@ -184,8 +182,7 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(29, 32));
     buffer.append(result.substring(33, 35));
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -208,12 +205,8 @@ public class FPEMaskingProviderTest {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
-    assertEquals(original,
-        FPEDriverBase
-            .shiftBase26ToLetters(
-                cipher.decrypt(FPEDriverBase.shiftLettersToBase26(result.toLowerCase())))
-            .toUpperCase());
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
+    assertEquals(original, cipher.decrypt(result));
   }
 
   @Test
@@ -248,10 +241,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(25, 28));
     buffer.append(result.substring(29, 32));
     buffer.append(result.substring(33, 35));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase())))
-        .toUpperCase());
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -280,8 +271,7 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(5, 8));
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -312,10 +302,7 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(4, 7));
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym,
-        FPEDriverBase
-            .shiftBase26ToLetters(
-                cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -326,7 +313,7 @@ public class FPEMaskingProviderTest {
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
     String original = "abc$8XYZ \t";
-    String originalNoSym = "abcxyz";
+    String originalNoSym = "ABCXYZ";
     Pattern pattern = Pattern.compile("[A-Z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
     System.out.println(original + " -> " + result);
@@ -342,10 +329,9 @@ public class FPEMaskingProviderTest {
     StringBuilder buffer = new StringBuilder(originalNoSym.length());
     buffer.append(result.substring(0, 3));
     buffer.append(result.substring(5, 8));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -374,8 +360,7 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(5, 8));
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
   }
 
   @Test

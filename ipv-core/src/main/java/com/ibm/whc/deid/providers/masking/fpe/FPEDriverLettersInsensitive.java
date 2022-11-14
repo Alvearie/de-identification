@@ -43,20 +43,21 @@ public class FPEDriverLettersInsensitive extends FPEDriverBaseSinglePhase {
 
   @Override
   protected String processInput(String in, PositionManager posMgr, int padNeeded, Pad padding) {
-    return shiftLettersToBase26(in.toLowerCase(Locale.US));
+    return in.toLowerCase(Locale.US);
   }
 
   @Override
   protected String processOutput(String out, PositionManager posMgr, int padNeeded, Pad padding) {
-    String outLetters = shiftBase26ToLetters(out);
+    String outLetters;
     switch (outputCase) {
       case LOWER:
+        outLetters = out;
         break;
       case UPPER:
-        outLetters = outLetters.toUpperCase(Locale.US);
+        outLetters = out.toUpperCase(Locale.US);
         break;
       case ORIGINAL:
-        StringBuilder buffer = new StringBuilder(outLetters);
+        StringBuilder buffer = new StringBuilder(out);
         int index = 0;
         // skip pad characters
         if (padNeeded > 0 && padding == Pad.FRONT) {
