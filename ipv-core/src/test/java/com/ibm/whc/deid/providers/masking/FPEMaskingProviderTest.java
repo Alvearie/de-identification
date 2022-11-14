@@ -435,8 +435,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(41, 44));
     buffer.append(result.substring(45, 47));
     FF3Cipher cipher =
-        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_LOWER.value());
-    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()).toUpperCase());
+        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_UPPER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -474,7 +474,7 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(44, 46));
     FF3Cipher cipher =
         new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_LOWER.value());
-    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
