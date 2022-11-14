@@ -853,11 +853,13 @@ public class FPEMaskingProviderTest {
     HashSet<String> set = new HashSet<>(1600000);
     int originalLength = 7;
     FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
-    String original;
+    String original = null;
+    String result = null;
 
-    for (int i = 0; i <= 1000000; i++) {
+    long start = System.currentTimeMillis();
+    for (int i = 0; i < 1000000; i++) {
       original = String.format("%07d", i);
-      String result = provider.mask(original);
+      result = provider.mask(original);
       // expected length
       assertEquals(originalLength, result.length());
       // unique
@@ -865,5 +867,9 @@ public class FPEMaskingProviderTest {
       // reverses
       assertEquals(original, cipher.decrypt(result));
     }
+    long end = System.currentTimeMillis();
+    System.out.println("duration = " + ((end - start) / 1000.0) + " sec");
+    System.out.println("last = " + original + " <-> " + result);
+    System.out.println(set.size() + " values");
   }
 }
