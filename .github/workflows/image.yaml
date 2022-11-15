@@ -56,8 +56,7 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: |
-        git submodule update --init --recursive && mvn -B package --file pom.xml
+      run: mvn -B package --file pom.xml
     - name: Sanity Test
       run: cd de-identification-app/scripts && ./sanity_test.sh
 

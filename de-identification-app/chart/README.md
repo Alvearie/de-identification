@@ -16,7 +16,7 @@ This [Helm](https://github.com/kubernetes/helm) chart installs an instance of th
 Git clone this repository.
 
 ```bash
-git clone --recurse-submodules https://github.com/Alvearie/de-identification.git
+git clone https://github.com/Alvearie/de-identification.git
 ```
 
 ### Install the Chart

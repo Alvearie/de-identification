@@ -11,14 +11,11 @@ To compile the De-Identification server, clone the GIT repository and compile wi
 
 ```
    export RELEASE=1.1.0   (change to the release you want to build)
-   git clone --recurse-submodules https://github.com/Alvearie/de-identification
+   git clone https://github.com/Alvearie/de-identification
    cd de-identification/
    git checkout v${RELEASE}
    mvn clean package
 ```
-
- Note: `--recurse-submodules` is required because the repository contains a third-party encryption engine as a Git submodule.  For reference, the
- host repository for the submodule is `https://github.com/Alvearie/deid-java-fpe`, which is a modified fork of the third-party code available at `https://github.com/mysto/java-fpe`.
 
 ### Running the server
 

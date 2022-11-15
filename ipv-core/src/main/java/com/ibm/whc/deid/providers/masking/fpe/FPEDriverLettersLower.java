@@ -5,8 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
-import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
-
 /**
  * Concrete subclass for processing sequences of lower case letters.
  */
@@ -30,15 +28,5 @@ public class FPEDriverLettersLower extends FPEDriverBaseSinglePhase {
   @Override
   protected Radix getRadix() {
     return Radix.LOWER;
-  }
-
-  @Override
-  protected String processInput(String in, PositionManager posMgr, int padNeeded, Pad padding) {
-    return shiftLettersToBase26(in);
-  }
-
-  @Override
-  protected String processOutput(String out, PositionManager posMgr, int padNeeded, Pad padding) {
-    return shiftBase26ToLetters(out);
   }
 }

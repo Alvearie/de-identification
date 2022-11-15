@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
-import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
@@ -15,54 +14,6 @@ import com.privacylogistics.FF3Cipher;
  * Superclass with utility functions useful for FPE operations.
  */
 public abstract class FPEDriverBase implements FPEDriver {
-
-  protected static final char[] BASE26 = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8',
-      '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'};
-  protected static final char[] LETTERS = new char[] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-      'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-
-  /**
-   * Maps a given sequence of lower-case letters to digits using base 26 (0-9,a-p) where 'a' is the
-   * lowest valued digit (0) and 'p' is the highest valued digit (25).
-   * 
-   * @param in the sequence to map to base 26
-   * 
-   * @return the equivalent "number" consisting of digits in base 26
-   * 
-   * @throws ArrayIndexOutOfBoundsException if a given character in the input is not a letter
-   *         between 'a' and 'z' inclusive
-   */
-  public static String shiftLettersToBase26(String in) {
-    return convertChars(in, LETTERS, BASE26);
-  }
-
-  /**
-   * Maps a sequence of base 26 digits into an alphabetical string. The digit 0 is mapped to an 'a'
-   * and digit 'p' is mapped to a z.
-   * 
-   * @param in the base 26 digit sequence to map to an alphabetical string
-   * 
-   * @return the alphabetical string
-   * 
-   * @throws ArrayIndexOutOfBoundsException if a given character in the input is not a base 26 digit
-   *         [0-9a-p]
-   */
-  public static String shiftBase26ToLetters(String in) {
-    return convertChars(in, BASE26, LETTERS);
-  }
-
-  private static String convertChars(String in, char[] sourceRange, char[] targetRange) {
-    StringBuilder buffer = new StringBuilder(in.length());
-    int length = in.length();
-    char ch;
-    int index;
-    for (int i = 0; i < length; i++) {
-      ch = in.charAt(i);
-      index = Arrays.binarySearch(sourceRange, ch);
-      buffer.append(targetRange[index]);
-    }
-    return buffer.toString();
-  }
 
   /**
    * Determines the number of additional characters that would be needed to reach the minimum number
