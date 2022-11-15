@@ -39,6 +39,7 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("756378309", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -64,6 +65,7 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("756a&378309@", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -90,6 +92,7 @@ public class FPEMaskingProviderTest {
     assertEquals(6, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("900369", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -115,6 +118,7 @@ public class FPEMaskingProviderTest {
     assertEquals(10, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("900a-A369@", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -140,6 +144,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("qxjybsegrisimahnabsipxqnug", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -166,6 +172,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("0qxj-ybs-egr-isi-mah-nab-sip-xqn-ugZ", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -200,6 +208,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("QXJYBSEGRISIMAHNABSIPXQNUG", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -226,6 +236,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("zQXJ-YBS-EGR-ISI-MAH-NAB-SIP-XQN-UG9", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -261,6 +273,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("bcg$8ski \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -292,6 +306,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length() + 1, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("ii$8rek \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -321,6 +337,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("BCG$8SKI \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -341,8 +359,8 @@ public class FPEMaskingProviderTest {
     config.setKey("11111111222222223333333344444444");
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
-    String original = "abc$8XYZ \t";
-    String originalNoSym = "abcxyz";
+    String original = "def$8JKL \t";
+    String originalNoSym = "defjkl";
     Pattern pattern = Pattern.compile("[a-z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
     System.out.println(original + " -> " + result);
@@ -350,6 +368,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("ghl$8NKM \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -370,8 +390,8 @@ public class FPEMaskingProviderTest {
     config.setKey("11111111222222223333333344444444");
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
-    String original = "A#0123456789#abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
-    String originalNoSym = "0123456789abcdefghijklmnopqrstuvwxyz";
+    String original = "A#9876543210#abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
+    String originalNoSym = "9876543210abcdefghijklmnopqrstuvwxyz";
     Pattern pattern = Pattern.compile(
         "A#[0-9a-z]{10}+#[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{2}Z");
     String result = provider.mask(original);
@@ -380,6 +400,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("A#8hwyecapjs#jmz-dru-t2u-zl2-tp1-yg7-slo-7o4-qzZ", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -418,6 +440,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("#aWXDQSQH7NM#V9C-940-CE3-3RG-4X8-XK8-E2A-DPY-E2z", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -456,6 +480,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@wxdqsqh7nm#v9c-940-ce3-3rg-4x8-xk8-e2a-dpy-e2@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -494,6 +520,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@WXDQSQH7NM#V9C-940-CE3-3RG-4X8-XK8-E2A-DPY-E2@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -531,6 +559,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@0123456789#zhl-MQD-luv-DRG-XCO-ZLO-SQU-wdb-QP@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -556,6 +586,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("brp-123-CXG-yu-FF", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -604,6 +636,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@2482145309#zhl-MQD-luv-DRG-XCO-ZLO-SQU-wdb-QP@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -629,6 +663,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("brp-837-CXG-yu-581-FF", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
