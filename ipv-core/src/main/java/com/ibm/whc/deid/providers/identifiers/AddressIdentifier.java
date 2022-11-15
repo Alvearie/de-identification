@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -31,12 +31,10 @@ public class AddressIdentifier extends AbstractIdentifier {
           "\\s+(?<roadtype>STREET|ST\\.|ST|DRIVE|DR\\.|DR|BOULEVARD|BLVD\\.|BLVD|COURT|CT\\.|CT|"
               + "ROAD|RD\\.|RD|AVENUE|AVE\\.|AVE|LANE|LN\\.|LN)(\\s*,|\\s*\\z|\\s+)");
 
-  /** The First part pattern. */
   Pattern firstPartPattern =
       Pattern.compile("^(?<number>\\d+){0,1}\\s*(?<street>(([\\w|\\d]+)\\s*)+)");
-  /** The Second part pattern. */
   Pattern secondPartPattern = Pattern.compile(
-      ",\\s*(?<cityorstate>(([\\p{L}0-9\\u0327\\u0331.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>(\\w+\\s*)+)){0,1}",
+      ",\\s*(?<cityorstate>(([\\p{L}0-9\\u0327\\u0331.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>\\w+(\\s+\\w+)*)\\s*){0,1}",
       Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
