@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Ignore;
 import org.junit.Test;
-import com.ibm.whc.deid.providers.masking.fpe.FPEDriverBase;
+import com.ibm.whc.deid.providers.masking.fpe.Radix;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.UsageType;
@@ -39,12 +39,13 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("756378309", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
     assertEquals(original, cipher.decrypt(result));
   }
 
@@ -64,12 +65,13 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("756a&378309@", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
     String resultNoSymbols = result.substring(0, 3) + result.substring(5, 11);
     assertEquals("897435847", cipher.decrypt(resultNoSymbols));
   }
@@ -90,12 +92,13 @@ public class FPEMaskingProviderTest {
     assertEquals(6, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("900369", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
     assertEquals("00" + original, cipher.decrypt(result));
   }
 
@@ -115,12 +118,13 @@ public class FPEMaskingProviderTest {
     assertEquals(10, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    assertEquals("900a-A369@", result); // result with same keys should always be the same
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
     String resultNoSymbols = result.substring(0, 3) + result.substring(6, 9);
     assertEquals("006789", cipher.decrypt(resultNoSymbols));
   }
@@ -140,14 +144,15 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("qxjybsegrisimahnabsipxqnug", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
-    assertEquals(original, FPEDriverBase
-        .shiftBase26ToLetters(cipher.decrypt(FPEDriverBase.shiftLettersToBase26(result))));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
+    assertEquals(original, cipher.decrypt(result));
   }
 
   @Test
@@ -167,6 +172,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("0qxj-ybs-egr-isi-mah-nab-sip-xqn-ugZ", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -182,9 +189,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(25, 28));
     buffer.append(result.substring(29, 32));
     buffer.append(result.substring(33, 35));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -202,17 +208,15 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("QXJYBSEGRISIMAHNABSIPXQNUG", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
     }
     // verify reversible
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
-    assertEquals(original,
-        FPEDriverBase
-            .shiftBase26ToLetters(
-                cipher.decrypt(FPEDriverBase.shiftLettersToBase26(result.toLowerCase())))
-            .toUpperCase());
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
+    assertEquals(original, cipher.decrypt(result));
   }
 
   @Test
@@ -232,6 +236,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("zQXJ-YBS-EGR-ISI-MAH-NAB-SIP-XQN-UG9", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -247,10 +253,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(25, 28));
     buffer.append(result.substring(29, 32));
     buffer.append(result.substring(33, 35));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase())))
-        .toUpperCase());
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -269,6 +273,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("bcg$8ski \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -277,10 +283,9 @@ public class FPEMaskingProviderTest {
     StringBuilder buffer = new StringBuilder(originalNoSym.length());
     buffer.append(result.substring(0, 3));
     buffer.append(result.substring(5, 8));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -301,6 +306,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length() + 1, result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("ii$8rek \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -309,12 +316,9 @@ public class FPEMaskingProviderTest {
     StringBuilder buffer = new StringBuilder(originalNoSym.length());
     buffer.append(result.substring(0, 2));
     buffer.append(result.substring(4, 7));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym,
-        FPEDriverBase
-            .shiftBase26ToLetters(
-                cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -325,7 +329,7 @@ public class FPEMaskingProviderTest {
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
     String original = "abc$8XYZ \t";
-    String originalNoSym = "abcxyz";
+    String originalNoSym = "ABCXYZ";
     Pattern pattern = Pattern.compile("[A-Z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
     System.out.println(original + " -> " + result);
@@ -333,6 +337,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("BCG$8SKI \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -341,10 +347,9 @@ public class FPEMaskingProviderTest {
     StringBuilder buffer = new StringBuilder(originalNoSym.length());
     buffer.append(result.substring(0, 3));
     buffer.append(result.substring(5, 8));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.UPPER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -354,8 +359,8 @@ public class FPEMaskingProviderTest {
     config.setKey("11111111222222223333333344444444");
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
-    String original = "abc$8XYZ \t";
-    String originalNoSym = "abcxyz";
+    String original = "def$8JKL \t";
+    String originalNoSym = "defjkl";
     Pattern pattern = Pattern.compile("[a-z]{3}+\\$8[A-Z]{3} \t");
     String result = provider.mask(original);
     System.out.println(original + " -> " + result);
@@ -363,6 +368,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue("`" + result + "`", matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("ghl$8NKM \t", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -371,10 +378,9 @@ public class FPEMaskingProviderTest {
     StringBuilder buffer = new StringBuilder(originalNoSym.length());
     buffer.append(result.substring(0, 3));
     buffer.append(result.substring(5, 8));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 26);
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.LOWER.value());
     // recapitalization from original as desired
-    assertEquals(originalNoSym, FPEDriverBase.shiftBase26ToLetters(
-        cipher.decrypt(FPEDriverBase.shiftLettersToBase26(buffer.toString().toLowerCase()))));
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
   }
 
   @Test
@@ -384,8 +390,8 @@ public class FPEMaskingProviderTest {
     config.setKey("11111111222222223333333344444444");
     config.setTweak("aaaabbbbccccdddd");
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
-    String original = "A#0123456789#abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
-    String originalNoSym = "0123456789abcdefghijklmnopqrstuvwxyz";
+    String original = "A#9876543210#abc-def-ghi-jkl-mno-pqr-stu-vwx-yzZ";
+    String originalNoSym = "9876543210abcdefghijklmnopqrstuvwxyz";
     Pattern pattern = Pattern.compile(
         "A#[0-9a-z]{10}+#[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{3}-[0-9a-z]{2}Z");
     String result = provider.mask(original);
@@ -394,6 +400,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("A#8hwyecapjs#jmz-dru-t2u-zl2-tp1-yg7-slo-7o4-qzZ", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -410,7 +418,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(37, 40));
     buffer.append(result.substring(41, 44));
     buffer.append(result.substring(45, 47));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    FF3Cipher cipher =
+        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_LOWER.value());
     assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
@@ -431,6 +440,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("#aWXDQSQH7NM#V9C-940-CE3-3RG-4X8-XK8-E2A-DPY-E2z", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -447,8 +458,9 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(37, 40));
     buffer.append(result.substring(41, 44));
     buffer.append(result.substring(45, 47));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
-    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()).toUpperCase());
+    FF3Cipher cipher =
+        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_UPPER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -468,6 +480,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@wxdqsqh7nm#v9c-940-ce3-3rg-4x8-xk8-e2a-dpy-e2@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -484,8 +498,9 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(36, 39));
     buffer.append(result.substring(40, 43));
     buffer.append(result.substring(44, 46));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
-    assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
+    FF3Cipher cipher =
+        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_LOWER.value());
+    assertEquals(originalNoSym, cipher.decrypt(buffer.toString()));
   }
 
   @Test
@@ -505,6 +520,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@WXDQSQH7NM#V9C-940-CE3-3RG-4X8-XK8-E2A-DPY-E2@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -521,7 +538,8 @@ public class FPEMaskingProviderTest {
     buffer.append(result.substring(36, 39));
     buffer.append(result.substring(40, 43));
     buffer.append(result.substring(44, 46));
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 36);
+    FF3Cipher cipher =
+        new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS_LOWER.value());
     assertEquals(originalNoSym, cipher.decrypt(buffer.toString().toLowerCase()));
   }
 
@@ -541,6 +559,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@0123456789#zhl-MQD-luv-DRG-XCO-ZLO-SQU-wdb-QP@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -566,6 +586,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("brp-123-CXG-yu-FF", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -614,6 +636,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("@2482145309#zhl-MQD-luv-DRG-XCO-ZLO-SQU-wdb-QP@", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -639,6 +663,8 @@ public class FPEMaskingProviderTest {
     assertEquals(original.length(), result.length());
     Matcher matcher = pattern.matcher(result);
     assertTrue(result, matcher.matches());
+    // result with same keys should always be the same
+    assertEquals("brp-837-CXG-yu-581-FF", result);
     // verify repeatable
     for (int i = 0; i < 3; i++) {
       assertEquals(result, provider.mask(original));
@@ -847,18 +873,63 @@ public class FPEMaskingProviderTest {
     FPEMaskingProvider provider = new FPEMaskingProvider(config);
     HashSet<String> set = new HashSet<>(1600000);
     int originalLength = 7;
-    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), 10);
-    String original;
+    FF3Cipher cipher = new FF3Cipher(config.getKey(), config.getTweak(), Radix.DIGITS.value());
+    String original = null;
+    String result = null;
 
-    for (int i = 0; i <= 1000000; i++) {
+    long start = System.currentTimeMillis();
+    for (int i = 0; i < 1000000; i++) {
       original = String.format("%07d", i);
-      String result = provider.mask(original);
+      result = provider.mask(original);
       // expected length
       assertEquals(originalLength, result.length());
       // unique
       assertTrue(set.add(result));
       // reverses
       assertEquals(original, cipher.decrypt(result));
+    }
+    long end = System.currentTimeMillis();
+    System.out.println("duration = " + ((end - start) / 1000.0) + " sec");
+    System.out.println("last = " + original + " <-> " + result);
+    System.out.println(set.size() + " values");
+  }
+
+  @Test
+  @Ignore("Long running test, not routinely required")
+  public void testEngine2() throws Exception {
+    FPEMaskingProviderConfig config = new FPEMaskingProviderConfig();
+    config.setInputType(UsageType.LETTERS_UPPER);
+    config.setKey("aaaabbbbccccdddd11111111222222223333333344444444aaaabbbbccccdddd");
+    config.setTweak("aaaabbbbccccdddd");
+    config.setPadding(Pad.NONE);
+    FPEMaskingProvider provider = new FPEMaskingProvider(config);
+    HashSet<String> set = new HashSet<>(1600000);
+    int originalLength = 7;
+    StringBuilder original = new StringBuilder("AAAAAAA");
+    String result = null;
+
+    long start = System.currentTimeMillis();
+    for (int i = 0; i < 1000000; i++) {
+      inc(original, 0);
+      result = provider.mask(original.toString());
+      // expected length
+      assertEquals(originalLength, result.length());
+      // unique
+      assertTrue(set.add(result));
+    }
+    long end = System.currentTimeMillis();
+    System.out.println("duration = " + ((end - start) / 1000.0) + " sec");
+    System.out.println("last = " + original + " <-> " + result);
+    System.out.println(set.size() + " values");
+  }
+
+  private void inc(StringBuilder original, int position) {
+    char ch = original.charAt(position);
+    if (ch == 'Z') {
+      original.setCharAt(position, 'A');
+      inc(original, position + 1);
+    } else {
+      original.setCharAt(position, (char) (ch + 1));
     }
   }
 }

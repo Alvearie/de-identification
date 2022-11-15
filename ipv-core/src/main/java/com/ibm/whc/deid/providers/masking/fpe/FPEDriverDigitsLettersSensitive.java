@@ -25,7 +25,7 @@ public class FPEDriverDigitsLettersSensitive extends FPEDriverLettersSensitive {
     PositionManager posMgr = new PositionManager(in);
 
     String lowerResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.LOWER);
-    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.UPPER);
+    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.UPPER, CharType.UPPER);
     String digitsResult = getEncryptedChars(key, tweak, posMgr, Radix.DIGITS, CharType.DIGIT);
 
 

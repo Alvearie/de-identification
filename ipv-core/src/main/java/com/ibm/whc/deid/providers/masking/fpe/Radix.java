@@ -14,24 +14,34 @@ public enum Radix {
   /**
    * Digits 0-9
    */
-  DIGITS(10, 6, 56, '0'),
+  DIGITS("0123456789", 6, 56, '0'),
 
   /**
    * lower case letters a-z
    */
-  LOWER(26, 5, 40, 'a'),
+  LOWER("abcdefghijklmnopqrstuvwxyz", 5, 40, 'a'),
 
   /**
    * Digits 0-9 and lower case letters a-z
    */
-  DIGITS_LOWER(36, 4, 36, 'a');
+  DIGITS_LOWER("0123456789abcdefghijklmnopqrstuvwxyz", 4, 36, 'a'),
 
-  private final int value;
+  /**
+   * lower case letters A-Z
+   */
+  UPPER("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 5, 40, 'A'),
+
+  /**
+   * Digits 0-9 and upper case letters A-Z
+   */
+  DIGITS_UPPER("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 4, 36, 'a');
+
+  private final String value;
   private final int minchars;
   private final int maxchars;
   private final char padchar;
 
-  private Radix(int val, int min, int max, char pad) {
+  private Radix(String val, int min, int max, char pad) {
     value = val;
     minchars = min;
     maxchars = max;
@@ -42,7 +52,7 @@ public enum Radix {
    * 
    * @return the number of different characters that are recognized and encrypted
    */
-  public int value() {
+  public String value() {
     return value;
   }
 

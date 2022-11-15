@@ -5,7 +5,6 @@
  */
 package com.ibm.whc.deid.providers.masking.fpe;
 
-import java.util.Locale;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.CharType;
 import com.ibm.whc.deid.providers.masking.fpe.PositionManager.Position;
 import com.ibm.whc.deid.shared.pojo.config.masking.FPEMaskingProviderConfig.Pad;
@@ -26,7 +25,7 @@ public class FPEDriverLettersSensitive extends FPEDriverBase {
     PositionManager posMgr = new PositionManager(in);
 
     String lowerResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.LOWER);
-    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.LOWER, CharType.UPPER);
+    String upperResult = getEncryptedChars(key, tweak, posMgr, Radix.UPPER, CharType.UPPER);
 
     int lowerResultIndex = 0;
     int upperResultIndex = 0;
@@ -67,20 +66,7 @@ public class FPEDriverLettersSensitive extends FPEDriverBase {
         throw new UnsupportedLengthException(input.length(), radix.getMinStringLength(),
             radix.getMaxStringLength());
       }
-
-      if (charType == CharType.UPPER) {
-        input = input.toLowerCase(Locale.US);
-      }
-      if (charType == CharType.LOWER || charType == CharType.UPPER) {
-        input = shiftLettersToBase26(input);
-      }
       result = encrypt(input, key, tweak, radix);
-      if (charType == CharType.LOWER || charType == CharType.UPPER) {
-        result = shiftBase26ToLetters(result);
-      }
-      if (charType == CharType.UPPER) {
-        result = result.toUpperCase(Locale.US);
-      }
     }
     return result;
   }
