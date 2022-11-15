@@ -17,7 +17,7 @@ public enum Radix {
   DIGITS("0123456789", 6, 56, '0'),
 
   /**
-   * lower case letters a-z
+   * Lower case letters a-z
    */
   LOWER("abcdefghijklmnopqrstuvwxyz", 5, 40, 'a'),
 
@@ -27,7 +27,7 @@ public enum Radix {
   DIGITS_LOWER("0123456789abcdefghijklmnopqrstuvwxyz", 4, 36, 'a'),
 
   /**
-   * lower case letters A-Z
+   * Upper case letters A-Z
    */
   UPPER("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 5, 40, 'A'),
 
