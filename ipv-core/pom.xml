@@ -132,7 +132,7 @@
 		<dependency>
     		<groupId>io.github.mysto</groupId>
 		    <artifactId>ff3</artifactId>
-   			<version>1.0.1</version>
+   			<version>${ff3.version}</version>
 		</dependency>        
 	</dependencies>
 </project>
