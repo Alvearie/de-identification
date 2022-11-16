@@ -34,7 +34,7 @@ public class AddressIdentifier extends AbstractIdentifier {
   Pattern firstPartPattern =
       Pattern.compile("^(?<number>\\d+){0,1}\\s*(?<street>(([\\w|\\d]+)\\s*)+)");
   Pattern secondPartPattern = Pattern.compile(
-      ",\\s*(?<cityorstate>(([\\p{L}0-9\\u0327\\u0331.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*\\s*)+){0,1}(,\\s+(?<country>\\w+(\\s+\\w+)*)\\s*){0,1}",
+      ",\\s*(?<cityorstate>(([\\p{L}\\u0327\\u0331.()'‘’/-]+)[\\s]+)+)(?<postal>([A-Z]*\\d+[A-Z]*(\\s+[A-Z]*\\d+[A-Z]*)*\\s*)){0,1}(,\\s+(?<country>\\w+(\\s+\\w+)*)\\s*){0,1}",
       Pattern.UNICODE_CHARACTER_CLASS);
 
   /**
@@ -53,21 +53,30 @@ public class AddressIdentifier extends AbstractIdentifier {
     return ProviderType.ADDRESS;
   }
 
-  private Address tryParsePOBOX(String key) {
+  /**
+   * If the given address string starts with a post office box number, update the given address
+   * accordingly and return the offset of the last character matched.
+   * 
+   * @param key the address string to examine
+   * 
+   * @param address the address that will be updated in place if a post office box number is found
+   * 
+   * @return the offset of the last character matched in the address by the post office box search
+   *         or -1 if no post office box number was found.
+   */
+  private int tryParsePOBOX(String key, Address address) {
     if (key.startsWith("PO ") || key.startsWith("P.O. ")) {
       for (Pattern p : poBoxPatterns) {
         Matcher m = p.matcher(key);
-        if (m.matches()) {
-          String poboxnumber = m.group("poboxnumber");
-          Address address = new Address();
+        if (m.find()) {
+          String pobox = m.group("poboxnumber");
           address.setPoBox(true);
-          address.setPoBoxNumber(poboxnumber);
-          return address;
+          address.setPoBoxNumber(pobox);
+          return m.end();
         }
       }
     }
-
-    return null;
+    return -1;
   }
 
   /**
@@ -80,58 +89,64 @@ public class AddressIdentifier extends AbstractIdentifier {
     // String key = removeDiacriticalMarks(data.trim()).toUpperCase();
     String key = data.toUpperCase();
 
-    Address address = tryParsePOBOX(key);
-    if (address != null) {
-      return address;
-    }
+    Address address = new Address();
 
-    Matcher roadtypeMatch = roadTypePattern.matcher(key);
+    int secondPartStart = tryParsePOBOX(key, address);
+    if (secondPartStart == -1) {
+      Matcher roadtypeMatch = roadTypePattern.matcher(key);
 
-    int roadtypeMatchOffset = -1;
-    int roadtypeMatchEnd = -1;
-    String roadType = null;
-    int startRoadTypeSearchIndex = 0;
+      int roadtypeMatchOffset = -1;
+      int roadtypeMatchEnd = -1;
+      String roadType = null;
+      int startRoadTypeSearchIndex = 0;
 
-    while (roadtypeMatch.find(startRoadTypeSearchIndex)) {
-      roadtypeMatchOffset = roadtypeMatch.start();
-      roadtypeMatchEnd = roadtypeMatch.end();
-      roadType = roadtypeMatch.group("roadtype").trim();
-      // if EOL, stop
-      if (roadtypeMatchEnd == key.length()) {
-        break;
-      }
-      // if ends with comma, backup next match to start at comma and
-      // stop looking for road type names
-      if (key.charAt(roadtypeMatchEnd - 1) == ',') {
+      while (roadtypeMatch.find(startRoadTypeSearchIndex)) {
+        roadtypeMatchOffset = roadtypeMatch.start();
+        roadtypeMatchEnd = roadtypeMatch.end();
+        roadType = roadtypeMatch.group("roadtype").trim();
+        // if EOL, stop
+        if (roadtypeMatchEnd == key.length()) {
+          break;
+        }
+        // if ends with comma, backup next match to start at comma and
+        // stop looking for road type names
+        if (key.charAt(roadtypeMatchEnd - 1) == ',') {
+          roadtypeMatchEnd--;
+          break;
+        }
+        // otherwise, backup next match one char to start at whitespace
         roadtypeMatchEnd--;
-        break;
+        startRoadTypeSearchIndex = roadtypeMatchEnd;
       }
-      // otherwise, backup next match one char to start at whitespace
-      roadtypeMatchEnd--;
-      startRoadTypeSearchIndex = roadtypeMatchEnd;
-    }
 
-    if (roadtypeMatchOffset < 5) {
-      return null;
-    }
+      if (roadtypeMatchOffset < 5) {
+        return null;
+      }
 
-    Matcher firstPartMatch = firstPartPattern.matcher(key.substring(0, roadtypeMatchOffset));
-    if (!firstPartMatch.find()) {
-      return null;
-    }
+      Matcher firstPartMatch = firstPartPattern.matcher(key.substring(0, roadtypeMatchOffset));
+      if (!firstPartMatch.find()) {
+        return null;
+      }
 
-    String number = firstPartMatch.group("number");
-    if (number == null) {
-      number = "";
-    }
+      String number = firstPartMatch.group("number");
+      if (number == null) {
+        number = "";
+      }
 
-    String street = firstPartMatch.group("street").trim();
+      String street = firstPartMatch.group("street").trim();
+
+      address.setRoadType(roadType);
+      address.setNumber(number);
+      address.setName(street);
+
+      secondPartStart = roadtypeMatchEnd;
+    }
 
     String cityOrState;
     String postal;
     String country;
 
-    Matcher secondPartMatch = secondPartPattern.matcher(key.substring(roadtypeMatchEnd));
+    Matcher secondPartMatch = secondPartPattern.matcher(key.substring(secondPartStart));
     if (!secondPartMatch.matches()) {
       cityOrState = "";
       postal = "";
@@ -150,11 +165,6 @@ public class AddressIdentifier extends AbstractIdentifier {
       }
     }
 
-    address = new Address();
-
-    address.setRoadType(roadType);
-    address.setNumber(number);
-    address.setName(street);
     address.setCityOrState(cityOrState);
     address.setPostalCode(postal.trim());
     address.setCountry(country.trim());

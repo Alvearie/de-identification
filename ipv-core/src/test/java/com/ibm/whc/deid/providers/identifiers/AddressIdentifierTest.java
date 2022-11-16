@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,7 +8,10 @@ package com.ibm.whc.deid.providers.identifiers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.Ignore;
 import org.junit.Test;
 import com.ibm.whc.deid.models.Address;
@@ -19,28 +22,35 @@ import com.ibm.whc.deid.util.ManagerFactory;
 import com.ibm.whc.deid.util.localization.LocalizationManager;
 
 public class AddressIdentifierTest {
+
   @Test
   public void testIsOfThisType() throws Exception {
     AddressIdentifier identifier = new AddressIdentifier();
 
-    /*
-     * WIP : (\d+\s){0,1}(?<street>(\w+\s*)+)[St.|Street|Road|Rd.|Avenue|Av.| Drive|
-     * Dr.|Boulevard|Blvd.|Court|Ct.]\s*(?<citystate>([A-Za-z]+\s*)*)(?
-     * <zip>\d+)\s*(?<country>[A-Za-z]+)*
-     */
-
-    String[] validAddresses = {"200 E Main St, Phoenix AZ 85123, USA",
-        "200 E Main St., Phoenix AZ 85123, USA", "200 Main Street, Phoenix AZ 85123, USA",
-        "200 Main Boulevard, Phoenix AZ 85123, USA", "200 Main Blvd, Phoenix AZ 85123, USA",
-        "200 Main Blvd., Phoenix AZ 85123, USA", "200 Main Drive, Phoenix AZ 85123, USA",
-        "200 Main Dr., Phoenix AZ 85123, USA", "200 Main Court, Phoenix AZ 85123, USA",
-        "200 Main Ct., Phoenix AZ 85123, USA", "300 Bolyston Ave, Seattle WA 98102",
-        "300 Bolyston Avenue, Seattle WA 98102", "300 Bolyston Ave., Seattle WA 98102",
+    //@formatter:off
+    String[] validAddresses = {
+        "200 E Main St, Phoenix AZ 85123, USA",
+        "200 E Main St., Phoenix AZ 85123, USA", 
+        "200 Main Street, Phoenix AZ 85123, USA",
+        "200 Main Boulevard, Phoenix AZ 85123, USA", 
+        "200 Main Blvd, Phoenix AZ 85123, USA",
+        "200 Main Blvd., Phoenix AZ 85123, USA", 
+        "200 Main Drive, Phoenix AZ 85123, USA",
+        "200 Main Dr., Phoenix AZ 85123, USA", 
+        "200 Main Court, Phoenix AZ 85123, USA",
+        "200 Main Ct., Phoenix AZ 85123, USA", 
+        "300 Bolyston Ave, Seattle WA 98102",
+        "300 Bolyston Avenue, Seattle WA 98102", 
+        "300 Bolyston Ave., Seattle WA 98102",
         "Hammersmith Bridge Road, London W6 9EJ, United Kingdom",
-        "Hammersmith Bridge Road, London W6 9EJ", "20 Rock Road, Blackrock Co. Dublin 15, Ireland",
+        "Hammersmith Bridge Road, London W6 9EJ",
+        "20 Rock Road, Blackrock Co. Dublin 15, Ireland",
         "20 Rock Road, Blackrock Co. Dublin 15",
         // "191 E MAIN BOULEVARD, QĀ’EM SHAHR 85241, LTU",
-        "2505 SACKETT RUN RD", "1022 WOODLAND AVE", "P.O. BOX 334", "PO BOX 297"};
+        "2505 SACKETT RUN RD", "1022 WOODLAND AVE", 
+        "P.O. BOX 334", 
+        "PO BOX 297"};
+    //@formatter:on
 
     for (String address : validAddresses) {
       assertTrue(identifier.isOfThisType(address));
@@ -49,37 +59,50 @@ public class AddressIdentifierTest {
 
   @Test
   public void testParseAddress() throws Exception {
-    String addressName = "200 E Main St, Phoenix AZ 85123, USA";
     AddressIdentifier identifier = new AddressIdentifier();
 
+    String addressName = "200 E Main St, Phoenix AZ 85123, USA";
     Address address = identifier.parseAddress(addressName);
     assertEquals("200", address.getNumber());
-    assertTrue(address.getName().equals("E MAIN"));
-    assertTrue(address.getRoadType().equals("ST"));
-    assertTrue(address.getCityOrState().equals("PHOENIX AZ"));
-    assertTrue(address.getPostalCode().equals("85123"));
-    assertTrue(address.getCountry().equals("USA"));
+    assertEquals("E MAIN", address.getName());
+    assertEquals("ST", address.getRoadType());
+    assertEquals("PHOENIX AZ", address.getCityOrState());
+    assertEquals("85123", address.getPostalCode());
+    assertEquals("USA", address.getCountry());
+    assertFalse(address.isPOBox());
 
     addressName = "Hammersmith Bridge Road, London W6 9EJ";
     address = identifier.parseAddress(addressName);
-    assertTrue(address.getNumber().equals(""));
-    assertTrue(address.getCountry().equals(""));
+    assertEquals("", address.getNumber());
+    assertEquals("HAMMERSMITH BRIDGE", address.getName());
+    assertEquals("ROAD", address.getRoadType());
+    assertEquals("LONDON", address.getCityOrState());
+    assertEquals("W6 9EJ", address.getPostalCode());
+    assertEquals("", address.getCountry());
+    assertFalse(address.isPOBox());
 
     // address without city and country
     addressName = "200 E Main St";
     address = identifier.parseAddress(addressName);
-    assertTrue(address.getNumber().equals("200"));
-    assertTrue(address.getName().equals("E MAIN"));
-    assertTrue(address.getRoadType().equals("ST"));
-    assertTrue(address.getCityOrState().equals(""));
-    assertTrue(address.getPostalCode().equals(""));
-    assertTrue(address.getCountry().equals(""));
+    assertEquals("200", address.getNumber());
+    assertEquals("E MAIN", address.getName());
+    assertEquals("ST", address.getRoadType());
+    assertEquals("", address.getCityOrState());
+    assertEquals("", address.getPostalCode());
+    assertEquals("", address.getCountry());
+    assertFalse(address.isPOBox());
 
     // PO BOX case
-    addressName = "PO BOX 777";
+    addressName = "PO BOX 946, Hope ND 58046";
     address = identifier.parseAddress(addressName);
+    assertNull(address.getNumber());
+    assertNull(address.getName());
+    assertNull(address.getRoadType());
+    assertEquals("HOPE ND", address.getCityOrState());
+    assertEquals("58046", address.getPostalCode());
+    assertEquals("", address.getCountry());
     assertTrue(address.isPOBox());
-    assertTrue(address.getPoBoxNumber().equals("777"));
+    assertEquals("946", address.getPoBoxNumber());
   }
 
   @Test
@@ -88,21 +111,26 @@ public class AddressIdentifierTest {
     CityManager cityResourceManager = (CityManager) ManagerFactory.getInstance().getManager("test",
         Resource.CITY, null, LocalizationManager.DEFAULT_LOCALIZATION_PROPERTIES);
     StringBuilder buffer = new StringBuilder(100);
+    Pattern hasNumber = Pattern.compile("[0-9]");
 
     for (City city : cityResourceManager.getValues()) {
       String name = city.getName();
-      buffer.setLength(0);
-      buffer.append("200 E Main St, ").append(name).append(" 85123, USA");
-      String addr = buffer.toString();
+      // skip cities with numbers in their name, such as the sectors of Bucharest
+      Matcher m = hasNumber.matcher(name);
+      if (!m.find()) {
+        buffer.setLength(0);
+        buffer.append("200 E Main St, ").append(name).append(" 85123, USA");
+        String addr = buffer.toString();
 
-      Address address = identifier.parseAddress(addr);
-      assertNotNull(address);
-      assertEquals("200", address.getNumber());
-      assertEquals("E MAIN", address.getName());
-      assertEquals("ST", address.getRoadType());
-      assertEquals(name.toUpperCase(), address.getCityOrState());
-      assertEquals("85123", address.getPostalCode());
-      assertEquals("USA", address.getCountry());
+        Address address = identifier.parseAddress(addr);
+        assertNotNull(address);
+        assertEquals("200", address.getNumber());
+        assertEquals("E MAIN", address.getName());
+        assertEquals("ST", address.getRoadType());
+        assertEquals(name.toUpperCase(), address.getCityOrState());
+        assertEquals("85123", address.getPostalCode());
+        assertEquals("USA", address.getCountry());
+      }
     }
   }
 
