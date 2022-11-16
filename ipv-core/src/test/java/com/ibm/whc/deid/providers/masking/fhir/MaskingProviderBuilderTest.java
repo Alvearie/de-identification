@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -723,13 +723,13 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testArrayMaskHash_ValuesList() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/fhir/Group/array[{0,2}]", hashRuleName);
+    groupMaskConf.put("/fhir/Group/array[{0,11}]", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
 
-    JsonNode group = new ObjectMapper()
-        .readTree(this.getClass().getResourceAsStream("/fhir/examples/group-example-array.json"));
+    JsonNode group = new ObjectMapper().readTree(
+        this.getClass().getResourceAsStream("/fhir/examples/group-example-array-long.json"));
 
     DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
     testMaskingConfig = addRules(testMaskingConfig);
@@ -743,10 +743,13 @@ public class MaskingProviderBuilderTest {
     String maskedExpect0 = "FD601A88D32FF3CC5FD5508E617841F6FBAADDDFE5B21241F1CF9AC3F80BF272";
     String maskedExpect2 = "0537D481F73A757334328052DA3AF9626CED97028E20B849F6115C22CD765197";
     assertEquals(maskedExpect0, maskedValue.get("array").get(0).asText());
-    assertEquals(maskedExpect2, maskedValue.get("array").get(2).asText());
+    assertEquals(maskedExpect2, maskedValue.get("array").get(11).asText());
 
     // Check that the other values are unchanged
-    assertEquals("value1", maskedValue.get("array").get(1).asText());
+    for (int i = 1; i <= 10; i++) {
+      assertEquals("value1", maskedValue.get("array").get(i).asText());
+    }
+    assertEquals("value1", maskedValue.get("array").get(12).asText());
   }
 
   @Test

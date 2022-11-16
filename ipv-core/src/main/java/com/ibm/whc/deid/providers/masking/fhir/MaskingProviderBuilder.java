@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2022
+ * © Merative US L.P. 2016, 2022
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -507,7 +507,7 @@ public class MaskingProviderBuilder implements Serializable {
 
           // If a list of indices is provided
           // e.g.: array[{1,3,5,17}]
-          else if (arrayIndex.matches("(\\{)([0-9]+,?)+(\\})")) {
+          else if (arrayIndex.matches("\\{([0-9]+)(,[0-9]+)*,?\\}")) {
             // Get rid of { and }
             arrayIndex = arrayIndex.substring(1, arrayIndex.length() - 1);
             // Split the list by comma
