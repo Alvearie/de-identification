@@ -1,5 +1,5 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-NON-IBM-LICENSE FOR De-id data files
+NON-MERATIVE-LICENSE FOR De-identification data files
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -52,9 +52,9 @@ ipv-core/src/main/resources/identifier/common/tacdb.txt
 (http://tacdb.osmocom.org/)
 
 
-END OF CREATIVE COMMONS ATTRIBUTION SHARE ALIKE 3.0 GENERIC NON-IBM-LICENSE
+END OF CREATIVE COMMONS ATTRIBUTION SHARE ALIKE 3.0 GENERIC
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-END OF NON-IBM-LICENSE FILE
+END OF NON-MERATIVE-LICENSE FILE
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
