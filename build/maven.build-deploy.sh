@@ -32,6 +32,7 @@ fi
 # If the branch is not master, include branch name in the version.
 RELEASE_VERSION=1.2.0
 RELEASE_BUILD=false
+mkdir -p .mvn
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 if [ "$GIT_BRANCH" == "master" ]; then
     echo "-Drevision=${RELEASE_VERSION}${JAVA_RELEASE}-SNAPSHOT" > .mvn/maven.config

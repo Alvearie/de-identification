@@ -10,6 +10,13 @@
 		<version>${revision}</version>
 	</parent>
 
+    <licenses>
+      <license>
+        <name>Apache-2.0</name>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+    </licenses>
+
 	<properties>
 		<springfox-version>2.7.0</springfox-version>
 		<dockerfile-maven-plugin.version>1.4.4</dockerfile-maven-plugin.version>
