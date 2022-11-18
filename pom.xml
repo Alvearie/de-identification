@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<properties>
-		<revision>1.2.0-SNAPSHOT</revision>
+		<revision>1.3.0-SNAPSHOT</revision>
 		<!-- see org.springframework.boot:spring-boot-dependencies for additional managed dependency versions -->
 		<mockito.version>1.10.19</mockito.version>
 		<commons-csv.version>1.8</commons-csv.version>
