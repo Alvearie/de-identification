@@ -52,8 +52,9 @@ jobs:
       with:
         ref: ${{ github.event.inputs.tagOrRef }}
     - name: Set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
+        distribution: "temurin"
         java-version: 11
     - name: Build with Maven
       run: mvn -B package --file pom.xml
