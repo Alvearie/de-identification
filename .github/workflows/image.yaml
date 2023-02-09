@@ -73,7 +73,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    #TODO uncomment
-    #- name: Push Docker Images
-    #  run: |
-    #    docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
+    - name: Push Docker Images
+      run: |
+        docker push alvearie/deid:${{ steps.release_info.outputs.SOURCE_TAG }}
