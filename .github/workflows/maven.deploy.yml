@@ -43,29 +43,30 @@ jobs:
            # use event source branch (default)
            checkout_branch=''
         fi        
-        echo ::set-output name=CHECKOUT_BRANCH::${checkout_branch}
+        echo "CHECKOUT_BRANCH=${checkout_branch}" >> $GITHUB_OUTPUT
         # check for jar publish
         if [ ! -z ${{ github.event.inputs.save-jars }} ]; then
            deploy=${{ github.event.inputs.save-jars }}
         else
            deploy="true"
         fi           
-        echo ::set-output name=DEPLOY::${deploy}
+        echo "DEPLOY=${deploy}" >> $GITHUB_OUTPUT
         # check for Java 8 build
         if [ ! -z ${{ github.event.inputs.java8 }} ]; then
            java8=${{ github.event.inputs.java8 }}
         else
            java8="true"
         fi           
-        echo ::set-output name=JAVA8::${java8}
+        echo "JAVA8=${java8}" >> $GITHUB_OUTPUT
                 
     - uses: actions/checkout@v2
       with:
         ref: ${{ steps.job_info.outputs.CHECKOUT_BRANCH }}
 
     - name: Set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
+        distribution: "temurin"
         java-version: 11
    
     - name: Maven Build and Deploy
