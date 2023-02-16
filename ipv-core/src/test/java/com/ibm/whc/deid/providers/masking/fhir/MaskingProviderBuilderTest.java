@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -443,7 +444,7 @@ public class MaskingProviderBuilderTest {
   public void testBasicMaskDateDependency() throws Exception {
     String dateDependencyRuleName = "dateDependency";
     Map<String, String> patientMaskConf = new HashMap<>();
-    patientMaskConf.put("/birthDate", dateDependencyRuleName);
+    patientMaskConf.put("/fhir/Patient/birthDate", dateDependencyRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Patient", patientMaskConf);
@@ -856,7 +857,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayHash_Index11() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[1]/extension[1]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[1]/extension[1]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -889,9 +890,29 @@ public class MaskingProviderBuilderTest {
   }
 
   @Test
-  public void testNestedArrayMaskHash_Index1N() throws Exception {
+  public void testInvalidRulePath() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
     groupMaskConf.put("/extension[1]/extension[*]/valueString", hashRuleName);
+
+    FHIRResourceMaskingConfiguration resourceConfiguration =
+        new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
+
+    DeidMaskingConfig testMaskingConfig = (new ConfigGenerator()).getTestDeidConfig();
+    testMaskingConfig = addRules(testMaskingConfig);
+
+    try {
+      new TestMaskingProviderBuilder(resourceConfiguration, testMaskingConfig, defNoRuleRes,
+          maskingProviderFactory, tenantId);
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      assertEquals("unexpected path in rule", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testNestedArrayMaskHash_Index1N() throws Exception {
+    Map<String, String> groupMaskConf = new HashMap<>();
+    groupMaskConf.put("/fhir/Group/extension[1]/extension[*]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -928,7 +949,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayMaskRandom_Index1N() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[1]/extension[*]/valueString", randomRuleName);
+    groupMaskConf.put("/fhir/Group/extension[1]/extension[*]/valueString", randomRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -970,7 +991,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayMaskDate_Index1N() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[1]/extension[*]/valueDateTime", datetimeRuleName);
+    groupMaskConf.put("/fhir/Group/extension[1]/extension[*]/valueDateTime", datetimeRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -999,7 +1020,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayMaskHash_IndexN1() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[*]/extension[1]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[*]/extension[1]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1036,7 +1057,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayMaskHash_IndexNN() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[*]/extension[*]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[*]/extension[*]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1088,7 +1109,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testNestedArrayMaskHash_NoIndexN1() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension/extension[1]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension/extension[1]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1149,8 +1170,8 @@ public class MaskingProviderBuilderTest {
     // TEST A: Mask one index differently
 
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[*]/extension[0]/valueString", hashRuleName);
-    groupMaskConf.put("/extension[*]/extension[*]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[*]/extension[0]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[*]/extension[*]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1208,7 +1229,7 @@ public class MaskingProviderBuilderTest {
     // TEST A: Mask one index differently
 
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[*]/extension[0]/valueString", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[*]/extension[0]/valueString", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1703,7 +1724,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testArrayMaskHash_NoElementDefined() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/characteristic[1]", hashRuleName);
+    groupMaskConf.put("/fhir/Group/characteristic[1]", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1727,7 +1748,7 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testArrayMaskHash_NonArray() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/name[1]", hashRuleName);
+    groupMaskConf.put("/fhir/Group/name[1]", hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1751,7 +1772,8 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testArrayIndexWithArrayQuery_Valid() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension/extension/url(valueString==TestString.1.0)", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension/extension/url(valueString==TestString.1.0)",
+        hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
@@ -1775,7 +1797,8 @@ public class MaskingProviderBuilderTest {
   @Test
   public void testArrayIndexWithArrayQuery_InValid() throws Exception {
     Map<String, String> groupMaskConf = new HashMap<>();
-    groupMaskConf.put("/extension[1]/extension/url(valueString==TestString.1.0)", hashRuleName);
+    groupMaskConf.put("/fhir/Group/extension[1]/extension/url(valueString==TestString.1.0)",
+        hashRuleName);
 
     FHIRResourceMaskingConfiguration resourceConfiguration =
         new FHIRResourceMaskingConfiguration("/fhir/Group", groupMaskConf);
