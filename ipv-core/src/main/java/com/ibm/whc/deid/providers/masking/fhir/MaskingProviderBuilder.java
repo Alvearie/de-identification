@@ -132,7 +132,11 @@ public class MaskingProviderBuilder implements Serializable {
     for (FHIRResourceField field : fields) {
       String ruleName = field.getShortRuleName();
       String fullRuleName = prefix + ruleName;
-      String pathToIdentifier = field.getKey().replaceAll(basePath, "");
+      // safety check - should never occur
+      if (!field.getKey().startsWith(basePath)) {
+        throw new IllegalArgumentException("unexpected path in rule"); 
+      }
+      String pathToIdentifier = field.getKey().substring(basePath.length());
 
       checkIfValidPath(pathToIdentifier);
 
