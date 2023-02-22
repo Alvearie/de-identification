@@ -1,0 +1,29 @@
+name: JFrog XRay Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      target-branch:
+        description: 'Branch name'
+        required: true
+  push:
+    branches: [ release*, master ]
+
+jobs:
+  audit-job:
+    runs-on: ubuntu-latest
+    
+    steps:                
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.target-branch }}
+
+    - uses: actions/setup-python@v3
+      with:
+        python-version: "3.10.10"
+
+    - name: XRay Audit
+      run: |
+        curl -fL https://install-cli.jfrog.io | sh
+        printf '%s\n' yes no | jf c add "truvenhealth" --url https://artifactory.commops.truvenhealth.com --user ${{ secrets.ARTIFACTORY_USER }} --password ${{ secrets.ARTIFACTORY_KEY }}
+        jf audit --mvn --repo-path wh-de-id-maven-local --licenses
