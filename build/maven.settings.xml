@@ -26,14 +26,14 @@
 			<repositories>
                 <repository>
 					<id>central</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-maven-virtual</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-maven-virtual</url>
 					<snapshots>
 						<enabled>false</enabled>
 					</snapshots>
 				</repository>
 				<repository>
 					<id>snapshots</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-snapshot-maven-local</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-snapshot-maven-local</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>
@@ -43,7 +43,7 @@
 				</repository>
 				<repository>
 					<id>releases</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-release-maven-local</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-release-maven-local</url>
 					<snapshots>
 						<enabled>false</enabled>
 					</snapshots>
@@ -55,14 +55,14 @@
 			<pluginRepositories>
 				<pluginRepository>
 					<id>central</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-maven-virtual</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-maven-virtual</url>
 					<snapshots>
 						<enabled>false</enabled>
 					</snapshots>
 				</pluginRepository>
 				<pluginRepository>
 					<id>snapshots</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-snapshot-maven-local</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-snapshot-maven-local</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>
@@ -72,7 +72,7 @@
 				</pluginRepository>
 				<pluginRepository>
 					<id>releases</id>
-					<url>https://artifactory.commops.truvenhealth.com:443/artifactory/wh-de-id-release-maven-local</url>
+					<url>https://artifactory.commops.merative.com:443/artifactory/wh-de-id-release-maven-local</url>
 					<snapshots>
 						<enabled>false</enabled>
 					</snapshots>
