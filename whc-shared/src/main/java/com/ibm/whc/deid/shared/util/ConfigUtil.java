@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * © Merative US L.P. 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,7 +8,6 @@ package com.ibm.whc.deid.shared.util;
 import java.io.IOException;
 import java.io.InputStream;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.ibm.whc.deid.shared.exception.DeidException;
 import com.ibm.whc.deid.shared.pojo.config.DeidConfig;
 
@@ -18,19 +17,22 @@ import com.ibm.whc.deid.shared.pojo.config.DeidConfig;
 public class ConfigUtil {
 
   public static DeidConfig getDeidConfig() throws DeidException {
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    // use a plain object mapper -
+    // no special configuration is necessary for the simple json file
+    ObjectMapper mapper = new ObjectMapper();
     DeidConfig config;
 
-    try (InputStream is = ConfigUtil.class.getClassLoader().getResourceAsStream("deid.yaml")) {
+    // up through version 1.2.0, this file was a yaml file - deid.yaml
+    try (InputStream is = ConfigUtil.class.getClassLoader().getResourceAsStream("deid.config.json")) {
       if (is == null) {
-        return new DeidConfig();
+        config = new DeidConfig();
+      } else {
+        config = mapper.readValue(is, DeidConfig.class);
       }
-      config = mapper.readValue(is, DeidConfig.class);
     } catch (IOException e) {
       throw new DeidException("Unable to read the config file", e);
     }
-
+    
     return config;
   }
-
 }
