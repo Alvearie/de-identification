@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * © Merative US L.P. 2016,2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import java.lang.reflect.InvocationTargetException;
 import org.junit.Test;
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * © Merative US L.P. 2016,2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */

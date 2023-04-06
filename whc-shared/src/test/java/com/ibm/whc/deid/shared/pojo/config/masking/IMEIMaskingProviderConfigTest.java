@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2020
+ * © Merative US L.P. 2020
  *
  * SPDX-License-Identifier: Apache-2.0
  */

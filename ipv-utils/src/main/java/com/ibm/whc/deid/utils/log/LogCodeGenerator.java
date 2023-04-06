@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2021
+ * © Merative US L.P. 2016,2021
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -74,7 +74,7 @@ public class LogCodeGenerator {
   /** Generates log error codes for de-id */
   public static void generate(Properties properties, String filePath) {
     try (FileWriter aWriter = new FileWriter(filePath, true)) {
-      aWriter.write("/*\n" + " * (C) Copyright IBM Corp. 2016,2021\n" + " *\n"
+      aWriter.write("/*\n" + " * © Merative US L.P. 2016,2021\n" + " *\n"
           + " * SPDX-License-Identifier: Apache-2.0\n" + " */\n\n");
 
       aWriter.write("package com.ibm.whc.deid.utils.log;\n\n");
