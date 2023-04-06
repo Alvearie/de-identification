@@ -1690,7 +1690,13 @@ This provider has no configuration options.
           "maskingProviders": [
             {
               "type": "DATETIME",
-              "generalizeMonthyear": true
+              "generalizeMonthYear": true,
+			  "yearMask": false,
+			  "monthMask": false,
+			  "dayMask": false,
+			  "hourMask": false,
+			  "minuteMask": false,
+			  "secondMask": false              
             },
             {
               "type": "HASH"
@@ -1701,8 +1707,7 @@ This provider has no configuration options.
           "name": "EMAIL_RULE",
           "maskingProviders": [
             {
-              "type": "EMAIL",
-              "generalizeMonthyear": true
+              "type": "EMAIL"
             },
             {
               "type": "HASH"
