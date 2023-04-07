@@ -1,5 +1,5 @@
 /*
- * © Merative US L.P. 2016,2021
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,7 +22,7 @@ public class LatLonDistanceTest {
 
     List<City> locationList = new ArrayList<>();
 
-    City c1 = new City("IBM Campus", 53.4184439, -6.4165875, "en");
+    City c1 = new City("Technical Campus", 53.4184439, -6.4165875, "en");
     City c2 = new City("The Mayne, Clonee", 53.422235, -6.426072, "en");
     City cx1 = new City("unknown1, Clonee", null, "-6.426072", "en");
     City cx2 = new City("unknown2, Clonee", "53.422235", "", "en");
@@ -51,7 +51,7 @@ public class LatLonDistanceTest {
     });
 
     assertTrue(neighbors.get(0).getName().equals("Damastown Industrial Park"));
-    assertTrue(neighbors.get(1).getName().equals("IBM Campus"));
+    assertTrue(neighbors.get(1).getName().equals("Technical Campus"));
   }
 
   @Test
@@ -59,7 +59,7 @@ public class LatLonDistanceTest {
 
     List<City> locationList = new ArrayList<>();
 
-    City c1 = new City("IBM Campus", "  ", "-6.4165875", "en");
+    City c1 = new City("Technical Campus", "  ", "-6.4165875", "en");
     City c2 = new City("The Mayne, Clonee", "53.422235", null, "en");
     City c3 = new City("Damastown Industrial Park", null, "-6.412983", "en");
     City c4 = new City("Carlton Hotel Tyrrelstown", "53.419480", "", "en");

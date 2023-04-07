@@ -1,7 +1,7 @@
 # Masking Providers
 ## Overview
 
-To preserve utility in the data being de-identified, the IBM Data De-Identification service supports the following data protection methods:
+To preserve utility in the data being de-identified, the Data De-Identification service supports the following data protection methods:
 
 * [ADDRESS](#address)
 * [ATC](#atc)
@@ -1651,7 +1651,7 @@ This provider has no configuration options.
 
 ## Applying multiple data protection methods to the same data element
 
-   The IBM Data De-Identification Service supports the application of multiple data
+   The Data De-Identification Service supports the application of multiple data
    protection methods and rules to a data element. This is a
    powerful and useful feature, which works similarly to a UNIX pipe command,
    for example: ls –al \| grep ‘\^d’

@@ -1,5 +1,5 @@
 /*
- * © Merative US L.P. 2016,2021
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -22,12 +22,13 @@ import io.swagger.v3.oas.models.info.License;
 public class SwaggerConfiguration {
 
   Info info() {
-    return new Info().title("IBM Data De-Identification").description(
+    return new Info().title("Data De-Identification").description(
         "The Data De-Identification service provides a wide range of de-identification capabilities designed to support GDPR, HIPAA, CCPA and other privacy frameworks allowing customers to meet their regulatory and privacy requirements.")
         .license(new License().name("license")
             .url("https://github.com/Alvearie/de-identification/blob/master/LICENSE"))
         .version("1.3.0")
-        .contact(new Contact().name("IBM").url("https://github.com/Alvearie/de-identification"));
+        .contact(
+            new Contact().name("Merative").url("https://github.com/Alvearie/de-identification"));
   }
 
   @Bean

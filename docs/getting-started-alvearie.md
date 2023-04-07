@@ -3,7 +3,7 @@
 ## Installation
 
 ### Prerequisites
-   - The IBM® Data De-Identification server requires Java™ 11 or higher and has been tested with OpenJDK™ 11.  To install Java on your system, we recommend downloading and installing OpenJDK 11 from `https://adoptopenjdk.net/`.
+   - The Data De-Identification server requires Java™ 11 or higher and has been tested with OpenJDK™ 11.  To install Java on your system, we recommend downloading and installing OpenJDK 11 from `https://adoptopenjdk.net/`.
    - Apache® Maven™ is required to compile the server. It is downloadable as a compressed (zip) file from `https://maven.apache.org/download.cgi`. Only the binaries are required. Look for the link to either apache-maven-{version}-bin.zip or apache-maven-{version}-bin.tar.gz.
 
 ### Compilation
