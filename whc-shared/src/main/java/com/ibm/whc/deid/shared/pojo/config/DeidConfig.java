@@ -1,12 +1,12 @@
 /*
- * (C) Copyright IBM Corp. 2016,2020
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.shared.pojo.config;
 
 /*
- * A class that contains the de-identification configuration for Factory classes
+ * A class that contains the de-identification configuration for factory classes
  */
 public class DeidConfig {
   private String maskingProviderFactoryClass =
@@ -35,6 +35,10 @@ public class DeidConfig {
 
   public String getIdentifierFactoryClass() {
     return identifierFactoryClass;
+  }
+
+  public void setIdentifierFactoryClass(String identifierFactoryClass) {
+    this.identifierFactoryClass = identifierFactoryClass;
   }
 
   public String getObjectMapperUtilClass() {

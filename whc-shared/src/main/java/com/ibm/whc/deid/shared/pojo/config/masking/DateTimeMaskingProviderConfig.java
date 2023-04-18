@@ -1,5 +1,5 @@
 /*
- * (C) Copyright IBM Corp. 2016,2022
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -28,10 +28,11 @@ public class DateTimeMaskingProviderConfig extends MaskingProviderConfig {
   private static final long serialVersionUID = -2155188165694612384L;
 
   protected static final String TOO_MANY_FINAL_OPTIONS_ERROR =
-      "Only one of the following options may be true: maskShiftDate, "
-          + "generalizeWeekyear, generalizeMonthyear, generalizeQuarteryear, "
-          + "generalizeYear, yearDelete, generalizeYearMaskAgeOver90, "
-          + "generalizeMonthyearMaskAgeOver90, or one or more of these options: "
+      "Only one of the following options may be specified as `true` or allowed to default to `true`: "
+          + "maskShiftDate, "
+          + "generalizeWeekYear, generalizeMonthYear, generalizeQuarterYear, "
+          + "generalizeYear, generalizeDayMonth, generalizeYearMaskAgeOver90, "
+          + "generalizeMonthYearMaskAgeOver90, or one or more of these options: "
           + "yearMask, monthMask, dayMask, hourMask, minuteMask, secondMask.";
 
   private static final ConcurrentHashMap<String, DateTimeFormatter> dateTimeFormatterCache =

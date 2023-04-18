@@ -29,7 +29,13 @@
       "maskingProviders": [
         {
           "type": "DATETIME",
-          "generalizeYear": true
+          "generalizeYear": true,
+  		  "yearMask": false,
+		  "monthMask": false,
+  		  "dayMask": false,
+		  "hourMask": false,
+		  "minuteMask": false,
+		  "secondMask": false          
         }
       ]
     }
