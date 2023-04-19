@@ -1,5 +1,5 @@
 # Introduction to the Data De-Identification service configuration
-This topic describes how to configure the behavior of the IBM Data De-Identification service.
+This topic describes how to configure the behavior of the Data De-Identification service.
 
 ## Masking configuration options
 

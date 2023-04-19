@@ -1,18 +1,17 @@
 /*
- * © Merative US L.P. 2016,2021
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
 package com.ibm.whc.deid.utils.log;
 
 /**
- * Generated code. DO NOT edit manually. To add additional log codes, add them to
+ * Generated code. DO NOT edit manually. To add additional log codes, add them to:
  * 
- * <a href= "file:../resources/logCodes.properties">/resources/logCodes.properties</a>
+ * <a href="file:../resources/logCodes.properties">/resources/logCodes.properties</a>
  * 
- * and run mvn compile
- *
+ * This class is generated when LogCodeGeneratorTest.testMain() is executed
+ * either during build process or manually.
  */
 public interface LogCodes {
   public static final String WPH1000I = "WPH1000I";

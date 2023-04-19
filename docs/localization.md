@@ -1,6 +1,6 @@
 # Localization
 
-The IBM Data De-Identification service internally loads various CSV files to help with data masking or field type identification. The application comes with default values for the United States of America. If needed, you can change these values to meet the requirements of any country, region, or language. To this, the string data must conform to UTF-8 encoding standards. Follow the instructions in this topic.
+The Data De-Identification service internally loads various CSV files to help with data masking or field type identification. The application comes with default values for the United States of America. If needed, you can change these values to meet the requirements of any country, region, or language. To this, the string data must conform to UTF-8 encoding standards. Follow the instructions in this topic.
 
 ### Masking providers
 

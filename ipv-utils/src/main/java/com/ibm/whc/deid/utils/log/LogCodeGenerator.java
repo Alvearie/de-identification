@@ -1,21 +1,28 @@
 /*
- * © Merative US L.P. 2016,2021
+ * © Merative US L.P. 2016, 2023
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.ibm.whc.deid.utils.log;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.TreeSet;
 
+/**
+ * Produces a constants file for the message codes defined in the logCodes.properties file.
+ */
 public class LogCodeGenerator {
 
   protected static final String LOG_CODES_JAVA =
@@ -54,7 +61,7 @@ public class LogCodeGenerator {
     File logCodesJava = logCodes_class_file.toFile();
 
     if (logCodesJava.exists()) {
-      if (logCodesJava.delete() == Boolean.FALSE) {
+      if (!logCodesJava.delete()) {
         throw new IOException("Deletion of the old logCodes.properties file failed");
       }
     }
@@ -71,19 +78,21 @@ public class LogCodeGenerator {
     }
   }
 
-  /** Generates log error codes for de-id */
   public static void generate(Properties properties, String filePath) {
-    try (FileWriter aWriter = new FileWriter(filePath, true)) {
-      aWriter.write("/*\n" + " * © Merative US L.P. 2016,2021\n" + " *\n"
-          + " * SPDX-License-Identifier: Apache-2.0\n" + " */\n\n");
+    try (Writer aWriter = new BufferedWriter(
+        new OutputStreamWriter(new FileOutputStream(filePath, true), StandardCharsets.UTF_8))) {
+      aWriter.write("/*\n" + " * © Merative US L.P. 2016, 2023\n" + " *\n"
+          + " * SPDX-License-Identifier: Apache-2.0\n" + " */\n");
 
       aWriter.write("package com.ibm.whc.deid.utils.log;\n\n");
 
       aWriter.write("/**\n"
-          + " * Generated code. DO NOT edit manually. To add additional log codes, add them to\n"
+          + " * Generated code. DO NOT edit manually. To add additional log codes, add them to:\n"
           + " * \n"
-          + " * <a href= \"file:../resources/logCodes.properties\">/resources/logCodes.properties</a>\n"
-          + " * \n" + " * and run mvn compile\n" + " *\n" + " */\n");
+          + " * <a href=\"file:../resources/logCodes.properties\">/resources/logCodes.properties</a>\n"
+          + " * \n"
+          + " * This class is generated when LogCodeGeneratorTest.testMain() is executed\n"
+          + " * either during build process or manually.\n" + " */\n");
 
       aWriter.write("public interface LogCodes {\n");
 

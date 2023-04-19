@@ -14,7 +14,7 @@ type: application
 
 # This is the chart version.  It is normally changed when the chart or application changes.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.2.0
+version: 1.2.1
 
 keywords:
   - ibm
@@ -27,8 +27,8 @@ home: https://github.com/Alvearie/de-identification
 
 maintainers:
   - name: Jarrett Anderson
-    email: jarrett@us.ibm.com
+    email: janderson@merative.com
   - name: Dumas Hwang
-    email: dhwang@ca.ibm.com
+    email: dhwang@merative.com
   - name: Denis Ricard
-    email: dricard@ca.ibm.com
+    email: dricard@merative.com
