@@ -27,13 +27,13 @@ jobs:
       - name: Get changed charts (ct list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --chart-dirs de-identification-app --target-branch master)
+          changed=$(ct list-changed --chart-dirs de-identification-app --target-branch release-1.2.1)
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Lint charts (ct lint)
-        run: ct lint --chart-dirs de-identification-app --target-branch master --validate-maintainers=false --debug
+        run: ct lint --chart-dirs de-identification-app --target-branch release-1.2.1 --validate-maintainers=false --debug
 
       - name: Create 'kind' cluster
         uses: helm/kind-action@v1.4.0
