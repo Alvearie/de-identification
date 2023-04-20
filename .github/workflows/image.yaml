@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       tagOrRef:
-        decription: 'Release tag or branch reference'
+        description: 'Release tag or branch reference'
         required: true
   release:
-    types: [published, edited]
+    types: [published]
 
 jobs:
   build_push_img:
