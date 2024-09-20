@@ -37,7 +37,7 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
    */
   public static final String MASKING_CONFIG_FILE_ENV_VAR = "DEID_UDF_MASKING_CONFIG_FILE";
 
-  protected static final String AZURE_SYNAPSE_STORAGE_ACCOUNT_MOUNT_POINT = "/synfs";
+  protected static final String AZURE_SYNAPSE_STORAGE_ACCOUNT_MOUNT_POINT = "/synfs/notebook";
   protected static final Pattern jobIdPattern = Pattern.compile("\\d+");
 
   /**
@@ -47,11 +47,11 @@ public class DeIdSynapseUDF extends DeIdUDF implements UDF1<String, String> {
    * Function (UDF) will be executed.
    * 
    * Storage Account filesystems are always mounted on the Spark nodes under the directory
-   * /synfs/<job-id>, where <job-id> is the current notebook or pipeline job number in Synapse. This
+   * /synfs/notebook/<job-id>, where <job-id> is the current notebook or pipeline job number in Synapse. This
    * value is not known to the UDF, so the UDF will search for the target directory in all
    * directories in the filesystem that start with this path.
    * 
-   * After /synfs/<job-id>, the next component of the path is the mount point name given when the
+   * After /synfs/notebook/<job-id>, the next component of the path is the mount point name given when the
    * filesystem was mounted. Finally, the rest of the path is the path to the target directory
    * within the Storage Account filesystem itself.
    * 
