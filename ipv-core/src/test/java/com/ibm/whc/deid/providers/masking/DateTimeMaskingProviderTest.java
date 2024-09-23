@@ -11,13 +11,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.Year;
 import java.util.Locale;
 import java.util.TreeMap;
 import org.junit.Ignore;
@@ -1079,6 +1082,13 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
     assertEquals(String.format("%02d-%s-%d", 16, name.toLowerCase(), expectedYear), maskedDateTime);
   }
 
+  /**
+   * Test masking a date with a leap day and force it into a year
+   * without leap day to see if the code correctly adjust the day
+   * so that the date is still valid.
+   * 
+   * @throws Exception
+   */
   @Test
   public void testMaskMaxYears_OverMaxYears_leapyear() throws Exception {
     DateTimeMaskingProviderConfig maskingConfiguration = new DateTimeMaskingProviderConfig();
@@ -1090,18 +1100,19 @@ public class DateTimeMaskingProviderTest extends TestLogSetUp {
 
     String originalDate = LocalDateTime.of(1908, 2, 29, 13, 14, 15)
         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-    LocalDateTime currentDate = LocalDateTime.now();
-    int targetyear = currentDate.get(ChronoField.YEAR) - 52;
-    if (targetyear % 4 == 0 && (targetyear % 100 != 0 || targetyear % 400 == 0)) {
-      // targetyear is also a leap year, go back one more year
+
+    Year targetYear = Year.now().minus(Period.ofYears(52));
+    if (targetYear.isLeap()) {
+      // The target year is also a leap year, go back one more year to test the case
+      // where the target year does not have Feb 29th
       maskingConfiguration.setYearShiftFromCurrentYear(53);
+      targetYear = targetYear.minus(Period.ofYears(1));
     }
 
     DateTimeMaskingProvider maskingProvider = new DateTimeMaskingProvider(maskingConfiguration);
-
     String maskedDateTime = maskingProvider.mask(originalDate);
 
-    assertEquals("28-02-" + String.valueOf(targetyear) + " 13:14:15", maskedDateTime);
+    assertEquals("28-02-" + targetYear.toString() + " 13:14:15", maskedDateTime);
   }
 
   @Test

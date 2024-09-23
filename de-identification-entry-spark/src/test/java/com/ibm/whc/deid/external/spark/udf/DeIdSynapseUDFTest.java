@@ -221,6 +221,6 @@ public class DeIdSynapseUDFTest {
   @Test
   public void testMountPoint() {
     DeIdSynapseUDF udf = new DeIdSynapseUDF();
-    assertEquals("/synfs", udf.getSynapseMountPoint());
+    assertEquals("/synfs/notebook", udf.getSynapseMountPoint());
   }
 }
