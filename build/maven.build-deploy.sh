@@ -30,7 +30,7 @@ fi
 # If the branch is master, use the ${RELEASE_VERSION}-SNAPSHOT.
 # If the branch is a release branch, use the ${RELEASE_VERSION}.
 # If the branch is not master, include branch name in the version.
-RELEASE_VERSION=1.3.0
+RELEASE_VERSION=1.4.0
 RELEASE_BUILD=false
 mkdir -p .mvn
 GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
