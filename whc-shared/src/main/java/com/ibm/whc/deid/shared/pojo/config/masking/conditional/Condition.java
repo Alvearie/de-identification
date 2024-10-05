@@ -86,12 +86,17 @@ public class Condition {
         }
         offset++;
       }
-    } else {
-      if (value == null) {
-        throw new InvalidMaskingConfigurationException(
-            "`" + String.valueOf(parentName) + ".value` is missing");
-      }
     }
+
+    /**
+     * WHD-1930 commenting below code for supporting null value in CONDITIONAL
+     */
+    // else {
+    // if (value == null) {
+    // throw new InvalidMaskingConfigurationException(
+    // "`" + String.valueOf(parentName) + ".value` is missing");
+    // }
+    // }
   }
 
   // generated code
