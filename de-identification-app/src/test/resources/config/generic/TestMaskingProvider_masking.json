@@ -1,0 +1,667 @@
+{
+	
+	"rules": [
+		{
+                "name": "swiftRule",
+                "maskingProviders": [{
+                        "type": "SWIFT",
+                        "unexpectedInputHandling":"MESSAGE",
+                        "unexpectedInputReturnMessage": "unexpected"
+                    }
+                ]
+            }, {
+                "name": "cityRule",
+                "maskingProviders": [{
+                        "type": "CITY",
+                        "maskPseudorandom": false,
+                        "maskClosest": true,
+                        "maskClosestK": "10",
+                        "unexpectedInputHandling":"MESSAGE",
+                        "unexpectedInputReturnMessage": "unexpected"
+                    }
+                ]
+            }, {
+                "name": "continentRule",
+                "maskingProviders": [{
+                        "type": "CONTINENT",
+                        "maskClosest": false,
+                        "maskClosestK": "5",
+                        "unexpectedInputHandling":"RANDOM",
+                        "unexpectedInputReturnMessage": "unexpected"
+                    }
+                ]
+            }, {
+                "name": "countryRule",
+                "maskingProviders": [{
+                        "type": "COUNTRY"
+                    }
+                ]
+            }, {
+                "name": "icd9Rule",
+                "maskingProviders": [{
+                        "type": "ICDV9",
+                        "generalizeToChapter": false,
+                        "generalizeToCategory": false
+                    }
+                ]
+            }, {
+                "name": "icd10Rule",
+                "maskingProviders": [{
+                        "type": "ICDV10",
+                        "generalizeToChapter": false,
+                        "generalizeToCategory": false
+                    }
+                ]
+            }, {
+                "name": "maritalRule",
+                "maskingProviders": [{
+                        "type": "MARITAL",
+                        "unexpectedInputHandling":"MESSAGE",
+                        "unexpectedInputReturnMessage": "unexpected"
+                    }
+                ]
+            }, {
+            "name": "addressRule",
+            "maskingProviders": [{
+                    "type": "ADDRESS",
+                    "numberMask": true,
+                    "streetNameMask": true,
+                    "roadTypeMask": true,
+                    "cityMask": true,
+                    "countryMask": true,
+                    "postalCodeMask": true,
+                    "postalCodeNearest": false,
+                    "postalCodeNearestK": "10",
+                    "maskPseudorandom": false,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "atcRule",
+            "maskingProviders": [{
+                    "type": "ATC",
+                    "maskLevelsToKeep": "4",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "binningRule",
+            "maskingProviders": [{
+                    "type": "BINNING",
+                    "binSize": "5",
+                    "useStartValue": false,
+                    "startValue": "0",
+                    "format": "%s-%s",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "conditionalRule",
+            "maskingProviders": [{
+                    "type": "CONDITIONAL",
+                    "maskRuleSet": [{
+                            "condition": {
+                                "field": "marital",
+                                "operator": "equals",
+                                "type": "string",
+                                "value": "xxx"
+                            },
+                            "maskingProvider": {
+                                "type": "BINNING",
+                                "binSize": "5",
+                                "useStartValue": false,
+                                "startValue": "0",
+                                "format": "%s-%s",
+                                "unexpectedInputHandling": "NULL",
+                                "unexpectedInputReturnMessage": "OTHER"
+                            }
+                        }, {
+                            "maskingProvider": {
+                                "type": "CITY",
+                                "maskPseudorandom": false,
+                                "maskClosest": false,
+                                "maskClosestK": "10",
+                                "unexpectedInputHandling": "NULL",
+                                "unexpectedInputReturnMessage": "OTHER"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }, {
+            "name": "countyRule",
+            "maskingProviders": [{
+                    "type": "COUNTY",
+                    "maskPseudorandom": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "credit_cardRule",
+            "maskingProviders": [{
+                    "type": "CREDIT_CARD",
+                    "issuerPreserve": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "dateDependencyRule",
+            "maskingProviders": [{
+                    "type": "DATEDEPENDENCY",
+                    "dateYearDeleteNDaysValue": "365",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER",
+                    "datetimeYearDeleteNIntervalCompareDate": "dateTime"
+                }
+            ]
+        },{
+                "name": "dateTimeRule",
+                "maskingProviders": [{
+                        "type": "DATETIME",
+                        "unexpectedInputHandling": "NULL",
+                        "unexpectedInputReturnMessage": "OTHER",
+                        "overrideMask": false,
+                        "overrideYearsPassed": "0",
+                        "maskShiftDate": false,
+                        "maskShiftSeconds": "0",
+                        "generalizeWeekyear": false,
+                        "generalizeMonthyear": false,
+                        "generalizeQuarteryear": false,
+                        "generalizeYear": false,
+                        "generalizeYearMaskAgeOver90": false,
+                        "generalizeMonthyearMaskAgeOver90": false,
+                        "yearMask": true,
+                        "yearRangeDown": "10",
+                        "yearRangeUp": "0",
+                        "monthMask": true,
+                        "monthRangeDown": "12",
+                        "monthRangeUp": "0",
+                        "dayMask": true,
+                        "dayRangeDownMin": "0",
+                        "dayRangeDown": "7",
+                        "dayRangeUpMin": "0",
+                        "dayRangeUp": "0",
+                        "hourMask": true,
+                        "hourRangeDown": "100",
+                        "hourRangeUp": "0",
+                        "yearMaxYearsAgoMask": false,
+                        "yearMaxYearsAgo": "0",
+                        "yearShiftFromCurrentYear": "0",
+                        "dayMaxDaysAgoMask": false,
+                        "dayMaxDaysAgo": "0",
+                        "dayShiftFromCurrentDay": "0",
+                        "yearMaxYearsAgoOnlyYear": false,
+                        "yearDelete": false,
+                        "yearDeleteNdays": false,
+                        "yearDeleteNdaysValue": "365"
+                    }
+                ]
+            }, {
+                "name": "dateTimeConsistentShiftRule",
+                "maskingProviders": [{
+                        "type": "DATETIME_CONSISTENT_SHIFT",
+                        "patientIdentifierPath": "/name",
+                        "dateShiftMinimumDays": "1",
+                        "dateShiftMaximumDays": "365",
+                        "dateShiftDirection": "beforeOrAfter",
+                        "unexpectedInputHandling": "NULL",
+                        "unexpectedInputReturnMessage": "OTHER"
+                    }
+                ]
+            }, {
+            "name": "emailRule",
+            "maskingProviders": [{
+                    "type": "EMAIL",
+                    "preserveDomains": "1",
+                    "nameLength": "-1",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "fhirRule",
+            "maskingProviders": [{
+                    "type": "FHIR_MORTALITY_DEPENDENCY",
+                    "mortalityIndicatorMinYears": "2"
+                }
+            ]
+        }, {
+            "name": "fpeRule",
+            "maskingProviders": [{
+                    "type": "FPE",
+                    "inputType": "DIGITS",
+                    "padding": "NONE",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER",
+                    "key": "123456789987654321abcdefabcdefab",
+                    "tweak": "1234567898765434"
+                }
+            ]
+        }, {
+            "name": "genderRule",
+            "maskingProviders": [{
+                    "type": "GENDER"
+                }
+            ]
+        }, {
+            "name": "generalizeRule",
+            "maskingProviders": [{
+                    "type": "GENERALIZE",
+                    "maskRuleSet": "[{\"targetValue\":\"correct\",\"sourceValueIn\":[\"test\"]},{\"targetValue\":\"fail\",\"sourceValueIn\":[\"*\"]}]"
+                }
+            ]
+        }, {
+            "name": "guidRule",
+            "maskingProviders": [{
+                    "type": "GUID"
+                }
+            ]
+        }, {
+            "name": "hashRule",
+            "maskingProviders": [{
+                    "type": "HASH",
+                    "algorithmDefault": "SHA-256",
+                    "offsetOffsetMask": false,
+                    "offsetOffsetMaskDelete": false,
+                    "offsetBegin": "-1",
+                    "offsetEnd": "-1",
+                    "offsetInvalidOffsetValue": "1"
+                }
+            ]
+        }, {
+            "name": "hospitalRule",
+            "maskingProviders": [{
+                    "type": "HOSPITAL",
+                    "maskPreserveCountry": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "ibanRule",
+            "maskingProviders": [{
+                    "type": "IBAN",
+                    "maskPreserveCountry": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "imeiRule",
+            "maskingProviders": [{
+                    "type": "IMEI",
+                    "preserveTAC": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "ipAddressRule",
+            "maskingProviders": [{
+                    "type": "IP_ADDRESS",
+                    "subnetsPreserve": "0",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "latitudeLongitudeRule",
+            "maskingProviders": [{
+                    "type": "LATITUDE_LONGITUDE",
+                    "maskFixedRadiusRandomDirection": false,
+                    "maskDonutMasking": false,
+                    "maskRandomWithinCircle": true,
+                    "offsetMaximumRadius": "100",
+                    "offsetMinimumRadius": "50",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "macAddressRule",
+            "maskingProviders": [{
+                    "type": "MAC_ADDRESS",
+                    "maskingPreserveVendor": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "maintainRule",
+            "maskingProviders": [{
+                    "type": "MAINTAIN"
+                }
+            ]
+        }, {
+            "name": "nameRule",
+            "maskingProviders": [{
+                    "type": "NAME",
+                    "maskPseudorandom": false,
+                    "maskingAllowUnisex": false,
+                    "maskGenderPreserve": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "nullRule",
+            "maskingProviders": [{
+                    "type": "NULL",
+                    "maskReturnNull": false
+                }
+            ]
+        }, {
+            "name": "numberVarianceRule",
+            "maskingProviders": [{
+                    "type": "NUMBERVARIANCE",
+                    "augmentMask": false,
+                    "augmentLowerBound": "1.0",
+                    "augmentUpperBound": "10.0",
+                    "resultWithPrecision": false,
+                    "precisionDigits": "-1",
+                    "maskLimitUp": "10.0",
+                    "maskLimitDown": "10.0",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "occupationRule",
+            "maskingProviders": [{
+                    "type": "OCCUPATION",
+                    "maskGeneralize": false,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "phoneRule",
+            "maskingProviders": [{
+                    "type": "PHONE",
+                    "countryCodePreserve": true,
+                    "areaCodePreserve": true,
+                    "phoneRegexPatterns": ["^(?<prefix>\\+|00)(?<countryCode>\\d{1,3})(?<separator>-| )(?<number>\\d+)", "^(?<prefix>\\+|00)(?<countryCode>\\d{1,3})(?<separator>-| )(?<number>\\(\\d+\\))\\d+"],
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "pseudonymRule",
+            "maskingProviders": [{
+                    "type": "PSEUDONYM",
+                    "generateViaOptionsEnabled": true,
+                    "generateViaOptionsMinLength": "10",
+                    "generateViaOptionsMaxLength": "10",
+                    "generateViaOptionsGenerateUppercase": true,
+                    "generateViaOptionsGenerateLowercase": true,
+                    "generateViaOptionsGenerateDigit": true,
+                    "generateViaOptionsGenerateSpecial": false,
+                    "generateViaPatternEnabled": false,
+                    "generateViaPatternLanguageCode": "en",
+                    "generateViaHashEnabled": false,
+                    "generateViaHashUseSHA256": false
+                }
+            ]
+        }, {
+            "name": "raceRule",
+            "maskingProviders": [{
+                    "type": "RACE",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "randomRule",
+            "maskingProviders": [{
+                    "type": "RANDOM"
+                }
+            ]
+        }, {
+            "name": "redactRule",
+            "maskingProviders": [{
+                    "type": "REDACT",
+                    "preserveLength": true,
+                    "replaceCharacter": "X"
+                }
+            ]
+        }, {
+            "name": "religionRule",
+            "maskingProviders": [{
+                    "type": "RELIGION",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "replaceRule",
+            "maskingProviders": [{
+                    "type": "REPLACE",
+                    "maskReplaceWithRandom": true,
+                    "maskReplaceWithAsterisks": true,
+                    "maskOffset": "0",
+                    "maskPreserve": "3"
+                }
+            ]
+        }, {
+            "name": "ssnUKrule",
+            "maskingProviders": [{
+                    "type": "SSN_UK",
+                    "maskPreservePrefix": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "ssnUSrule",
+            "maskingProviders": [{
+                    "type": "SSN_US",
+                    "maskPreserveAreaNumber": true,
+                    "maskPreserveGroup": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "stateUSrule",
+            "maskingProviders": [{
+                    "type": "STATE_US",
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "urlRule",
+            "maskingProviders": [{
+                    "type": "URL",
+                    "preserveDomains": "1",
+                    "maskPort": false,
+                    "maskRemoveQuery": false,
+                    "maskMaskQuery": false,
+                    "maskUsernamePassword": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "vinRule",
+            "maskingProviders": [{
+                    "type": "VIN",
+                    "wmiPreserve": true,
+                    "vdsPreserve": false,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }, {
+            "name": "zipcodeRule",
+            "maskingProviders": [{
+                    "type": "ZIPCODE",
+                    "maskCountryCode": "US",
+                    "maskReplaceWithNeighbor": false,
+                    "maskReplaceWithNeighborNearestCount": "10",
+                    "maskPrefixLength": "3",
+                    "maskPrefixRequireMinPopulation": false,
+                    "maskTruncateIfNotMinPopulation": false,
+                    "maskTruncateLengthIfNotMinPopulation": "2",
+                    "maskPrefixMinPopulation": "20000",
+                    "maskSuffixReplaceWithRandom": false,
+                    "maskSuffixReplaceWithValidOnly": false,
+                    "maskSuffixTruncate": true,
+                    "unexpectedInputHandling": "NULL",
+                    "unexpectedInputReturnMessage": "OTHER"
+                }
+            ]
+        }
+	],
+	"json": {
+		"schemaType": "GEN",
+		"maskingRules":[{
+                    "rule": "swiftRule",
+                    "jsonPath": "/gen/default/swift"
+                }, {
+                    "rule": "continentRule",
+                    "jsonPath": "/gen/default/continent"
+                }, {
+                    "rule": "cityRule",
+                    "jsonPath": "/gen/default/city"
+                }, {
+                    "rule": "countryRule",
+                    "jsonPath": "/gen/default/country"
+                }, {
+                    "rule": "icd9Rule",
+                    "jsonPath": "/gen/default/icd9"
+                }, {
+                    "rule": "icd10Rule",
+                    "jsonPath": "/gen/default/icd10"
+                }, {
+                    "rule": "maritalRule",
+                    "jsonPath": "/gen/default/marital"
+                }, {
+                "rule": "addressRule",
+                "jsonPath": "/gen/default/address"
+            }, {
+                "rule": "atcRule",
+                "jsonPath": "/gen/default/atc"
+            }, {
+                "rule": "binningRule",
+                "jsonPath": "/gen/default/binning"
+            }, {
+                "rule": "conditionalRule",
+                "jsonPath": "/gen/default/conditional"
+            }, {
+                "rule": "countyRule",
+                "jsonPath": "/gen/default/county"
+            }, {
+                "rule": "credit_cardRule",
+                "jsonPath": "/gen/default/credit_card"
+            }, {
+                "rule": "dateDependencyRule",
+                "jsonPath": "/gen/default/dateDependency"
+            }, {
+                "rule": "dateTimeRule",
+                "jsonPath": "/gen/default/dateTime"
+            }, {
+                "rule": "dateTimeConsistentShiftRule",
+                "jsonPath": "/gen/default/dateTimeConsistentShift"
+            }, {
+                "rule": "emailRule",
+                "jsonPath": "/gen/default/email"
+            }, {
+                "rule": "fhirRule",
+                "jsonPath": "/gen/default/fhir"
+            }, {
+                "rule": "fpeRule",
+                "jsonPath": "/gen/default/fpe"
+            }, {
+                "rule": "genderRule",
+                "jsonPath": "/gen/default/gender"
+            }, {
+                "rule": "generalizeRule",
+                "jsonPath": "/gen/default/generalize"
+            }, {
+                "rule": "guidRule",
+                "jsonPath": "/gen/default/guid"
+            }, {
+                "rule": "hashRule",
+                "jsonPath": "/gen/default/hash"
+            }, {
+                "rule": "hospitalRule",
+                "jsonPath": "/gen/default/hospital"
+            }, {
+                "rule": "ibanRule",
+                "jsonPath": "/gen/default/iban"
+            }, {
+                "rule": "imeiRule",
+                "jsonPath": "/gen/default/imei"
+            }, {
+                "rule": "ipAddressRule",
+                "jsonPath": "/gen/default/ipAddress"
+            }, {
+                "rule": "latitudeLongitudeRule",
+                "jsonPath": "/gen/default/latitudeLongitude"
+            }, {
+                "rule": "macAddressRule",
+                "jsonPath": "/gen/default/macAddress"
+            }, {
+                "rule": "maintainRule",
+                "jsonPath": "/gen/default/maintain"
+            }, {
+                "rule": "nameRule",
+                "jsonPath": "/gen/default/name"
+            }, {
+                "rule": "nullRule",
+                "jsonPath": "/gen/default/null"
+            }, {
+                "rule": "numberVarianceRule",
+                "jsonPath": "/gen/default/numberVariance"
+            }, {
+                "rule": "occupationRule",
+                "jsonPath": "/gen/default/occupation"
+            }, {
+                "rule": "phoneRule",
+                "jsonPath": "/gen/default/phone"
+            }, {
+                "rule": "pseudonymRule",
+                "jsonPath": "/gen/default/pseudonym"
+            }, {
+                "rule": "raceRule",
+                "jsonPath": "/gen/default/race"
+            }, {
+                "rule": "randomRule",
+                "jsonPath": "/gen/default/random"
+            }, {
+                "rule": "redactRule",
+                "jsonPath": "/gen/default/redact"
+            }, {
+                "rule": "religionRule",
+                "jsonPath": "/gen/default/religion"
+            }, {
+                "rule": "replaceRule",
+                "jsonPath": "/gen/default/replace"
+            }, {
+                "rule": "ssnUKrule",
+                "jsonPath": "/gen/default/ssnUK"
+            }, {
+                "rule": "ssnUSrule",
+                "jsonPath": "/gen/default/ssnUS"
+            }, {
+                "rule": "stateUSrule",
+                "jsonPath": "/gen/default/stateUS"
+            }, {
+                "rule": "urlRule",
+                "jsonPath": "/gen/default/url"
+            }, {
+                "rule": "vinRule",
+                "jsonPath": "/gen/default/vin"
+            }, {
+                "rule": "zipcodeRule",
+                "jsonPath": "/gen/default/zipcode"
+            }
+            ]
+	}
+}
