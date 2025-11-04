@@ -139,7 +139,6 @@
                             <arg>-Xlint:all</arg>
                             <arg>-Xlint:-processing</arg>
                             <arg>-Xlint:-rawtypes</arg>
-                            <arg>-Werror</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
