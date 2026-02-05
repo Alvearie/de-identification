@@ -79,15 +79,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       // get the comparison field values from the input document
       List<JsonNode> documentValues = getFieldValues(condition, root);
 
-      // remove any explicit NULL values
-      // TODO: eliminate if comparison to NULL becomes supported
-      Iterator<JsonNode> it = documentValues.iterator();
-      while (it.hasNext()) {
-        JsonNode node = it.next();
-        if (node.isNull()) {
-          it.remove();
-        }
-      }
 
       // Evaluate the condition based on the data type being compared.
       // Currently, only "string" type comparisons are supported, so
@@ -125,63 +116,100 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
     Set<String> conditionValueSet = null;
     Set<String> conditionValueSetLowerCase = null;
 
-    for (JsonNode valueNode : documentValues) {
-      // TODO: add support for NULL comparisons
-      String value = valueNode.asText();
-      switch (condition.getOperator()) {
-        case EQUALS:
-          if (value.equals(conditionValue)) {
-            return true;
+    if (!documentValues.isEmpty()) {
+      for (JsonNode valueNode : documentValues) {
+        if (valueNode.isNull()) {
+          return evaluateNullConditionType(valueNode, condition);
+        } else {
+          String value = valueNode.asText();
+          switch (condition.getOperator()) {
+            case EQUALS:
+              if (value.equals(conditionValue)) {
+                return true;
+              }
+              break;
+            case EQUALS_IGNORE_CASE:
+              if (value.equalsIgnoreCase(conditionValue)) {
+                return true;
+              }
+              break;
+            case CONTAINS:
+              if (value.contains(conditionValue)) {
+                return true;
+              }
+              break;
+            case CONTAINED_IN:
+              if (conditionValue.contains(value)) {
+                return true;
+              }
+              break;
+            case ANY_OF:
+              if (conditionValueSet == null) {
+                conditionValueSet = getConditionValueSet(condition);
+              }
+              if (conditionValueSet.contains(value)) {
+                return true;
+              }
+              break;
+            case NOT_ANY_OF:
+              if (conditionValueSet == null) {
+                conditionValueSet = getConditionValueSet(condition);
+              }
+              if (!conditionValueSet.contains(value)) {
+                return true;
+              }
+              break;
+            case ANY_OF_IGNORE_CASE:
+              if (conditionValueSetLowerCase == null) {
+                conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
+              }
+              if (conditionValueSetLowerCase.contains(value.toLowerCase())) {
+                return true;
+              }
+              break;
+            case NOT_ANY_OF_IGNORE_CASE:
+              if (conditionValueSetLowerCase == null) {
+                conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
+              }
+              if (!conditionValueSetLowerCase.contains(value.toLowerCase())) {
+                return true;
+              }
+              break;
           }
-          break;
-        case EQUALS_IGNORE_CASE:
-          if (value.equalsIgnoreCase(conditionValue)) {
-            return true;
-          }
-          break;
-        case CONTAINS:
-          if (value.contains(conditionValue)) {
-            return true;
-          }
-          break;
-        case CONTAINED_IN:
-          if (conditionValue.contains(value)) {
-            return true;
-          }
-          break;
-        case ANY_OF:
-          if (conditionValueSet == null) {
-            conditionValueSet = getConditionValueSet(condition);
-          }
-          if (conditionValueSet.contains(value)) {
-            return true;
-          }
-          break;
-        case NOT_ANY_OF:
-          if (conditionValueSet == null) {
-            conditionValueSet = getConditionValueSet(condition);
-          }
-          if (!conditionValueSet.contains(value)) {
-            return true;
-          }
-          break;
-        case ANY_OF_IGNORE_CASE:
-          if (conditionValueSetLowerCase == null) {
-            conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
-          }
-          if (conditionValueSetLowerCase.contains(value.toLowerCase())) {
-            return true;
-          }
-          break;
-        case NOT_ANY_OF_IGNORE_CASE:
-          if (conditionValueSetLowerCase == null) {
-            conditionValueSetLowerCase = getConditionValueSetLowerCase(condition);
-          }
-          if (!conditionValueSetLowerCase.contains(value.toLowerCase())) {
-            return true;
-          }
-          break;
+        }
       }
+    }
+    return false;
+  }
+
+  private boolean evaluateNullConditionType(JsonNode valueNode, Condition condition) {
+    Set<String> conditionValueSet = null;
+    switch (condition.getOperator()) {
+      case EQUALS:
+      case EQUALS_IGNORE_CASE:
+        if (condition.getValue() == null) {
+          return true;
+        }
+        break;
+
+      case CONTAINS:
+      case CONTAINED_IN:
+        if (condition.getValueList().contains(null)) {
+          return true;
+        }
+        break;
+
+      case ANY_OF:
+        if (conditionValueSet == null) {
+          conditionValueSet = getConditionValueSet(condition);
+        }
+        if (conditionValueSet.contains(condition.getValue())) {
+          return true;
+        }
+        break;
+      default:
+        return false;
+
     }
     return false;
   }
@@ -244,7 +272,6 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
    */
   protected List<JsonNode> getConditionArrayFieldValue(Condition condition, JsonNode root) {
     List<JsonNode> valueSet = new ArrayList<>();
-
     String path = condition.getField();
     String[] paths = null;
     int eqeqIndex = path.indexOf("==");
@@ -371,7 +398,8 @@ public class ConditionalMaskingProvider extends AbstractMaskingProvider {
       for (JsonNode subNode : nodeList) {
         JsonNode currentNode = subNode.get(currentPath);
         if (currentNode == null) {
-          continue;
+          // The child node does not exist
+          return null;
         }
         if (currentNode.isArray()) {
           for (JsonNode childNode : currentNode) {
